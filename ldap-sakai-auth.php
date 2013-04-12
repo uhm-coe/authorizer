@@ -76,7 +76,6 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
      * Run on action hook: admin_menu
      */
     public function add_plugin_page() {
-error_log("asdf");
       // @see http://codex.wordpress.org/Function_Reference/add_options_page
       add_options_page(
         'LDAP Sakai Authorization', // Page title
