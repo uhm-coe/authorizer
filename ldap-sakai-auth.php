@@ -161,6 +161,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
         'ldap-sakai-auth', // Page this setting is shown on (slug)
         'lsa_settings_ldap' // Section this setting is shown on
       );
+
     }
 
 
@@ -210,15 +211,21 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
 
 
     /**
+     ****************************
      * Helper functions
+     ****************************
      */
 
-    // Basic encryption using a public (not secret!) key. Used for general database obfuscation of passwords.
+
+    /**
+     * Basic encryption using a public (not secret!) key. Used for general
+     * database obfuscation of passwords.
+     */
     private static $key = "8QxnrvjdtweisvCBKEY!+0";
-    function encrypt ($text) {
+    function encrypt($text) {
       return mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, "abcdefghijklmnopqrstuvwxyz012345");
     }
-    function decrypt ($secret) {
+    function decrypt($secret) {
       return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, "abcdefghijklmnopqrstuvwxyz012345"), "\0");
     }
 
