@@ -95,7 +95,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       <div class="wrap">
         <?php screen_icon(); ?>
         <h2>Settings</h2>
-        <form method="post" action="options.php">
+        <form method="post" action="options.php" autocomplete="off">
           <?php
             // This prints out all hidden settings fields
             // @see http://codex.wordpress.org/Function_Reference/settings_fields
@@ -135,8 +135,29 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       // @see http://codex.wordpress.org/Function_Reference/add_settings_field
       add_settings_field(
         'lsa_settings_ldap_host', // HTML element ID
-        'LDAP Directory Host', // HTML element Title
+        'LDAP Host', // HTML element Title
         array($this, 'print_text_lsa_ldap_host'), // Callback (echos form element)
+        'ldap-sakai-auth', // Page this setting is shown on (slug)
+        'lsa_settings_ldap' // Section this setting is shown on
+      );
+      add_settings_field(
+        'lsa_settings_ldap_search_base', // HTML element ID
+        'LDAP Search Base', // HTML element Title
+        array($this, 'print_text_lsa_ldap_search_base'), // Callback (echos form element)
+        'ldap-sakai-auth', // Page this setting is shown on (slug)
+        'lsa_settings_ldap' // Section this setting is shown on
+      );
+      add_settings_field(
+        'lsa_settings_ldap_user', // HTML element ID
+        'LDAP Directory User', // HTML element Title
+        array($this, 'print_text_lsa_ldap_user'), // Callback (echos form element)
+        'ldap-sakai-auth', // Page this setting is shown on (slug)
+        'lsa_settings_ldap' // Section this setting is shown on
+      );
+      add_settings_field(
+        'lsa_settings_ldap_password', // HTML element ID
+        'LDAP Directory User Password', // HTML element Title
+        array($this, 'print_password_lsa_ldap_password'), // Callback (echos form element)
         'ldap-sakai-auth', // Page this setting is shown on (slug)
         'lsa_settings_ldap' // Section this setting is shown on
       );
@@ -166,9 +187,22 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
     function print_section_info_ldap() {
       print 'Enter your LDAP server settings below:';
     }
-    function print_text_lsa_ldap_host() {
+    function print_text_lsa_ldap_host($args) {
+error_log(print_r($args,true));
       $lsa = get_option('lsa_settings');
       ?><input type="text" id="lsa_settings_ldap_host" name="lsa_settings[ldap_host]" value="<?php print $lsa['ldap_host']; ?>" /><?php
+    }
+    function print_text_lsa_ldap_search_base($args) {
+      $lsa = get_option('lsa_settings');
+      ?><input type="text" id="lsa_settings_ldap_search_base" name="lsa_settings[ldap_search_base]" value="<?php print $lsa['ldap_search_base']; ?>" /><?php
+    }
+    function print_text_lsa_ldap_user($args) {
+      $lsa = get_option('lsa_settings');
+      ?><input type="text" id="lsa_settings_ldap_user" name="lsa_settings[ldap_user]" value="<?php print $lsa['ldap_user']; ?>" /><?php
+    }
+    function print_password_lsa_ldap_password($args) {
+      $lsa = get_option('lsa_settings');
+      ?><input type="password" id="lsa_settings_ldap_password" name="lsa_settings[ldap_password]" value="<?php print $lsa['ldap_password']; ?>" /><?php
     }
 
   } // END class WP_Plugin_LDAP_Sakai_Auth
