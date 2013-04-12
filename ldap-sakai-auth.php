@@ -172,11 +172,15 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       if (filter_var($lsa_settings['ldap_host'], FILTER_SANITIZE_URL) === FALSE) {
         $lsa_settings['ldap_host'] = '';
       }
+      // Obfuscate LDAP directory user password
+      if (strlen($lsa_settings['ldap_password']) > 0) {
+        // base64 encode the directory user password for some minor obfuscation in the database.
+        $lsa_settings['ldap_password'] = base64_encode($this->encrypt($lsa_settings['ldap_password']));
+      }
       // Sanitize ABC setting
       if (false) {
         $lsa_settings['somesetting'] = '';
       }
-
       return $lsa_settings;
     }
 
@@ -188,7 +192,6 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       print 'Enter your LDAP server settings below:';
     }
     function print_text_lsa_ldap_host($args) {
-error_log(print_r($args,true));
       $lsa = get_option('lsa_settings');
       ?><input type="text" id="lsa_settings_ldap_host" name="lsa_settings[ldap_host]" value="<?php print $lsa['ldap_host']; ?>" /><?php
     }
@@ -202,7 +205,21 @@ error_log(print_r($args,true));
     }
     function print_password_lsa_ldap_password($args) {
       $lsa = get_option('lsa_settings');
-      ?><input type="password" id="lsa_settings_ldap_password" name="lsa_settings[ldap_password]" value="<?php print $lsa['ldap_password']; ?>" /><?php
+      ?><input type="password" id="lsa_settings_ldap_password" name="lsa_settings[ldap_password]" value="<?php print $this->decrypt(base64_decode($lsa['ldap_password'])); ?>" /><?php
+    }
+
+
+    /**
+     * Helper functions
+     */
+
+    // Basic encryption using a public (not secret!) key. Used for general database obfuscation of passwords.
+    private static $key = "8QxnrvjdtweisvCBKEY!+0";
+    function encrypt ($text) {
+      return mcrypt_encrypt(MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, "abcdefghijklmnopqrstuvwxyz012345");
+    }
+    function decrypt ($secret) {
+      return rtrim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, "abcdefghijklmnopqrstuvwxyz012345"), "\0");
     }
 
   } // END class WP_Plugin_LDAP_Sakai_Auth
