@@ -148,7 +148,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
      */
     function sanitize_lsa_settings($lsa_settings) {
       // Sanitize LDAP Host setting
-      if (filter_var($lsa_settings['ldap_host'], FILTER_VALIDATE_URL) === FALSE) {
+      if (filter_var($lsa_settings['ldap_host'], FILTER_SANITIZE_URL) === FALSE) {
         $lsa_settings['ldap_host'] = '';
       }
       // Sanitize ABC setting
@@ -156,11 +156,6 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
         $lsa_settings['somesetting'] = '';
       }
 
-      if (get_option('lsa_settings') === FALSE) {
-        add_option('lsa_settings', $lsa_settings);
-      } else {
-        update_option('lsa_settings', $lsa_settings);
-      }
       return $lsa_settings;
     }
 
