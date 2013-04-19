@@ -22,7 +22,7 @@ function lsa_add_ip(ip) {
       add_btn.removeAttr('disabled');
       return false;
     } else { // succeeded checking ip
-      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[access_ips][]" value="' + ip + '" readonly="true" /> <input type="button" onclick="lsa_remove_ip(this);" value="Remove" /></div>').appendTo('#list_lsa_settings_access_ips').slideDown(250);
+      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[access_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="lsa_remove_ip(this);" value="Remove" /></div>').appendTo('#list_lsa_settings_access_ips').slideDown(250);
       // Reset the new ip textbox if we successfully added this ip
       if (ip == jQuery('#newip').val())
         jQuery('#newip').val('');
@@ -39,6 +39,7 @@ function lsa_remove_ip(btnObj) {
 
 
 var add_btn;
+var animation_speed = 300;
 
 
 jQuery(document).ready(function($){
@@ -59,27 +60,27 @@ jQuery(document).ready(function($){
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
   $('input[name="lsa_settings[access_redirect]"]').change(function(){
-    if( $('#radio_lsa_settings_access_redirect_to_url').is(':checked') )
+    if ($('#radio_lsa_settings_access_redirect_to_url').is(':checked'))
       lsa_settings_access_redirect_to_url.show();
     else
-      lsa_settings_access_redirect_to_url.hide();
+      lsa_settings_access_redirect_to_url.hide(animation_speed);
 
-    if( $('#radio_lsa_settings_access_redirect_to_message').is(':checked') )
+    if ($('#radio_lsa_settings_access_redirect_to_message').is(':checked'))
       lsa_settings_access_redirect_to_message.show();
     else
-      lsa_settings_access_redirect_to_message.hide();
+      lsa_settings_access_redirect_to_message.hide(animation_speed);
 
-    if( $('#radio_lsa_settings_access_redirect_to_page').is(':checked') )
+    if ($('#radio_lsa_settings_access_redirect_to_page').is(':checked'))
       lsa_settings_access_redirect_to_page.show();
     else
-      lsa_settings_access_redirect_to_page.hide();
+      lsa_settings_access_redirect_to_page.hide(animation_speed);
   });
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="lsa_settings[access_restriction]"]').change(function(){
-    if( $('#radio_lsa_settings_access_restriction_everyone').is(':checked') )
+    if ($('#radio_lsa_settings_access_restriction_everyone').is(':checked'))
       lsa_settings_access_redirect_to_login.hide();
     else
-      lsa_settings_access_redirect_to_login.show();
+      lsa_settings_access_redirect_to_login.show(animation_speed);
   });
 });

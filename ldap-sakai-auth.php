@@ -57,6 +57,8 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       add_action('admin_menu', array($this, 'add_plugin_page')); // Create menu item in Settings
       add_action('admin_init', array($this, 'page_init')); // Create options page
       add_action('load-settings_page_ldap-sakai-auth', array($this, 'load_options_page')); // Enqueue javascript only on the plugin's options page
+      add_action('wp_ajax_lsa_ip_check', array($this, 'ajax_lsa_ip_check')); // ajax IP verification check
+
     } // END __construct()
 
 
@@ -166,6 +168,8 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       add_action('admin_notices', array($this, 'admin_notices')); // Add any notices to the top of the options page.
       add_action('admin_head', array($this, 'admin_head')); // Add help documentation to the options page.
 
+
+      // @todo: copy this from restricted access plugin
       //$this->set_option_defaults();
     }
 
@@ -215,13 +219,13 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
      * validate IP address entry on demand (AJAX)
      */
     public function ajax_lsa_ip_check() {
-      if (empty($_POST['ip_address']))
+      if (empty($_POST['ip_address'])) {
         die('1');
-
-      if ($this->is_ip(stripslashes($_POST['ip_address'])))
-        die;
-      else
+      } else if ($this->is_ip(stripslashes($_POST['ip_address']))) {
+        die; // success
+      } else {
         die('1');
+      }
     }
 
     /**
@@ -426,11 +430,11 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
     }
     function print_text_lsa_ldap_search_base($args) {
       $lsa_settings = get_option('lsa_settings');
-      ?><input type="text" id="lsa_settings_ldap_search_base" name="lsa_settings[ldap_search_base]" value="<?php print $lsa_settings['ldap_search_base']; ?>" /><?php
+      ?><input type="text" id="lsa_settings_ldap_search_base" name="lsa_settings[ldap_search_base]" value="<?php print $lsa_settings['ldap_search_base']; ?>" style="width:225px;" /><?php
     }
     function print_text_lsa_ldap_user($args) {
       $lsa_settings = get_option('lsa_settings');
-      ?><input type="text" id="lsa_settings_ldap_user" name="lsa_settings[ldap_user]" value="<?php print $lsa_settings['ldap_user']; ?>" /><?php
+      ?><input type="text" id="lsa_settings_ldap_user" name="lsa_settings[ldap_user]" value="<?php print $lsa_settings['ldap_user']; ?>" style="width:275px;" /><?php
     }
     function print_password_lsa_ldap_password($args) {
       $lsa_settings = get_option('lsa_settings');
@@ -463,6 +467,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
         <input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked('university' == $lsa_settings['access_restriction']); ?> /> University community<br />
         <input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked('course' == $lsa_settings['access_restriction']); ?> /> Students enrolled in specific course(s)<?php
     }
+    // @todo: migrate this to a combo tool like below in Unrestricted IP addresses
     function print_textarea_lsa_access_courses($args) {
       $lsa_settings = get_option('lsa_settings');
       ?><textarea name="lsa_settings[access_courses]" cols="35" rows="5"><?php print $lsa_settings['access_courses']; ?></textarea><?php
@@ -507,12 +512,12 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
     }
     function print_combo_lsa_access_ips($args) {
       $lsa_settings = get_option('lsa_settings');
-      ?><ul id="list_lsa_settings_access_ips">
+      ?><ul id="list_lsa_settings_access_ips" style="margin:0;">
         <?php foreach ($lsa_settings['access_ips'] as $key => $ip): ?>
           <?php if (empty($ip)) continue; ?>
           <li>
             <input type="text" id="lsa_settings_access_ips_<?php print $key; ?>" name="lsa_settings[access_ips][]" value="<?php print esc_attr($ip); ?>" readonly="true" />
-            <input type="button" id="remove_ip_<?php print $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
+            <input type="button" class="button" id="remove_ip_<?php print $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
           </li>
         <?php endforeach; ?>
       </ul>
@@ -521,7 +526,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
         <input class="button" type="button" id="addip" onclick="lsa_add_ip(jQuery('#newip').val());" value="Add" />
         <label for="newip"><span class="description">Enter a single IP address or a range using a subnet prefix</span></label>
         <?php if (!empty($_SERVER['REMOTE_ADDR'])): ?>
-          <input class="button" type="button" onclick="add_ip('<?php print esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
+          <br /><input class="button" type="button" onclick="lsa_add_ip('<?php print esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
         <?php endif; ?>
       </div>
       <?php
