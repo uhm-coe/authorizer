@@ -34,7 +34,7 @@ Portions forked from Simple LDAP Login: http://clifgriffin.com/2009/05/13/simple
  * Include adLDAP external library for ActiveDirectory connections.
  * @see http://adldap.sourceforge.net/download.php
  */
-require_once(dirname(__FILE__) . '/inc/adLDAP/src/adLDAP.php');
+require_once dirname(__FILE__) . '/inc/adLDAP/src/adLDAP.php' ;
 
 
 /**
@@ -58,6 +58,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       add_action('admin_init', array($this, 'page_init')); // Create options page
       add_action('load-settings_page_ldap-sakai-auth', array($this, 'load_options_page')); // Enqueue javascript only on the plugin's options page
       add_action('wp_ajax_lsa_ip_check', array($this, 'ajax_lsa_ip_check')); // ajax IP verification check
+      add_action('wp_ajax_lsa_course_check', array($this, 'ajax_lsa_course_check')); // ajax IP verification check
 
     } // END __construct()
 
@@ -249,6 +250,55 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
 
 
     /**
+     * Validate Sakai Site ID entry on demand (AJAX)
+     */
+    public function ajax_lsa_course_check() {
+      if (empty($_POST['sakai_site_id']) || empty($_POST['sakai_base_url'])) {
+        die('1');
+      }
+
+      $request_url = trailingslashit($_POST['sakai_base_url']) . "site/" . $_POST['sakai_site_id'] . ".json";
+      $course_details = $this->call_api('get', $request_url);
+      if (isset($course_details)) {
+        die('Course Name'); // success
+      } else {
+        die('1');
+      }
+    }
+
+
+    /**
+     * Wrapper for a RESTful call.
+     * Method: POST, PUT, GET etc
+     * Data: array("param" => "value") ==> index.php?param=value
+     */
+    private function call_api($method, $url, $data = false) {
+      $curl = curl_init();
+      switch ($method) {
+        case "POST":
+          curl_setopt($curl, CURLOPT_POST, 1);
+          if ($data)
+              curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
+          break;
+        case "PUT":
+          curl_setopt($curl, CURLOPT_PUT, 1);
+          break;
+        default:
+          if ($data)
+            $url = sprintf("%s?%s", $url, http_build_query($data));
+      }
+
+      // Optional Authentication:
+      //curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+      //curl_setopt($curl, CURLOPT_USERPWD, "username:password");
+
+      curl_setopt($curl, CURLOPT_URL, $url);
+      curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+      return curl_exec($curl);
+    }
+
+
+    /**
      * Create sections and options
      * Run on action hook: admin_init
      */
@@ -349,7 +399,7 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
       add_settings_field(
         'lsa_settings_access_courses', // HTML element ID
         'Course Site IDs with access (one per line)', // HTML element Title
-        array($this, 'print_textarea_lsa_access_courses'), // Callback (echos form element)
+        array($this, 'print_combo_lsa_access_courses'), // Callback (echos form element)
         'ldap-sakai-auth', // Page this setting is shown on (slug)
         'lsa_settings_access' // Section this setting is shown on
       );
@@ -468,18 +518,26 @@ if (!class_exists('WP_Plugin_LDAP_Sakai_Auth')) {
         <input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked('course' == $lsa_settings['access_restriction']); ?> /> Students enrolled in specific course(s)<?php
     }
     // @todo: migrate this to a combo tool like below in Unrestricted IP addresses
-    function print_textarea_lsa_access_courses($args) {
+    function print_combo_lsa_access_courses($args) {
       $lsa_settings = get_option('lsa_settings');
-      ?><textarea name="lsa_settings[access_courses]" cols="35" rows="5"><?php print $lsa_settings['access_courses']; ?></textarea><?php
-      // If we have Sakai details, try to grab course details to display.
-      if (strlen($lsa_settings['sakai_base_url'])) {
-        ?><p><strong>Details for Site IDs entered above :</strong></p><?php
-        $site_ids = explode(PHP_EOL, $lsa_settings['access_courses']);
-        foreach ($site_ids as $site_id) {
-          $course_name = 'asdf'; // @todo: get course name from sakai
-          ?><p><?php print $course_name; ?> (<?php print $site_id; ?>)</p><?php
-        }
-      }
+      ?><ul id="list_lsa_settings_access_courses" style="margin:0;">
+        <?php foreach ($lsa_settings['access_courses'] as $key => $course_id): ?>
+          <?php if (empty($course_id)) continue; ?>
+          <li>
+            <input type="text" id="lsa_settings_access_courses_<?php print $key; ?>" name="lsa_settings[access_courses][]" value="<?php print esc_attr($course_id); ?>" readonly="true" style="width: 275px;" />
+            <input type="button" class="button" id="remove_course_<?php print $key; ?>" onclick="lsa_remove_course(this);" value="Remove" />
+            <?php if (strlen($lsa_settings['sakai_base_url'])): // If we have Sakai details, display course info. @todo ?>
+              <label for="lsa_settings_access_courses_<?php print $key; ?>"><span class="description"></span></label>
+            <?php endif; ?>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+      <div id="new_lsa_settings_access_courses">
+        <input type="text" name="newcourse" id="newcourse" placeholder="7017b553-3d21-46ac-ad5c-9a6c335b9a24" style="width: 275px;" />
+        <input class="button" type="button" id="addcourse" onclick="lsa_add_course(jQuery('#newcourse').val());" value="Add" />
+        <label for="newcourse"><span class="description">Enter a Site ID for a course with access</span></label>
+      </div>
+      <?php
     }
     function print_radio_lsa_access_redirect($args) {
       $lsa_settings = get_option('lsa_settings');
