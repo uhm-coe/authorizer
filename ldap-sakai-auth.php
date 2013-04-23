@@ -60,6 +60,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 
 			// Register filters.
 			add_filter( 'authenticate', array($this, 'ldap_authenticate'), 1, 3 ); // Custom wp authentication routine using LDAP
+			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3); // Removing this bypasses Wordpress authentication (so if ldap auth fails, no one can log in); with it enabled, it will run if ldap auth fails.
+
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array($this, 'plugin_settings_link') ); // Create settings link on Plugins page
 
 			// Register actions.
@@ -161,7 +163,12 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 					)
 				);
 				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
-xdebug_break();
+
+				// If we didn't find any users in ldap, continue on
+				if ( $ldap_entries['count'] < 1 ) {
+					break;
+				}
+
 				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
 					$ldap_user['dn'] = $ldap_entries[$i]['dn'];
 					$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
@@ -218,11 +225,12 @@ xdebug_break();
 			// Successfully authenticated now, so create/update the WordPress user.
 			$user = get_user_by( 'login', $username );
 			if ( !$user || strcasecmp( $user->user_login, $username ) ) {
-				// User doesn't exist in WordPress
+				// User doesn't exist in WordPress, so add it.
 				$result = wp_insert_user(
 					array(
 						'user_login' => $username,
-						'user_pass' => $this->encrypt( $password ),
+						//'user_pass' => base64_encode( $this->encrypt( $password ) ),
+						'user_pass' => base64_encode( $this->encrypt( microtime() ) ), // fake password
 						'first_name' => $ldap_user['first'],
 						'last_name' => $ldap_user['last'],
 						'user_email' => $ldap_user['email'],
@@ -231,7 +239,20 @@ xdebug_break();
 						),
 					)
 				);
-				return new WP_Error( 'ldap_error', 'Could not authenticate.' );
+
+				// Check to see if there's an error because another user has the ldap
+				// user's email. If so, log user in as that WordPress user.
+				if ( is_wp_error( $result ) && array_key_exists( 'existing_user_email', $result->errors ) ) {
+					$result = get_user_by( 'email', $ldap_user['email'] );
+				}
+
+				// Fail with message if error.
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+
+				// Authenticate as new user (or as old user with same email address as ldap)
+				return new WP_User( $result );
 			} else {
 				// User exists in WordPress
 				return $user;
