@@ -104,29 +104,33 @@ jQuery(document).ready(function($){
   var lsa_settings_access_redirect_to_url = $('#lsa_settings_access_redirect_to_url').closest('tr');
   var lsa_settings_access_redirect_to_message = $('#wp-lsa_settings_access_redirect_to_message-wrap').closest('tr');
   var lsa_settings_access_redirect_to_page = $('#lsa_settings_access_redirect_to_page').closest('tr');
-  if (!$('#radio_lsa_settings_access_redirect_to_url').is(':checked'))
+  if (!$('#radio_lsa_settings_access_redirect_to_url').is(':checked')) {
     lsa_settings_access_redirect_to_url.hide();
-  if (!$('#radio_lsa_settings_access_redirect_to_message').is(':checked'))
+  }
+  if (!$('#radio_lsa_settings_access_redirect_to_message').is(':checked')) {
     lsa_settings_access_redirect_to_message.hide();
-  if (!$('#radio_lsa_settings_access_redirect_to_page').is(':checked'))
+  }
+  if (!$('#radio_lsa_settings_access_redirect_to_page').is(':checked')) {
     lsa_settings_access_redirect_to_page.hide();
+  }
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
-  $('input[name="lsa_settings[access_redirect]"]').change(function(){
-    if ($('#radio_lsa_settings_access_redirect_to_url').is(':checked'))
+  $('input[name="lsa_settings[access_redirect]"]').change(function() {
+    if ($('#radio_lsa_settings_access_redirect_to_url').is(':checked')) {
       lsa_settings_access_redirect_to_url.show();
-    else
+    } else {
       lsa_settings_access_redirect_to_url.hide(animation_speed);
-
-    if ($('#radio_lsa_settings_access_redirect_to_message').is(':checked'))
+    }
+    if ($('#radio_lsa_settings_access_redirect_to_message').is(':checked')) {
       lsa_settings_access_redirect_to_message.show();
-    else
+    } else {
       lsa_settings_access_redirect_to_message.hide(animation_speed);
-
-    if ($('#radio_lsa_settings_access_redirect_to_page').is(':checked'))
+    }
+    if ($('#radio_lsa_settings_access_redirect_to_page').is(':checked')) {
       lsa_settings_access_redirect_to_page.show();
-    else
+    } else {
       lsa_settings_access_redirect_to_page.hide(animation_speed);
+    }
   });
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
