@@ -177,7 +177,7 @@ xdebug_break();
 				break;
 			case 'ad': // Active Directory
 				// @todo: incomplete authentication (via active directory)
-				return new WP_Error( 'openldap_error', 'Incomplete authentication routine.' );
+				return new WP_Error( 'adldap_error', 'Incomplete authentication routine.' );
 				// try {
 				// 	$adldap = new adLDAP(
 				// 		array(
@@ -231,7 +231,7 @@ xdebug_break();
 						),
 					)
 				);
-				return new WP_Error( 'adldap_error', 'Could not authenticate.' );
+				return new WP_Error( 'ldap_error', 'Could not authenticate.' );
 			} else {
 				// User exists in WordPress
 				return $user;
@@ -525,6 +525,13 @@ xdebug_break();
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
+			add_settings_field(
+				'lsa_settings_ldap_default_role', // HTML element ID
+				'Default role for new users', // HTML element Title
+				array($this, 'print_select_lsa_ldap_default_role'), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_ldap' // Section this setting is shown on
+			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
@@ -670,6 +677,13 @@ xdebug_break();
 		{
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="checkbox" name="lsa_settings[ldap_tls]" value="1"<?php checked( 1 == $lsa_settings['ldap_tls'] ); ?> /> Use TLS<?php
+		}
+		function print_select_lsa_ldap_default_role( $args )
+		{
+			$lsa_settings = get_option( 'lsa_settings' );
+			?><select id="lsa_settings_ldap_default_role" name="lsa_settings[ldap_default_role]">
+				<?php wp_dropdown_roles( $lsa_settings['ldap_default_role'] ); ?>
+			</select><?php
 		}
 
 		function print_section_info_sakai()
