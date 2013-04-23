@@ -263,6 +263,21 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 					return $result;
 				}
 
+				// Try to create a Sakai session if Sakai base URL option exists; save session id in user meta
+				if ( strlen( $lsa_settings['sakai_base_url'] ) > 0 ) {
+					$sakai_session = $this->call_api(
+						'post',
+						trailingslashit( $lsa_settings['sakai_base_url'] ) . 'session',
+						array(
+							'_username' => $username,
+							'_password' => $password,
+						)
+					);
+					if ( isset( $sakai_session ) ) {
+						update_user_meta( $result, 'sakai_session_id', $sakai_session );
+					}
+				}
+
 				// Authenticate as new user (or as old user with same email address as ldap)
 				return new WP_User( $result );
 			}
@@ -465,7 +480,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		private function call_api( $method, $url, $data = false )
 		{
 			$curl = curl_init();
-			switch ( $method )
+			switch ( strtoupper( $method ) )
 			{
 				case 'POST':
 					curl_setopt( $curl, CURLOPT_POST, 1 );
