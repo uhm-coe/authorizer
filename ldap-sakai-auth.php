@@ -723,7 +723,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		function print_text_lsa_sakai_base_url( $args )
 		{
 			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?= $lsa_settings['sakai_base_url']; ?>" /><?php
+			?><input type="text" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?= $lsa_settings['sakai_base_url']; ?>" style="width:275px;" /><?php
 		}
 
 		function print_section_info_access()
