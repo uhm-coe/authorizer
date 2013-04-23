@@ -224,7 +224,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 
 			// Successfully authenticated now, so create/update the WordPress user.
 			$user = get_user_by( 'login', $username );
-			if ( !$user || strcasecmp( $user->user_login, $username ) ) {
+			if ( $user && strcasecmp( $user->user_login, $username ) ) {
+				// User exists in WordPress
+				return $user;
+			} else {
 				// User doesn't exist in WordPress, so add it.
 				$result = wp_insert_user(
 					array(
@@ -234,9 +237,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 						'first_name' => $ldap_user['first'],
 						'last_name' => $ldap_user['last'],
 						'user_email' => $ldap_user['email'],
-						'roles' => array(
-							$lsa_settings['ldap_default_role'],
-						),
+						'user_registered' => date( 'Y-m-d H:i:s' ),
+						'role' => $lsa_settings['ldap_default_role'],
 					)
 				);
 
@@ -253,9 +255,6 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 
 				// Authenticate as new user (or as old user with same email address as ldap)
 				return new WP_User( $result );
-			} else {
-				// User exists in WordPress
-				return $user;
 			}
 		}
 
