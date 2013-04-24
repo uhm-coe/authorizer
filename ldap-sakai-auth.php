@@ -164,9 +164,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 				);
 				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 
-				// If we didn't find any users in ldap, continue on
+				// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
 				if ( $ldap_entries['count'] < 1 ) {
-					break;
+					return new WP_Error( 'no_ldap', 'No LDAP user found.' );
 				}
 
 				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
@@ -178,7 +178,11 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 
 				$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
 				if ( !$result ) {
-					return new WP_Error( 'ldap_error', 'Invalid password.' );
+					// We have a real ldap user, but an invalid password, so we shouldn't
+					// pass through to wp authentication after failing ldap. Instead,
+					// remove the WordPress authenticate function, and return an error.
+					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+					return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
 				}
 
 				break;
