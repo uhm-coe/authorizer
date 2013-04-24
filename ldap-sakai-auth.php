@@ -363,12 +363,108 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * Restrict access to WordPress site based on settings (everyone, university, course).
 		 * Hook: parse_request http://codex.wordpress.org/Plugin_API/Action_Reference/parse_request
 		 *
-		 * @param array $extra_query_vars extra querystring variables in request.
+		 * @param array $wp WordPress object.
 		 *
 		 * @return void
 		 */
-		public function restrict_access( $extra_query_vars ) {
+		public function restrict_access( $wp ) {
 			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 );	// only need it the first time
+
+			$lsa_settings = get_option( 'lsa_settings' );
+
+			$has_access = (
+				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) || // Always allow access if WordPress is installing
+				( is_admin() ) || // Always allow access to admins
+				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
+				( $lsa_settings['access_restriction'] == 'university' && is_user_logged_in() ) || // Allow access to logged in users if option is set to 'university' community
+				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only
+			);
+			$is_restricted = !$has_access;
+
+			/**
+			 * Developers can use the `ldap_sakai_auth_has_access` filter
+			 * to override restricted access on certain pages. Note that the
+			 * restriction checks happens before WordPress executes any queries, so
+			 * use the global `$wp` variable to investigate what the visitor is
+			 * trying to load.
+			 *
+			 * For example, to unblock an RSS feed, place the following PHP code in
+			 * the theme's functions.php file or in a simple plug-in:
+			 *
+			 *   function my_rsa_feed_access_override( $has_access ) {
+			 *     global $wp;
+			 *     // check query variables to see if this is the feed
+			 *     if ( ! empty( $wp->query_vars['feed'] ) )
+			 *       $has_access = true;
+			 *     return $has_access;
+			 *   }
+			 *   add_filter( 'ldap_sakai_auth_has_access', 'my_rsa_feed_access_override' );
+			 */
+			if ( apply_filters( 'ldap_sakai_auth_has_access', $has_access, $wp ) === true ) {
+				// We've determined that the current user has access, so simply return to grant access.
+				return;
+			}
+
+			// allow access from the ip address allow list; if it's empty, block everything
+			if ( $list = $this->rsa_options['allowed'] ) {
+				$remote_ip = $_SERVER['REMOTE_ADDR'];  //save the remote ip
+				if ( strpos( $remote_ip, '.' ) )
+					$remote_ip = str_replace( '::ffff:', '', $remote_ip ); //handle dual-stack addresses
+				$remote_ip = inet_pton( $remote_ip ); //parse the remote ip
+				
+				// iterate through the allow list
+				foreach( $list as $line ) {
+					list( $ip, $mask ) = explode( '/', $line . '/128' ); // get the ip and mask from the list
+					
+					$mask = str_repeat( 'f', $mask >> 2 ); //render the mask as bits, similar to info on the php.net man page discussion for inet_pton
+		
+					switch( $mask % 4 ) {
+						case 1:
+							$mask .= '8';
+							break;
+						case 2:
+							$mask .= 'c';
+							break;
+						case 3:
+							$mask .= 'e';
+							break;
+					}
+					
+					$mask = pack( 'H*', $mask );
+		
+					// check if the masked versions match
+					if ( ( inet_pton( $ip ) & $mask ) == ( $remote_ip & $mask ) )
+						return;
+				}
+			}
+
+			// We've determined that the current user doesn't have access, so we deal with them now.
+			switch ( $lsa_settings['access_redirect']) {
+			case 'url':
+				break;
+			case 'message':
+				break;
+			case 'page':
+				break;
+			default:
+				break;
+			}
+
+		}
+
+		/**
+		 * Determine if current user is enrolled in one of the allowed sakai courses.
+		 *
+		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
+		 */
+		function is_current_user_enrolled() {
+			$lsa_settings = get_option( 'lsa_settings' );
+
+			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
+			if ( $lsa_settings['access_restriction'] == 'everyone' || $lsa_settings['access_restriction'] == 'university' ) {
+				return true;
+			}
+
 		}
 
 
