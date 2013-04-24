@@ -896,10 +896,34 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 	} // END class WP_Plugin_LDAP_Sakai_Auth
 }
 
+
+/**
+ * inet_pton is not included in PHP < 5.3 on Windows (WP requires PHP 5.2)
+ */
+if ( ! function_exists( 'inet_pton' ) ) :
+	function inet_pton( $ip ) {
+		if ( strpos( $ip, '.' ) !== false ) {
+			// ipv4
+			$ip = pack( 'N', ip2long( $ip ) );
+		} elseif ( strpos( $ip, ':' ) !== false ) {
+			// ipv6
+			$ip = explode( ':', $ip );
+			$res = str_pad( '', ( 4 * ( 8 - count( $ip ) ) ), '0000', STR_PAD_LEFT );
+			foreach ( $ip as $seg ) {
+				$res .= str_pad( $seg, 4, '0', STR_PAD_LEFT );
+			}
+			$ip = pack( 'H'.strlen( $res ), $res );
+		}
+		return $ip;
+	}
+endif;
+
+
 // Installation and uninstallation hooks.
 register_activation_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'activate') );
 register_deactivation_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'deactivate') );
 register_uninstall_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'uninstall') );
+
 
 // Instantiate the plugin class.
 $wp_plugin_ldap_sakai_auth = new WP_Plugin_LDAP_Sakai_Auth();
