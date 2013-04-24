@@ -77,7 +77,57 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * @return void
 		 */
 		public function activate() {
-			// Do nothing.
+			// Set meaningful defaults (but if values already exist in db, use those).
+			$lsa_settings = get_option( 'lsa_settings' );
+			if ($lsa_settings === FALSE) {
+				$lsa_settings = array();
+			}
+			if (!array_key_exists( 'ldap_host', $lsa_settings ) ) {
+				$lsa_settings['ldap_host'] = '';
+			}
+			if (!array_key_exists( 'ldap_search_base', $lsa_settings ) ) {
+				$lsa_settings['ldap_search_base'] = '';
+			}
+			if (!array_key_exists( 'ldap_user', $lsa_settings ) ) {
+				$lsa_settings['ldap_user'] = '';
+			}
+			if (!array_key_exists( 'ldap_password', $lsa_settings ) ) {
+				$lsa_settings['ldap_password'] = '';
+			}
+			if (!array_key_exists( 'ldap_type', $lsa_settings ) ) {
+				$lsa_settings['ldap_type'] = 'openldap';
+			}
+			if (!array_key_exists( 'ldap_tls', $lsa_settings ) ) {
+				$lsa_settings['ldap_tls'] = '1';
+			}
+			if (!array_key_exists( 'ldap_default_role', $lsa_settings ) ) {
+				$lsa_settings['ldap_default_role'] = 'subscriber';
+			}
+			if (!array_key_exists( 'sakai_base_url', $lsa_settings ) ) {
+				$lsa_settings['sakai_base_url'] = '';
+			}
+			if (!array_key_exists( 'access_restriction', $lsa_settings ) ) {
+				$lsa_settings['access_restriction'] = 'everyone';
+			}
+			if (!array_key_exists( 'access_courses', $lsa_settings ) ) {
+				$lsa_settings['access_courses'] = '';
+			}
+			if (!array_key_exists( 'access_redirect', $lsa_settings ) ) {
+				$lsa_settings['access_redirect'] = 'login';
+			}
+			if (!array_key_exists( 'access_redirect_to_url', $lsa_settings ) ) {
+				$lsa_settings['access_redirect_to_url'] = '';
+			}
+			if (!array_key_exists( 'access_redirect_to_message', $lsa_settings ) ) {
+				$lsa_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
+			}
+			if (!array_key_exists( 'access_redirect_to_page', $lsa_settings ) ) {
+				$lsa_settings['access_redirect_to_page'] = '';
+			}
+			if (!array_key_exists( 'access_ips', $lsa_settings ) ) {
+				$lsa_settings['access_ips'] = '';
+			}
+			update_option( 'lsa_settings', $lsa_settings );
 		} // END activate()
 
 
