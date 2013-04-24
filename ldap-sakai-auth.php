@@ -142,6 +142,25 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 
 		/**
+		 * Plugin uninstallation.
+		 *
+		 * @return void
+		 */
+		public function deactivate() {
+			// Delete options in database.
+			if ( get_option( 'lsa_settings' ) ) {
+				delete_option( 'lsa_settings' );
+			}
+
+			// Delete sakai session token from user meta for all users.
+			$all_users = get_users();
+			foreach ( $all_users as $user ) {
+				delete_user_meta( $user->ID, 'sakai_session_id' );
+			}
+		} // END deactivate()
+
+
+		/**
 		 ****************************
 		 * LDAP Authentication
 		 ****************************
@@ -880,6 +899,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 // Installation and uninstallation hooks.
 register_activation_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'activate') );
 register_deactivation_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'deactivate') );
+register_uninstall_hook( __FILE__, array('WP_Plugin_LDAP_Sakai_Auth', 'uninstall') );
 
 // Instantiate the plugin class.
 $wp_plugin_ldap_sakai_auth = new WP_Plugin_LDAP_Sakai_Auth();
