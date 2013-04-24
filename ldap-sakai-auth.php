@@ -426,10 +426,6 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			add_action( 'admin_notices', array($this, 'admin_notices') ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array($this, 'admin_head') ); // Add help documentation to the options page.
-
-
-			// @todo: copy this from restricted access plugin
-			//$this->set_option_defaults();
 		}
 
 
