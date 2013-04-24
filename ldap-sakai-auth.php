@@ -146,16 +146,16 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 *
 		 * @return void
 		 */
-		public function deactivate() {
+		public function uninstall() {
 			// Delete options in database.
 			if ( get_option( 'lsa_settings' ) ) {
 				delete_option( 'lsa_settings' );
 			}
 
 			// Delete sakai session token from user meta for all users.
-			$all_users = get_users();
-			foreach ( $all_users as $user ) {
-				delete_user_meta( $user->ID, 'sakai_session_id' );
+			$all_user_ids = get_users( 'fields=ID' );
+			foreach ( $all_user_ids as $user_id ) {
+				delete_user_meta( $user_id, 'sakai_session_id' );
 			}
 		} // END deactivate()
 
