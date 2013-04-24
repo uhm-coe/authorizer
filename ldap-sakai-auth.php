@@ -37,8 +37,7 @@ Portions forked from Simple LDAP Login: http://clifgriffin.com/2009/05/13/simple
 require_once dirname( __FILE__ ) . '/inc/adLDAP/src/adLDAP.php';
 
 
-if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
-{
+if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 	/**
 	 * Define class for plugin: LDAP Sakai Auth.
 	 *
@@ -48,14 +47,12 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 	 * @license  http://www.gnu.org/licenses/gpl-2.0.html GPL2
 	 * @link     http://hawaii.edu/coe/dcdc/wordpress/ldap-sakai-auth/doc/
 	 */
-	class WP_Plugin_LDAP_Sakai_Auth
-	{
+	class WP_Plugin_LDAP_Sakai_Auth {
 		
 		/**
 		 * Constructor.
 		 */
-		public function __construct()
-		{
+		public function __construct() {
 			//$adldap = new adLDAP();
 
 			// Register filters.
@@ -79,8 +76,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 *
 		 * @return void
 		 */
-		public function activate()
-		{
+		public function activate() {
 			// Do nothing.
 		} // END activate()
 
@@ -90,8 +86,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 *
 		 * @return void
 		 */
-		public function deactivate()
-		{
+		public function deactivate() {
 			// Do nothing.
 		} // END deactivate()
 
@@ -112,8 +107,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 *
 		 * @return WP_User
 		 */
-		public function ldap_authenticate( $user, $username, $password )
-		{
+		public function ldap_authenticate( $user, $username, $password ) {
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
 				return $user;
@@ -303,8 +297,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 *
 		 * @return array of links to show in the admin sidebar.
 		 */
-		public function plugin_settings_link( $links )
-		{
+		public function plugin_settings_link( $links ) {
 			$settings_link = '<a href="options-general.php?page=ldap-sakai-auth">Settings</a>';
 			array_unshift( $links, $settings_link );
 			return $links;
@@ -315,8 +308,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Create the options page under Dashboard > Settings
 		 * Run on action hook: admin_menu
 		 */
-		public function add_plugin_page()
-		{
+		public function add_plugin_page() {
 			// @see http://codex.wordpress.org/Function_Reference/add_options_page
 			add_options_page(
 				'LDAP Sakai Authorization', // Page title
@@ -331,8 +323,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		/**
 		 * Output the HTML for the options page
 		 */
-		public function create_admin_page()
-		{
+		public function create_admin_page() {
 			?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
@@ -357,8 +348,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Load external resources on this plugin's options page.
 		 * Run on action hook: load-settings_page_ldap-sakai-auth
 		 */
-		public function load_options_page()
-		{
+		public function load_options_page() {
 			wp_enqueue_script(
 				'ldap-sakai-auth',
 				plugin_dir_url( __FILE__ ) . 'ldap-sakai-auth.js',
@@ -379,8 +369,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Run on action hook chain: load-settings_page_ldap-sakai-auth > admin_notices
 		 * @todo: add warning messages.
 		 */
-		public function admin_notices()
-		{
+		public function admin_notices() {
 			// Check for invalid settings combinations and show a warning message, e.g.:
 			// if (sakai base url inaccessible) {
 			//   print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
@@ -393,8 +382,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Run on action hook chain: load-settings_page_ldap-sakai-auth > admin_head
 		 * @todo: add documentation.
 		 */
-		public function admin_head()
-		{
+		public function admin_head() {
 			$screen = get_current_screen();
 			
 			// Add help tab for LDAP Settings
@@ -424,8 +412,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		/**
 		 * validate IP address entry on demand (AJAX)
 		 */
-		public function ajax_lsa_ip_check()
-		{
+		public function ajax_lsa_ip_check() {
 			if ( empty( $_POST['ip_address'] ) ) {
 				die('1');
 			} else if ( $this->is_ip( stripslashes( $_POST['ip_address'] ) ) ) {
@@ -438,8 +425,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		/**
 		 * Is it a valid IP address? v4/v6 with subnet range
 		 */
-		public function is_ip( $ip_address )
-		{
+		public function is_ip( $ip_address ) {
 			// very basic validation of ranges
 			if ( strpos( $ip_address, '/' ) )
 			{
@@ -460,8 +446,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		/**
 		 * Validate Sakai Site ID entry on demand (AJAX)
 		 */
-		public function ajax_lsa_course_check()
-		{
+		public function ajax_lsa_course_check() {
 			if ( empty( $_POST['sakai_site_id'] ) || empty( $_POST['sakai_base_url'] ) ) {
 				die('1');
 			}
@@ -481,11 +466,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Method: POST, PUT, GET etc
 		 * Data: array("param" => "value") ==> index.php?param=value
 		 */
-		private function call_api( $method, $url, $data = false )
-		{
+		private function call_api( $method, $url, $data = false ) {
 			$curl = curl_init();
-			switch ( strtoupper( $method ) )
-			{
+			switch ( strtoupper( $method ) ) {
 				case 'POST':
 					curl_setopt( $curl, CURLOPT_POST, 1 );
 					if ( $data )
@@ -513,8 +496,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Create sections and options
 		 * Run on action hook: admin_init
 		 */
-		public function page_init()
-		{
+		public function page_init() {
 			// Create one setting that holds all the options (array)
 			// @see http://codex.wordpress.org/Function_Reference/register_setting
 			register_setting(
@@ -664,8 +646,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		 * Settings sanitizer callback
 		 * @todo: add sanitizer filters for the different options fields.
 		 */
-		function sanitize_lsa_settings( $lsa_settings )
-		{
+		function sanitize_lsa_settings( $lsa_settings ) {
 			// Sanitize LDAP Host setting
 			if ( filter_var( $lsa_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
 				$lsa_settings['ldap_host'] = '';
@@ -691,74 +672,61 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		/**
 		 * Settings print callbacks
 		 */
-		function print_section_info_ldap()
-		{
+		function print_section_info_ldap() {
 			print 'Enter your LDAP server settings below:';
 		}
-		function print_text_lsa_ldap_host( $args )
-		{
+		function print_text_lsa_ldap_host( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="text" id="lsa_settings_ldap_host" name="lsa_settings[ldap_host]" value="<?= $lsa_settings['ldap_host']; ?>" /><?php
 		}
-		function print_text_lsa_ldap_search_base( $args )
-		{
+		function print_text_lsa_ldap_search_base( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="text" id="lsa_settings_ldap_search_base" name="lsa_settings[ldap_search_base]" value="<?= $lsa_settings['ldap_search_base']; ?>" style="width:225px;" /><?php
 		}
-		function print_text_lsa_ldap_user( $args )
-		{
+		function print_text_lsa_ldap_user( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="text" id="lsa_settings_ldap_user" name="lsa_settings[ldap_user]" value="<?= $lsa_settings['ldap_user']; ?>" style="width:275px;" /><?php
 		}
-		function print_password_lsa_ldap_password( $args )
-		{
+		function print_password_lsa_ldap_password( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="password" id="lsa_settings_ldap_password" name="lsa_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($lsa_settings['ldap_password'])); ?>" /><?php
 		}
-		function print_radio_lsa_ldap_type( $args )
-		{
+		function print_radio_lsa_ldap_type( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" name="lsa_settings[ldap_type]" value="ad"<?php checked( 'ad' == $lsa_settings['ldap_type'] ); ?> /> Active Directory<br />
 				<input type="radio" name="lsa_settings[ldap_type]" value="openldap"<?php checked( 'openldap' == $lsa_settings['ldap_type'] ); ?> /> OpenLDAP<br />
 				<input type="radio" name="lsa_settings[ldap_type]" value="custom_uh"<?php checked( 'custom_uh' == $lsa_settings['ldap_type'] ); ?> /> Custom: University of Hawai'i<?php
 		}
-		function print_checkbox_lsa_ldap_tls( $args )
-		{
+		function print_checkbox_lsa_ldap_tls( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="checkbox" name="lsa_settings[ldap_tls]" value="1"<?php checked( 1 == $lsa_settings['ldap_tls'] ); ?> /> Use TLS<?php
 		}
-		function print_select_lsa_ldap_default_role( $args )
-		{
+		function print_select_lsa_ldap_default_role( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><select id="lsa_settings_ldap_default_role" name="lsa_settings[ldap_default_role]">
 				<?php wp_dropdown_roles( $lsa_settings['ldap_default_role'] ); ?>
 			</select><?php
 		}
 
-		function print_section_info_sakai()
-		{
+		function print_section_info_sakai() {
 			print 'Enter your Sakai-based course management system settings below:';
 		}
-		function print_text_lsa_sakai_base_url( $args )
-		{
+		function print_text_lsa_sakai_base_url( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="text" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?= $lsa_settings['sakai_base_url']; ?>" style="width:275px;" /><?php
 		}
 
-		function print_section_info_access()
-		{
+		function print_section_info_access() {
 			print 'Choose how you want to restrict access to this site below:';
 		}
-		function print_radio_lsa_access_restriction( $args )
-		{
+		function print_radio_lsa_access_restriction( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" id="radio_lsa_settings_access_restriction_everyone" name="lsa_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $lsa_settings['access_restriction'] ); ?> /> Everyone<br />
 				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> University community<br />
 				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Students enrolled in specific course(s)<?php
 		}
 		// @todo: migrate this to a combo tool like below in Unrestricted IP addresses
-		function print_combo_lsa_access_courses( $args )
-		{
+		function print_combo_lsa_access_courses( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><ul id="list_lsa_settings_access_courses" style="margin:0;">
 				<?php foreach ( $lsa_settings['access_courses'] as $key => $course_id ): ?>
@@ -779,21 +747,18 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 			</div>
 			<?php
 		}
-		function print_radio_lsa_access_redirect( $args )
-		{
+		function print_radio_lsa_access_redirect( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" id="radio_lsa_settings_access_redirect_to_login" name="lsa_settings[access_redirect]" value="login"<?php checked( 'login' == $lsa_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
 				<input type="radio" id="radio_lsa_settings_access_redirect_to_url" name="lsa_settings[access_redirect]" value="url"<?php checked( 'url' == $lsa_settings['access_redirect'] ); ?> /> Redirect them to a specific URL<br />
 				<input type="radio" id="radio_lsa_settings_access_redirect_to_message" name="lsa_settings[access_redirect]" value="message"<?php checked( 'message' == $lsa_settings['access_redirect'] ); ?> /> Show them a simple message<br />
 				<input type="radio" id="radio_lsa_settings_access_redirect_to_page" name="lsa_settings[access_redirect]" value="page"<?php checked( 'page' == $lsa_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<?php
 		}
-		function print_text_lsa_access_redirect_to_url( $args )
-		{
+		function print_text_lsa_access_redirect_to_url( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="text" id="lsa_settings_access_redirect_to_url" name="lsa_settings[access_redirect_to_url]" value="<?= $lsa_settings['access_redirect_to_url']; ?>" placeholder="http://www.example.com/" /><?php
 		}
-		function print_wysiwyg_lsa_access_redirect_to_message( $args )
-		{
+		function print_wysiwyg_lsa_access_redirect_to_message( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			wp_editor(
 				$lsa_settings['access_redirect_to_message'],
@@ -806,8 +771,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 				)
 			);
 		}
-		function print_select_lsa_access_redirect_to_page( $args )
-		{
+		function print_select_lsa_access_redirect_to_page( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			wp_dropdown_pages(
 				array( 
@@ -818,8 +782,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 				)
 			);
 		}
-		function print_combo_lsa_access_ips( $args )
-		{
+		function print_combo_lsa_access_ips( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><ul id="list_lsa_settings_access_ips" style="margin:0;">
 				<?php foreach ( $lsa_settings['access_ips'] as $key => $ip ): ?>
@@ -856,8 +819,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) )
 		function encrypt( $text ) {
 			return mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
 		}
-		function decrypt( $secret )
-		{
+		function decrypt( $secret ) {
 			$str = '';
 			return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$str" );
 		}
