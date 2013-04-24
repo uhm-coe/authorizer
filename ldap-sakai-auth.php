@@ -65,6 +65,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			add_action( 'admin_menu', array($this, 'add_plugin_page') ); // Create menu item in Settings
 			add_action( 'admin_init', array($this, 'page_init') ); // Create options page
 			add_action( 'load-settings_page_ldap-sakai-auth', array($this, 'load_options_page') ); // Enqueue javascript only on the plugin's options page
+			add_action( 'parse_request', array($this, 'restrict_access'), 1 ); // Verify current user has access to page they are visiting
 			add_action( 'wp_ajax_lsa_ip_check', array($this, 'ajax_lsa_ip_check') ); // ajax IP verification check
 			add_action( 'wp_ajax_lsa_course_check', array($this, 'ajax_lsa_course_check') ); // ajax IP verification check
 
@@ -174,7 +175,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * @param string  $username optional username to authenticate.
 		 * @param string  $password optional password to authenticate.
 		 *
-		 * @return WP_User
+		 * @return WP_User or WP_Error
 		 */
 		public function ldap_authenticate( $user, $username, $password ) {
 			// Pass through if already authenticated.
@@ -348,6 +349,26 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				// Authenticate as new user (or as old user with same email address as ldap)
 				return new WP_User( $result );
 			}
+		}
+
+
+		/**
+		 ****************************
+		 * Access Restriction
+		 ****************************
+		 */
+
+
+		/**
+		 * Restrict access to WordPress site based on settings (everyone, university, course).
+		 * Hook: parse_request http://codex.wordpress.org/Plugin_API/Action_Reference/parse_request
+		 *
+		 * @param array $extra_query_vars extra querystring variables in request.
+		 *
+		 * @return void
+		 */
+		public function restrict_access( $extra_query_vars ) {
+			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 );	// only need it the first time
 		}
 
 
