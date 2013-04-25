@@ -377,7 +377,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				( is_admin() ) || // Always allow access to admins
 				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
 				( $lsa_settings['access_restriction'] == 'university' && is_user_logged_in() ) || // Allow access to logged in users if option is set to 'university' community
-				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only
+				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only
 			);
 			$is_restricted = !$has_access;
 
@@ -405,51 +405,59 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				return;
 			}
 
-			// allow access from the ip address allow list; if it's empty, block everything
-			if ( $list = $this->rsa_options['allowed'] ) {
-				$remote_ip = $_SERVER['REMOTE_ADDR'];  //save the remote ip
-				if ( strpos( $remote_ip, '.' ) )
-					$remote_ip = str_replace( '::ffff:', '', $remote_ip ); //handle dual-stack addresses
-				$remote_ip = inet_pton( $remote_ip ); //parse the remote ip
-				
-				// iterate through the allow list
-				foreach( $list as $line ) {
+			// Allow access from the ip address allow list; if it's empty, block everything
+			if ( $allowed_ips = $lsa_settings['access_ips'] ) {
+				$current_user_ip = $_SERVER['REMOTE_ADDR'];
+				if ( strpos( $current_user_ip, '.' ) !== false ) {
+					$current_user_ip = str_replace( '::ffff:', '', $current_user_ip ); // Handle dual-stack addresses
+				}
+				$current_user_ip = inet_pton( $current_user_ip ); // Parse the remote ip
+				foreach ( $allowed_ips as $line ) {
 					list( $ip, $mask ) = explode( '/', $line . '/128' ); // get the ip and mask from the list
-					
 					$mask = str_repeat( 'f', $mask >> 2 ); //render the mask as bits, similar to info on the php.net man page discussion for inet_pton
-		
-					switch( $mask % 4 ) {
-						case 1:
-							$mask .= '8';
-							break;
-						case 2:
-							$mask .= 'c';
-							break;
-						case 3:
-							$mask .= 'e';
-							break;
+					switch ( $mask % 4 ) {
+					case 1:
+						$mask .= '8';
+						break;
+					case 2:
+						$mask .= 'c';
+						break;
+					case 3:
+						$mask .= 'e';
+						break;
 					}
-					
 					$mask = pack( 'H*', $mask );
-		
 					// check if the masked versions match
-					if ( ( inet_pton( $ip ) & $mask ) == ( $remote_ip & $mask ) )
+					if ( ( inet_pton( $ip ) & $mask ) == ( $current_user_ip & $mask ) ) {
 						return;
+					}
 				}
 			}
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
-			switch ( $lsa_settings['access_redirect']) {
+			switch ( $lsa_settings['access_redirect'] ) {
 			case 'url':
+				wp_redirect( $lsa_settings['access_redirect_to_url'], 302 );
 				break;
 			case 'message':
+				wp_die( $lsa_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				break;
 			case 'page':
-				break;
+				$page_id = get_post_field( 'ID', $lsa_settings['access_redirect_to_page'] );
+				if ( is_wp_error( $page_id ) ) {
+					wp_die( '<p>Access to this site is restricted.</p>', get_bloginfo( 'name' ) . ' - Site Access Restricted' );
+				}
+				unset( $wp->query_vars );
+				$wp->query_vars['page_id'] = $page_id;
+				return;
 			default:
+				$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
+				wp_redirect( wp_login_url( $current_path ), 302 );
 				break;
 			}
 
+			// Sanity check: we should never get here
+			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
 		}
 
 		/**
@@ -457,7 +465,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 *
 		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
 		 */
-		function is_current_user_enrolled() {
+		function is_current_user_sakai_enrolled() {
 			$lsa_settings = get_option( 'lsa_settings' );
 
 			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
@@ -465,6 +473,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				return true;
 			}
 
+			return false;
 		}
 
 
@@ -634,11 +643,28 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			$request_url = trailingslashit( $_POST['sakai_base_url'] ) . 'site/' . $_POST['sakai_site_id'] . '.json';
-			$course_details = $this->call_api( 'get', $request_url );
+			$sakai_session_id = get_user_meta( get_current_user_id(), 'sakai_session_id', true );
+			$course_details = $this->call_api(
+				'get',
+				$request_url,
+				array(
+					'sakai.session' => $sakai_session_id
+				)
+			);
 			if ( isset( $course_details ) ) {
-				die('Course Name'); // success
+				if ( strpos( 'HTTP Status 403', $course_details ) !== false ) {
+					// couldn't get sakai info because not logged in
+					die( '' );
+				} else {
+					$course_details = json_decode($course_details);
+					if ( property_exists( $course_details, 'entityTitle' ) ) {
+						die( $course_details->entityTitle ); // success
+					} else {
+						die( '' ); // success
+					}
+				}
 			} else {
-				die('1');
+				die( '1' );
 			}
 		}
 
