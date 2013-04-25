@@ -377,7 +377,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				( is_admin() ) || // Always allow access to admins
 				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
 				( $lsa_settings['access_restriction'] == 'university' && is_user_logged_in() ) || // Allow access to logged in users if option is set to 'university' community
-				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only
+				( $lsa_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
+				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
 			);
 			$is_restricted = !$has_access;
 
@@ -500,6 +501,9 @@ xdebug_break();
 					}
 				}
 			}
+
+			// Store the result in user meta so we don't have to keep checking against sakai on every page load
+			update_user_meta( get_current_user_id(), 'has_access', $has_access );
 
 			return $has_access;
 		}
