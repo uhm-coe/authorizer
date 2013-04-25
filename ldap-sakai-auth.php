@@ -292,10 +292,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			// Successfully authenticated now, so create/update the WordPress user.
 			$user = get_user_by( 'login', $username );
-			if ( $user && strcasecmp( $user->user_login, $username ) ) {
-				// User exists in this WordPress site
-				return $user;
-			} else {
+			if ( ! ( $user && strcasecmp( $user->user_login, $username ) ) ) {
 				// User doesn't exist in WordPress, so add it.
 				$result = wp_insert_user(
 					array(
@@ -331,24 +328,29 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 					return $result;
 				}
 
-				// Try to create a Sakai session if Sakai base URL option exists; save session id in user meta
-				if ( strlen( $lsa_settings['sakai_base_url'] ) > 0 ) {
-					$sakai_session = $this->call_api(
-						'post',
-						trailingslashit( $lsa_settings['sakai_base_url'] ) . 'session',
-						array(
-							'_username' => $username,
-							'_password' => $password,
-						)
-					);
-					if ( isset( $sakai_session ) ) {
-						update_user_meta( $result, 'sakai_session_id', $sakai_session );
-					}
-				}
-
 				// Authenticate as new user (or as old user with same email address as ldap)
-				return new WP_User( $result );
+				$user = new WP_User( $result );
 			}
+
+			// Try to create a Sakai session if Sakai base URL option exists; save session id in user meta
+			if ( strlen( $lsa_settings['sakai_base_url'] ) > 0 ) {
+				$sakai_session = $this->call_api(
+					'post',
+					trailingslashit( $lsa_settings['sakai_base_url'] ) . 'session',
+					array(
+						'_username' => $username,
+						'_password' => $password,
+					)
+				);
+				if ( isset( $sakai_session ) ) {
+					update_user_meta( $user->ID, 'sakai_session_id', $sakai_session );
+				}
+			}
+
+			// Reset cached access so plugin checks against sakai to make sure this newly-logged in user still has access (if restricting access by sakai course)
+			update_user_meta( $user->ID, 'has_access', false );
+
+			return $user;
 		}
 
 
