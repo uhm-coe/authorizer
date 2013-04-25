@@ -473,7 +473,37 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				return true;
 			}
 
-			return false;
+			$has_access = false;
+			$sakai_session_id = get_user_meta( get_current_user_id(), 'sakai_session_id', true );
+			foreach ( $lsa_settings['access_courses'] as $sakai_site_id ) {
+				$request_url = trailingslashit( $_POST['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
+				$permission_to_visit = $this->call_api(
+					'get',
+					$request_url,
+					array(
+						'sakai.session' => $sakai_session_id,
+					)
+				);
+			}
+			if ( isset( $permission_to_visit ) ) {
+				if ( strpos( 'HTTP Status 403', $permission_to_visit ) !== false ) {
+					// couldn't get sakai info because not logged in, so don't check any more site ids
+					$has_access = false;
+					break;
+				} else if ( strpos( 'HTTP Status 500', $permission_to_visit ) !== false ) {
+					// couldn't get sakai info because no permissions (this seems like a wrong error code from laulima...)
+				} else {
+					$permission_to_visit = json_decode( $permission_to_visit );
+					if ( property_exists( $permission_to_visit, 'entityTitle' ) ) {
+						if ( array_key_exists( 'site.visit', $permission_to_visit->data ) ) { // success
+							$has_access = true;
+							break;
+						}
+					}
+				}
+			}
+
+			return $has_access;
 		}
 
 
@@ -648,7 +678,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'get',
 				$request_url,
 				array(
-					'sakai.session' => $sakai_session_id
+					'sakai.session' => $sakai_session_id,
 				)
 			);
 			if ( isset( $course_details ) ) {
@@ -656,7 +686,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 					// couldn't get sakai info because not logged in
 					die( '' );
 				} else {
-					$course_details = json_decode($course_details);
+					$course_details = json_decode( $course_details );
 					if ( property_exists( $course_details, 'entityTitle' ) ) {
 						die( $course_details->entityTitle ); // success
 					} else {
