@@ -114,6 +114,11 @@ jQuery(document).ready(function($){
     lsa_settings_access_redirect_to_page.hide();
   }
 
+  var lsa_settings_access_courses = $('#list_lsa_settings_access_courses').closest('tr');
+  if (!$('#radio_lsa_settings_access_restriction_course').is(':checked')) {
+    lsa_settings_access_courses.hide();
+  }
+
   // show and hide specific options based on "Handle unauthorized visitors" selection
   $('input[name="lsa_settings[access_redirect]"]').change(function() {
     if ($('#radio_lsa_settings_access_redirect_to_url').is(':checked')) {
@@ -139,7 +144,16 @@ jQuery(document).ready(function($){
       lsa_settings_access_redirect_to_login.hide();
     else
       lsa_settings_access_redirect_to_login.show(animation_speed);
-  });
+  
+    // Hide "Course Site IDs with access" unless "Students enrolled in specific course(s)" is checked
+    if (!$('#radio_lsa_settings_access_restriction_course').is(':checked')) {
+      lsa_settings_access_courses.hide();
+    } else {
+      lsa_settings_access_courses.show(animation_speed);
+    }
+});
+
+  
 
   // Get course name for Site ID from Sakai
   $('#list_lsa_settings_access_courses label').each(function() {
