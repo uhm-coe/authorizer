@@ -101,9 +101,6 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			if ( !array_key_exists( 'ldap_tls', $lsa_settings ) ) {
 				$lsa_settings['ldap_tls'] = '1';
 			}
-			if ( !array_key_exists( 'ldap_default_role', $lsa_settings ) ) {
-				$lsa_settings['ldap_default_role'] = 'subscriber';
-			}
 			if ( !array_key_exists( 'sakai_base_url', $lsa_settings ) ) {
 				$lsa_settings['sakai_base_url'] = '';
 			}
@@ -127,6 +124,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 			if ( !array_key_exists( 'access_ips', $lsa_settings ) ) {
 				$lsa_settings['access_ips'] = '';
+			}
+			if ( !array_key_exists( 'access_default_role', $lsa_settings ) ) {
+				$lsa_settings['access_default_role'] = 'subscriber';
 			}
 			update_option( 'lsa_settings', $lsa_settings );
 		} // END activate()
@@ -303,7 +303,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 						'last_name' => $ldap_user['last'],
 						'user_email' => $ldap_user['email'],
 						'user_registered' => date( 'Y-m-d H:i:s' ),
-						'role' => $lsa_settings['ldap_default_role'],
+						'role' => $lsa_settings['access_default_role'],
 					)
 				);
 
@@ -317,7 +317,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				// isn't added to this site (can occur in multisite installs).
 				if ( is_wp_error( $result ) && array_key_exists( 'existing_user_login', $result->errors ) ) {
 					global $current_blog;
-					$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $lsa_settings['ldap_default_role'] );
+					$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $lsa_settings['access_default_role'] );
 					if ( !is_wp_error( $result ) ) {
 						$result = $user->ID;
 					}
@@ -798,13 +798,6 @@ xdebug_break();
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
-			add_settings_field(
-				'lsa_settings_ldap_default_role', // HTML element ID
-				'Default role for new users', // HTML element Title
-				array( $this, 'print_select_lsa_ldap_default_role' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
-			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
@@ -881,6 +874,13 @@ xdebug_break();
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
+			add_settings_field(
+				'lsa_settings_access_default_role', // HTML element ID
+				'Default role for new users', // HTML element Title
+				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
 		}
 
 
@@ -942,12 +942,6 @@ xdebug_break();
 		function print_checkbox_lsa_ldap_tls( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="checkbox" name="lsa_settings[ldap_tls]" value="1"<?php checked( 1 == $lsa_settings['ldap_tls'] ); ?> /> Use TLS<?php
-		}
-		function print_select_lsa_ldap_default_role( $args ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><select id="lsa_settings_ldap_default_role" name="lsa_settings[ldap_default_role]">
-				<?php wp_dropdown_roles( $lsa_settings['ldap_default_role'] ); ?>
-			</select><?php
 		}
 
 		function print_section_info_sakai() {
@@ -1044,6 +1038,12 @@ xdebug_break();
 				<?php endif; ?>
 			</div>
 			<?php
+		}
+		function print_select_lsa_access_default_role( $args ) {
+			$lsa_settings = get_option( 'lsa_settings' );
+			?><select id="lsa_settings_access_default_role" name="lsa_settings[access_default_role]">
+				<?php wp_dropdown_roles( $lsa_settings['access_default_role'] ); ?>
+			</select><?php
 		}
 
 		/**
