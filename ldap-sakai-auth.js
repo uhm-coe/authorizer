@@ -104,52 +104,60 @@ jQuery(document).ready(function($){
   var lsa_settings_access_redirect_to_url = $('#lsa_settings_access_redirect_to_url').closest('tr');
   var lsa_settings_access_redirect_to_message = $('#wp-lsa_settings_access_redirect_to_message-wrap').closest('tr');
   var lsa_settings_access_redirect_to_page = $('#lsa_settings_access_redirect_to_page').closest('tr');
+  var lsa_settings_access_courses = $('#list_lsa_settings_access_courses').closest('tr');
+
+  // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
+  $('th, td', lsa_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', lsa_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', lsa_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', lsa_settings_access_redirect_to_page).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', lsa_settings_access_courses).wrapInner('<div class="animated_wrapper" />');
+
   if (!$('#radio_lsa_settings_access_redirect_to_url').is(':checked')) {
-    lsa_settings_access_redirect_to_url.hide();
+    $('div.animated_wrapper', lsa_settings_access_redirect_to_url).hide();
   }
   if (!$('#radio_lsa_settings_access_redirect_to_message').is(':checked')) {
-    lsa_settings_access_redirect_to_message.hide();
+    $('div.animated_wrapper', lsa_settings_access_redirect_to_message).hide();
   }
   if (!$('#radio_lsa_settings_access_redirect_to_page').is(':checked')) {
-    lsa_settings_access_redirect_to_page.hide();
+    $('div.animated_wrapper', lsa_settings_access_redirect_to_page).hide();
   }
 
-  var lsa_settings_access_courses = $('#list_lsa_settings_access_courses').closest('tr');
   if (!$('#radio_lsa_settings_access_restriction_course').is(':checked')) {
-    lsa_settings_access_courses.hide();
+    $('div.animated_wrapper', lsa_settings_access_courses).hide();
   }
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
   $('input[name="lsa_settings[access_redirect]"]').change(function() {
     if ($('#radio_lsa_settings_access_redirect_to_url').is(':checked')) {
-      lsa_settings_access_redirect_to_url.show();
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_url).slideDown(animation_speed);
     } else {
-      lsa_settings_access_redirect_to_url.hide(animation_speed);
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_url).slideUp(animation_speed);
     }
     if ($('#radio_lsa_settings_access_redirect_to_message').is(':checked')) {
-      lsa_settings_access_redirect_to_message.show();
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_message).slideDown(animation_speed);
     } else {
-      lsa_settings_access_redirect_to_message.hide(animation_speed);
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_message).slideUp(animation_speed);
     }
     if ($('#radio_lsa_settings_access_redirect_to_page').is(':checked')) {
-      lsa_settings_access_redirect_to_page.show();
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_page).slideDown(animation_speed);
     } else {
-      lsa_settings_access_redirect_to_page.hide(animation_speed);
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_page).slideUp(animation_speed);
     }
   });
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="lsa_settings[access_restriction]"]').change(function(){
     if ($('#radio_lsa_settings_access_restriction_everyone').is(':checked'))
-      lsa_settings_access_redirect_to_login.hide();
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_login).slideUp(animation_speed);
     else
-      lsa_settings_access_redirect_to_login.show(animation_speed);
+      $('div.animated_wrapper', lsa_settings_access_redirect_to_login).slideDown(animation_speed);
   
     // Hide "Course Site IDs with access" unless "Students enrolled in specific course(s)" is checked
     if (!$('#radio_lsa_settings_access_restriction_course').is(':checked')) {
-      lsa_settings_access_courses.hide();
+      $('div.animated_wrapper', lsa_settings_access_courses).slideUp(animation_speed);
     } else {
-      lsa_settings_access_courses.show(animation_speed);
+      $('div.animated_wrapper', lsa_settings_access_courses).slideDown(animation_speed);
     }
 });
 

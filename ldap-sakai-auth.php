@@ -826,6 +826,13 @@ xdebug_break();
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
+				'lsa_settings_access_default_role', // HTML element ID
+				'Default role for new users', // HTML element Title
+				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
 				'lsa_settings_access_restriction', // HTML element ID
 				'Limit access to', // HTML element Title
 				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
@@ -854,13 +861,6 @@ xdebug_break();
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_redirect_to_message', // HTML element ID
-				'Restriction message', // HTML element Title
-				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
 				'lsa_settings_access_redirect_to_page', // HTML element ID
 				'Redirect to restricted notice page', // HTML element Title
 				array( $this, 'print_select_lsa_access_redirect_to_page' ), // Callback (echos form element)
@@ -868,9 +868,9 @@ xdebug_break();
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_default_role', // HTML element ID
-				'Default role for new users', // HTML element Title
-				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
+				'lsa_settings_access_redirect_to_message', // HTML element ID
+				'Restriction message', // HTML element Title
+				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
@@ -882,6 +882,7 @@ xdebug_break();
 				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
 				'ldap-sakai-auth' // Page this section is shown on (slug)
 			);
+
 			add_settings_field(
 				'lsa_settings_misc_ips', // HTML element ID
 				'Unrestricted IP addresses', // HTML element Title
@@ -995,8 +996,8 @@ xdebug_break();
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" id="radio_lsa_settings_access_redirect_to_login" name="lsa_settings[access_redirect]" value="login"<?php checked( 'login' == $lsa_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
 				<input type="radio" id="radio_lsa_settings_access_redirect_to_url" name="lsa_settings[access_redirect]" value="url"<?php checked( 'url' == $lsa_settings['access_redirect'] ); ?> /> Redirect them to a specific URL<br />
-				<input type="radio" id="radio_lsa_settings_access_redirect_to_message" name="lsa_settings[access_redirect]" value="message"<?php checked( 'message' == $lsa_settings['access_redirect'] ); ?> /> Show them a simple message<br />
-				<input type="radio" id="radio_lsa_settings_access_redirect_to_page" name="lsa_settings[access_redirect]" value="page"<?php checked( 'page' == $lsa_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<?php
+				<input type="radio" id="radio_lsa_settings_access_redirect_to_page" name="lsa_settings[access_redirect]" value="page"<?php checked( 'page' == $lsa_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
+				<input type="radio" id="radio_lsa_settings_access_redirect_to_message" name="lsa_settings[access_redirect]" value="message"<?php checked( 'message' == $lsa_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
 		function print_text_lsa_access_redirect_to_url( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
