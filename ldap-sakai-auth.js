@@ -11,7 +11,7 @@ function lsa_add_ip(ip) {
   add_btn_ip.attr('disabled', 'disabled');
 
   // Check if the IP address being added already exists in the list.
-  jQuery('#list_lsa_settings_access_ips input[type=text]').each(function() {
+  jQuery('#list_lsa_settings_misc_ips input[type=text]').each(function() {
     if (this.value == ip) {
       jQuery(this).parent().effect('shake',shake_speed);
       add_btn_ip.removeAttr('disabled');
@@ -25,7 +25,7 @@ function lsa_add_ip(ip) {
       add_btn_ip.removeAttr('disabled');
       return false;
     } else { // succeeded checking ip
-      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[access_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="lsa_remove_ip(this);" value="Remove" /></div>').appendTo('#list_lsa_settings_access_ips').slideDown(250);
+      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[misc_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="lsa_remove_ip(this);" value="Remove" /></div>').appendTo('#list_lsa_settings_misc_ips').slideDown(250);
       // Reset the new ip textbox if we successfully added this ip
       if (ip == jQuery('#newip').val())
         jQuery('#newip').val('');

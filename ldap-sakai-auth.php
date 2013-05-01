@@ -122,8 +122,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			if ( !array_key_exists( 'access_redirect_to_page', $lsa_settings ) ) {
 				$lsa_settings['access_redirect_to_page'] = '';
 			}
-			if ( !array_key_exists( 'access_ips', $lsa_settings ) ) {
-				$lsa_settings['access_ips'] = '';
+			if ( !array_key_exists( 'misc_ips', $lsa_settings ) ) {
+				$lsa_settings['misc_ips'] = '';
 			}
 			if ( !array_key_exists( 'access_default_role', $lsa_settings ) ) {
 				$lsa_settings['access_default_role'] = 'subscriber';
@@ -409,7 +409,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			// Allow access from the ip address allow list; if it's empty, block everything
-			if ( $allowed_ips = $lsa_settings['access_ips'] ) {
+			if ( $allowed_ips = $lsa_settings['misc_ips'] ) {
 				$current_user_ip = $_SERVER['REMOTE_ADDR'];
 				if ( strpos( $current_user_ip, '.' ) !== false ) {
 					$current_user_ip = str_replace( '::ffff:', '', $current_user_ip ); // Handle dual-stack addresses
@@ -868,18 +868,26 @@ xdebug_break();
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_ips', // HTML element ID
-				'Unrestricted IP addresses', // HTML element Title
-				array( $this, 'print_combo_lsa_access_ips' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
 				'lsa_settings_access_default_role', // HTML element ID
 				'Default role for new users', // HTML element Title
 				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
+			);
+
+			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			add_settings_section(
+				'lsa_settings_misc', // HTML element ID
+				'Miscellaneous Settings', // HTML element Title
+				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
+				'ldap-sakai-auth' // Page this section is shown on (slug)
+			);
+			add_settings_field(
+				'lsa_settings_misc_ips', // HTML element ID
+				'Unrestricted IP addresses', // HTML element Title
+				array( $this, 'print_combo_lsa_misc_ips' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_misc' // Section this setting is shown on
 			);
 		}
 
@@ -1018,33 +1026,34 @@ xdebug_break();
 				)
 			);
 		}
-		function print_combo_lsa_access_ips( $args ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><ul id="list_lsa_settings_access_ips" style="margin:0;">
-				<?php foreach ( $lsa_settings['access_ips'] as $key => $ip ): ?>
-					<?php if ( empty( $ip ) ) continue; ?>
-					<li>
-						<input type="text" id="lsa_settings_access_ips_<?= $key; ?>" name="lsa_settings[access_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
-						<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
-					</li>
-				<?php endforeach; ?>
-			</ul>
-			<div id="new_lsa_settings_access_ips">
-				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
-				<input class="button" type="button" id="addip" onclick="lsa_add_ip(jQuery('#newip').val());" value="Add" />
-				<label for="newip"><span class="description">Enter a single IP address or a range using a subnet prefix</span></label>
-				<?php if ( !empty( $_SERVER['REMOTE_ADDR'] ) ): ?>
-					<br /><input class="button" type="button" onclick="lsa_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
-				<?php endif; ?>
-			</div>
-			<?php
-		}
 		function print_select_lsa_access_default_role( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><select id="lsa_settings_access_default_role" name="lsa_settings[access_default_role]">
 				<?php wp_dropdown_roles( $lsa_settings['access_default_role'] ); ?>
 			</select><?php
 		}
+		function print_combo_lsa_misc_ips( $args ) {
+			$lsa_settings = get_option( 'lsa_settings' );
+			?><ul id="list_lsa_settings_misc_ips" style="margin:0;">
+				<?php foreach ( $lsa_settings['misc_ips'] as $key => $ip ): ?>
+					<?php if ( empty( $ip ) ) continue; ?>
+					<li>
+						<input type="text" id="lsa_settings_misc_ips_<?= $key; ?>" name="lsa_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
+						<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
+					</li>
+				<?php endforeach; ?>
+			</ul>
+			<div id="new_lsa_settings_misc_ips">
+				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
+				<input class="button" type="button" id="addip" onclick="lsa_add_ip(jQuery('#newip').val());" value="Add" />
+				<label for="newip"><span class="description">Enter a single IP address</span></label>
+				<?php if ( !empty( $_SERVER['REMOTE_ADDR'] ) ): ?>
+					<br /><input class="button" type="button" onclick="lsa_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
+				<?php endif; ?>
+			</div>
+			<?php
+		}
+
 
 		/**
 		 ****************************
