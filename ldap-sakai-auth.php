@@ -199,7 +199,15 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'last' => '',
 				'email' => '',
 			);
+
 			$lsa_settings = get_option( 'lsa_settings' );
+
+			// If we're restricting access to only WP users, don't check against ldap;
+			// Instead, pass through to default WP authentication.
+			if ( $lsa_settings['access_restriction'] === 'user' ) {
+				return new WP_Error( 'no_ldap', 'Only authenticate against local WP install (not LDAP).' );
+			}
+
 			switch ( $lsa_settings['ldap_type'] ) {
 			case 'custom_uh': // University of Hawai'i
 				$ldap = ldap_connect( $lsa_settings['ldap_host'] );
@@ -379,6 +387,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				( is_admin() ) || // Always allow access to admins
 				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
 				( $lsa_settings['access_restriction'] == 'university' && is_user_logged_in() ) || // Allow access to logged in users if option is set to 'university' community
+				( $lsa_settings['access_restriction'] == 'user' && is_user_logged_in() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
 				( $lsa_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
 				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
 			);
@@ -749,6 +758,65 @@ xdebug_break();
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
+				'lsa_settings_access', // HTML element ID
+				'Access Settings', // HTML element Title
+				array( $this, 'print_section_info_access' ), // Callback (echos section content)
+				'ldap-sakai-auth' // Page this section is shown on (slug)
+			);
+
+			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
+			add_settings_field(
+				'lsa_settings_access_default_role', // HTML element ID
+				'Default role for new LDAP users', // HTML element Title
+				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_restriction', // HTML element ID
+				'Limit access to', // HTML element Title
+				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_courses', // HTML element ID
+				'Course Site IDs with access (one per line)', // HTML element Title
+				array( $this, 'print_combo_lsa_access_courses' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_redirect', // HTML element ID
+				'Handle unauthorized visitors', // HTML element Title
+				array( $this, 'print_radio_lsa_access_redirect' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_redirect_to_url', // HTML element ID
+				'Redirect to URL', // HTML element Title
+				array( $this, 'print_text_lsa_access_redirect_to_url' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_redirect_to_page', // HTML element ID
+				'Redirect to restricted notice page', // HTML element Title
+				array( $this, 'print_select_lsa_access_redirect_to_page' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'lsa_settings_access_redirect_to_message', // HTML element ID
+				'Restriction message', // HTML element Title
+				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_access' // Section this setting is shown on
+			);
+
+			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			add_settings_section(
 				'lsa_settings_ldap', // HTML element ID
 				'LDAP Settings', // HTML element Title
 				array( $this, 'print_section_info_ldap' ), // Callback (echos section content)
@@ -818,65 +886,6 @@ xdebug_break();
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'lsa_settings_access', // HTML element ID
-				'Access Settings', // HTML element Title
-				array( $this, 'print_section_info_access' ), // Callback (echos section content)
-				'ldap-sakai-auth' // Page this section is shown on (slug)
-			);
-
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
-			add_settings_field(
-				'lsa_settings_access_default_role', // HTML element ID
-				'Default role for new users', // HTML element Title
-				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_restriction', // HTML element ID
-				'Limit access to', // HTML element Title
-				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_courses', // HTML element ID
-				'Course Site IDs with access (one per line)', // HTML element Title
-				array( $this, 'print_combo_lsa_access_courses' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_redirect', // HTML element ID
-				'Handle unauthorized visitors', // HTML element Title
-				array( $this, 'print_radio_lsa_access_redirect' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_redirect_to_url', // HTML element ID
-				'Redirect to URL', // HTML element Title
-				array( $this, 'print_text_lsa_access_redirect_to_url' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_redirect_to_page', // HTML element ID
-				'Redirect to restricted notice page', // HTML element Title
-				array( $this, 'print_select_lsa_access_redirect_to_page' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'lsa_settings_access_redirect_to_message', // HTML element ID
-				'Restriction message', // HTML element Title
-				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
-			);
-
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
-			add_settings_section(
 				'lsa_settings_misc', // HTML element ID
 				'Miscellaneous Settings', // HTML element Title
 				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
@@ -908,7 +917,7 @@ xdebug_break();
 				$lsa_settings['ldap_password'] = base64_encode( $this->encrypt( $lsa_settings['ldap_password'] ) );
 			}
 			// Default to "Everyone" access restriction
-			if ( !in_array( $lsa_settings['access_restriction'], array( 'everyone', 'university', 'course' ) ) ) {
+			if ( !in_array( $lsa_settings['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
 				$lsa_settings['access_restriction'] = 'everyone';
 			}
 			// Sanitize ABC setting
@@ -967,7 +976,8 @@ xdebug_break();
 		function print_radio_lsa_access_restriction( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" id="radio_lsa_settings_access_restriction_everyone" name="lsa_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $lsa_settings['access_restriction'] ); ?> /> Everyone<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> University community<br />
+				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> University community (All LDAP and WP Users)<br />
+				<input type="radio" id="radio_lsa_settings_access_restriction_user" name="lsa_settings[access_restriction]" value="user"<?php checked( 'user' == $lsa_settings['access_restriction'] ); ?> /> Only WP Users in this site<br />
 				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Students enrolled in specific course(s)<?php
 		}
 		// @todo: migrate this to a combo tool like below in Unrestricted IP addresses
@@ -1032,6 +1042,10 @@ xdebug_break();
 			?><select id="lsa_settings_access_default_role" name="lsa_settings[access_default_role]">
 				<?php wp_dropdown_roles( $lsa_settings['access_default_role'] ); ?>
 			</select><?php
+		}
+
+		function print_section_info_misc() {
+			print 'Choose some miscellaneous settings below:';
 		}
 		function print_combo_lsa_misc_ips( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
