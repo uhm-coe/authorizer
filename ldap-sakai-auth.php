@@ -813,7 +813,7 @@ xdebug_break();
 			);
 			add_settings_field(
 				'lsa_settings_access_restriction', // HTML element ID
-				'Limit access to', // HTML element Title
+				'Which people can access the site?', // HTML element Title
 				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
@@ -827,7 +827,7 @@ xdebug_break();
 			);
 			add_settings_field(
 				'lsa_settings_access_redirect', // HTML element ID
-				'Handle unauthorized visitors', // HTML element Title
+				'What happens to people without access?', // HTML element Title
 				array( $this, 'print_radio_lsa_access_redirect' ), // Callback (echos form element)
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
@@ -1015,9 +1015,9 @@ xdebug_break();
 		function print_radio_lsa_access_restriction( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><input type="radio" id="radio_lsa_settings_access_restriction_everyone" name="lsa_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $lsa_settings['access_restriction'] ); ?> /> Everyone<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> University community (All LDAP and WP Users)<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_user" name="lsa_settings[access_restriction]" value="user"<?php checked( 'user' == $lsa_settings['access_restriction'] ); ?> /> Only WP Users in this site<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Students enrolled in specific course(s)<?php
+				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> Only the university community (All LDAP and WP users)<br />
+				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Only students enrolled in specific course(s) (LDAP and Sakai)<br />
+				<input type="radio" id="radio_lsa_settings_access_restriction_user" name="lsa_settings[access_restriction]" value="user"<?php checked( 'user' == $lsa_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
 		}
 		// @todo: migrate this to a combo tool like below in Unrestricted IP addresses
 		function print_combo_lsa_access_courses( $args ) {
