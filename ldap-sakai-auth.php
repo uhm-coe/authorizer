@@ -489,7 +489,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			switch ( $lsa_settings['access_redirect'] ) {
 			case 'url':
 				wp_redirect( $lsa_settings['access_redirect_to_url'], 302 );
-				break;
+				exit;
 			case 'message':
 				wp_die( $lsa_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				break;
@@ -501,10 +501,11 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				unset( $wp->query_vars );
 				$wp->query_vars['page_id'] = $page_id;
 				return;
+			case 'login':
 			default:
 				$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 				wp_redirect( wp_login_url( $current_path ), 302 );
-				break;
+				exit;
 			}
 
 			// Sanity check: we should never get here
