@@ -73,11 +73,39 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 
 		/**
-		 * Plugin activation.
+		 * Plugin activation hook.
+		 * Will also activate the plugin for all sites/blogs if this is a "Network enable."
 		 *
 		 * @return void
 		 */
 		public function activate() {
+			global $wpdb;
+
+			// If we're in a multisite environment, run the plugin activation for each site when network enabling
+			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+				if ( isset($_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
+					$old_blog = $wpdb->blogid;
+					// Get all blog ids
+					$blogids = $wpdb->get_col( $wpdb->prepare( "SELECT blog_id FROM $wpdb->blogs" ) );
+					foreach ( $blogids as $blog_id ) {
+						switch_to_blog( $blog_id );
+						self::_single_blog_activate();
+					}
+					switch_to_blog( $old_blog );
+					return;
+				}
+			}
+
+			// Activet the plugin for the current site
+			self::_single_blog_activate();
+		}
+
+		/**
+		 * Plugin activation.
+		 *
+		 * @return void
+		 */
+		private static function _single_blog_activate() {
 			// Set meaningful defaults (but if values already exist in db, use those).
 			$lsa_settings = get_option( 'lsa_settings' );
 			if ( $lsa_settings === FALSE ) {
