@@ -926,7 +926,7 @@ xdebug_break();
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
 				'lsa_settings_misc', // HTML element ID
-				'Miscellaneous Settings', // HTML element Title
+				'Advanced Settings', // HTML element Title
 				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
 				'ldap-sakai-auth' // Page this section is shown on (slug)
 			);
@@ -1086,7 +1086,7 @@ xdebug_break();
 		}
 
 		function print_section_info_misc() {
-			print 'Choose some miscellaneous settings below:';
+			print 'You may optionally specify some advanced settings, like an IP whitelist, below:';
 		}
 		function print_combo_lsa_misc_ips( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
