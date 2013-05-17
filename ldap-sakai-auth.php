@@ -106,6 +106,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * @return void
 		 */
 		private static function _single_blog_activate() {
+			global $wp_roles;
+
 			// Set meaningful defaults (but if values already exist in db, use those).
 			$lsa_settings = get_option( 'lsa_settings' );
 			if ( $lsa_settings === FALSE ) {
@@ -154,7 +156,16 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				$lsa_settings['misc_ips'] = '';
 			}
 			if ( !array_key_exists( 'access_default_role', $lsa_settings ) ) {
-				$lsa_settings['access_default_role'] = 'subscriber';
+				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
+				$all_roles = $wp_roles->roles;
+				$editable_roles = apply_filters( 'editable_roles', $all_roles );
+				if ( array_key_exists( 'student', $editable_roles ) ) {
+					$lsa_settings['access_default_role'] = 'student';
+				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
+					$lsa_settings['access_default_role'] = 'subscriber';
+				} else {
+					$lsa_settings['access_default_role'] = 'subscriber';
+				}
 			}
 			update_option( 'lsa_settings', $lsa_settings );
 		} // END activate()
