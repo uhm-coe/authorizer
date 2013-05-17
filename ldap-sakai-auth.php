@@ -1023,16 +1023,18 @@ xdebug_break();
 		function print_combo_lsa_access_courses( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><ul id="list_lsa_settings_access_courses" style="margin:0;">
-				<?php foreach ( $lsa_settings['access_courses'] as $key => $course_id ): ?>
-					<?php if (empty($course_id)) continue; ?>
-					<li>
-						<input type="text" id="lsa_settings_access_courses_<?= $key; ?>" name="lsa_settings[access_courses][]" value="<?= esc_attr( $course_id ); ?>" readonly="true" style="width: 275px;" />
-						<input type="button" class="button" id="remove_course_<?= $key; ?>" onclick="lsa_remove_course(this);" value="Remove" />
-						<?php if ( strlen( $lsa_settings['sakai_base_url'] ) ): ?>
-							<label for="lsa_settings_access_courses_<?= $key; ?>"><span class="description"></span></label>
-						<?php endif; ?>
-					</li>
-				<?php endforeach; ?>
+				<?php if ( array_key_exists( 'access_courses', $lsa_settings ) && is_array( $lsa_settings['access_courses'] ) ) : ?>
+					<?php foreach ( $lsa_settings['access_courses'] as $key => $course_id ): ?>
+						<?php if (empty($course_id)) continue; ?>
+						<li>
+							<input type="text" id="lsa_settings_access_courses_<?= $key; ?>" name="lsa_settings[access_courses][]" value="<?= esc_attr( $course_id ); ?>" readonly="true" style="width: 275px;" />
+							<input type="button" class="button" id="remove_course_<?= $key; ?>" onclick="lsa_remove_course(this);" value="Remove" />
+							<?php if ( strlen( $lsa_settings['sakai_base_url'] ) ): ?>
+								<label for="lsa_settings_access_courses_<?= $key; ?>"><span class="description"></span></label>
+							<?php endif; ?>
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</ul>
 			<div id="new_lsa_settings_access_courses">
 				<input type="text" name="newcourse" id="newcourse" placeholder="7017b553-3d21-46ac-ad5c-9a6c335b9a24" style="width: 275px;" />
@@ -1089,13 +1091,15 @@ xdebug_break();
 		function print_combo_lsa_misc_ips( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><ul id="list_lsa_settings_misc_ips" style="margin:0;">
-				<?php foreach ( $lsa_settings['misc_ips'] as $key => $ip ): ?>
-					<?php if ( empty( $ip ) ) continue; ?>
-					<li>
-						<input type="text" id="lsa_settings_misc_ips_<?= $key; ?>" name="lsa_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
-						<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
-					</li>
-				<?php endforeach; ?>
+				<?php if ( array_key_exists( 'misc_ips', $lsa_settings ) && is_array( $lsa_settings['misc_ips'] ) ) : ?>
+					<?php foreach ( $lsa_settings['misc_ips'] as $key => $ip ): ?>
+						<?php if ( empty( $ip ) ) continue; ?>
+						<li>
+							<input type="text" id="lsa_settings_misc_ips_<?= $key; ?>" name="lsa_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
+							<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="lsa_remove_ip(this);" value="Remove" />
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
 			</ul>
 			<div id="new_lsa_settings_misc_ips">
 				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
