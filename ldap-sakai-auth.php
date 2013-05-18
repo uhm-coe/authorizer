@@ -525,7 +525,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				return true;
 			}
 			$has_access = false;
-xdebug_break();
+
 			$sakai_session_id = get_user_meta( get_current_user_id(), 'sakai_session_id', true );
 			foreach ( $lsa_settings['access_courses'] as $sakai_site_id ) {
 				$request_url = trailingslashit( $lsa_settings['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
@@ -555,6 +555,16 @@ xdebug_break();
 
 			// Store the result in user meta so we don't have to keep checking against sakai on every page load
 			update_user_meta( get_current_user_id(), 'has_access', $has_access );
+
+			// If this user has access, store the sakai course site id in his/her usermeta, so we have a
+			// record that they were enrolled in that course.
+			if ( $has_access ) {
+				$enrolled_courses = get_user_meta( get_current_user_id(), 'enrolled_courses' );
+				if ( ! in_array( $sakai_session_id, $enrolled_courses ) ) {
+					$enrolled_courses[] = $sakai_session_id;
+					update_user_meta( get_current_user_id(), 'enrolled_courses', $enrolled_courses );
+				}
+			}
 
 			return $has_access;
 		}
