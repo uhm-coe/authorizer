@@ -486,7 +486,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
-			switch ( $lsa_settings['access_redirect'] ) {
+			switch ( $lsa_settings['access_redirect'] ) :
 			case 'url':
 				wp_redirect( $lsa_settings['access_redirect_to_url'], 302 );
 				exit;
@@ -506,7 +506,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
-			}
+			endswitch;
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
