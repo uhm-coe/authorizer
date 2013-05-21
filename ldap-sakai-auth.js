@@ -40,7 +40,7 @@ function lsa_remove_ip(btnObj) {
 }
 
 
-// Add IP address to whitelist.
+// Add course to whitelist.
 function lsa_add_course(course) {
   if (jQuery.trim(course) == '')
     return false;
@@ -56,11 +56,13 @@ function lsa_add_course(course) {
     }
   });
 
+  jQuery('#newcourse').css('background', 'url(/wp-admin/images/loading.gif) no-repeat 253px 2px');
   jQuery.post(ajaxurl, {
     action: 'lsa_course_check', 
     'sakai_site_id': course, 
     'sakai_base_url': jQuery('#lsa_settings_sakai_base_url').val() 
-    }, function(response) {
+  }, function(response) {
+    jQuery('#newcourse').css('background', 'none');
     if (response==0) { // failed checking course
       jQuery('#newcourse').parent().effect('shake',shake_speed);
       add_btn_course.removeAttr('disabled');
