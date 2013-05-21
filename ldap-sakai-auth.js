@@ -19,7 +19,9 @@ function lsa_add_ip(ip) {
     }
   });
 
+  jQuery('#newip').css('background', 'url(/wp-admin/images/loading.gif) no-repeat 148px 2px');
   jQuery.post(ajaxurl, { action: 'lsa_ip_check', 'ip_address': ip }, function(response) {
+    jQuery('#newip').css('background', 'none');
     if (response) { // failed checking ip
       jQuery('#newip').parent().effect('shake',shake_speed);
       add_btn_ip.removeAttr('disabled');
