@@ -747,13 +747,13 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			if ( isset( $course_details ) ) {
 				if ( strpos( 'HTTP Status 403', $course_details ) !== false ) {
 					// couldn't get sakai info because not logged in
-					die( '' );
+					die( '[Unknown course]' );
 				} else {
 					$course_details = json_decode( $course_details );
 					if ( isset( $course_details ) && property_exists( $course_details, 'entityTitle' ) ) {
 						die( $course_details->entityTitle ); // success
 					} else {
-						die( '' ); // success
+						die( '[Unknown course]' ); // success
 					}
 				}
 			} else {
