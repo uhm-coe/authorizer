@@ -656,7 +656,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 						// couldn't get sakai info because no permissions (this seems like a wrong error code from laulima...)
 					} else {
 						$permission_to_visit = json_decode( $permission_to_visit );
-						if ( property_exists( $permission_to_visit, 'data' ) && in_array( 'site.visit', $permission_to_visit->data ) ) {
+						if ( isset( $permission_to_visit ) && property_exists( $permission_to_visit, 'data' ) && in_array( 'site.visit', $permission_to_visit->data ) ) {
 							$has_access = true;
 							break;
 						}
