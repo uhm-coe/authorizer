@@ -71,9 +71,16 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			add_action( 'wp_ajax_lsa_ip_check', array( $this, 'ajax_lsa_ip_check' ) ); // ajax IP verification check
 			add_action( 'wp_ajax_lsa_course_check', array( $this, 'ajax_lsa_course_check' ) ); // ajax IP verification check
 
+			// If we have a custom admin message, add the action to show it.
 			$notice = get_option( 'lsa_settings_misc_admin_notice' );
 			if ( $notice && strlen( $notice ) > 0 ) {
 				add_action( 'admin_notices', array( $this, 'show_misc_admin_notice' ) );
+			}
+
+			// If we have a custom login error, add the filter to show it.
+			$error = get_option( 'lsa_settings_misc_login_error' );
+			if ( $error && strlen( $error ) > 0 ) {
+				add_filter( 'login_errors', array( $this, 'show_misc_login_error' ) );
 			}
 
 		} // END __construct()
@@ -238,8 +245,14 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			return $lostpassword_url;
 		}
 
+		/**
+		 * Show custom admin notice.
+		 * Filter: admin_notice
+		 */
 		function show_misc_admin_notice() {
 			$notice = get_option( 'lsa_settings_misc_admin_notice' );
+			delete_option( 'lsa_settings_misc_admin_notice' );
+
 			if ( $notice && strlen( $notice ) > 0 ) {
 				?>
 				<div class="error">
@@ -247,7 +260,19 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				</div>
 				<?php
 			}
-			delete_option( 'lsa_settings_misc_admin_notice' );
+		}
+
+		/**
+		 * Add custom error message to login screen.
+		 * Filter: login_errors
+		 */
+		function show_misc_login_error( $errors ) {
+			$error = get_option( 'lsa_settings_misc_login_error' );
+			delete_option( 'lsa_settings_misc_login_error' );
+
+			//$errors .= '    ' . $error . "<br />\n";
+			$errors = '    ' . $error . "<br />\n";
+			return $errors;
 		}
 
 
@@ -448,6 +473,19 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			// Reset cached access so plugin checks against sakai to make sure this newly-logged in user still has access (if restricting access by sakai course)
 			update_user_meta( $user->ID, 'has_access', false );
 
+			// Make sure (if we're restricting access by courses) that the current user is enrolled in an allowed course
+			$logged_in_but_no_access = (
+				$lsa_settings['access_restriction'] == 'course' &&
+				! $this->is_current_user_sakai_enrolled( $user->ID )
+			);
+			if ( $logged_in_but_no_access ) {
+				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				update_option( 'lsa_settings_misc_login_error', $error );
+				wp_logout();
+				wp_redirect( wp_login_url(), 302 );
+				exit;
+			}
+
 			return $user;
 		}
 
@@ -548,9 +586,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
 			if ( $logged_in_but_no_access ) {
-				$notice = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
-				update_option( 'lsa_settings_misc_admin_notice', $notice );
-				wp_redirect( admin_url( 'profile.php' ), 302 );
+				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				update_option( 'lsa_settings_misc_login_error', $error );
+				wp_logout();
+				wp_redirect( wp_login_url(), 302 );
 				exit;
 			}
 
@@ -585,8 +624,12 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 *
 		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
 		 */
-		function is_current_user_sakai_enrolled() {
+		function is_current_user_sakai_enrolled( $current_user = '' ) {
 			$lsa_settings = get_option( 'lsa_settings' );
+
+			if ($current_user === '') {
+				$current_user = get_current_user_id();
+			}
 
 			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
 			if ( $lsa_settings['access_restriction'] == 'everyone' || $lsa_settings['access_restriction'] == 'university' ) {
@@ -594,7 +637,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 			$has_access = false;
 
-			$sakai_session_id = get_user_meta( get_current_user_id(), 'sakai_session_id', true );
+			$sakai_session_id = get_user_meta( $current_user, 'sakai_session_id', true );
 			foreach ( $lsa_settings['access_courses'] as $sakai_site_id ) {
 				$request_url = trailingslashit( $lsa_settings['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
 				$permission_to_visit = $this->call_api(
@@ -622,15 +665,15 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			// Store the result in user meta so we don't have to keep checking against sakai on every page load
-			update_user_meta( get_current_user_id(), 'has_access', $has_access );
+			update_user_meta( $current_user, 'has_access', $has_access );
 
 			// If this user has access, store the sakai course site id in his/her usermeta, so we have a
 			// record that they were enrolled in that course.
 			if ( $has_access ) {
-				$enrolled_courses = get_user_meta( get_current_user_id(), 'enrolled_courses' );
+				$enrolled_courses = get_user_meta( $current_user, 'enrolled_courses' );
 				if ( ! in_array( $sakai_session_id, $enrolled_courses ) ) {
 					$enrolled_courses[] = $sakai_session_id;
-					update_user_meta( get_current_user_id(), 'enrolled_courses', $enrolled_courses );
+					update_user_meta( $current_user, 'enrolled_courses', $enrolled_courses );
 				}
 			}
 
