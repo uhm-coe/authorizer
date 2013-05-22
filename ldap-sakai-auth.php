@@ -218,7 +218,13 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
 			$lsa_settings = get_option( 'lsa_settings' );
-			if ( array_key_exists( 'misc_lostpassword_url', $lsa_settings ) && filter_var( $lsa_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) ) {
+			if (
+				array_key_exists( 'misc_lostpassword_url', $lsa_settings ) &&
+				filter_var( $lsa_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) &&
+				array_key_exists( 'access_restriction', $lsa_settings ) &&
+				$lsa_settings['access_restriction'] !== 'everyone' &&
+				$lsa_settings['access_restriction'] !== 'user'
+			) {
 				$lostpassword_url = $lsa_settings['misc_lostpassword_url'];
 			}
 			return $lostpassword_url;
@@ -969,7 +975,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			add_settings_field(
 				'lsa_settings_misc_lostpassword_url', // HTML element ID
-				'Lost Password URL', // HTML element Title
+				'Custom LDAP Lost Password URL', // HTML element Title
 				array( $this, 'print_text_lsa_misc_lostpassword_url' ), // Callback (echos form element)
 				'ldap-sakai-auth', // Page this setting is shown on (slug)
 				'lsa_settings_misc' // Section this setting is shown on
