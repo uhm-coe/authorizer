@@ -71,8 +71,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			add_action( 'wp_ajax_lsa_ip_check', array( $this, 'ajax_lsa_ip_check' ) ); // ajax IP verification check
 			add_action( 'wp_ajax_lsa_course_check', array( $this, 'ajax_lsa_course_check' ) ); // ajax IP verification check
 
-			$lsa_settings = get_option( 'lsa_settings' );
-			if ( array_key_exists( 'misc_admin_notice', $lsa_settings ) && strlen( $lsa_settings['misc_admin_notice'] ) > 0 ) {
+			$notice = get_option( 'lsa_settings_misc_admin_notice' );
+			if ( $notice && strlen( $notice ) > 0 ) {
 				add_action( 'admin_notices', array( $this, 'show_misc_admin_notice' ) );
 			}
 
@@ -201,6 +201,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			if ( get_option( 'lsa_settings' ) ) {
 				delete_option( 'lsa_settings' );
 			}
+			if ( get_option( 'lsa_settings_misc_admin_notice' ) ) {
+				delete_option( 'lsa_settings_misc_admin_notice' );
+			}
 
 			// Delete sakai session token from user meta for all users.
 			$all_user_ids = get_users( 'fields=ID' );
@@ -236,16 +239,15 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		}
 
 		function show_misc_admin_notice() {
-			$lsa_settings = get_option( 'lsa_settings' );
-			if ( array_key_exists( 'misc_admin_notice', $lsa_settings ) && strlen( $lsa_settings['misc_admin_notice'] ) > 0 ) {
+			$notice = get_option( 'lsa_settings_misc_admin_notice' );
+			if ( $notice && strlen( $notice ) > 0 ) {
 				?>
 				<div class="error">
-					<p><?php _e( $lsa_settings['misc_admin_notice'] ); ?></p>
+					<p><?php _e( $notice ); ?></p>
 				</div>
 				<?php
 			}
-			unset( $lsa_settings['misc_admin_notice'] );
-			update_option( 'lsa_settings', $lsa_settings );
+			delete_option( 'lsa_settings_misc_admin_notice' );
 		}
 
 
@@ -552,8 +554,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				//wp_redirect( admin_url( 'profile.php' ), 302 );
 				//exit;
 				//return $errors;
-				$lsa_settings['misc_admin_notice'] = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
-				update_option( 'lsa_settings', $lsa_settings );
+				$notice = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				update_option( 'lsa_settings_misc_admin_notice', $notice );
 				wp_redirect( admin_url( 'profile.php' ), 302 );
 				exit;
 			}
