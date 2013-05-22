@@ -420,8 +420,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				$result = wp_insert_user(
 					array(
 						'user_login' => $username,
-						//'user_pass' => base64_encode( $this->encrypt( $password ) ),
-						'user_pass' => base64_encode( $this->encrypt( microtime() ) ), // fake password
+						'user_pass' => wp_generate_password(), // random password
 						'first_name' => $ldap_user['first'],
 						'last_name' => $ldap_user['last'],
 						'user_email' => $ldap_user['email'],
