@@ -514,8 +514,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) || // Always allow access if WordPress is installing
 				( is_admin() ) || // Always allow access to admins
 				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
-				( $lsa_settings['access_restriction'] == 'university' && is_user_logged_in() ) || // Allow access to logged in users if option is set to 'university' community
-				( $lsa_settings['access_restriction'] == 'user' && is_user_logged_in() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
+				( $lsa_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
+				( $lsa_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
 				( $lsa_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
 				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
 			);
@@ -526,7 +526,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			// profile page with a message (so we don't get into a redirect loop on
 			// the wp-login.php page).
 			$logged_in_but_no_access = false;
-			if ( is_user_logged_in() && !$has_access && $lsa_settings['access_restriction'] == 'course' ) {
+			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $lsa_settings['access_restriction'] == 'course' ) {
 				$logged_in_but_no_access = true;
 			}
 
@@ -627,7 +627,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		function is_current_user_sakai_enrolled( $current_user = '' ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 
-			if ($current_user === '') {
+			if ( $current_user === '' ) {
 				$current_user = get_current_user_id();
 			}
 
@@ -1264,6 +1264,22 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		function decrypt( $secret ) {
 			$str = '';
 			return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$str" );
+		}
+
+		/**
+		 * In a multisite environment, returns true if the current user is logged
+		 * in and a user of the current blog. In single site mode, simply returns
+		 * true if the current user is logged in.
+		 */
+		function is_user_logged_in_and_blog_user() {
+			$is_user_logged_in_and_blog_user = false;
+			if ( is_multisite() ) {
+				global $current_blog;
+				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_blog_user( $current_blog->blog_id );
+			} else {
+				$is_user_logged_in_and_blog_user = is_user_logged_in();
+			}
+			return $is_user_logged_in_and_blog_user;
 		}
 
 	} // END class WP_Plugin_LDAP_Sakai_Auth
