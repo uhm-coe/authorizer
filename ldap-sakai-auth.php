@@ -71,6 +71,11 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			add_action( 'wp_ajax_lsa_ip_check', array( $this, 'ajax_lsa_ip_check' ) ); // ajax IP verification check
 			add_action( 'wp_ajax_lsa_course_check', array( $this, 'ajax_lsa_course_check' ) ); // ajax IP verification check
 
+			$lsa_settings = get_option( 'lsa_settings' );
+			if ( array_key_exists( 'misc_admin_notice', $lsa_settings ) && strlen( $lsa_settings['misc_admin_notice'] ) > 0 ) {
+				add_action( 'admin_notices', array( $this, 'show_misc_admin_notice' ) );
+			}
+
 		} // END __construct()
 
 
@@ -207,7 +212,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 		/**
 		 ****************************
-		 * Custom filters
+		 * Custom filters and actions
 		 ****************************
 		 */
 
@@ -228,6 +233,19 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				$lostpassword_url = $lsa_settings['misc_lostpassword_url'];
 			}
 			return $lostpassword_url;
+		}
+
+		function show_misc_admin_notice() {
+			$lsa_settings = get_option( 'lsa_settings' );
+			if ( array_key_exists( 'misc_admin_notice', $lsa_settings ) && strlen( $lsa_settings['misc_admin_notice'] ) > 0 ) {
+				?>
+				<div class="error">
+					<p><?php _e( $lsa_settings['misc_admin_notice'] ); ?></p>
+				</div>
+				<?php
+			}
+			unset( $lsa_settings['misc_admin_notice'] );
+			update_option( 'lsa_settings', $lsa_settings );
 		}
 
 
@@ -463,6 +481,15 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			);
 			$is_restricted = !$has_access;
 
+			// Fringe case: User successfully logged in, but they don't have access
+			// to an allowed course. Flag these users, and redirect them to their
+			// profile page with a message (so we don't get into a redirect loop on
+			// the wp-login.php page).
+			$logged_in_but_no_access = false;
+			if ( is_user_logged_in() && !$has_access && $lsa_settings['access_restriction'] == 'course' ) {
+				$logged_in_but_no_access = true;
+			}
+
 			/**
 			 * Developers can use the `ldap_sakai_auth_has_access` filter
 			 * to override restricted access on certain pages. Note that the
@@ -517,6 +544,20 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
+
+			if ( $logged_in_but_no_access ) {
+				//global $errors;
+				//$errors = new WP_Error();
+				//$errors->add( 'no_access', 'Sorry, it seems you don\'t have access to this site. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.' );
+				//wp_redirect( admin_url( 'profile.php' ), 302 );
+				//exit;
+				//return $errors;
+				$lsa_settings['misc_admin_notice'] = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				update_option( 'lsa_settings', $lsa_settings );
+				wp_redirect( admin_url( 'profile.php' ), 302 );
+				exit;
+			}
+
 			switch ( $lsa_settings['access_redirect'] ) :
 			case 'url':
 				wp_redirect( $lsa_settings['access_redirect_to_url'], 302 );
