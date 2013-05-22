@@ -548,12 +548,6 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
 			if ( $logged_in_but_no_access ) {
-				//global $errors;
-				//$errors = new WP_Error();
-				//$errors->add( 'no_access', 'Sorry, it seems you don\'t have access to this site. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.' );
-				//wp_redirect( admin_url( 'profile.php' ), 302 );
-				//exit;
-				//return $errors;
 				$notice = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
 				update_option( 'lsa_settings_misc_admin_notice', $notice );
 				wp_redirect( admin_url( 'profile.php' ), 302 );
