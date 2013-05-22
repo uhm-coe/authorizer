@@ -1274,8 +1274,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		function is_user_logged_in_and_blog_user() {
 			$is_user_logged_in_and_blog_user = false;
 			if ( is_multisite() ) {
-				global $current_blog;
-				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_blog_user( $current_blog->blog_id );
+				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_user_member_of_blog( get_current_user_id() );
 			} else {
 				$is_user_logged_in_and_blog_user = is_user_logged_in();
 			}
