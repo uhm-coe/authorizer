@@ -61,7 +61,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) ); // Create settings link on Plugins page
 
-			add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
+			if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) {
+				add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
+				add_filter( 'gettext', array( $this, 'custom_login_form_labels' ), 20, 3 );
+			}
 
 			// Register actions.
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) ); // Create menu item in Settings
@@ -243,6 +246,27 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				$lostpassword_url = $lsa_settings['misc_lostpassword_url'];
 			}
 			return $lostpassword_url;
+		}
+
+		/**
+		 * Overwrite the username label on the login form.
+		 */
+		function custom_login_form_labels( $translated_text, $text, $domain ) {
+			$lsa_settings = get_option( 'lsa_settings' );
+
+			if ( $translated_text === 'Username' ) {
+				if ( array_key_exists( 'ldap_type', $lsa_settings ) && $lsa_settings['ldap_type'] === 'custom_uh' ) {
+					$translated_text = 'UH Username';
+				}
+			}
+
+			if ( $translated_text === 'Password' ) {
+				if ( array_key_exists( 'ldap_type', $lsa_settings ) && $lsa_settings['ldap_type'] === 'custom_uh' ) {
+					$translated_text = 'UH Password';
+				}
+			}
+
+			return $translated_text;
 		}
 
 		/**
