@@ -61,6 +61,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) ); // Create settings link on Plugins page
 
+			add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
+
 			// Register actions.
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) ); // Create menu item in Settings
 			add_action( 'admin_init', array( $this, 'page_init' ) ); // Create options page
@@ -155,6 +157,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			if ( !array_key_exists( 'misc_ips', $lsa_settings ) ) {
 				$lsa_settings['misc_ips'] = '';
 			}
+			if ( !array_key_exists( 'misc_lostpassword_url', $lsa_settings ) ) {
+				$lsa_settings['misc_lostpassword_url'] = '';
+			}
 			if ( !array_key_exists( 'access_default_role', $lsa_settings ) ) {
 				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 				$all_roles = $wp_roles->roles;
@@ -198,6 +203,26 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				delete_user_meta( $user_id, 'sakai_session_id' );
 			}
 		} // END deactivate()
+
+
+		/**
+		 ****************************
+		 * Custom filters
+		 ****************************
+		 */
+
+		/**
+		 * Overwrite the URL for the lost password link on the login form.
+		 * If we're authenticating against LDAP, standard WordPress password resets
+		 * won't work.
+		 */
+		function custom_lostpassword_url( $lostpassword_url ) {
+			$lsa_settings = get_option( 'lsa_settings' );
+			if ( array_key_exists( 'misc_lostpassword_url', $lsa_settings ) && filter_var( $lsa_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) ) {
+				$lostpassword_url = $lsa_settings['misc_lostpassword_url'];
+			}
+			return $lostpassword_url;
+		}
 
 
 		/**
@@ -943,6 +968,13 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			);
 
 			add_settings_field(
+				'lsa_settings_misc_lostpassword_url', // HTML element ID
+				'Lost Password URL', // HTML element Title
+				array( $this, 'print_text_lsa_misc_lostpassword_url' ), // Callback (echos form element)
+				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'lsa_settings_misc' // Section this setting is shown on
+			);
+			add_settings_field(
 				'lsa_settings_misc_ips', // HTML element ID
 				'Unrestricted IP addresses', // HTML element Title
 				array( $this, 'print_combo_lsa_misc_ips' ), // Callback (echos form element)
@@ -1097,7 +1129,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		}
 
 		function print_section_info_misc() {
-			print 'You may optionally specify some advanced settings, like an IP whitelist, below:';
+			print 'You may optionally specify some advanced settings below:';
 		}
 		function print_combo_lsa_misc_ips( $args ) {
 			$lsa_settings = get_option( 'lsa_settings' );
@@ -1121,6 +1153,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				<?php endif; ?>
 			</div>
 			<?php
+		}
+		function print_text_lsa_misc_lostpassword_url() {
+			$lsa_settings = get_option( 'lsa_settings' );
+			?><input type="text" id="lsa_settings_misc_lostpassword_url" name="lsa_settings[misc_lostpassword_url]" value="<?= $lsa_settings['misc_lostpassword_url']; ?>" placeholder="http://www.example.com/" /><?php
 		}
 
 
