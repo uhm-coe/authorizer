@@ -1,1 +1,120 @@
 /* Restyle wp-login.php to reflect UH logins */
+
+/* Login Body */
+body.login { background: url('assets/texture-debut-light.jpg') #fbfbfb; }
+
+/* Logo */
+body.login h1 a { background: url('assets/logo-uh-system.png') top center no-repeat; background-size: 277px 132px; height: 132px; }
+
+/* Login Form */
+body.login #loginform {
+	background: url('assets/texture-gray-jean.jpg') #FFF;
+	border: 1px solid #CECECE;
+	padding: 26px 24px 24px;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+}
+
+/* Hide label text only */
+body.login label[for^="user_login"],
+body.login label[for*="user_login"],
+body.login label[for^="user_pass"],
+body.login label[for*="user_pass"] {
+	display: block;
+	text-indent: -9999px;
+}
+
+/* Login form user/pass inputs */
+body.login #loginform .input {
+	background-color: #FFF;
+	border: 1px solid #D3D3D3;
+	-webkit-border-radius: 6px;
+	border-radius: 6px;
+	font-size: 19px;
+	line-height: 1.5;
+}
+body.login #loginform #user_login {
+	background: url('assets/icon-user.png') #FFF 16px 17px no-repeat;
+	padding: 12px 12px 12px 45px;
+	margin: -15px 0 15px 0;
+}
+body.login #loginform #user_pass {
+	background: url('assets/icon-pass.png') #FFF 13px 19px no-repeat;
+	padding: 12px 12px 12px 45px;
+	margin: -15px 0 15px 0;
+}
+
+/* Login form "Remember me?" */
+body.login #loginform .forgetmenot {
+	display: block;
+	clear: both;
+	margin: 0 0 14px 0;
+}
+
+/* Login form submit button */
+body.login #loginform #wp-submit,
+body.login #loginform .submit {
+	display: block;
+	clear: both;
+	width: 100%;
+}
+body.login #loginform #wp-submit {
+	height: 44px;
+	font-size: 18px;
+	background-color: #B3995D;
+	background-image: -webkit-gradient(linear,left top,left bottom,from(#DEBE73),to(#B3995D));
+	background-image: -webkit-linear-gradient(top,#DEBE73,#B3995D);
+	background-image: -moz-linear-gradient(top,#DEBE73,#B3995D);
+	background-image: -ms-linear-gradient(top,#DEBE73,#B3995D);
+	background-image: -o-linear-gradient(top,#DEBE73,#B3995D);
+	background-image: linear-gradient(to bottom,#DEBE73,#B3995D);
+	border-color: #B3995D;
+	border-bottom-color: #907A54;
+	-webkit-box-shadow: none;
+	box-shadow: none;
+	color: #fff;
+	text-decoration: none;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+/* "Lost Your Password?" Container */
+body.login #nav {
+	clear: both;
+	display: block;
+	margin: 0;
+	padding: 15px 0 0 0;
+}
+
+/* "Lost Your Password?" Link */
+body.login #nav a {
+	font-size: 14px;
+	text-align: center;
+	text-decoration: none;
+	display: block;
+	color: #B3995D !important;
+}
+
+/* "Back To ..." link and DCDC Courses Logo contatiner */
+body.login #backtoblog {
+	background: url('assets/logo-dcdc-courses.png') top left no-repeat;
+	height: 17px;
+	margin: 18px 5px;
+	padding: 16px 0 0;
+}
+
+/* "Back To ..." link */
+body.login #backtoblog a {
+	float: right;
+	margin: -10px -3px 0 0;
+	color: #999999 !important;
+	text-decoration: none;
+	max-width: 138px;
+	font-size: 11px;
+}
+
+/* Retina Images */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+	body.login h1 a { width: 277px; background: url('assets/retina/logo-uh-system-@2X.png') top center no-repeat; }
+	body.login #loginform #user_login { background: url('assets/icon-user.png-@2X.jpg') #FFF 16px 17px no-repeat; }
+	body.login #loginform #user_pass { background: url('assets/icon-pass.png-@2X.jpg') #FFF 13px 19px no-repeat;
+}
