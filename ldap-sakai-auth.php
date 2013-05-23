@@ -1332,6 +1332,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		}
 
 		function add_sakai_dashboard_widget() {
+			$lsa_settings = get_option( 'lsa_settings' );
 			?>
 			<div class="inside">
 				<form method="post" id="lsa_settings_access_form" action="">
@@ -1346,6 +1347,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 							<span class="spinner"></span>
 						</span>
 						<?php wp_nonce_field( 'save_lsa_settings_access', 'nonce_save_lsa_settings_access' ); ?>
+						<input type="hidden" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?php print $lsa_settings['sakai_base_url']; ?>" />
 					</p>
 					<br class="clear" />
 				</form>
