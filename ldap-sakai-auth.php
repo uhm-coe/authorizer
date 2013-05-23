@@ -1239,7 +1239,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			</ul>
 			<div id="new_lsa_settings_access_courses">
 				<input type="text" name="newcourse" id="newcourse" placeholder="7017b553-3d21-46ac-ad5c-9a6c335b9a24" style="width: 275px;" />
-				<input class="button" type="button" id="addcourse" onclick="lsa_add_course(jQuery('#newcourse').val());" value="+" />
+				<input class="button" type="button" id="addcourse" onclick="lsa_add_course(jQuery('#newcourse').val());" value="+" /><br />
 				<label for="newcourse"><span class="description">Enter a Site ID for a course with access</span></label>
 			</div>
 			<?php
@@ -1305,7 +1305,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			<div id="new_lsa_settings_misc_ips">
 				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
 				<input class="button" type="button" id="addip" onclick="lsa_add_ip(jQuery('#newip').val());" value="+" />
-				<label for="newip"><span class="description">Enter a single IP address</span></label>
+				<label for="newip"><span class="description"></span></label>
 				<?php if ( !empty( $_SERVER['REMOTE_ADDR'] ) ): ?>
 					<br /><input class="button" type="button" onclick="lsa_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
 				<?php endif; ?>
