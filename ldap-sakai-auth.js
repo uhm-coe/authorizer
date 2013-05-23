@@ -27,7 +27,7 @@ function lsa_add_ip(ip) {
       add_btn_ip.removeAttr('disabled');
       return false;
     } else { // succeeded checking ip
-      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[misc_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="lsa_remove_ip(this);" value="Remove" /></div>').appendTo('#list_lsa_settings_misc_ips').slideDown(250);
+      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[misc_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="lsa_remove_ip(this);" value="&minus;" /></div>').appendTo('#list_lsa_settings_misc_ips').slideDown(250);
       // Reset the new ip textbox if we successfully added this ip
       if (ip == jQuery('#newip').val())
         jQuery('#newip').val('');
@@ -70,7 +70,7 @@ function lsa_add_course(course) {
       add_btn_course.removeAttr('disabled');
       return false;
     } else { // succeeded checking course
-      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[access_courses][]" value="' + course + '" readonly="true" style="width:275px;" /> <input type="button" class="button" onclick="lsa_remove_course(this);" value="Remove" /> <span class="description">' + response + '</span></div>').appendTo('#list_lsa_settings_access_courses').slideDown(250);
+      jQuery('<li style="display: none;"><input type="text" name="lsa_settings[access_courses][]" value="' + course + '" readonly="true" style="width:275px;" /> <input type="button" class="button" onclick="lsa_remove_course(this);" value="&minus;" /> <span class="description">' + response + '</span></div>').appendTo('#list_lsa_settings_access_courses').slideDown(250);
       // Reset the new course textbox if we successfully added this course
       if (course == jQuery('#newcourse').val())
         jQuery('#newcourse').val('');
@@ -82,6 +82,35 @@ function lsa_add_course(course) {
 // Remove IP address from whitelist.
 function lsa_remove_course(btnObj) {
   jQuery(btnObj).parent().slideUp(250,function(){ jQuery(this).remove(); });
+}
+
+
+// Save sakai options from dashboard widget.
+function save_lsa_settings_access(caller) {
+  jQuery('#lsa_settings_access_form .spinner').show();
+  jQuery(caller).attr('disabled', 'disabled');
+
+  var access_restriction = jQuery('#lsa_settings_access_form input[name="lsa_settings[access_restriction]"]:checked').val();
+  var access_courses = new Array();
+  jQuery('#lsa_settings_access_form input[name="lsa_settings[access_courses][]"]').each(function() {
+    access_courses.push(jQuery(this).val());
+  });
+  var nonce_save_lsa_settings_access = jQuery('#nonce_save_lsa_settings_access').val();
+
+  jQuery.post(ajaxurl, {
+    action: 'save_sakai_dashboard_widget',
+    'access_restriction': access_restriction,
+    'access_courses': access_courses,
+    'nonce_save_lsa_settings_access': nonce_save_lsa_settings_access,
+  }, function(response) {
+    jQuery('#lsa_settings_access_form .spinner').hide();
+    jQuery(caller).removeAttr('disabled');
+    if (response==0) { // failed checking course
+      return false;
+    } else { // succeeded checking course
+      return true;
+    }
+  });
 }
 
 
