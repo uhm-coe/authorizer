@@ -820,10 +820,14 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * Run on action hook: login_head
 		 */
 		function load_login_css_and_js() {
-			?>
-			<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'ldap-sakai-auth-login.css', __FILE__ ); ?>" />
-			<script type="text/javascript" src="<?php print plugins_url( 'ldap-sakai-auth-login.js', __FILE__ ); ?>"></script>
-			<?php
+			$lsa_settings = get_option( 'lsa_settings' );
+
+			if ( $lsa_settings['ldap_type'] === 'custom_uh' ):
+				?>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'ldap-sakai-auth-login.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'ldap-sakai-auth-login.js', __FILE__ ); ?>"></script>
+				<?php
+			endif;
 		}
 
 
