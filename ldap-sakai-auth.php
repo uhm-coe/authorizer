@@ -1370,6 +1370,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			$lsa_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
 			$lsa_settings['access_courses'] = $_POST['access_courses'];
+			$lsa_settings['ldap_password'] = $this->decrypt( base64_decode( $lsa_settings['ldap_password'] ) );
 
 			update_option( 'lsa_settings', $lsa_settings );
 		}
