@@ -87,9 +87,12 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			// Create options page
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
-			// Enqueue javascript only on the plugin's options page and the dashboard (for the widget)
+			// Enqueue javascript and css only on the plugin's options page and the dashboard (for the widget)
 			add_action( 'load-settings_page_ldap-sakai-auth', array( $this, 'load_options_page' ) );
 			add_action( 'admin_head-index.php', array( $this, 'load_options_page' ) );
+
+			// Add custom css and js to wp-login.php
+			add_action( 'login_head', array( $this, 'load_login_css_and_js' ) );
 
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
@@ -800,12 +803,27 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		public function load_options_page() {
 			wp_enqueue_script(
 				'ldap-sakai-auth',
-				plugin_dir_url( __FILE__ ) . 'ldap-sakai-auth.js',
+				plugins_url( 'ldap-sakai-auth.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 
+			wp_register_style( 'ldap-sakai-auth-css', plugins_url( 'ldap-sakai-auth.css', __FILE__ ) );
+			wp_enqueue_style( 'ldap-sakai-auth-css' );
+
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
+		}
+
+
+		/**
+		 * Load external resources on the wp-login.php page.
+		 * Run on action hook: login_head
+		 */
+		function load_login_css_and_js() {
+			?>
+			<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'ldap-sakai-auth-login.css', __FILE__ ); ?>" />
+			<script type="text/javascript" src="<?php print plugins_url( 'ldap-sakai-auth-login.js', __FILE__ ); ?>"></script>
+			<?php
 		}
 
 
