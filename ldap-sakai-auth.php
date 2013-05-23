@@ -352,6 +352,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				return $user;
 			}
 
+			// Custom UH code: remove @hawaii.edu if it exists in the username
+			$username = str_replace( '@hawaii.edu', '', $username );
+
 			// Fail with error message if username or password is blank.
 			if ( empty( $username ) ) {
 				return new WP_Error( 'empty_username', 'Username cannot be blank.' );
