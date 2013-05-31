@@ -329,7 +329,6 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			return $errors;
 		}
 
-
 		/**
 		 ****************************
 		 * LDAP Authentication
@@ -1327,8 +1326,11 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 ****************************
 		 */
 		function add_dashboard_widgets() {
-			// Add dashboard widget for adding/editing sakai courses with access
-			wp_add_dashboard_widget( 'sakai_dashboard_widget', 'Course Access Settings', array( $this, 'add_sakai_dashboard_widget' ) );
+			// Only users who can edit can see the Sakai dashboard widget
+			if ( current_user_can( 'edit_post' ) ) {
+				// Add dashboard widget for adding/editing sakai courses with access
+				wp_add_dashboard_widget( 'sakai_dashboard_widget', 'Course Access Settings', array( $this, 'add_sakai_dashboard_widget' ) );
+			}
 		}
 
 		function add_sakai_dashboard_widget() {
@@ -1377,7 +1379,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			$lsa_settings['access_courses'] = $_POST['access_courses'];
 			$lsa_settings['ldap_password'] = $this->decrypt( base64_decode( $lsa_settings['ldap_password'] ) );
 
-			update_option( 'lsa_settings', $lsa_settings );
+			// Only users who can edit can see the Sakai dashboard widget
+			if ( current_user_can( 'edit_post' ) ) {
+				update_option( 'lsa_settings', $lsa_settings );
+			}
 		}
 
 
