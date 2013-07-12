@@ -1,31 +1,30 @@
-=== LDAP Sakai Authorization ===
+=== CAS Admission ===
 Contributors: figureone
-Tags: ldap, authentication, authorization, sakai, education, laulima
+Tags: cas, authentication, authorization, access, education
 Requires at least: 3.0.1
-Tested up to: 3.5
+Tested up to: 3.5.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-LDAP Sakai Authorization restricts access to students enrolled in university courses, using LDAP for authentication and Sakai for course rosters.
+CAS Admission restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
 
 == Description ==
 
-*LDAP Sakai Authorization* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It replaces the default WordPress login/authorization system with one relying on an LDAP server. Further, it communicates with a Sakai-based course management system (e.g., Laulima at the University of Hawai'i) to retrieve course rosters that it can use to restrict access to only students enrolled in a specific course.
+*CAS Admission* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It replaces the default WordPress login/authorization system with one relying on a CAS server. Further, it maintains a course roster that it can use to restrict access to only students enrolled in a specific course. This course roster can be populated with usernames by an administrator, or an adminstrator can approve individuals from a log of prior CAS login attempts.
 
-*LDAP Sakai Authorization* requires the following:
+*CAS Admission* requires the following:
 
-* **LDAP server** (plugin needs the host, search base, directory user and password);
-* **Sakai-based CMS** (plugin needs the base URL).
+* **CAS server** (plugin needs the URL)
 
-*LDAP Sakai Authorization* provides the following options:
+*CAS Admission* provides the following options:
 
-* **Authentication**: Local (no LDAP); Local first, then LDAP; LDAP-only (except for admins);
-* **Access restriction**: Everyone (no restriction); University members; Specific course(s).
+* **Authentication**: Local (no CAS); Local first, then CAS; CAS-only (except for admins)
+* **Access**: Everyone (all have access); University members (all local and all CAS); Specific users (all local and specific CAS)
 
 == Installation ==
 
-1. Upload the `ldap-sakai-auth` directory to the `/wp-content/plugins/` directory
+1. Upload the `cas-admission` directory to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Specify your server details in the 'Settings' menu in WordPress
 
@@ -33,11 +32,9 @@ LDAP Sakai Authorization restricts access to students enrolled in university cou
 
 = Where is this plugin used? =
 
-The [University of Hawai'i][uh], which stores student, faculty, and staff directory information in LDAP, and runs a [Sakai][sakai]-based course management system called [Laulima][laulima].
+The [University of Hawai'i][uh], which provides authentication for student, faculty, and staff members via CAS.
 
 [uh]: http://hawaii.edu/
-[sakai]: http://www.sakaiproject.org/
-[laulima]: https://laulima.hawaii.edu/
 
 == Screenshots ==
 
@@ -50,7 +47,7 @@ The [University of Hawai'i][uh], which stores student, faculty, and staff direct
 
 = 0.1 =
 * Initial development build.
-* Wed Apr 10, 2013
+* Thu Jul 11, 2013
 
 == Upgrade Notice ==
 
