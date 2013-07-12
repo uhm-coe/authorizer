@@ -103,7 +103,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_save_admission_dashboard_widget', array( $this, 'ajax_save_admission_dashboard_widget' ) );
 
-			// Add dashboard widget so instructors can add/edit sakai courses with access.
+			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 
@@ -157,26 +157,14 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( $cas_settings === FALSE ) {
 				$cas_settings = array();
 			}
-			if ( !array_key_exists( 'ldap_host', $cas_settings ) ) {
-				$cas_settings['ldap_host'] = '';
+			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
+				$cas_settings['cas_host'] = '';
 			}
-			if ( !array_key_exists( 'ldap_search_base', $cas_settings ) ) {
-				$cas_settings['ldap_search_base'] = '';
+			if ( !array_key_exists( 'cas_port', $cas_settings ) ) {
+				$cas_settings['cas_port'] = '';
 			}
-			if ( !array_key_exists( 'ldap_user', $cas_settings ) ) {
-				$cas_settings['ldap_user'] = '';
-			}
-			if ( !array_key_exists( 'ldap_password', $cas_settings ) ) {
-				$cas_settings['ldap_password'] = '';
-			}
-			if ( !array_key_exists( 'ldap_type', $cas_settings ) ) {
-				$cas_settings['ldap_type'] = 'openldap';
-			}
-			if ( !array_key_exists( 'ldap_tls', $cas_settings ) ) {
-				$cas_settings['ldap_tls'] = '1';
-			}
-			if ( !array_key_exists( 'sakai_base_url', $cas_settings ) ) {
-				$cas_settings['sakai_base_url'] = '';
+			if ( !array_key_exists( 'cas_path', $cas_settings ) ) {
+				$cas_settings['cas_path'] = '';
 			}
 			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
@@ -358,110 +346,65 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			$cas_settings = get_option( 'cas_settings' );
 
-			// If we're restricting access to only WP users, don't check against ldap;
+			// If we're restricting access to only WP users, don't check against CAS;
 			// Instead, pass through to default WP authentication.
 			if ( $cas_settings['access_restriction'] === 'user' ) {
-				return new WP_Error( 'no_ldap', 'Only authenticate against local WP install (not LDAP).' );
+				return new WP_Error( 'no_cas', 'Only authenticate against local WP install (not CAS).' );
 			}
 
-			switch ( $cas_settings['ldap_type'] ) {
-			case 'custom_uh': // University of Hawai'i
-				$ldap = ldap_connect( $cas_settings['ldap_host'] );
-				ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-				if ( $cas_settings['ldap_tls'] == 1 ) {
-					ldap_start_tls( $ldap );
-				}
-				$result = ldap_bind( $ldap, $cas_settings['ldap_user'], $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ) );
-				if ( !$result ) {
-					return new WP_Error( 'ldap_error', 'Could not authenticate.' );
-				}
-				// UH has an odd system; people cn's are their uhuuid's (8 digit
-				// numbers), not their uids (unique email address usernames).
-				// So here we need to do an extra search by uid to get a uhuuid,
-				// and then attempt to authenticate with uhuuid and password.
-				$ldap_search = ldap_search(
-					$ldap,
-					$cas_settings['ldap_search_base'],
-					"(uid=$username)",
-					array(
-						'givenName',
-						'sn',
-						'mail',
-						'uhUuid',
-					)
-				);
-				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
-
-				// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
-				if ( $ldap_entries['count'] < 1 ) {
-					return new WP_Error( 'no_ldap', 'No LDAP user found.' );
-				}
-
-				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
-					$ldap_user['dn'] = $ldap_entries[$i]['dn'];
-					$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
-					$ldap_user['last'] = $ldap_entries[$i]['sn'][0];
-					$ldap_user['email'] = $ldap_entries[$i]['mail'][0];
-				}
-
-				$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
-				if ( !$result ) {
-					// We have a real ldap user, but an invalid password, so we shouldn't
-					// pass through to wp authentication after failing ldap. Instead,
-					// remove the WordPress authenticate function, and return an error.
-					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-					return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
-				}
-
-				break;
-			case 'ad': // Active Directory
-				/**
-				@todo: incomplete authentication (via active directory)
-				*/
-				return new WP_Error( 'adldap_error', 'Incomplete authentication routine.' );
-				// try {
-				// 	$adldap = new adLDAP(
-				// 		array(
-				// 			'base_dn' => $cas_settings['ldap_search_base'],
-				// 			'domain_controllers' => array($cas_settings['ldap_host']),
-				// 			'admin_username' => $cas_settings['ldap_user'],
-				// 			'account_suffix' => '', // suffix should already be included in the admin_username
-				// 			'admin_password' => $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ),
-				// 			'use_tls' => $cas_settings['ldap_tls'] == 1,
-				// 		)
-				// 	);
-				// 	$result = $adldap->authenticate( $username, $password );
-				// 	if ( !$result ) {
-				// 		//do_action( 'wp_login_failed', $username );
-				// 		return new WP_Error( 'adldap_error', 'Could not authenticate against Active Directory.' );
-				// 	}
-				// } catch (adLDAPException $e) {;
-				// 	//do_action( 'wp_login_failed', $username );
-				// 	return new WP_Error( 'adldap_error', $e );
-				// }
-				break;
-			case 'openldap': // OpenLDAP
-				/**
-				@todo: incomplete authentication (via openldap)
-				*/
-				return new WP_Error( 'openldap_error', 'Incomplete authentication routine.' );
-				// $ldap = ldap_connect( $cas_settings['ldap_host'] );
-				// ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-				// if ( $cas_settings['ldap_tls'] == 1 ) {
-				// 	ldap_start_tls( $ldap );
-				// }
-				// $result = ldap_bind( $ldap, $cas_settings['ldap_user'], $cas_settings['ldap_password'] );
-				break;
-			default:
-				//do_action( 'wp_login_failed', $username );
-				return new WP_Error( 'missing_ldap_type', 'An administrator must choose an LDAP type to authenticate against an LDAP server (Error: Missing ldap_type specification).' );
-				break;
+			$ldap = ldap_connect( $cas_settings['ldap_host'] );
+			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
+			if ( $cas_settings['ldap_tls'] == 1 ) {
+				ldap_start_tls( $ldap );
 			}
+			$result = ldap_bind( $ldap, $cas_settings['ldap_user'], $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ) );
+			if ( !$result ) {
+				return new WP_Error( 'ldap_error', 'Could not authenticate.' );
+			}
+			// UH has an odd system; people cn's are their uhuuid's (8 digit
+			// numbers), not their uids (unique email address usernames).
+			// So here we need to do an extra search by uid to get a uhuuid,
+			// and then attempt to authenticate with uhuuid and password.
+			$ldap_search = ldap_search(
+				$ldap,
+				$cas_settings['ldap_search_base'],
+				"(uid=$username)",
+				array(
+					'givenName',
+					'sn',
+					'mail',
+					'uhUuid',
+				)
+			);
+			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+
+			// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
+			if ( $ldap_entries['count'] < 1 ) {
+				return new WP_Error( 'no_ldap', 'No LDAP user found.' );
+			}
+
+			for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
+				$ldap_user['dn'] = $ldap_entries[$i]['dn'];
+				$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
+				$ldap_user['last'] = $ldap_entries[$i]['sn'][0];
+				$ldap_user['email'] = $ldap_entries[$i]['mail'][0];
+			}
+
+			$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
+			if ( !$result ) {
+				// We have a real ldap user, but an invalid password, so we shouldn't
+				// pass through to wp authentication after failing ldap. Instead,
+				// remove the WordPress authenticate function, and return an error.
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
+			}
+
 
 			// Successfully authenticated now, so create/update the WordPress user.
 			$user = get_user_by( 'login', $username );
+
+			// User doesn't exist in WordPress, so add it.
 			if ( ! ( $user && strcasecmp( $user->user_login, $username ) ) ) {
-				// User doesn't exist in WordPress, so add it.
 				$result = wp_insert_user(
 					array(
 						'user_login' => $username,
@@ -499,7 +442,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$user = new WP_User( $result );
 			}
 
-			// Reset cached access so plugin checks against sakai to make sure this newly-logged in user still has access (if restricting access by sakai course)
+
+			// Reset cached access so plugin checks against whitelist to make sure this newly-logged in user still has access (if restricting access by course)
 			update_user_meta( $user->ID, 'has_access', false );
 
 			// Make sure (if we're restricting access by courses) that the current user is enrolled in an allowed course
@@ -508,7 +452,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				! $this->is_current_user_enrolled( $user->ID )
 			);
 			if ( $logged_in_but_no_access ) {
-				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				update_option( 'cas_settings_misc_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
@@ -545,8 +489,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				( $cas_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
 				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
 				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
-				( $cas_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
-				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
+				( $cas_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in course if option is set to 'course' members only (check cached result first)
+				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in course if option is set to 'course' members only (check against whitelist if no cached value is present)
 			);
 			$is_restricted = !$has_access;
 
@@ -586,7 +530,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
 			if ( $logged_in_but_no_access ) {
-				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
+				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				update_option( 'cas_settings_misc_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
@@ -620,9 +564,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 		/**
-		 * Determine if current user is enrolled in one of the allowed sakai courses.
+		 * Determine if current user is enrolled by checking the whitelist.
 		 *
-		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
+		 * @returns BOOL true if the currently logged in user is listed in the whitelist in the plugin options.
 		 */
 		function is_current_user_enrolled() {
 			$cas_settings = get_option( 'cas_settings' );
@@ -769,25 +713,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function admin_head() {
 			$screen = get_current_screen();
 			
-			// Add help tab for LDAP Settings
-			$help_cas_settings_ldap_content = '
-				<p><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</p>
-				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=yourcompany,dc=com</p>
-				<p><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</p>
-				<p><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</p>
-				<p><strong>LDAP Installation type</strong>: Select whether your LDAP server is running an Active Directory-compatible LDAP instance, or an OpenLDAP-compatible instance.</p>
-				<p><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</p>
+			// Add help tab for CAS Settings
+			$help_cas_settings_cas_content = '
+				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
+				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
+				<p><strong>CAS server path</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas/login).</p>
 			';
-
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_cas_settings_ldap',
 					'title' => 'LDAP Settings',
-					'content' => $help_cas_settings_ldap_content,
+					'content' => $help_cas_settings_cas_content,
 				)
 			);
-
-			// Add help tab for Sakai Settings
 
 			// Add help tab for Access Settings      
 		}
