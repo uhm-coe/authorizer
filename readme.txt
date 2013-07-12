@@ -13,6 +13,8 @@ CAS Admission restricts access to students enrolled in university courses, using
 
 *CAS Admission* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It replaces the default WordPress login/authorization system with one relying on a CAS server. Further, it maintains a course roster that it can use to restrict access to only students enrolled in a specific course. This course roster can be populated with usernames by an administrator, or an adminstrator can approve individuals from a log of prior CAS login attempts.
 
+The primary difference between this plugin and other CAS offerings is that we offer the functionality to restrict all access to a WordPress site based on successful CAS logins.
+
 *CAS Admission* requires the following:
 
 * **CAS server** (plugin needs the URL)

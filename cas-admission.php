@@ -10,7 +10,7 @@ License: GPL2
 */
 
 /*
-Copyright 2013  Paul Ryan  (email : prar@hawaii.edu)
+Copyright 2013  Paul Ryan  (email: prar@hawaii.edu)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as 
@@ -27,7 +27,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 /*
-Portions forked from Restricted Site Access plugin: http://10up.com/plugins/restricted-site-access-wordpress/
+Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
+Portions forked from wpCAS plugin:  http://wordpress.org/extend/plugins/cas-authentication/
 */
 
 
@@ -47,21 +48,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
-			//$adldap = new adLDAP();
-
 			// Register filters.
 
 			// Custom wp authentication routine using CAS
-			add_filter( 'authenticate', array( $this, 'ldap_authenticate' ), 1, 3 );
+			add_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
 
-			// Removing this bypasses Wordpress authentication (so if ldap auth fails,
-			// no one can log in); with it enabled, it will run if ldap auth fails.
+			// Removing this bypasses Wordpress authentication (so if CAS auth fails,
+			// no one can log in); with it enabled, it will run if CAS auth fails.
 			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3);
 
 			// Create settings link on Plugins page
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
 
-			// Modify login page to help users use ldap to log in
+			// Modify login page to help users use CAS to log in
 			if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) {
 				add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
 				add_filter( 'gettext', array( $this, 'custom_login_form_labels' ), 20, 3 );
@@ -239,11 +238,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				delete_option( 'cas_settings_misc_admin_notice' );
 			}
 
-			// Delete sakai session token from user meta for all users.
-			$all_user_ids = get_users( 'fields=ID' );
-			foreach ( $all_user_ids as $user_id ) {
-				delete_user_meta( $user_id, 'sakai_session_id' );
-			}
 		} // END deactivate()
 
 
@@ -273,21 +267,17 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 		/**
-		 * Overwrite the username label on the login form.
+		 * Overwrite the username and password labels on the login form.
 		 */
 		function custom_login_form_labels( $translated_text, $text, $domain ) {
 			$cas_settings = get_option( 'cas_settings' );
 
 			if ( $translated_text === 'Username' ) {
-				if ( array_key_exists( 'ldap_type', $cas_settings ) && $cas_settings['ldap_type'] === 'custom_uh' ) {
-					$translated_text = 'UH Username';
-				}
+				$translated_text = 'Username';
 			}
 
 			if ( $translated_text === 'Password' ) {
-				if ( array_key_exists( 'ldap_type', $cas_settings ) && $cas_settings['ldap_type'] === 'custom_uh' ) {
-					$translated_text = 'UH Password';
-				}
+				$translated_text = 'Password';
 			}
 
 			return $translated_text;
@@ -339,7 +329,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 *
 		 * @return WP_User or WP_Error
 		 */
-		public function ldap_authenticate( $user, $username, $password ) {
+		public function cas_authenticate( $user, $username, $password ) {
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
 				return $user;
@@ -508,28 +498,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$user = new WP_User( $result );
 			}
 
-			// Try to create a Sakai session if Sakai base URL option exists; save session id in user meta
-			if ( strlen( $cas_settings['sakai_base_url'] ) > 0 ) {
-				$sakai_session = $this->call_api(
-					'post',
-					trailingslashit( $cas_settings['sakai_base_url'] ) . 'session',
-					array(
-						'_username' => $username,
-						'_password' => $password,
-					)
-				);
-				if ( isset( $sakai_session ) ) {
-					update_user_meta( $user->ID, 'sakai_session_id', $sakai_session );
-				}
-			}
-
 			// Reset cached access so plugin checks against sakai to make sure this newly-logged in user still has access (if restricting access by sakai course)
 			update_user_meta( $user->ID, 'has_access', false );
 
 			// Make sure (if we're restricting access by courses) that the current user is enrolled in an allowed course
 			$logged_in_but_no_access = (
 				$cas_settings['access_restriction'] == 'course' &&
-				! $this->is_current_user_sakai_enrolled( $user->ID )
+				! $this->is_current_user_enrolled( $user->ID )
 			);
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
@@ -570,7 +545,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
 				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
 				( $cas_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
-				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
+				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
 			);
 			$is_restricted = !$has_access;
 
@@ -677,61 +652,31 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 *
 		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
 		 */
-		function is_current_user_sakai_enrolled( $current_user = '' ) {
+		function is_current_user_enrolled() {
 			$cas_settings = get_option( 'cas_settings' );
-
-			if ( $current_user === '' ) {
-				$current_user = get_current_user_id();
-			}
 
 			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
 			if ( $cas_settings['access_restriction'] == 'everyone' || $cas_settings['access_restriction'] == 'university' ) {
 				return true;
 			}
+
+			$current_user = wp_get_current_user();
 			$has_access = false;
 
-			$sakai_session_id = get_user_meta( $current_user, 'sakai_session_id', true );
-			foreach ( $cas_settings['access_courses'] as $sakai_site_id ) {
-				$request_url = trailingslashit( $cas_settings['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
-				$permission_to_visit = $this->call_api(
-					'get',
-					$request_url,
-					array(
-						'sakai.session' => $sakai_session_id,
-					)
-				);
-				if ( isset( $permission_to_visit ) ) {
-					if ( strpos( 'HTTP Status 403', $permission_to_visit ) !== false ) {
-						// couldn't get sakai info because not logged in, so don't check any more site ids
-						$has_access = false;
-						break;
-					} else if ( strpos( 'HTTP Status 500', $permission_to_visit ) !== false ) {
-						// couldn't get sakai info because no permissions (this seems like a wrong error code from laulima...)
-					} else {
-						$permission_to_visit = json_decode( $permission_to_visit );
-						if ( isset( $permission_to_visit ) && property_exists( $permission_to_visit, 'data' ) && in_array( 'site.visit', $permission_to_visit->data ) ) {
-							$has_access = true;
-							break;
-						}
-					}
+			// See if the current user is in the whitelist of users with access
+			foreach ( $cas_settings['access_users_enrolled'] as $enrolled_user ) {
+				if ( $enrolled_user['username'] === current_user->user_login ) {
+					$has_access = true;
+					break;
 				}
 			}
 
-			// Store the result in user meta so we don't have to keep checking against sakai on every page load
+			// Store the result in user meta so we don't have to keep checking on every page load
 			update_user_meta( $current_user, 'has_access', $has_access );
-
-			// If this user has access, store the sakai course site id in his/her usermeta, so we have a
-			// record that they were enrolled in that course.
-			if ( $has_access ) {
-				$enrolled_courses = get_user_meta( $current_user, 'enrolled_courses' );
-				if ( ! in_array( $sakai_session_id, $enrolled_courses ) ) {
-					$enrolled_courses[] = $sakai_session_id;
-					update_user_meta( $current_user, 'enrolled_courses', $enrolled_courses );
-				}
-			}
 
 			return $has_access;
 		}
+
 
 
 		/**
