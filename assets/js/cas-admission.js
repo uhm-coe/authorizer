@@ -1,45 +1,6 @@
-var add_btn_ip, add_btn_course;
+var add_btn_course;
 var animation_speed = 300;
 var shake_speed = 600;
-
-
-// Add IP address to whitelist.
-function cas_add_ip(ip) {
-  if (jQuery.trim(ip) == '')
-    return false;
-
-  add_btn_ip.attr('disabled', 'disabled');
-
-  // Check if the IP address being added already exists in the list.
-  jQuery('#list_cas_settings_misc_ips input[type=text]').each(function() {
-    if (this.value == ip) {
-      jQuery(this).parent().effect('shake',shake_speed);
-      add_btn_ip.removeAttr('disabled');
-      return false;
-    }
-  });
-
-  jQuery('#newip').css('background', 'url(/wp-admin/images/loading.gif) no-repeat 148px 2px');
-  jQuery.post(ajaxurl, { action: 'cas_ip_check', 'ip_address': ip }, function(response) {
-    jQuery('#newip').css('background', 'none');
-    if (response) { // failed checking ip
-      jQuery('#newip').parent().effect('shake',shake_speed);
-      add_btn_ip.removeAttr('disabled');
-      return false;
-    } else { // succeeded checking ip
-      jQuery('<li style="display: none;"><input type="text" name="cas_settings[misc_ips][]" value="' + ip + '" readonly="true" /> <input type="button" class="button" onclick="cas_remove_ip(this);" value="&minus;" /></div>').appendTo('#list_cas_settings_misc_ips').slideDown(250);
-      // Reset the new ip textbox if we successfully added this ip
-      if (ip == jQuery('#newip').val())
-        jQuery('#newip').val('');
-      jQuery('#addip').removeAttr('disabled');
-      return true;
-    }
-  } );
-}
-// Remove IP address from whitelist.
-function cas_remove_ip(btnObj) {
-  jQuery(btnObj).parent().slideUp(250,function(){ jQuery(this).remove(); });
-}
 
 
 // Add course to whitelist.
@@ -49,7 +10,7 @@ function cas_add_course(course) {
 
   add_btn_course.attr('disabled', 'disabled');
 
-  // Check if the IP address being added already exists in the list.
+  // Check if the course being added already exists in the list.
   jQuery('#list_cas_settings_access_courses input[type=text]').each(function() {
     if (this.value == course) {
       jQuery(this).parent().effect('shake',shake_speed);
@@ -79,13 +40,13 @@ function cas_add_course(course) {
     }
   });
 }
-// Remove IP address from whitelist.
+// Remove course from whitelist.
 function cas_remove_course(btnObj) {
   jQuery(btnObj).parent().slideUp(250,function(){ jQuery(this).remove(); });
 }
 
 
-// Save sakai options from dashboard widget.
+// Save options from dashboard widget.
 function save_cas_settings_access(caller) {
   jQuery('#cas_settings_access_form .spinner').show();
   jQuery(caller).attr('disabled', 'disabled');
@@ -129,7 +90,6 @@ function getParameterByName(needle, haystack) {
 
 jQuery(document).ready(function($){
   // hide and show relevant pieces
-  add_btn_ip = $('#addip');
   add_btn_course = $('#addcourse');
 
   // Show and hide specific options on page load
@@ -192,21 +152,6 @@ jQuery(document).ready(function($){
     } else {
       $('div.animated_wrapper', cas_settings_access_courses).slideDown(animation_speed);
     }
-});
-
-  
-
-  // Get course name for Site ID from Sakai
-  $('#list_cas_settings_access_courses label').each(function() {
-    $.post(ajaxurl, {
-      action: 'cas_course_check', 
-      'sakai_site_id': $(this).siblings('input[type=text]').val(), 
-      'sakai_base_url': $('#cas_settings_sakai_base_url').val(),
-      'element_to_update': $(this).attr('for')
-      }, function(response) {
-      if (response!=0) { // failed checking course
-        $('#' + getParameterByName('element_to_update',this.data)).siblings('label').children('.description').html(response);
-      }
-    });
   });
+
 });

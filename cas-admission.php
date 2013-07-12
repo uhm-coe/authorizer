@@ -32,6 +32,13 @@ Portions forked from wpCAS plugin:  http://wordpress.org/extend/plugins/cas-auth
 */
 
 
+// Add phpCAS library if it's not included.
+// @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
+if ( ! defined( 'PHPCAS_VERSION' ) ) {
+	include_once dirname(__FILE__) . '/assets/inc/CAS-1.3.2/CAS.php';
+}
+
+
 if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 	/**
 	 * Define class for plugin: CAS Admission.
@@ -90,10 +97,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
-			// ajax IP verification check
-			add_action( 'wp_ajax_cas_ip_check', array( $this, 'ajax_cas_ip_check' ) );
-
-			// ajax IP verification check
+			// ajax course verification check
 			add_action( 'wp_ajax_cas_course_check', array( $this, 'ajax_cas_course_check' ) );
 
 			// ajax save options from dashboard widget
@@ -191,9 +195,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
 				$cas_settings['access_redirect_to_page'] = '';
-			}
-			if ( !array_key_exists( 'misc_ips', $cas_settings ) ) {
-				$cas_settings['misc_ips'] = '';
 			}
 			if ( !array_key_exists( 'misc_lostpassword_url', $cas_settings ) ) {
 				$cas_settings['misc_lostpassword_url'] = '';
@@ -582,35 +583,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				return;
 			}
 
-			// Allow access from the ip address allow list; if it's empty, block everything
-			if ( $allowed_ips = $cas_settings['misc_ips'] ) {
-				$current_user_ip = $_SERVER['REMOTE_ADDR'];
-				if ( strpos( $current_user_ip, '.' ) !== false ) {
-					$current_user_ip = str_replace( '::ffff:', '', $current_user_ip ); // Handle dual-stack addresses
-				}
-				$current_user_ip = inet_pton( $current_user_ip ); // Parse the remote ip
-				foreach ( $allowed_ips as $line ) {
-					list( $ip, $mask ) = explode( '/', $line . '/128' ); // get the ip and mask from the list
-					$mask = str_repeat( 'f', $mask >> 2 ); //render the mask as bits, similar to info on the php.net man page discussion for inet_pton
-					switch ( $mask % 4 ) {
-					case 1:
-						$mask .= '8';
-						break;
-					case 2:
-						$mask .= 'c';
-						break;
-					case 3:
-						$mask .= 'e';
-						break;
-					}
-					$mask = pack( 'H*', $mask );
-					// check if the masked versions match
-					if ( ( inet_pton( $ip ) & $mask ) == ( $current_user_ip & $mask ) ) {
-						return;
-					}
-				}
-			}
-
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
 			if ( $logged_in_but_no_access ) {
@@ -822,40 +794,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 
 		/**
-		 * validate IP address entry on demand (AJAX)
-		 */
-		public function ajax_cas_ip_check() {
-			if ( empty( $_POST['ip_address'] ) ) {
-				die('1');
-			} else if ( $this->is_ip( stripslashes( $_POST['ip_address'] ) ) ) {
-				die; // success
-			} else {
-				die('1');
-			}
-		}
-
-		/**
-		 * Is it a valid IP address? v4/v6 with subnet range
-		 */
-		public function is_ip( $ip_address ) {
-			// very basic validation of ranges
-			if ( strpos( $ip_address, '/' ) )
-			{
-				$ip_parts = explode( '/', $ip_address );
-				if ( empty( $ip_parts[1] ) || !is_numeric( $ip_parts[1] ) || strlen( $ip_parts[1] ) > 3 )
-					return false;
-				$ip_address = $ip_parts[0];
-			}
-
-			// confirm IP part is a valid IPv6 or IPv4 IP
-			if ( empty( $ip_address ) || !inet_pton( stripslashes( $ip_address ) ) )
-				return false;
-
-			return true;
-		}
-
-
-		/**
 		 * Validate Sakai Site ID entry on demand (AJAX)
 		 */
 		public function ajax_cas_course_check() {
@@ -891,37 +829,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 
 		/**
-		 * Wrapper for a RESTful call.
-		 * Method: POST, PUT, GET etc
-		 * Data: array( "param" => "value" ) ==> index.php?param=value
-		 */
-		private function call_api( $method, $url, $data = false ) {
-			$curl = curl_init();
-			switch ( strtoupper( $method ) ) {
-				case 'POST':
-					curl_setopt( $curl, CURLOPT_POST, 1 );
-					if ( $data )
-							curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
-					break;
-				case 'PUT':
-					curl_setopt( $curl, CURLOPT_PUT, 1 );
-					break;
-				default:
-					if ($data)
-						$url = sprintf( '%s?%s', $url, http_build_query( $data ) );
-			}
-
-			// Optional Authentication:
-			//curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-			//curl_setopt($curl, CURLOPT_USERPWD, "username:password");
-
-			curl_setopt( $curl, CURLOPT_URL, $url );
-			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-			return curl_exec( $curl );
-		}
-
-
-		/**
 		 * Create sections and options
 		 * Run on action hook: admin_init
 		 */
@@ -945,7 +852,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
 				'cas_settings_access_default_role', // HTML element ID
-				'Default role for new LDAP users', // HTML element Title
+				'Default role for new CAS users', // HTML element Title
 				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
@@ -957,13 +864,40 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
+/**
+@todo: remove refs to access_courses var and add refs to users_pending/enrolled/blocked
+*/
+			// add_settings_field(
+			// 	'cas_settings_access_courses', // HTML element ID
+			// 	'Course Site IDs with access (one per line)', // HTML element Title
+			// 	array( $this, 'print_combo_cas_access_courses' ), // Callback (echos form element)
+			// 	'cas_admission', // Page this setting is shown on (slug)
+			// 	'cas_settings_access' // Section this setting is shown on
+			// );
 			add_settings_field(
-				'cas_settings_access_courses', // HTML element ID
-				'Course Site IDs with access (one per line)', // HTML element Title
-				array( $this, 'print_combo_cas_access_courses' ), // Callback (echos form element)
+				'cas_settings_access_users_pending', // HTML element ID
+				'Pending CAS Users', // HTML element Title
+				array( $this, 'print_select_cas_access_users_pending' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
+			add_settings_field(
+				'cas_settings_access_users_enrolled', // HTML element ID
+				'Approved CAS Users', // HTML element Title
+				array( $this, 'print_select_cas_access_users_enrolled' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'cas_settings_access_users_blocked', // HTML element ID
+				'Blocked CAS Users', // HTML element Title
+				array( $this, 'print_select_cas_access_users_blocked' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+/**
+END TODO
+*/
 			add_settings_field(
 				'cas_settings_access_redirect', // HTML element ID
 				'What happens to people without access?', // HTML element Title
@@ -995,71 +929,33 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'cas_settings_ldap', // HTML element ID
-				'LDAP Settings', // HTML element Title
-				array( $this, 'print_section_info_ldap' ), // Callback (echos section content)
+				'cas_settings_cas', // HTML element ID
+				'CAS Settings', // HTML element Title
+				array( $this, 'print_section_info_cas' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
-				'cas_settings_ldap_host', // HTML element ID
-				'LDAP Host', // HTML element Title
-				array( $this, 'print_text_cas_ldap_host' ), // Callback (echos form element)
+				'cas_settings_cas_host', // HTML element ID
+				'CAS server hostname', // HTML element Title
+				array( $this, 'print_text_cas_host' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
+				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_ldap_search_base', // HTML element ID
-				'LDAP Search Base', // HTML element Title
-				array( $this, 'print_text_cas_ldap_search_base' ), // Callback (echos form element)
+				'cas_settings_cas_port', // HTML element ID
+				'CAS server port', // HTML element Title
+				array( $this, 'print_text_cas_port' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
+				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_ldap_user', // HTML element ID
-				'LDAP Directory User', // HTML element Title
-				array( $this, 'print_text_cas_ldap_user' ), // Callback (echos form element)
+				'cas_settings_cas_path', // HTML element ID
+				'CAS server path', // HTML element Title
+				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_ldap_password', // HTML element ID
-				'LDAP Directory User Password', // HTML element Title
-				array( $this, 'print_password_cas_ldap_password' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_ldap_type', // HTML element ID
-				'LDAP installation type', // HTML element Title
-				array( $this, 'print_radio_cas_ldap_type' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_ldap_tls', // HTML element ID
-				'Secure Connection (TLS)', // HTML element Title
-				array( $this, 'print_checkbox_cas_ldap_tls' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_ldap' // Section this setting is shown on
-			);
-
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
-			add_settings_section(
-				'cas_settings_sakai', // HTML element ID
-				'Sakai Settings', // HTML element Title
-				array( $this, 'print_section_info_sakai' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
-			);
-
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
-			add_settings_field(
-				'cas_settings_sakai_base_url', // HTML element ID
-				'Sakai Base URL', // HTML element Title
-				array( $this, 'print_text_cas_sakai_base_url' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_sakai' // Section this setting is shown on
+				'cas_settings_cas' // Section this setting is shown on
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
@@ -1077,13 +973,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_misc' // Section this setting is shown on
 			);
-			add_settings_field(
-				'cas_settings_misc_ips', // HTML element ID
-				'Unrestricted IP addresses', // HTML element Title
-				array( $this, 'print_combo_cas_misc_ips' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_misc' // Section this setting is shown on
-			);
 		}
 
 
@@ -1093,22 +982,18 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 */
 		function sanitize_cas_settings( $cas_settings ) {
 			// Sanitize LDAP Host setting
-			if ( filter_var( $cas_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
-				$cas_settings['ldap_host'] = '';
-			}
-			// Obfuscate LDAP directory user password
-			if ( strlen( $cas_settings['ldap_password'] ) > 0 ) {
-				// base64 encode the directory user password for some minor obfuscation in the database.
-				$cas_settings['ldap_password'] = base64_encode( $this->encrypt( $cas_settings['ldap_password'] ) );
+			if ( filter_var( $cas_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
+				$cas_settings['cas_host'] = '';
 			}
 			// Default to "Everyone" access restriction
 			if ( !in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
 			}
-			// Sanitize ABC setting
-			if ( false ) {
-				$cas_settings['somesetting'] = '';
-			}
+
+			// Sanitize ABC setting (template)
+			// if ( false ) {
+			// 	$cas_settings['somesetting'] = '';
+			// }
 
 			return $cas_settings;
 		}
@@ -1117,42 +1002,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		/**
 		 * Settings print callbacks
 		 */
-		function print_section_info_ldap() {
+		function print_section_info_cas() {
 			print 'Enter your LDAP server settings below:';
 		}
-		function print_text_cas_ldap_host( $args = '' ) {
+		function print_text_cas_host( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_ldap_host" name="cas_settings[ldap_host]" value="<?= $cas_settings['ldap_host']; ?>" /><?php
+			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" /><?php
 		}
-		function print_text_cas_ldap_search_base( $args = '' ) {
+		function print_text_cas_port( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_ldap_search_base" name="cas_settings[ldap_search_base]" value="<?= $cas_settings['ldap_search_base']; ?>" style="width:225px;" /><?php
+			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" style="width:225px;" /><?php
 		}
-		function print_text_cas_ldap_user( $args = '' ) {
+		function print_text_cas_path( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_ldap_user" name="cas_settings[ldap_user]" value="<?= $cas_settings['ldap_user']; ?>" style="width:275px;" /><?php
-		}
-		function print_password_cas_ldap_password( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="password" id="cas_settings_ldap_password" name="cas_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($cas_settings['ldap_password'])); ?>" /><?php
-		}
-		function print_radio_cas_ldap_type( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="radio" name="cas_settings[ldap_type]" value="ad"<?php checked( 'ad' == $cas_settings['ldap_type'] ); ?> /> Active Directory<br />
-				<input type="radio" name="cas_settings[ldap_type]" value="openldap"<?php checked( 'openldap' == $cas_settings['ldap_type'] ); ?> /> OpenLDAP<br />
-				<input type="radio" name="cas_settings[ldap_type]" value="custom_uh"<?php checked( 'custom_uh' == $cas_settings['ldap_type'] ); ?> /> Custom: University of Hawai'i<?php
-		}
-		function print_checkbox_cas_ldap_tls( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="checkbox" name="cas_settings[ldap_tls]" value="1"<?php checked( 1 == $cas_settings['ldap_tls'] ); ?> /> Use TLS<?php
-		}
-
-		function print_section_info_sakai() {
-			print 'Enter your Sakai-based course management system settings below:';
-		}
-		function print_text_cas_sakai_base_url( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_sakai_base_url" name="cas_settings[sakai_base_url]" value="<?= $cas_settings['sakai_base_url']; ?>" style="width:275px;" /><?php
+			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" style="width:275px;" /><?php
 		}
 
 		function print_section_info_access() {
@@ -1165,9 +1028,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
 		}
-		/**
-		@todo: migrate this to a combo tool like below in Unrestricted IP addresses
-		*/
 		function print_combo_cas_access_courses( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_access_courses" style="margin:0;">
@@ -1235,29 +1095,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_section_info_misc() {
 			print 'You may optionally specify some advanced settings below:';
-		}
-		function print_combo_cas_misc_ips( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_misc_ips" style="margin:0;">
-				<?php if ( array_key_exists( 'misc_ips', $cas_settings ) && is_array( $cas_settings['misc_ips'] ) ) : ?>
-					<?php foreach ( $cas_settings['misc_ips'] as $key => $ip ): ?>
-						<?php if ( empty( $ip ) ) continue; ?>
-						<li>
-							<input type="text" id="cas_settings_misc_ips_<?= $key; ?>" name="cas_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
-							<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="cas_remove_ip(this);" value="&minus;" />
-						</li>
-					<?php endforeach; ?>
-				<?php endif; ?>
-			</ul>
-			<div id="new_cas_settings_misc_ips">
-				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
-				<input class="button" type="button" id="addip" onclick="cas_add_ip(jQuery('#newip').val());" value="+" />
-				<label for="newip"><span class="description"></span></label>
-				<?php if ( !empty( $_SERVER['REMOTE_ADDR'] ) ): ?>
-					<br /><input class="button" type="button" onclick="cas_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
-				<?php endif; ?>
-			</div>
-			<?php
 		}
 		function print_text_cas_misc_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
@@ -1368,28 +1205,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 	} // END class WP_Plugin_CAS_Admission
 }
-
-
-/**
- * inet_pton is not included in PHP < 5.3 on Windows (WP requires PHP 5.2)
- */
-if ( ! function_exists( 'inet_pton' ) ) :
-	function inet_pton( $ip ) {
-		if ( strpos( $ip, '.' ) !== false ) {
-			// ipv4
-			$ip = pack( 'N', ip2long( $ip ) );
-		} elseif ( strpos( $ip, ':' ) !== false ) {
-			// ipv6
-			$ip = explode( ':', $ip );
-			$res = str_pad( '', ( 4 * ( 8 - count( $ip ) ) ), '0000', STR_PAD_LEFT );
-			foreach ( $ip as $seg ) {
-				$res .= str_pad( $seg, 4, '0', STR_PAD_LEFT );
-			}
-			$ip = pack( 'H'.strlen( $res ), $res );
-		}
-		return $ip;
-	}
-endif;
 
 
 // Installation and uninstallation hooks.
