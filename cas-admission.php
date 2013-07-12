@@ -68,7 +68,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			// If we have a custom login error, add the filter to show it.
-			$error = get_option( 'lsa_settings_misc_login_error' );
+			$error = get_option( 'cas_settings_misc_login_error' );
 			if ( $error && strlen( $error ) > 0 ) {
 				add_filter( 'login_errors', array( $this, 'show_misc_login_error' ) );
 			}
@@ -92,20 +92,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
 			// ajax IP verification check
-			add_action( 'wp_ajax_lsa_ip_check', array( $this, 'ajax_lsa_ip_check' ) );
+			add_action( 'wp_ajax_cas_ip_check', array( $this, 'ajax_cas_ip_check' ) );
 
 			// ajax IP verification check
-			add_action( 'wp_ajax_lsa_course_check', array( $this, 'ajax_lsa_course_check' ) );
+			add_action( 'wp_ajax_cas_course_check', array( $this, 'ajax_cas_course_check' ) );
 
 			// ajax save options from dashboard widget
-			add_action( 'wp_ajax_save_sakai_dashboard_widget', array( $this, 'ajax_save_sakai_dashboard_widget' ) );
+			add_action( 'wp_ajax_save_admission_dashboard_widget', array( $this, 'ajax_save_admission_dashboard_widget' ) );
 
 			// Add dashboard widget so instructors can add/edit sakai courses with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 
 			// If we have a custom admin message, add the action to show it.
-			$notice = get_option( 'lsa_settings_misc_admin_notice' );
+			$notice = get_option( 'cas_settings_misc_admin_notice' );
 			if ( $notice && strlen( $notice ) > 0 ) {
 				add_action( 'admin_notices', array( $this, 'show_misc_admin_notice' ) );
 			}
@@ -150,68 +150,68 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			global $wp_roles;
 
 			// Set meaningful defaults (but if values already exist in db, use those).
-			$lsa_settings = get_option( 'lsa_settings' );
-			if ( $lsa_settings === FALSE ) {
-				$lsa_settings = array();
+			$cas_settings = get_option( 'cas_settings' );
+			if ( $cas_settings === FALSE ) {
+				$cas_settings = array();
 			}
-			if ( !array_key_exists( 'ldap_host', $lsa_settings ) ) {
-				$lsa_settings['ldap_host'] = '';
+			if ( !array_key_exists( 'ldap_host', $cas_settings ) ) {
+				$cas_settings['ldap_host'] = '';
 			}
-			if ( !array_key_exists( 'ldap_search_base', $lsa_settings ) ) {
-				$lsa_settings['ldap_search_base'] = '';
+			if ( !array_key_exists( 'ldap_search_base', $cas_settings ) ) {
+				$cas_settings['ldap_search_base'] = '';
 			}
-			if ( !array_key_exists( 'ldap_user', $lsa_settings ) ) {
-				$lsa_settings['ldap_user'] = '';
+			if ( !array_key_exists( 'ldap_user', $cas_settings ) ) {
+				$cas_settings['ldap_user'] = '';
 			}
-			if ( !array_key_exists( 'ldap_password', $lsa_settings ) ) {
-				$lsa_settings['ldap_password'] = '';
+			if ( !array_key_exists( 'ldap_password', $cas_settings ) ) {
+				$cas_settings['ldap_password'] = '';
 			}
-			if ( !array_key_exists( 'ldap_type', $lsa_settings ) ) {
-				$lsa_settings['ldap_type'] = 'openldap';
+			if ( !array_key_exists( 'ldap_type', $cas_settings ) ) {
+				$cas_settings['ldap_type'] = 'openldap';
 			}
-			if ( !array_key_exists( 'ldap_tls', $lsa_settings ) ) {
-				$lsa_settings['ldap_tls'] = '1';
+			if ( !array_key_exists( 'ldap_tls', $cas_settings ) ) {
+				$cas_settings['ldap_tls'] = '1';
 			}
-			if ( !array_key_exists( 'sakai_base_url', $lsa_settings ) ) {
-				$lsa_settings['sakai_base_url'] = '';
+			if ( !array_key_exists( 'sakai_base_url', $cas_settings ) ) {
+				$cas_settings['sakai_base_url'] = '';
 			}
-			if ( !array_key_exists( 'access_restriction', $lsa_settings ) ) {
-				$lsa_settings['access_restriction'] = 'everyone';
+			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
+				$cas_settings['access_restriction'] = 'everyone';
 			}
-			if ( !array_key_exists( 'access_courses', $lsa_settings ) ) {
-				$lsa_settings['access_courses'] = '';
+			if ( !array_key_exists( 'access_courses', $cas_settings ) ) {
+				$cas_settings['access_courses'] = '';
 			}
-			if ( !array_key_exists( 'access_redirect', $lsa_settings ) ) {
-				$lsa_settings['access_redirect'] = 'login';
+			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = 'login';
 			}
-			if ( !array_key_exists( 'access_redirect_to_url', $lsa_settings ) ) {
-				$lsa_settings['access_redirect_to_url'] = '';
+			if ( !array_key_exists( 'access_redirect_to_url', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_url'] = '';
 			}
-			if ( !array_key_exists( 'access_redirect_to_message', $lsa_settings ) ) {
-				$lsa_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
+			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
 			}
-			if ( !array_key_exists( 'access_redirect_to_page', $lsa_settings ) ) {
-				$lsa_settings['access_redirect_to_page'] = '';
+			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_page'] = '';
 			}
-			if ( !array_key_exists( 'misc_ips', $lsa_settings ) ) {
-				$lsa_settings['misc_ips'] = '';
+			if ( !array_key_exists( 'misc_ips', $cas_settings ) ) {
+				$cas_settings['misc_ips'] = '';
 			}
-			if ( !array_key_exists( 'misc_lostpassword_url', $lsa_settings ) ) {
-				$lsa_settings['misc_lostpassword_url'] = '';
+			if ( !array_key_exists( 'misc_lostpassword_url', $cas_settings ) ) {
+				$cas_settings['misc_lostpassword_url'] = '';
 			}
-			if ( !array_key_exists( 'access_default_role', $lsa_settings ) ) {
+			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
 				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 				$all_roles = $wp_roles->roles;
 				$editable_roles = apply_filters( 'editable_roles', $all_roles );
 				if ( array_key_exists( 'student', $editable_roles ) ) {
-					$lsa_settings['access_default_role'] = 'student';
+					$cas_settings['access_default_role'] = 'student';
 				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
-					$lsa_settings['access_default_role'] = 'subscriber';
+					$cas_settings['access_default_role'] = 'subscriber';
 				} else {
-					$lsa_settings['access_default_role'] = 'subscriber';
+					$cas_settings['access_default_role'] = 'subscriber';
 				}
 			}
-			update_option( 'lsa_settings', $lsa_settings );
+			update_option( 'cas_settings', $cas_settings );
 		} // END activate()
 
 
@@ -232,11 +232,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 */
 		public function uninstall() {
 			// Delete options in database.
-			if ( get_option( 'lsa_settings' ) ) {
-				delete_option( 'lsa_settings' );
+			if ( get_option( 'cas_settings' ) ) {
+				delete_option( 'cas_settings' );
 			}
-			if ( get_option( 'lsa_settings_misc_admin_notice' ) ) {
-				delete_option( 'lsa_settings_misc_admin_notice' );
+			if ( get_option( 'cas_settings_misc_admin_notice' ) ) {
+				delete_option( 'cas_settings_misc_admin_notice' );
 			}
 
 			// Delete sakai session token from user meta for all users.
@@ -259,15 +259,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * won't work.
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 			if (
-				array_key_exists( 'misc_lostpassword_url', $lsa_settings ) &&
-				filter_var( $lsa_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) &&
-				array_key_exists( 'access_restriction', $lsa_settings ) &&
-				$lsa_settings['access_restriction'] !== 'everyone' &&
-				$lsa_settings['access_restriction'] !== 'user'
+				array_key_exists( 'misc_lostpassword_url', $cas_settings ) &&
+				filter_var( $cas_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) &&
+				array_key_exists( 'access_restriction', $cas_settings ) &&
+				$cas_settings['access_restriction'] !== 'everyone' &&
+				$cas_settings['access_restriction'] !== 'user'
 			) {
-				$lostpassword_url = $lsa_settings['misc_lostpassword_url'];
+				$lostpassword_url = $cas_settings['misc_lostpassword_url'];
 			}
 			return $lostpassword_url;
 		}
@@ -276,16 +276,16 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Overwrite the username label on the login form.
 		 */
 		function custom_login_form_labels( $translated_text, $text, $domain ) {
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
 			if ( $translated_text === 'Username' ) {
-				if ( array_key_exists( 'ldap_type', $lsa_settings ) && $lsa_settings['ldap_type'] === 'custom_uh' ) {
+				if ( array_key_exists( 'ldap_type', $cas_settings ) && $cas_settings['ldap_type'] === 'custom_uh' ) {
 					$translated_text = 'UH Username';
 				}
 			}
 
 			if ( $translated_text === 'Password' ) {
-				if ( array_key_exists( 'ldap_type', $lsa_settings ) && $lsa_settings['ldap_type'] === 'custom_uh' ) {
+				if ( array_key_exists( 'ldap_type', $cas_settings ) && $cas_settings['ldap_type'] === 'custom_uh' ) {
 					$translated_text = 'UH Password';
 				}
 			}
@@ -298,8 +298,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Filter: admin_notice
 		 */
 		function show_misc_admin_notice() {
-			$notice = get_option( 'lsa_settings_misc_admin_notice' );
-			delete_option( 'lsa_settings_misc_admin_notice' );
+			$notice = get_option( 'cas_settings_misc_admin_notice' );
+			delete_option( 'cas_settings_misc_admin_notice' );
 
 			if ( $notice && strlen( $notice ) > 0 ) {
 				?>
@@ -315,8 +315,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Filter: login_errors
 		 */
 		function show_misc_login_error( $errors ) {
-			$error = get_option( 'lsa_settings_misc_login_error' );
-			delete_option( 'lsa_settings_misc_login_error' );
+			$error = get_option( 'cas_settings_misc_login_error' );
+			delete_option( 'cas_settings_misc_login_error' );
 
 			//$errors .= '    ' . $error . "<br />\n";
 			$errors = '    ' . $error . "<br />\n";
@@ -365,22 +365,22 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'email' => '',
 			);
 
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
 			// If we're restricting access to only WP users, don't check against ldap;
 			// Instead, pass through to default WP authentication.
-			if ( $lsa_settings['access_restriction'] === 'user' ) {
+			if ( $cas_settings['access_restriction'] === 'user' ) {
 				return new WP_Error( 'no_ldap', 'Only authenticate against local WP install (not LDAP).' );
 			}
 
-			switch ( $lsa_settings['ldap_type'] ) {
+			switch ( $cas_settings['ldap_type'] ) {
 			case 'custom_uh': // University of Hawai'i
-				$ldap = ldap_connect( $lsa_settings['ldap_host'] );
+				$ldap = ldap_connect( $cas_settings['ldap_host'] );
 				ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-				if ( $lsa_settings['ldap_tls'] == 1 ) {
+				if ( $cas_settings['ldap_tls'] == 1 ) {
 					ldap_start_tls( $ldap );
 				}
-				$result = ldap_bind( $ldap, $lsa_settings['ldap_user'], $this->decrypt( base64_decode( $lsa_settings['ldap_password'] ) ) );
+				$result = ldap_bind( $ldap, $cas_settings['ldap_user'], $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ) );
 				if ( !$result ) {
 					return new WP_Error( 'ldap_error', 'Could not authenticate.' );
 				}
@@ -390,7 +390,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// and then attempt to authenticate with uhuuid and password.
 				$ldap_search = ldap_search(
 					$ldap,
-					$lsa_settings['ldap_search_base'],
+					$cas_settings['ldap_search_base'],
 					"(uid=$username)",
 					array(
 						'givenName',
@@ -431,12 +431,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// try {
 				// 	$adldap = new adLDAP(
 				// 		array(
-				// 			'base_dn' => $lsa_settings['ldap_search_base'],
-				// 			'domain_controllers' => array($lsa_settings['ldap_host']),
-				// 			'admin_username' => $lsa_settings['ldap_user'],
+				// 			'base_dn' => $cas_settings['ldap_search_base'],
+				// 			'domain_controllers' => array($cas_settings['ldap_host']),
+				// 			'admin_username' => $cas_settings['ldap_user'],
 				// 			'account_suffix' => '', // suffix should already be included in the admin_username
-				// 			'admin_password' => $this->decrypt( base64_decode( $lsa_settings['ldap_password'] ) ),
-				// 			'use_tls' => $lsa_settings['ldap_tls'] == 1,
+				// 			'admin_password' => $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ),
+				// 			'use_tls' => $cas_settings['ldap_tls'] == 1,
 				// 		)
 				// 	);
 				// 	$result = $adldap->authenticate( $username, $password );
@@ -454,12 +454,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				@todo: incomplete authentication (via openldap)
 				*/
 				return new WP_Error( 'openldap_error', 'Incomplete authentication routine.' );
-				// $ldap = ldap_connect( $lsa_settings['ldap_host'] );
+				// $ldap = ldap_connect( $cas_settings['ldap_host'] );
 				// ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-				// if ( $lsa_settings['ldap_tls'] == 1 ) {
+				// if ( $cas_settings['ldap_tls'] == 1 ) {
 				// 	ldap_start_tls( $ldap );
 				// }
-				// $result = ldap_bind( $ldap, $lsa_settings['ldap_user'], $lsa_settings['ldap_password'] );
+				// $result = ldap_bind( $ldap, $cas_settings['ldap_user'], $cas_settings['ldap_password'] );
 				break;
 			default:
 				//do_action( 'wp_login_failed', $username );
@@ -479,7 +479,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 						'last_name' => $ldap_user['last'],
 						'user_email' => $ldap_user['email'],
 						'user_registered' => date( 'Y-m-d H:i:s' ),
-						'role' => $lsa_settings['access_default_role'],
+						'role' => $cas_settings['access_default_role'],
 					)
 				);
 
@@ -493,7 +493,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// isn't added to this site (can occur in multisite installs).
 				if ( is_wp_error( $result ) && array_key_exists( 'existing_user_login', $result->errors ) ) {
 					global $current_blog;
-					$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $lsa_settings['access_default_role'] );
+					$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $cas_settings['access_default_role'] );
 					if ( !is_wp_error( $result ) ) {
 						$result = $user->ID;
 					}
@@ -509,10 +509,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			// Try to create a Sakai session if Sakai base URL option exists; save session id in user meta
-			if ( strlen( $lsa_settings['sakai_base_url'] ) > 0 ) {
+			if ( strlen( $cas_settings['sakai_base_url'] ) > 0 ) {
 				$sakai_session = $this->call_api(
 					'post',
-					trailingslashit( $lsa_settings['sakai_base_url'] ) . 'session',
+					trailingslashit( $cas_settings['sakai_base_url'] ) . 'session',
 					array(
 						'_username' => $username,
 						'_password' => $password,
@@ -528,12 +528,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Make sure (if we're restricting access by courses) that the current user is enrolled in an allowed course
 			$logged_in_but_no_access = (
-				$lsa_settings['access_restriction'] == 'course' &&
+				$cas_settings['access_restriction'] == 'course' &&
 				! $this->is_current_user_sakai_enrolled( $user->ID )
 			);
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
-				update_option( 'lsa_settings_misc_login_error', $error );
+				update_option( 'cas_settings_misc_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
 				exit;
@@ -561,16 +561,16 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function restrict_access( $wp ) {
 			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 );	// only need it the first time
 
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
 			$has_access = (
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) || // Always allow access if WordPress is installing
 				( is_admin() ) || // Always allow access to admins
-				( $lsa_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
-				( $lsa_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
-				( $lsa_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
-				( $lsa_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
-				( $lsa_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
+				( $cas_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
+				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
+				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
+				( $cas_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in sakai course if option is set to 'course' members only (check cached result first)
+				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_sakai_enrolled() ) // Allow access to users enrolled in sakai course if option is set to 'course' members only (check against sakai if no cached value is present)
 			);
 			$is_restricted = !$has_access;
 
@@ -579,7 +579,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// profile page with a message (so we don't get into a redirect loop on
 			// the wp-login.php page).
 			$logged_in_but_no_access = false;
-			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $lsa_settings['access_restriction'] == 'course' ) {
+			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $cas_settings['access_restriction'] == 'course' ) {
 				$logged_in_but_no_access = true;
 			}
 
@@ -608,7 +608,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			// Allow access from the ip address allow list; if it's empty, block everything
-			if ( $allowed_ips = $lsa_settings['misc_ips'] ) {
+			if ( $allowed_ips = $cas_settings['misc_ips'] ) {
 				$current_user_ip = $_SERVER['REMOTE_ADDR'];
 				if ( strpos( $current_user_ip, '.' ) !== false ) {
 					$current_user_ip = str_replace( '::ffff:', '', $current_user_ip ); // Handle dual-stack addresses
@@ -640,21 +640,21 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor and have them add you to their Sakai/Laulima course.';
-				update_option( 'lsa_settings_misc_login_error', $error );
+				update_option( 'cas_settings_misc_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
 				exit;
 			}
 
-			switch ( $lsa_settings['access_redirect'] ) :
+			switch ( $cas_settings['access_redirect'] ) :
 			case 'url':
-				wp_redirect( $lsa_settings['access_redirect_to_url'], 302 );
+				wp_redirect( $cas_settings['access_redirect_to_url'], 302 );
 				exit;
 			case 'message':
-				wp_die( $lsa_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
+				wp_die( $cas_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				break;
 			case 'page':
-				$page_id = get_post_field( 'ID', $lsa_settings['access_redirect_to_page'] );
+				$page_id = get_post_field( 'ID', $cas_settings['access_redirect_to_page'] );
 				if ( is_wp_error( $page_id ) ) {
 					wp_die( '<p>Access to this site is restricted.</p>', get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				}
@@ -678,21 +678,21 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @returns BOOL true if the currently logged in user is enrolled in one of the sakai courses listed in the plugin options.
 		 */
 		function is_current_user_sakai_enrolled( $current_user = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
 			if ( $current_user === '' ) {
 				$current_user = get_current_user_id();
 			}
 
 			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
-			if ( $lsa_settings['access_restriction'] == 'everyone' || $lsa_settings['access_restriction'] == 'university' ) {
+			if ( $cas_settings['access_restriction'] == 'everyone' || $cas_settings['access_restriction'] == 'university' ) {
 				return true;
 			}
 			$has_access = false;
 
 			$sakai_session_id = get_user_meta( $current_user, 'sakai_session_id', true );
-			foreach ( $lsa_settings['access_courses'] as $sakai_site_id ) {
-				$request_url = trailingslashit( $lsa_settings['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
+			foreach ( $cas_settings['access_courses'] as $sakai_site_id ) {
+				$request_url = trailingslashit( $cas_settings['sakai_base_url'] ) . 'site/' . $sakai_site_id . '/userPerms/site.visit.json';
 				$permission_to_visit = $this->call_api(
 					'get',
 					$request_url,
@@ -784,7 +784,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					<?php
 						// This prints out all hidden settings fields
 						// @see http://codex.wordpress.org/Function_Reference/settings_fields
-						settings_fields( 'lsa_settings_group' );
+						settings_fields( 'cas_settings_group' );
 						// This prints out all the sections
 						// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
 						do_settings_sections( 'cas_admission' );
@@ -820,9 +820,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Run on action hook: login_head
 		 */
 		function load_login_css_and_js() {
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
-			if ( $lsa_settings['ldap_type'] === 'custom_uh' ):
+			if ( $cas_settings['ldap_type'] === 'custom_uh' ):
 				?>
 				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas_admission-login.css', __FILE__ ); ?>" />
 				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas_admission-login.js', __FILE__ ); ?>"></script>
@@ -853,7 +853,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$screen = get_current_screen();
 			
 			// Add help tab for LDAP Settings
-			$help_lsa_settings_ldap_content = '
+			$help_cas_settings_ldap_content = '
 				<p><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</p>
 				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=yourcompany,dc=com</p>
 				<p><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</p>
@@ -864,9 +864,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_lsa_settings_ldap',
+					'id' => 'help_cas_settings_ldap',
 					'title' => 'LDAP Settings',
-					'content' => $help_lsa_settings_ldap_content,
+					'content' => $help_cas_settings_ldap_content,
 				)
 			);
 
@@ -879,7 +879,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		/**
 		 * validate IP address entry on demand (AJAX)
 		 */
-		public function ajax_lsa_ip_check() {
+		public function ajax_cas_ip_check() {
 			if ( empty( $_POST['ip_address'] ) ) {
 				die('1');
 			} else if ( $this->is_ip( stripslashes( $_POST['ip_address'] ) ) ) {
@@ -913,7 +913,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		/**
 		 * Validate Sakai Site ID entry on demand (AJAX)
 		 */
-		public function ajax_lsa_course_check() {
+		public function ajax_cas_course_check() {
 			if ( empty( $_POST['sakai_site_id'] ) || empty( $_POST['sakai_base_url'] ) ) {
 				die('&nbsp;');
 			}
@@ -984,14 +984,14 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Create one setting that holds all the options (array)
 			// @see http://codex.wordpress.org/Function_Reference/register_setting
 			register_setting(
-				'lsa_settings_group', // Option group
-				'lsa_settings', // Option name
-				array( $this, 'sanitize_lsa_settings' ) // Sanitize callback
+				'cas_settings_group', // Option group
+				'cas_settings', // Option name
+				array( $this, 'sanitize_cas_settings' ) // Sanitize callback
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'lsa_settings_access', // HTML element ID
+				'cas_settings_access', // HTML element ID
 				'Access Settings', // HTML element Title
 				array( $this, 'print_section_info_access' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
@@ -999,58 +999,58 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
-				'lsa_settings_access_default_role', // HTML element ID
+				'cas_settings_access_default_role', // HTML element ID
 				'Default role for new LDAP users', // HTML element Title
-				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
+				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_restriction', // HTML element ID
+				'cas_settings_access_restriction', // HTML element ID
 				'Which people can access the site?', // HTML element Title
-				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
+				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_courses', // HTML element ID
+				'cas_settings_access_courses', // HTML element ID
 				'Course Site IDs with access (one per line)', // HTML element Title
-				array( $this, 'print_combo_lsa_access_courses' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_access_courses' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_redirect', // HTML element ID
+				'cas_settings_access_redirect', // HTML element ID
 				'What happens to people without access?', // HTML element Title
-				array( $this, 'print_radio_lsa_access_redirect' ), // Callback (echos form element)
+				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_redirect_to_url', // HTML element ID
+				'cas_settings_access_redirect_to_url', // HTML element ID
 				'Redirect to URL', // HTML element Title
-				array( $this, 'print_text_lsa_access_redirect_to_url' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_access_redirect_to_url' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_redirect_to_page', // HTML element ID
+				'cas_settings_access_redirect_to_page', // HTML element ID
 				'Redirect to restricted notice page', // HTML element Title
-				array( $this, 'print_select_lsa_access_redirect_to_page' ), // Callback (echos form element)
+				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_access_redirect_to_message', // HTML element ID
+				'cas_settings_access_redirect_to_message', // HTML element ID
 				'Restriction message', // HTML element Title
-				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
+				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_access' // Section this setting is shown on
+				'cas_settings_access' // Section this setting is shown on
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'lsa_settings_ldap', // HTML element ID
+				'cas_settings_ldap', // HTML element ID
 				'LDAP Settings', // HTML element Title
 				array( $this, 'print_section_info_ldap' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
@@ -1058,51 +1058,51 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
-				'lsa_settings_ldap_host', // HTML element ID
+				'cas_settings_ldap_host', // HTML element ID
 				'LDAP Host', // HTML element Title
-				array( $this, 'print_text_lsa_ldap_host' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_ldap_host' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_ldap_search_base', // HTML element ID
+				'cas_settings_ldap_search_base', // HTML element ID
 				'LDAP Search Base', // HTML element Title
-				array( $this, 'print_text_lsa_ldap_search_base' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_ldap_search_base' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_ldap_user', // HTML element ID
+				'cas_settings_ldap_user', // HTML element ID
 				'LDAP Directory User', // HTML element Title
-				array( $this, 'print_text_lsa_ldap_user' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_ldap_user' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_ldap_password', // HTML element ID
+				'cas_settings_ldap_password', // HTML element ID
 				'LDAP Directory User Password', // HTML element Title
-				array( $this, 'print_password_lsa_ldap_password' ), // Callback (echos form element)
+				array( $this, 'print_password_cas_ldap_password' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_ldap_type', // HTML element ID
+				'cas_settings_ldap_type', // HTML element ID
 				'LDAP installation type', // HTML element Title
-				array( $this, 'print_radio_lsa_ldap_type' ), // Callback (echos form element)
+				array( $this, 'print_radio_cas_ldap_type' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_ldap_tls', // HTML element ID
+				'cas_settings_ldap_tls', // HTML element ID
 				'Secure Connection (TLS)', // HTML element Title
-				array( $this, 'print_checkbox_lsa_ldap_tls' ), // Callback (echos form element)
+				array( $this, 'print_checkbox_cas_ldap_tls' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_ldap' // Section this setting is shown on
+				'cas_settings_ldap' // Section this setting is shown on
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'lsa_settings_sakai', // HTML element ID
+				'cas_settings_sakai', // HTML element ID
 				'Sakai Settings', // HTML element Title
 				array( $this, 'print_section_info_sakai' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
@@ -1110,34 +1110,34 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			add_settings_field(
-				'lsa_settings_sakai_base_url', // HTML element ID
+				'cas_settings_sakai_base_url', // HTML element ID
 				'Sakai Base URL', // HTML element Title
-				array( $this, 'print_text_lsa_sakai_base_url' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_sakai_base_url' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_sakai' // Section this setting is shown on
+				'cas_settings_sakai' // Section this setting is shown on
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'lsa_settings_misc', // HTML element ID
+				'cas_settings_misc', // HTML element ID
 				'Advanced Settings', // HTML element Title
 				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			add_settings_field(
-				'lsa_settings_misc_lostpassword_url', // HTML element ID
+				'cas_settings_misc_lostpassword_url', // HTML element ID
 				'Custom LDAP Lost Password URL', // HTML element Title
-				array( $this, 'print_text_lsa_misc_lostpassword_url' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_misc_lostpassword_url' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_misc' // Section this setting is shown on
+				'cas_settings_misc' // Section this setting is shown on
 			);
 			add_settings_field(
-				'lsa_settings_misc_ips', // HTML element ID
+				'cas_settings_misc_ips', // HTML element ID
 				'Unrestricted IP addresses', // HTML element Title
-				array( $this, 'print_combo_lsa_misc_ips' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_misc_ips' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'lsa_settings_misc' // Section this setting is shown on
+				'cas_settings_misc' // Section this setting is shown on
 			);
 		}
 
@@ -1146,26 +1146,26 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Settings sanitizer callback
 		 @todo: add sanitizer filters for the different options fields.
 		 */
-		function sanitize_lsa_settings( $lsa_settings ) {
+		function sanitize_cas_settings( $cas_settings ) {
 			// Sanitize LDAP Host setting
-			if ( filter_var( $lsa_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
-				$lsa_settings['ldap_host'] = '';
+			if ( filter_var( $cas_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
+				$cas_settings['ldap_host'] = '';
 			}
 			// Obfuscate LDAP directory user password
-			if ( strlen( $lsa_settings['ldap_password'] ) > 0 ) {
+			if ( strlen( $cas_settings['ldap_password'] ) > 0 ) {
 				// base64 encode the directory user password for some minor obfuscation in the database.
-				$lsa_settings['ldap_password'] = base64_encode( $this->encrypt( $lsa_settings['ldap_password'] ) );
+				$cas_settings['ldap_password'] = base64_encode( $this->encrypt( $cas_settings['ldap_password'] ) );
 			}
 			// Default to "Everyone" access restriction
-			if ( !in_array( $lsa_settings['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
-				$lsa_settings['access_restriction'] = 'everyone';
+			if ( !in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
+				$cas_settings['access_restriction'] = 'everyone';
 			}
 			// Sanitize ABC setting
 			if ( false ) {
-				$lsa_settings['somesetting'] = '';
+				$cas_settings['somesetting'] = '';
 			}
 
-			return $lsa_settings;
+			return $cas_settings;
 		}
 
 
@@ -1175,148 +1175,148 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function print_section_info_ldap() {
 			print 'Enter your LDAP server settings below:';
 		}
-		function print_text_lsa_ldap_host( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_ldap_host" name="lsa_settings[ldap_host]" value="<?= $lsa_settings['ldap_host']; ?>" /><?php
+		function print_text_cas_ldap_host( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_ldap_host" name="cas_settings[ldap_host]" value="<?= $cas_settings['ldap_host']; ?>" /><?php
 		}
-		function print_text_lsa_ldap_search_base( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_ldap_search_base" name="lsa_settings[ldap_search_base]" value="<?= $lsa_settings['ldap_search_base']; ?>" style="width:225px;" /><?php
+		function print_text_cas_ldap_search_base( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_ldap_search_base" name="cas_settings[ldap_search_base]" value="<?= $cas_settings['ldap_search_base']; ?>" style="width:225px;" /><?php
 		}
-		function print_text_lsa_ldap_user( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_ldap_user" name="lsa_settings[ldap_user]" value="<?= $lsa_settings['ldap_user']; ?>" style="width:275px;" /><?php
+		function print_text_cas_ldap_user( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_ldap_user" name="cas_settings[ldap_user]" value="<?= $cas_settings['ldap_user']; ?>" style="width:275px;" /><?php
 		}
-		function print_password_lsa_ldap_password( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="password" id="lsa_settings_ldap_password" name="lsa_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($lsa_settings['ldap_password'])); ?>" /><?php
+		function print_password_cas_ldap_password( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="password" id="cas_settings_ldap_password" name="cas_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($cas_settings['ldap_password'])); ?>" /><?php
 		}
-		function print_radio_lsa_ldap_type( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="radio" name="lsa_settings[ldap_type]" value="ad"<?php checked( 'ad' == $lsa_settings['ldap_type'] ); ?> /> Active Directory<br />
-				<input type="radio" name="lsa_settings[ldap_type]" value="openldap"<?php checked( 'openldap' == $lsa_settings['ldap_type'] ); ?> /> OpenLDAP<br />
-				<input type="radio" name="lsa_settings[ldap_type]" value="custom_uh"<?php checked( 'custom_uh' == $lsa_settings['ldap_type'] ); ?> /> Custom: University of Hawai'i<?php
+		function print_radio_cas_ldap_type( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="radio" name="cas_settings[ldap_type]" value="ad"<?php checked( 'ad' == $cas_settings['ldap_type'] ); ?> /> Active Directory<br />
+				<input type="radio" name="cas_settings[ldap_type]" value="openldap"<?php checked( 'openldap' == $cas_settings['ldap_type'] ); ?> /> OpenLDAP<br />
+				<input type="radio" name="cas_settings[ldap_type]" value="custom_uh"<?php checked( 'custom_uh' == $cas_settings['ldap_type'] ); ?> /> Custom: University of Hawai'i<?php
 		}
-		function print_checkbox_lsa_ldap_tls( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="checkbox" name="lsa_settings[ldap_tls]" value="1"<?php checked( 1 == $lsa_settings['ldap_tls'] ); ?> /> Use TLS<?php
+		function print_checkbox_cas_ldap_tls( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="checkbox" name="cas_settings[ldap_tls]" value="1"<?php checked( 1 == $cas_settings['ldap_tls'] ); ?> /> Use TLS<?php
 		}
 
 		function print_section_info_sakai() {
 			print 'Enter your Sakai-based course management system settings below:';
 		}
-		function print_text_lsa_sakai_base_url( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?= $lsa_settings['sakai_base_url']; ?>" style="width:275px;" /><?php
+		function print_text_cas_sakai_base_url( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_sakai_base_url" name="cas_settings[sakai_base_url]" value="<?= $cas_settings['sakai_base_url']; ?>" style="width:275px;" /><?php
 		}
 
 		function print_section_info_access() {
 			print 'Choose how you want to restrict access to this site below:';
 		}
-		function print_radio_lsa_access_restriction( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="radio" id="radio_lsa_settings_access_restriction_everyone" name="lsa_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $lsa_settings['access_restriction'] ); ?> /> Everyone<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_university" name="lsa_settings[access_restriction]" value="university"<?php checked( 'university' == $lsa_settings['access_restriction'] ); ?> /> Only the university community (All LDAP and WP users)<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
-				<input type="radio" id="radio_lsa_settings_access_restriction_user" name="lsa_settings[access_restriction]" value="user"<?php checked( 'user' == $lsa_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
+		function print_radio_cas_access_restriction( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All LDAP and WP users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
 		}
 		/**
 		@todo: migrate this to a combo tool like below in Unrestricted IP addresses
 		*/
-		function print_combo_lsa_access_courses( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><ul id="list_lsa_settings_access_courses" style="margin:0;">
-				<?php if ( array_key_exists( 'access_courses', $lsa_settings ) && is_array( $lsa_settings['access_courses'] ) ) : ?>
-					<?php foreach ( $lsa_settings['access_courses'] as $key => $course_id ): ?>
+		function print_combo_cas_access_courses( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><ul id="list_cas_settings_access_courses" style="margin:0;">
+				<?php if ( array_key_exists( 'access_courses', $cas_settings ) && is_array( $cas_settings['access_courses'] ) ) : ?>
+					<?php foreach ( $cas_settings['access_courses'] as $key => $course_id ): ?>
 						<?php if (empty($course_id)) continue; ?>
 						<li>
-							<input type="text" id="lsa_settings_access_courses_<?= $key; ?>" name="lsa_settings[access_courses][]" value="<?= esc_attr( $course_id ); ?>" readonly="true" style="width: 275px;" />
-							<input type="button" class="button" id="remove_course_<?= $key; ?>" onclick="lsa_remove_course(this);" value="&minus;" />
-							<?php if ( strlen( $lsa_settings['sakai_base_url'] ) ): ?>
-								<label for="lsa_settings_access_courses_<?= $key; ?>"><span class="description"></span></label>
+							<input type="text" id="cas_settings_access_courses_<?= $key; ?>" name="cas_settings[access_courses][]" value="<?= esc_attr( $course_id ); ?>" readonly="true" style="width: 275px;" />
+							<input type="button" class="button" id="remove_course_<?= $key; ?>" onclick="cas_remove_course(this);" value="&minus;" />
+							<?php if ( strlen( $cas_settings['sakai_base_url'] ) ): ?>
+								<label for="cas_settings_access_courses_<?= $key; ?>"><span class="description"></span></label>
 							<?php endif; ?>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_lsa_settings_access_courses">
+			<div id="new_cas_settings_access_courses">
 				<input type="text" name="newcourse" id="newcourse" placeholder="7017b553-3d21-46ac-ad5c-9a6c335b9a24" style="width: 275px;" />
-				<input class="button" type="button" id="addcourse" onclick="lsa_add_course(jQuery('#newcourse').val());" value="+" /><br />
+				<input class="button" type="button" id="addcourse" onclick="cas_add_course(jQuery('#newcourse').val());" value="+" /><br />
 				<label for="newcourse"><span class="description">Enter a Site ID for a course with access</span></label>
 			</div>
 			<?php
 		}
-		function print_radio_lsa_access_redirect( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="radio" id="radio_lsa_settings_access_redirect_to_login" name="lsa_settings[access_redirect]" value="login"<?php checked( 'login' == $lsa_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
-				<input type="radio" id="radio_lsa_settings_access_redirect_to_url" name="lsa_settings[access_redirect]" value="url"<?php checked( 'url' == $lsa_settings['access_redirect'] ); ?> /> Redirect them to a specific URL<br />
-				<input type="radio" id="radio_lsa_settings_access_redirect_to_page" name="lsa_settings[access_redirect]" value="page"<?php checked( 'page' == $lsa_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
-				<input type="radio" id="radio_lsa_settings_access_redirect_to_message" name="lsa_settings[access_redirect]" value="message"<?php checked( 'message' == $lsa_settings['access_redirect'] ); ?> /> Show them a simple message<?php
+		function print_radio_cas_access_redirect( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
+				<input type="radio" id="radio_cas_settings_access_redirect_to_url" name="cas_settings[access_redirect]" value="url"<?php checked( 'url' == $cas_settings['access_redirect'] ); ?> /> Redirect them to a specific URL<br />
+				<input type="radio" id="radio_cas_settings_access_redirect_to_page" name="cas_settings[access_redirect]" value="page"<?php checked( 'page' == $cas_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
+				<input type="radio" id="radio_cas_settings_access_redirect_to_message" name="cas_settings[access_redirect]" value="message"<?php checked( 'message' == $cas_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
-		function print_text_lsa_access_redirect_to_url( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_access_redirect_to_url" name="lsa_settings[access_redirect_to_url]" value="<?= $lsa_settings['access_redirect_to_url']; ?>" placeholder="http://www.example.com/" /><?php
+		function print_text_cas_access_redirect_to_url( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_access_redirect_to_url" name="cas_settings[access_redirect_to_url]" value="<?= $cas_settings['access_redirect_to_url']; ?>" placeholder="http://www.example.com/" /><?php
 		}
-		function print_wysiwyg_lsa_access_redirect_to_message( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
+		function print_wysiwyg_cas_access_redirect_to_message( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
 			wp_editor(
-				$lsa_settings['access_redirect_to_message'],
-				'lsa_settings_access_redirect_to_message',
+				$cas_settings['access_redirect_to_message'],
+				'cas_settings_access_redirect_to_message',
 				array(
 					'media_buttons' => false,
-					'textarea_name' => 'lsa_settings[access_redirect_to_message]',
+					'textarea_name' => 'cas_settings[access_redirect_to_message]',
 					'textarea_rows' => 5,
 					'tinymce' => false,
 				)
 			);
 		}
-		function print_select_lsa_access_redirect_to_page( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
+		function print_select_cas_access_redirect_to_page( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
 			wp_dropdown_pages(
 				array( 
-					'selected' => $lsa_settings['access_redirect_to_page'],
+					'selected' => $cas_settings['access_redirect_to_page'],
 					'show_option_none' => 'Select a page',
-					'name' => 'lsa_settings[access_redirect_to_page]',
-					'id' => 'lsa_settings_access_redirect_to_page',
+					'name' => 'cas_settings[access_redirect_to_page]',
+					'id' => 'cas_settings_access_redirect_to_page',
 				)
 			);
 		}
-		function print_select_lsa_access_default_role( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><select id="lsa_settings_access_default_role" name="lsa_settings[access_default_role]">
-				<?php wp_dropdown_roles( $lsa_settings['access_default_role'] ); ?>
+		function print_select_cas_access_default_role( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><select id="cas_settings_access_default_role" name="cas_settings[access_default_role]">
+				<?php wp_dropdown_roles( $cas_settings['access_default_role'] ); ?>
 			</select><?php
 		}
 
 		function print_section_info_misc() {
 			print 'You may optionally specify some advanced settings below:';
 		}
-		function print_combo_lsa_misc_ips( $args = '' ) {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><ul id="list_lsa_settings_misc_ips" style="margin:0;">
-				<?php if ( array_key_exists( 'misc_ips', $lsa_settings ) && is_array( $lsa_settings['misc_ips'] ) ) : ?>
-					<?php foreach ( $lsa_settings['misc_ips'] as $key => $ip ): ?>
+		function print_combo_cas_misc_ips( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><ul id="list_cas_settings_misc_ips" style="margin:0;">
+				<?php if ( array_key_exists( 'misc_ips', $cas_settings ) && is_array( $cas_settings['misc_ips'] ) ) : ?>
+					<?php foreach ( $cas_settings['misc_ips'] as $key => $ip ): ?>
 						<?php if ( empty( $ip ) ) continue; ?>
 						<li>
-							<input type="text" id="lsa_settings_misc_ips_<?= $key; ?>" name="lsa_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
-							<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="lsa_remove_ip(this);" value="&minus;" />
+							<input type="text" id="cas_settings_misc_ips_<?= $key; ?>" name="cas_settings[misc_ips][]" value="<?= esc_attr($ip); ?>" readonly="true" />
+							<input type="button" class="button" id="remove_ip_<?= $key; ?>" onclick="cas_remove_ip(this);" value="&minus;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_lsa_settings_misc_ips">
+			<div id="new_cas_settings_misc_ips">
 				<input type="text" name="newip" id="newip" placeholder="127.0.0.1" />
-				<input class="button" type="button" id="addip" onclick="lsa_add_ip(jQuery('#newip').val());" value="+" />
+				<input class="button" type="button" id="addip" onclick="cas_add_ip(jQuery('#newip').val());" value="+" />
 				<label for="newip"><span class="description"></span></label>
 				<?php if ( !empty( $_SERVER['REMOTE_ADDR'] ) ): ?>
-					<br /><input class="button" type="button" onclick="lsa_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
+					<br /><input class="button" type="button" onclick="cas_add_ip('<?= esc_attr($_SERVER['REMOTE_ADDR']); ?>');" value="Add My Current IP Address" /><br />
 				<?php endif; ?>
 			</div>
 			<?php
 		}
-		function print_text_lsa_misc_lostpassword_url() {
-			$lsa_settings = get_option( 'lsa_settings' );
-			?><input type="text" id="lsa_settings_misc_lostpassword_url" name="lsa_settings[misc_lostpassword_url]" value="<?= $lsa_settings['misc_lostpassword_url']; ?>" placeholder="http://www.example.com/" /><?php
+		function print_text_cas_misc_lostpassword_url() {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="http://www.example.com/" /><?php
 		}
 
 
@@ -1326,30 +1326,30 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 ****************************
 		 */
 		function add_dashboard_widgets() {
-			// Only users who can edit can see the Sakai dashboard widget
+			// Only users who can edit can see the admissions dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
-				// Add dashboard widget for adding/editing sakai courses with access
-				wp_add_dashboard_widget( 'sakai_dashboard_widget', 'Course Access Settings', array( $this, 'add_sakai_dashboard_widget' ) );
+				// Add dashboard widget for adding/editing users with access
+				wp_add_dashboard_widget( 'admission_dashboard_widget', 'Course Admission Settings', array( $this, 'add_admission_dashboard_widget' ) );
 			}
 		}
 
-		function add_sakai_dashboard_widget() {
-			$lsa_settings = get_option( 'lsa_settings' );
+		function add_admission_dashboard_widget() {
+			$cas_settings = get_option( 'cas_settings' );
 			?>
 			<div class="inside">
-				<form method="post" id="lsa_settings_access_form" action="">
+				<form method="post" id="cas_settings_access_form" action="">
 					<p><?php $this->print_section_info_access(); ?></p>
-					<div><?php $this->print_radio_lsa_access_restriction(); ?></div>
+					<div><?php $this->print_radio_cas_access_restriction(); ?></div>
 					<br class="clear" />
-					<div><?php $this->print_combo_lsa_access_courses(); ?></div>
+					<div><?php $this->print_combo_cas_access_courses(); ?></div>
 					<br class="clear" />
 					<p class="submit">
 						<span class="save-action">
-							<input type="button" name="button_save_lsa_settings_access" id="button_save_lsa_settings_access" class="button-primary" value="Save" onclick="save_lsa_settings_access(this);" style="float: right;" />
+							<input type="button" name="button_save_cas_settings_access" id="button_save_cas_settings_access" class="button-primary" value="Save" onclick="save_cas_settings_access(this);" style="float: right;" />
 							<span class="spinner"></span>
 						</span>
-						<?php wp_nonce_field( 'save_lsa_settings_access', 'nonce_save_lsa_settings_access' ); ?>
-						<input type="hidden" id="lsa_settings_sakai_base_url" name="lsa_settings[sakai_base_url]" value="<?php print $lsa_settings['sakai_base_url']; ?>" />
+						<?php wp_nonce_field( 'save_cas_settings_access', 'nonce_save_cas_settings_access' ); ?>
+						<input type="hidden" id="cas_settings_sakai_base_url" name="cas_settings[sakai_base_url]" value="<?php print $cas_settings['sakai_base_url']; ?>" />
 					</p>
 					<br class="clear" />
 				</form>
@@ -1357,14 +1357,14 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			<?php
 		}
 
-		function ajax_save_sakai_dashboard_widget() {
+		function ajax_save_admission_dashboard_widget() {
 			// Make sure posted variables exist.
-			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['access_courses'] ) || empty( $_POST['nonce_save_lsa_settings_access'] ) ) {
+			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['access_courses'] ) || empty( $_POST['nonce_save_cas_settings_access'] ) ) {
 				die('');
 			}
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_lsa_settings_access'], 'save_lsa_settings_access' ) ) {
+			if ( ! wp_verify_nonce( $_POST['nonce_save_cas_settings_access'], 'save_cas_settings_access' ) ) {
 				die('');
 			}
 
@@ -1373,15 +1373,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$_POST['access_restriction'] = 'user';
 			}
 
-			$lsa_settings = get_option( 'lsa_settings' );
+			$cas_settings = get_option( 'cas_settings' );
 
-			$lsa_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
-			$lsa_settings['access_courses'] = $_POST['access_courses'];
-			$lsa_settings['ldap_password'] = $this->decrypt( base64_decode( $lsa_settings['ldap_password'] ) );
+			$cas_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
+			$cas_settings['access_courses'] = $_POST['access_courses'];
+			$cas_settings['ldap_password'] = $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) );
 
 			// Only users who can edit can see the Sakai dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
-				update_option( 'lsa_settings', $lsa_settings );
+				update_option( 'cas_settings', $cas_settings );
 			}
 		}
 
