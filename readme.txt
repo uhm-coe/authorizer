@@ -45,9 +45,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 = 1.0 =
 * First stable release.
 
+= 0.2 =
+* Switch to CAS instead of LDAP/Sakai.
+* Thu Jul 11, 2013
+
 = 0.1 =
 * Initial development build.
-* Thu Jul 11, 2013
+* Wed Apr 10, 2013
 
 == Upgrade Notice ==
 

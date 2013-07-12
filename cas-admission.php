@@ -1,13 +1,14 @@
 <?php
 /*
-Plugin Name: LDAP Sakai Authorization
+Plugin Name: CAS Admission
 Plugin URI: http://hawaii.edu/coe/dcdc/
-Description: LDAP Sakai Authorization restricts access to students enrolled in university courses, using LDAP for authentication and Sakai for course rosters.
+Description: CAS Admission restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
 Version: 0.1
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2
 */
+
 /*
 Copyright 2013  Paul Ryan  (email : prar@hawaii.edu)
 
@@ -24,30 +25,23 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 /*
 Portions forked from Restricted Site Access plugin: http://10up.com/plugins/restricted-site-access-wordpress/
-Portions forked from Simple LDAP Login: http://clifgriffin.com/2009/05/13/simple-ldap-login-13-for-wordpress/
 */
 
 
-/**
- * Include adLDAP external library for ActiveDirectory connections.
- * @see http://adldap.sourceforge.net/download.php
- */
-require_once dirname( __FILE__ ) . '/inc/adLDAP/src/adLDAP.php';
-
-
-if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
+if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 	/**
-	 * Define class for plugin: LDAP Sakai Auth.
+	 * Define class for plugin: CAS Admission.
 	 *
 	 * @category Authentication
-	 * @package  LDAP_Sakai_Auth
+	 * @package  CAS_Admission
 	 * @author   Paul Ryan <prar@hawaii.edu>
 	 * @license  http://www.gnu.org/licenses/gpl-2.0.html GPL2
-	 * @link     http://hawaii.edu/coe/dcdc/wordpress/ldap-sakai-auth/doc/
+	 * @link     http://hawaii.edu/coe/dcdc/wordpress/cas_admission/doc/
 	 */
-	class WP_Plugin_LDAP_Sakai_Auth {
+	class WP_Plugin_CAS_Admission {
 		
 		/**
 		 * Constructor.
@@ -57,7 +51,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			// Register filters.
 
-			// Custom wp authentication routine using LDAP
+			// Custom wp authentication routine using CAS
 			add_filter( 'authenticate', array( $this, 'ldap_authenticate' ), 1, 3 );
 
 			// Removing this bypasses Wordpress authentication (so if ldap auth fails,
@@ -88,7 +82,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
 			// Enqueue javascript and css only on the plugin's options page and the dashboard (for the widget)
-			add_action( 'load-settings_page_ldap-sakai-auth', array( $this, 'load_options_page' ) );
+			add_action( 'load-settings_page_cas_admission', array( $this, 'load_options_page' ) );
 			add_action( 'admin_head-index.php', array( $this, 'load_options_page' ) );
 
 			// Add custom css and js to wp-login.php
@@ -430,7 +424,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 				break;
 			case 'ad': // Active Directory
-				// @todo: incomplete authentication (via active directory)
+				/**
+				@todo: incomplete authentication (via active directory)
+				*/
 				return new WP_Error( 'adldap_error', 'Incomplete authentication routine.' );
 				// try {
 				// 	$adldap = new adLDAP(
@@ -454,7 +450,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				// }
 				break;
 			case 'openldap': // OpenLDAP
-				// @todo: incomplete authentication (via openldap)
+				/**
+				@todo: incomplete authentication (via openldap)
+				*/
 				return new WP_Error( 'openldap_error', 'Incomplete authentication routine.' );
 				// $ldap = ldap_connect( $lsa_settings['ldap_host'] );
 				// ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
@@ -586,7 +584,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			}
 
 			/**
-			 * Developers can use the `ldap_sakai_auth_has_access` filter
+			 * Developers can use the `cas_admission_has_access` filter
 			 * to override restricted access on certain pages. Note that the
 			 * restriction checks happens before WordPress executes any queries, so
 			 * use the global `$wp` variable to investigate what the visitor is
@@ -602,9 +600,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			 *       $has_access = true;
 			 *     return $has_access;
 			 *   }
-			 *   add_filter( 'ldap_sakai_auth_has_access', 'my_rsa_feed_access_override' );
+			 *   add_filter( 'cas_admission_has_access', 'my_rsa_feed_access_override' );
 			 */
-			if ( apply_filters( 'ldap_sakai_auth_has_access', $has_access, $wp ) === true ) {
+			if ( apply_filters( 'cas_admission_has_access', $has_access, $wp ) === true ) {
 				// We've determined that the current user has access, so simply return to grant access.
 				return;
 			}
@@ -752,7 +750,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		 * @return array of links to show in the admin sidebar.
 		 */
 		public function plugin_settings_link( $links ) {
-			$settings_link = '<a href="options-general.php?page=ldap-sakai-auth">Settings</a>';
+			$settings_link = '<a href="options-general.php?page=cas_admission">Settings</a>';
 			array_unshift( $links, $settings_link );
 			return $links;
 		} // END plugin_settings_link()
@@ -765,10 +763,10 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 		public function add_plugin_page() {
 			// @see http://codex.wordpress.org/Function_Reference/add_options_page
 			add_options_page(
-				'LDAP Sakai Authorization', // Page title
-				'LDAP Sakai Auth', // Menu title
+				'CAS Admission', // Page title
+				'CAS Admission', // Menu title
 				'manage_options', // Capability
-				'ldap-sakai-auth', // Menu slug
+				'cas_admission', // Menu slug
 				array( $this, 'create_admin_page' ) // function
 			);
 		}
@@ -781,7 +779,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			?>
 			<div class="wrap">
 				<?php screen_icon(); ?>
-				<h2>LDAP Sakai Authorization Settings</h2>
+				<h2>CAS Admission Settings</h2>
 				<form method="post" action="options.php" autocomplete="off">
 					<?php
 						// This prints out all hidden settings fields
@@ -789,7 +787,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 						settings_fields( 'lsa_settings_group' );
 						// This prints out all the sections
 						// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
-						do_settings_sections( 'ldap-sakai-auth' );
+						do_settings_sections( 'cas_admission' );
 					?>
 					<?php submit_button(); ?>
 				</form>
@@ -800,17 +798,17 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 		/**
 		 * Load external resources on this plugin's options page.
-		 * Run on action hook: load-settings_page_ldap-sakai-auth
+		 * Run on action hook: load-settings_page_cas_admission
 		 */
 		public function load_options_page() {
 			wp_enqueue_script(
-				'ldap-sakai-auth',
-				plugins_url( 'ldap-sakai-auth.js', __FILE__ ),
+				'cas_admission',
+				plugins_url( 'assets/js/cas_admission.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 
-			wp_register_style( 'ldap-sakai-auth-css', plugins_url( 'ldap-sakai-auth.css', __FILE__ ) );
-			wp_enqueue_style( 'ldap-sakai-auth-css' );
+			wp_register_style( 'cas_admission-css', plugins_url( 'assets/css/cas_admission.css', __FILE__ ) );
+			wp_enqueue_style( 'cas_admission-css' );
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
@@ -826,8 +824,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 			if ( $lsa_settings['ldap_type'] === 'custom_uh' ):
 				?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'ldap-sakai-auth-login.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'ldap-sakai-auth-login.js', __FILE__ ); ?>"></script>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas_admission-login.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas_admission-login.js', __FILE__ ); ?>"></script>
 				<?php
 			endif;
 		}
@@ -835,8 +833,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 		/**
 		 * Add notices to the top of the options page.
-		 * Run on action hook chain: load-settings_page_ldap-sakai-auth > admin_notices
-		 * @todo: add warning messages.
+		 * Run on action hook chain: load-settings_page_cas_admission > admin_notices
+		 @todo: add warning messages.
 		 */
 		public function admin_notices() {
 			// Check for invalid settings combinations and show a warning message, e.g.:
@@ -848,8 +846,8 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 		/**
 		 * Add help documentation to the options page.
-		 * Run on action hook chain: load-settings_page_ldap-sakai-auth > admin_head
-		 * @todo: add documentation.
+		 * Run on action hook chain: load-settings_page_cas_admission > admin_head
+		 @todo: add documentation.
 		 */
 		public function admin_head() {
 			$screen = get_current_screen();
@@ -996,7 +994,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_access', // HTML element ID
 				'Access Settings', // HTML element Title
 				array( $this, 'print_section_info_access' ), // Callback (echos section content)
-				'ldap-sakai-auth' // Page this section is shown on (slug)
+				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
@@ -1004,49 +1002,49 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_access_default_role', // HTML element ID
 				'Default role for new LDAP users', // HTML element Title
 				array( $this, 'print_select_lsa_access_default_role' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_restriction', // HTML element ID
 				'Which people can access the site?', // HTML element Title
 				array( $this, 'print_radio_lsa_access_restriction' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_courses', // HTML element ID
 				'Course Site IDs with access (one per line)', // HTML element Title
 				array( $this, 'print_combo_lsa_access_courses' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_redirect', // HTML element ID
 				'What happens to people without access?', // HTML element Title
 				array( $this, 'print_radio_lsa_access_redirect' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_redirect_to_url', // HTML element ID
 				'Redirect to URL', // HTML element Title
 				array( $this, 'print_text_lsa_access_redirect_to_url' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_redirect_to_page', // HTML element ID
 				'Redirect to restricted notice page', // HTML element Title
 				array( $this, 'print_select_lsa_access_redirect_to_page' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_access_redirect_to_message', // HTML element ID
 				'Restriction message', // HTML element Title
 				array( $this, 'print_wysiwyg_lsa_access_redirect_to_message' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_access' // Section this setting is shown on
 			);
 
@@ -1055,7 +1053,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_ldap', // HTML element ID
 				'LDAP Settings', // HTML element Title
 				array( $this, 'print_section_info_ldap' ), // Callback (echos section content)
-				'ldap-sakai-auth' // Page this section is shown on (slug)
+				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
@@ -1063,42 +1061,42 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_ldap_host', // HTML element ID
 				'LDAP Host', // HTML element Title
 				array( $this, 'print_text_lsa_ldap_host' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_ldap_search_base', // HTML element ID
 				'LDAP Search Base', // HTML element Title
 				array( $this, 'print_text_lsa_ldap_search_base' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_ldap_user', // HTML element ID
 				'LDAP Directory User', // HTML element Title
 				array( $this, 'print_text_lsa_ldap_user' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_ldap_password', // HTML element ID
 				'LDAP Directory User Password', // HTML element Title
 				array( $this, 'print_password_lsa_ldap_password' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_ldap_type', // HTML element ID
 				'LDAP installation type', // HTML element Title
 				array( $this, 'print_radio_lsa_ldap_type' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_ldap_tls', // HTML element ID
 				'Secure Connection (TLS)', // HTML element Title
 				array( $this, 'print_checkbox_lsa_ldap_tls' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_ldap' // Section this setting is shown on
 			);
 
@@ -1107,7 +1105,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_sakai', // HTML element ID
 				'Sakai Settings', // HTML element Title
 				array( $this, 'print_section_info_sakai' ), // Callback (echos section content)
-				'ldap-sakai-auth' // Page this section is shown on (slug)
+				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
@@ -1115,7 +1113,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_sakai_base_url', // HTML element ID
 				'Sakai Base URL', // HTML element Title
 				array( $this, 'print_text_lsa_sakai_base_url' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_sakai' // Section this setting is shown on
 			);
 
@@ -1124,21 +1122,21 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				'lsa_settings_misc', // HTML element ID
 				'Advanced Settings', // HTML element Title
 				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
-				'ldap-sakai-auth' // Page this section is shown on (slug)
+				'cas_admission' // Page this section is shown on (slug)
 			);
 
 			add_settings_field(
 				'lsa_settings_misc_lostpassword_url', // HTML element ID
 				'Custom LDAP Lost Password URL', // HTML element Title
 				array( $this, 'print_text_lsa_misc_lostpassword_url' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_misc' // Section this setting is shown on
 			);
 			add_settings_field(
 				'lsa_settings_misc_ips', // HTML element ID
 				'Unrestricted IP addresses', // HTML element Title
 				array( $this, 'print_combo_lsa_misc_ips' ), // Callback (echos form element)
-				'ldap-sakai-auth', // Page this setting is shown on (slug)
+				'cas_admission', // Page this setting is shown on (slug)
 				'lsa_settings_misc' // Section this setting is shown on
 			);
 		}
@@ -1146,7 +1144,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 
 		/**
 		 * Settings sanitizer callback
-		 * @todo: add sanitizer filters for the different options fields.
+		 @todo: add sanitizer filters for the different options fields.
 		 */
 		function sanitize_lsa_settings( $lsa_settings ) {
 			// Sanitize LDAP Host setting
@@ -1222,7 +1220,9 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 				<input type="radio" id="radio_lsa_settings_access_restriction_course" name="lsa_settings[access_restriction]" value="course"<?php checked( 'course' == $lsa_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
 				<input type="radio" id="radio_lsa_settings_access_restriction_user" name="lsa_settings[access_restriction]" value="user"<?php checked( 'user' == $lsa_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
 		}
-		// @todo: migrate this to a combo tool like below in Unrestricted IP addresses
+		/**
+		@todo: migrate this to a combo tool like below in Unrestricted IP addresses
+		*/
 		function print_combo_lsa_access_courses( $args = '' ) {
 			$lsa_settings = get_option( 'lsa_settings' );
 			?><ul id="list_lsa_settings_access_courses" style="margin:0;">
@@ -1421,7 +1421,7 @@ if ( !class_exists( 'WP_Plugin_LDAP_Sakai_Auth' ) ) {
 			return $is_user_logged_in_and_blog_user;
 		}
 
-	} // END class WP_Plugin_LDAP_Sakai_Auth
+	} // END class WP_Plugin_CAS_Admission
 }
 
 
@@ -1448,10 +1448,10 @@ endif;
 
 
 // Installation and uninstallation hooks.
-register_activation_hook( __FILE__, array( 'WP_Plugin_LDAP_Sakai_Auth', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'WP_Plugin_LDAP_Sakai_Auth', 'deactivate' ) );
-register_uninstall_hook( __FILE__, array( 'WP_Plugin_LDAP_Sakai_Auth', 'uninstall' ) );
+register_activation_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'activate' ) );
+register_deactivation_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'deactivate' ) );
+register_uninstall_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'uninstall' ) );
 
 
 // Instantiate the plugin class.
-$wp_plugin_ldap_sakai_auth = new WP_Plugin_LDAP_Sakai_Auth();
+$wp_plugin_cas_admission = new WP_Plugin_CAS_Admission();
