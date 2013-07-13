@@ -157,20 +157,30 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( $cas_settings === FALSE ) {
 				$cas_settings = array();
 			}
-			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
-				$cas_settings['cas_host'] = '';
-			}
-			if ( !array_key_exists( 'cas_port', $cas_settings ) ) {
-				$cas_settings['cas_port'] = '';
-			}
-			if ( !array_key_exists( 'cas_path', $cas_settings ) ) {
-				$cas_settings['cas_path'] = '';
+
+			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
+				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
+				$all_roles = $wp_roles->roles;
+				$editable_roles = apply_filters( 'editable_roles', $all_roles );
+				if ( array_key_exists( 'student', $editable_roles ) ) {
+					$cas_settings['access_default_role'] = 'student';
+				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
+					$cas_settings['access_default_role'] = 'subscriber';
+				} else {
+					$cas_settings['access_default_role'] = 'subscriber';
+				}
 			}
 			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
 			}
-			if ( !array_key_exists( 'access_courses', $cas_settings ) ) {
-				$cas_settings['access_courses'] = '';
+			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
+				$cas_settings['access_users_pending'] = '';
+			}
+			if ( !array_key_exists( 'access_users_enrolled', $cas_settings ) ) {
+				$cas_settings['access_users_enrolled'] = '';
+			}
+			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
+				$cas_settings['access_users_blocked'] = '';
 			}
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
@@ -184,21 +194,21 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
 				$cas_settings['access_redirect_to_page'] = '';
 			}
+
+			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
+				$cas_settings['cas_host'] = '';
+			}
+			if ( !array_key_exists( 'cas_port', $cas_settings ) ) {
+				$cas_settings['cas_port'] = '';
+			}
+			if ( !array_key_exists( 'cas_path', $cas_settings ) ) {
+				$cas_settings['cas_path'] = '';
+			}
+
 			if ( !array_key_exists( 'misc_lostpassword_url', $cas_settings ) ) {
 				$cas_settings['misc_lostpassword_url'] = '';
 			}
-			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
-				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
-				$all_roles = $wp_roles->roles;
-				$editable_roles = apply_filters( 'editable_roles', $all_roles );
-				if ( array_key_exists( 'student', $editable_roles ) ) {
-					$cas_settings['access_default_role'] = 'student';
-				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
-					$cas_settings['access_default_role'] = 'subscriber';
-				} else {
-					$cas_settings['access_default_role'] = 'subscriber';
-				}
-			}
+
 			update_option( 'cas_settings', $cas_settings );
 		} // END activate()
 
@@ -966,26 +976,79 @@ END TODO
 				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
 		}
-		function print_combo_cas_access_courses( $args = '' ) {
+		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_access_courses" style="margin:0;">
-				<?php if ( array_key_exists( 'access_courses', $cas_settings ) && is_array( $cas_settings['access_courses'] ) ) : ?>
-					<?php foreach ( $cas_settings['access_courses'] as $key => $course_id ): ?>
-						<?php if (empty($course_id)) continue; ?>
+			?><ul id="list_cas_settings_users_pending" style="margin:0;">
+				<?php if ( array_key_exists( 'users_pending', $cas_settings ) && is_array( $cas_settings['users_pending'] ) ) : ?>
+					<?php foreach ( $cas_settings['users_pending'] as $key => $email ): ?>
+						<?php if ( empty( $email ) ) continue; ?>
 						<li>
-							<input type="text" id="cas_settings_access_courses_<?= $key; ?>" name="cas_settings[access_courses][]" value="<?= esc_attr( $course_id ); ?>" readonly="true" style="width: 275px;" />
-							<input type="button" class="button" id="remove_course_<?= $key; ?>" onclick="cas_remove_course(this);" value="&minus;" />
-							<?php if ( strlen( $cas_settings['sakai_base_url'] ) ): ?>
-								<label for="cas_settings_access_courses_<?= $key; ?>"><span class="description"></span></label>
-							<?php endif; ?>
+							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 75px;" />
+							<input type="text" id="cas_settings_users_pending_<?= $key; ?>" name="cas_settings[users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 150px;" />
+							<input type="button" class="button" id="enroll_user_<?= $key; ?>" onclick="cas_enroll_user(this);" value="Enroll" />
+							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(this);" value="Block" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="X" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_cas_settings_access_courses">
-				<input type="text" name="newcourse" id="newcourse" placeholder="7017b553-3d21-46ac-ad5c-9a6c335b9a24" style="width: 275px;" />
-				<input class="button" type="button" id="addcourse" onclick="cas_add_course(jQuery('#newcourse').val());" value="+" /><br />
-				<label for="newcourse"><span class="description">Enter a Site ID for a course with access</span></label>
+			<?php
+		}
+		function print_combo_cas_access_users_enrolled( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><ul id="list_cas_settings_users_enrolled" style="margin:0;">
+				<?php if ( array_key_exists( 'users_enrolled', $cas_settings ) && is_array( $cas_settings['users_enrolled'] ) ) : ?>
+					<?php foreach ( $cas_settings['users_enrolled'] as $key => $email ): ?>
+						<?php if ( empty( $email ) ) continue; ?>
+						<?php if ( ! ( $enrolled_user = get_user_by( 'email', $email ) ) ) continue; ?>
+						<li>
+							<input type="text" name="discard[]" value="<?= $enrolled_user->user_login ?>" readonly="true" style="width: 75px;" />
+							<input type="text" id="cas_settings_users_enrolled_<?= $key; ?>" name="cas_settings[users_enrolled][]" value="<?= $enrolled_user->user_email; ?>" readonly="true" style="width: 150px;" />
+							<select name="discard[]" disabled="disabled" style="width: 50px;">
+								<option value="<?= array_shift( $enrolled_user->roles ); ?>"><?= array_shift( $enrolled_user->roles ); ?></option>
+							</select>
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
+							<label for="cas_settings_users_enrolled_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $enrolled_user->user_registered ) ); ?></span></label>
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</ul>
+			<div id="new_cas_settings_users_enrolled">
+				<input type="text" name="new_enrolled_user_name" id="new_enrolled_user_name" placeholder="username" style="width: 75px;" />
+				<input type="text" name="new_enrolled_user_email" id="new_enrolled_user_email" placeholder="email address" style="width: 150px;" />
+				<select name="new_enrolled_user_role" id="new_enrolled_user_role" style="width: 50px;">
+					<option value="<?= cas_settings['access_default_role']; ?>"><?= cas_settings['access_default_role']; ?></option>
+				</select>
+				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_enrolled'));" value="+" /><br />
+			</div>
+			<?php
+		}
+		function print_combo_cas_access_users_blocked( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><ul id="list_cas_settings_users_blocked" style="margin:0;">
+				<?php if ( array_key_exists( 'users_blocked', $cas_settings ) && is_array( $cas_settings['users_blocked'] ) ) : ?>
+					<?php foreach ( $cas_settings['users_blocked'] as $key => $email ): ?>
+						<?php if ( empty( $email ) ) continue; ?>
+						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ) continue; ?>
+						<li>
+							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 75px;" />
+							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 150px;" />
+							<select name="discard[]" disabled="disabled" style="width: 50px;">
+								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= array_shift( $blocked_user->roles ); ?></option>
+							</select>
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
+							<label for="cas_settings_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
+			</ul>
+			<div id="new_cas_settings_users_blocked">
+				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 75px;" />
+				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 150px;" />
+				<select name="new_blocked_user_role" id="new_blocked_user_role" style="width: 50px;">
+					<option value="<?= cas_settings['access_default_role']; ?>"><?= cas_settings['access_default_role']; ?></option>
+				</select>
+				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_blocked'));" value="X" /><br />
 			</div>
 			<?php
 		}
