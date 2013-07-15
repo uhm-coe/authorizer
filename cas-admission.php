@@ -591,7 +591,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// See if the current user is in the whitelist of users with access
 			foreach ( $cas_settings['access_users_enrolled'] as $enrolled_user ) {
-				if ( $enrolled_user['username'] === current_user->user_login ) {
+				if ( $enrolled_user['username'] === $current_user->user_login ) {
 					$has_access = true;
 					break;
 				}
@@ -807,7 +807,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 			add_settings_field(
 				'cas_settings_access_restriction', // HTML element ID
-				'Which people can access the site?', // HTML element Title
+				'Who can access the site?', // HTML element Title
 				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
@@ -955,15 +955,15 @@ END TODO
 		}
 		function print_text_cas_host( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" /><?php
+			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" placeholder="login.its.hawaii.edu" /><?php
 		}
 		function print_text_cas_port( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" style="width:225px;" /><?php
+			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" placeholder="443" style="width:50px;" /><?php
 		}
 		function print_text_cas_path( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" style="width:275px;" /><?php
+			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas/login" /><?php
 		}
 
 		function print_section_info_access() {
@@ -972,9 +972,9 @@ END TODO
 		function print_radio_cas_access_restriction( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All LDAP and WP users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only students enrolled in specific courses (LDAP/Sakai)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only WP users in this site<br /><?php
+				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
@@ -1017,7 +1017,7 @@ END TODO
 				<input type="text" name="new_enrolled_user_name" id="new_enrolled_user_name" placeholder="username" style="width: 75px;" />
 				<input type="text" name="new_enrolled_user_email" id="new_enrolled_user_email" placeholder="email address" style="width: 150px;" />
 				<select name="new_enrolled_user_role" id="new_enrolled_user_role" style="width: 50px;">
-					<option value="<?= cas_settings['access_default_role']; ?>"><?= cas_settings['access_default_role']; ?></option>
+					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
 				</select>
 				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_enrolled'));" value="+" /><br />
 			</div>
@@ -1046,7 +1046,7 @@ END TODO
 				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 75px;" />
 				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 150px;" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" style="width: 50px;">
-					<option value="<?= cas_settings['access_default_role']; ?>"><?= cas_settings['access_default_role']; ?></option>
+					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
 				</select>
 				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_blocked'));" value="X" /><br />
 			</div>
@@ -1099,7 +1099,7 @@ END TODO
 		}
 		function print_text_cas_misc_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="http://www.example.com/" /><?php
+			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/sessionid=nobody/am-sso-check-status" style="width: 400px;" /><?php
 		}
 
 
