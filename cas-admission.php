@@ -185,9 +185,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
 			}
-			if ( !array_key_exists( 'access_redirect_to_url', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_url'] = '';
-			}
 			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
 				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
 			}
@@ -548,9 +545,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			switch ( $cas_settings['access_redirect'] ) :
-			case 'url':
-				wp_redirect( $cas_settings['access_redirect_to_url'], 302 );
-				exit;
 			case 'message':
 				wp_die( $cas_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				break;
@@ -854,13 +848,6 @@ END TODO
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_access_redirect_to_url', // HTML element ID
-				'Redirect to URL', // HTML element Title
-				array( $this, 'print_text_cas_access_redirect_to_url' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
 				'cas_settings_access_redirect_to_page', // HTML element ID
 				'Redirect to restricted notice page', // HTML element Title
 				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
@@ -1055,13 +1042,8 @@ END TODO
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
-				<input type="radio" id="radio_cas_settings_access_redirect_to_url" name="cas_settings[access_redirect]" value="url"<?php checked( 'url' == $cas_settings['access_redirect'] ); ?> /> Redirect them to a specific URL<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_page" name="cas_settings[access_redirect]" value="page"<?php checked( 'page' == $cas_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_message" name="cas_settings[access_redirect]" value="message"<?php checked( 'message' == $cas_settings['access_redirect'] ); ?> /> Show them a simple message<?php
-		}
-		function print_text_cas_access_redirect_to_url( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_access_redirect_to_url" name="cas_settings[access_redirect_to_url]" value="<?= $cas_settings['access_redirect_to_url']; ?>" placeholder="http://www.example.com/" /><?php
 		}
 		function print_wysiwyg_cas_access_redirect_to_message( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
