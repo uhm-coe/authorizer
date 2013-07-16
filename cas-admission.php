@@ -237,6 +237,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		} // END deactivate()
 
 
+
 		/**
 		 ****************************
 		 * Custom filters and actions
@@ -308,6 +309,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$errors = '    ' . $error . "<br />\n";
 			return $errors;
 		}
+
+
 
 		/**
 		 ****************************
@@ -470,6 +473,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
+
 		/**
 		 ****************************
 		 * Access Restriction
@@ -611,6 +615,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 */
 
 
+
 		/**
 		 * Add a link to this plugin's settings page from the WordPress Plugins page.
 		 * Called from "plugin_action_links" filter in __construct() above.
@@ -624,6 +629,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			array_unshift( $links, $settings_link );
 			return $links;
 		} // END plugin_settings_link()
+
 
 
 		/**
@@ -640,6 +646,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				array( $this, 'create_admin_page' ) // function
 			);
 		}
+
 
 
 		/**
@@ -666,6 +673,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
+
 		/**
 		 * Load external resources on this plugin's options page.
 		 * Run on action hook: load-settings_page_cas_admission
@@ -685,6 +693,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
+
 		/**
 		 * Load external resources on the wp-login.php page.
 		 * Run on action hook: login_head
@@ -701,6 +710,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
+
 		/**
 		 * Add notices to the top of the options page.
 		 * Run on action hook chain: load-settings_page_cas_admission > admin_notices
@@ -712,6 +722,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			//   print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
 			// }
 		}
+
 
 
 		/**
@@ -738,6 +749,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Add help tab for Access Settings      
 		}
+
 
 
 		/**
@@ -773,6 +785,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				die( '1' );
 			}
 		}
+
 
 
 		/**
@@ -916,6 +929,7 @@ END TODO
 		}
 
 
+
 		/**
 		 * Settings sanitizer callback
 		 @todo: add sanitizer filters for the different options fields.
@@ -939,28 +953,35 @@ END TODO
 		}
 
 
+
 		/**
 		 * Settings print callbacks
 		 */
+
 		function print_section_info_cas() {
 			print 'Enter your LDAP server settings below:';
 		}
+
 		function print_text_cas_host( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" placeholder="login.its.hawaii.edu" /><?php
 		}
+
 		function print_text_cas_port( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" placeholder="443" style="width:50px;" /><?php
 		}
+
 		function print_text_cas_path( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas/login" /><?php
 		}
 
+
 		function print_section_info_access() {
 			print 'Choose how you want to restrict access to this site below:';
 		}
+
 		function print_radio_cas_access_restriction( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
@@ -968,6 +989,7 @@ END TODO
 				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
+
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_users_pending" style="margin:0;">
@@ -977,9 +999,9 @@ END TODO
 						<li>
 							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 80px;" />
 							<input type="text" id="cas_settings_users_pending_<?= $key; ?>" name="cas_settings[users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 180px;" />
-							<input type="button" class="button" id="enroll_user_<?= $key; ?>" onclick="cas_enroll_user(this);" value="Enroll" />
-							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(this);" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="X" />
+							<input type="button" class="button" id="approve_user_<?= $key; ?>" onclick="cas_approve_user(jQuery(this).parent());" value="Approve" />
+							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(jQuery(this).parent());" value="Block" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -988,6 +1010,7 @@ END TODO
 			</ul>
 			<?php
 		}
+
 		function print_combo_cas_access_users_approved( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_users_approved" style="margin:0;">
@@ -1013,10 +1036,11 @@ END TODO
 				<select name="new_approved_user_role" id="new_approved_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_approved'));" value="+" /><br />
+				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_users_approved'));" value="+" /><br />
 			</div>
 			<?php
 		}
+
 		function print_combo_cas_access_users_blocked( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_users_blocked" style="margin:0;">
@@ -1046,12 +1070,14 @@ END TODO
 			</div>
 			<?php
 		}
+
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_page" name="cas_settings[access_redirect]" value="page"<?php checked( 'page' == $cas_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_message" name="cas_settings[access_redirect]" value="message"<?php checked( 'message' == $cas_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
+
 		function print_wysiwyg_cas_access_redirect_to_message( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			wp_editor(
@@ -1065,6 +1091,7 @@ END TODO
 				)
 			);
 		}
+
 		function print_select_cas_access_redirect_to_page( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			wp_dropdown_pages(
@@ -1076,6 +1103,7 @@ END TODO
 				)
 			);
 		}
+
 		function print_select_cas_access_default_role( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><select id="cas_settings_access_default_role" name="cas_settings[access_default_role]">
@@ -1083,13 +1111,16 @@ END TODO
 			</select><?php
 		}
 
+
 		function print_section_info_misc() {
 			print 'You may optionally specify some advanced settings below:';
 		}
+
 		function print_text_cas_misc_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/sessionid=nobody/am-sso-check-status" style="width: 400px;" /><?php
 		}
+
 
 
 		/**
@@ -1156,6 +1187,7 @@ END TODO
 				update_option( 'cas_settings', $cas_settings );
 			}
 		}
+
 
 
 		/**
