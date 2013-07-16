@@ -18,7 +18,7 @@ function cas_block_user(caller) {
   jQuery(caller).append('<img src="/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_users_blocked input.cas-username').each(function() {
+  jQuery('#list_cas_settings_access_users_blocked input.cas-username').each(function() {
     if (this.value == username.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
@@ -28,7 +28,7 @@ function cas_block_user(caller) {
   });
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_users_blocked input.cas-email').each(function() {
+  jQuery('#list_cas_settings_access_users_blocked input.cas-email').each(function() {
     if (this.value == email.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
@@ -38,7 +38,7 @@ function cas_block_user(caller) {
   });
 
   if (validated) {
-    jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> <select name="discard[]" disabled="disabled" class="cas-role"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
+    jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> <input type="text" id="cas_settings_access_users_blocked_' + randomId + '" name="cas_settings[access_users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> <select name="discard[]" disabled="disabled" class="cas-role"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> <label for="cas_settings_access_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_access_users_blocked').slideDown(250);
 
     // Reset the new blocked user textboxes
     username.val('');
@@ -116,7 +116,7 @@ jQuery(document).ready(function($){
   var cas_settings_access_redirect_to_page = $('#cas_settings_access_redirect_to_page').closest('tr');
   var cas_settings_users_pending = $('#list_cas_settings_users_pending').closest('tr');
   var cas_settings_users_approved = $('#list_cas_settings_users_approved').closest('tr');
-  var cas_settings_users_blocked = $('#list_cas_settings_users_blocked').closest('tr');
+  var cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
@@ -125,7 +125,7 @@ jQuery(document).ready(function($){
   $('th, td', cas_settings_access_redirect_to_page).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_users_pending).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_users_approved).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_users_blocked).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
 
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
@@ -140,7 +140,7 @@ jQuery(document).ready(function($){
   if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
     $('div.animated_wrapper', cas_settings_users_pending).hide();
     $('div.animated_wrapper', cas_settings_users_approved).hide();
-    $('div.animated_wrapper', cas_settings_users_blocked).hide();
+    $('div.animated_wrapper', cas_settings_access_users_blocked).hide();
   }
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
@@ -178,11 +178,11 @@ jQuery(document).ready(function($){
     if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
       $('div.animated_wrapper', cas_settings_users_pending).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_users_approved).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_users_blocked).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_users_blocked).slideUp(animation_speed);
     } else {
       $('div.animated_wrapper', cas_settings_users_pending).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_users_approved).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_users_blocked).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_users_blocked).slideDown(animation_speed);
     }
   });
 

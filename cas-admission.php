@@ -1004,24 +1004,24 @@ END TODO
 
 		function print_combo_cas_access_users_blocked( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_users_blocked" style="margin:0;">
-				<?php if ( array_key_exists( 'users_blocked', $cas_settings ) && is_array( $cas_settings['users_blocked'] ) ) : ?>
-					<?php foreach ( $cas_settings['users_blocked'] as $key => $email ): ?>
+			?><ul id="list_cas_settings_access_users_blocked" style="margin:0;">
+				<?php if ( array_key_exists( 'access_users_blocked', $cas_settings ) && is_array( $cas_settings['access_users_blocked'] ) ) : ?>
+					<?php foreach ( $cas_settings['access_users_blocked'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
 						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
 							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" class="cas-username" />
-							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<input type="text" id="cas_settings_access_users_blocked_<?= $key; ?>" name="cas_settings[access_users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" class="cas-email" />
 							<select name="discard[]" disabled="disabled" class="cas-role">
 								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= ucfirst( array_shift( $blocked_user->roles ) ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
-							<label for="cas_settings_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
+							<label for="cas_settings_access_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_cas_settings_users_blocked">
+			<div id="new_cas_settings_access_users_blocked">
 				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" class="cas-username" />
 				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" class="cas-email" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="cas-role">
