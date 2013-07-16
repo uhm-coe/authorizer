@@ -36,7 +36,7 @@ function cas_block_user(caller) {
     }
   });
 
-  jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" /> <select name="discard[]" disabled="disabled"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(jQuery(this).parent());" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
+  jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" /> <select name="discard[]" disabled="disabled"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
 
   // Reset the new blocked user textboxes
   username.val('');

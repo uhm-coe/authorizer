@@ -901,7 +901,7 @@ END TODO
 				$cas_settings['cas_host'] = '';
 			}
 			// Default to "Everyone" access restriction
-			if ( !in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
+			if ( !in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
 			}
 
@@ -947,7 +947,7 @@ END TODO
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 
@@ -1015,7 +1015,7 @@ END TODO
 							<select name="discard[]" disabled="disabled">
 								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= ucfirst( array_shift( $blocked_user->roles ) ); ?></option>
 							</select>
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
 							<label for="cas_settings_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
