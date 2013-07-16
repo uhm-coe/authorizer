@@ -202,6 +202,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'misc_lostpassword_url', $cas_settings ) ) {
 				$cas_settings['misc_lostpassword_url'] = '';
 			}
+			if ( !array_key_exists( 'misc_branding', $cas_settings ) ) {
+				$cas_settings['misc_branding'] = 'default';
+			}
 
 			update_option( 'cas_settings', $cas_settings );
 		} // END activate()
@@ -698,7 +701,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function load_login_css_and_js() {
 			$cas_settings = get_option( 'cas_settings' );
 
-			if ( $cas_settings['ldap_type'] === 'custom_uh' ):
+			if ( $cas_settings['misc_branding'] === 'custom_uh' ):
 				?>
 				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas-admission-login.css', __FILE__ ); ?>" />
 				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas-admission-login.js', __FILE__ ); ?>"></script>
@@ -887,6 +890,13 @@ END TODO
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_misc' // Section this setting is shown on
 			);
+			add_settings_field(
+				'cas_settings_misc_branding', // HTML element ID
+				'Custom WordPress login branding', // HTML element Title
+				array( $this, 'print_radio_cas_misc_branding' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_misc' // Section this setting is shown on
+			);
 		}
 
 
@@ -950,7 +960,9 @@ END TODO
 				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
-
+/**
+TODO: modify pending user code to show list of cas users who have successfully logged in but who aren't in the 'approved' list below.
+*/
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_access_users_pending" style="margin:0;">
@@ -1096,6 +1108,12 @@ END TODO
 		function print_text_cas_misc_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/sessionid=nobody/am-sso-check-status" style="width: 400px;" /><?php
+		}
+
+		function print_radio_cas_misc_branding( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="radio" id="radio_cas_settings_misc_branding_default" name="cas_settings[misc_branding]" value="default"<?php checked( 'default' == $cas_settings['misc_branding'] ); ?> /> Default WordPress login screen<br />
+				<input type="radio" id="radio_cas_settings_misc_branding_custom_uh" name="cas_settings[misc_branding]" value="custom_uh"<?php checked( 'custom_uh' == $cas_settings['misc_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
 		}
 
 
