@@ -978,7 +978,7 @@ END TODO
 				<?php if ( array_key_exists( 'users_approved', $cas_settings ) && is_array( $cas_settings['users_approved'] ) ) : ?>
 					<?php foreach ( $cas_settings['users_approved'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
-						<?php if ( ! ( $approved_user = get_user_by( 'email', $email ) ) ) continue; ?>
+						<?php //if ( ! ( $approved_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
 							<input type="text" name="discard[]" value="<?= $approved_user->user_login ?>" readonly="true" style="width: 80px;" />
 							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
@@ -1008,7 +1008,13 @@ END TODO
 				<?php if ( array_key_exists( 'access_users_blocked', $cas_settings ) && is_array( $cas_settings['access_users_blocked'] ) ) : ?>
 					<?php foreach ( $cas_settings['access_users_blocked'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
-						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ) continue; ?>
+						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ): ?>
+							<?php $blocked_user = new stdClass(); ?>
+							<?php $blocked_user->user_login = array_shift( split( '@', $email ) ); ?>
+							<?php $blocked_user->user_email = $email; ?>
+							<?php $blocked_user->roles = array( $cas_settings['access_default_role'] ); ?>
+							<?php $blocked_user->user_registered = '(no account created)'; ?>
+						<?php endif; ?>
 						<li>
 							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" class="cas-username" />
 							<input type="text" id="cas_settings_access_users_blocked_<?= $key; ?>" name="cas_settings[access_users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" class="cas-email" />
