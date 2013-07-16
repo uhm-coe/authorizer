@@ -97,9 +97,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
-			// ajax course verification check
-			add_action( 'wp_ajax_cas_course_check', array( $this, 'ajax_cas_course_check' ) );
-
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_save_admission_dashboard_widget', array( $this, 'ajax_save_admission_dashboard_widget' ) );
 
@@ -753,42 +750,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 
 		/**
-		 * Validate Sakai Site ID entry on demand (AJAX)
-		 */
-		public function ajax_cas_course_check() {
-			if ( empty( $_POST['sakai_site_id'] ) || empty( $_POST['sakai_base_url'] ) ) {
-				die('&nbsp;');
-			}
-
-			$request_url = trailingslashit( $_POST['sakai_base_url'] ) . 'site/' . $_POST['sakai_site_id'] . '.json';
-			$sakai_session_id = get_user_meta( get_current_user_id(), 'sakai_session_id', true );
-			$course_details = $this->call_api(
-				'get',
-				$request_url,
-				array(
-					'sakai.session' => $sakai_session_id,
-				)
-			);
-			if ( isset( $course_details ) ) {
-				if ( strpos( 'HTTP Status 403', $course_details ) !== false ) {
-					// couldn't get sakai info because not logged in
-					die( '[Unknown course]' );
-				} else {
-					$course_details = json_decode( $course_details );
-					if ( isset( $course_details ) && property_exists( $course_details, 'entityTitle' ) ) {
-						die( $course_details->entityTitle ); // success
-					} else {
-						die( '[Unknown course]' ); // success
-					}
-				}
-			} else {
-				die( '1' );
-			}
-		}
-
-
-
-		/**
 		 * Create sections and options
 		 * Run on action hook: admin_init
 		 */
@@ -1036,7 +997,7 @@ END TODO
 				<select name="new_approved_user_role" id="new_approved_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_users_approved'));" value="+" /><br />
+				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_users_approved'));" value="Approve" /><br />
 			</div>
 			<?php
 		}
@@ -1061,12 +1022,12 @@ END TODO
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_users_blocked">
-				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" />
-				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" />
-				<select name="new_blocked_user_role" id="new_blocked_user_role">
+				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" class="cas-username" />
+				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" class="cas-email" />
+				<select name="new_blocked_user_role" id="new_blocked_user_role" class="cas-role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="block_user_new" onclick="cas_block_user(jQuery('#new_cas_settings_users_blocked'));" value="+" /><br />
+				<input class="button-primary" type="button" id="block_user_new" onclick="cas_block_user(this);" value="Block" /><br />
 			</div>
 			<?php
 		}

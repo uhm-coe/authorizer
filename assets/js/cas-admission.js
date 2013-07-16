@@ -1,49 +1,55 @@
-var add_btn_course;
 var animation_speed = 300;
 var shake_speed = 600;
 
 
-// Add course to whitelist.
-function cas_add_course(course) {
-  if (jQuery.trim(course) == '')
+
+// Add user to blacklist.
+function cas_block_user(caller) {
+  var username = jQuery(caller).parent().find('.cas-username');
+  var email = jQuery(caller).parent().find('.cas-email');
+  var role = jQuery(caller).parent().find('.cas-role');
+  var randomId = getRandomId();
+
+  if (jQuery.trim(username.val()) == '')
     return false;
 
-  add_btn_course.attr('disabled', 'disabled');
+  jQuery(caller).attr('disabled', 'disabled');
+  jQuery(caller).append('<img src="/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_courses input[type=text]').each(function() {
-    if (this.value == course) {
+  jQuery('#list_cas_settings_access_courses input[placeholder=username]').each(function() {
+    if (this.value == username.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
-      add_btn_course.removeAttr('disabled');
+      jQuery(caller).removeAttr('disabled');
+      jQuery('#cas_loading').remove();
       return false;
     }
   });
 
-  jQuery('#newcourse').css('background', 'url(/wp-admin/images/loading.gif) no-repeat 253px 2px');
-  jQuery.post(ajaxurl, {
-    action: 'cas_course_check', 
-    'sakai_site_id': course, 
-    'sakai_base_url': jQuery('#cas_settings_sakai_base_url').val() 
-  }, function(response) {
-    jQuery('#newcourse').css('background', 'none');
-    if (response==0) { // failed checking course
-      jQuery('#newcourse').parent().effect('shake',shake_speed);
-      add_btn_course.removeAttr('disabled');
+  // Check if the course being added already exists in the list.
+  jQuery('#list_cas_settings_access_courses input[placeholder=email]').each(function() {
+    if (this.value == email.val()) {
+      jQuery(this).parent().effect('shake',shake_speed);
+      jQuery(caller).removeAttr('disabled');
+      jQuery('#cas_loading').remove();
       return false;
-    } else { // succeeded checking course
-      jQuery('<li style="display: none;"><input type="text" name="cas_settings[access_courses][]" value="' + course + '" readonly="true" style="width:275px;" /> <input type="button" class="button" onclick="cas_remove_course(this);" value="&minus;" /> <span class="description">' + response + '</span></div>').appendTo('#list_cas_settings_access_courses').slideDown(250);
-      // Reset the new course textbox if we successfully added this course
-      if (course == jQuery('#newcourse').val())
-        jQuery('#newcourse').val('');
-      jQuery('#addcourse').removeAttr('disabled');
-      return true;
     }
   });
+
+  jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" /> <select name="discard[]" disabled="disabled"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(jQuery(this).parent());" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
+
+  // Reset the new blocked user textboxes
+  username.val('');
+  email.val('');
+  jQuery(caller).removeAttr('disabled');
+  jQuery('#cas_loading').remove();
+  return true;
 }
-// Remove course from whitelist.
-function cas_remove_course(btnObj) {
-  jQuery(btnObj).parent().slideUp(250,function(){ jQuery(this).remove(); });
+// Remove user from blacklist.
+function cas_ignore_user(caller) {
+  jQuery(caller).parent().slideUp(250,function(){ jQuery(this).remove(); });
 }
+
 
 
 // Save options from dashboard widget.
@@ -75,6 +81,7 @@ function save_cas_settings_access(caller) {
 }
 
 
+
 // Helper function to grab a querystring param value by name
 function getParameterByName(needle, haystack) {
   needle = needle.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -87,11 +94,18 @@ function getParameterByName(needle, haystack) {
     return decodeURIComponent(results[1].replace(/\+/g, " "));
 }
 
+// Helper function to generate a random string
+function getRandomId() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (var i=0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  return text;
+}
+
+
 
 jQuery(document).ready(function($){
-  // hide and show relevant pieces
-  add_btn_course = $('#addcourse');
-
   // Show and hide specific options on page load
   var cas_settings_access_redirect_to_login = $('#radio_cas_settings_access_redirect_to_login').closest('tr');
   var cas_settings_access_redirect_to_url = $('#cas_settings_access_redirect_to_url').closest('tr');
