@@ -176,8 +176,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
 				$cas_settings['access_users_pending'] = '';
 			}
-			if ( !array_key_exists( 'access_users_enrolled', $cas_settings ) ) {
-				$cas_settings['access_users_enrolled'] = '';
+			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
+				$cas_settings['access_users_approved'] = '';
 			}
 			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
 				$cas_settings['access_users_blocked'] = '';
@@ -453,10 +453,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Reset cached access so plugin checks against whitelist to make sure this newly-logged in user still has access (if restricting access by course)
 			update_user_meta( $user->ID, 'has_access', false );
 
-			// Make sure (if we're restricting access by courses) that the current user is enrolled in an allowed course
+			// Make sure (if we're restricting access by courses) that the current user is approved
 			$logged_in_but_no_access = (
-				$cas_settings['access_restriction'] == 'course' &&
-				! $this->is_current_user_enrolled( $user->ID )
+				$cas_settings['access_restriction'] == 'approved_cas' &&
+				! $this->is_current_user_approved( $user->ID )
 			);
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
@@ -478,7 +478,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 
 		/**
-		 * Restrict access to WordPress site based on settings (everyone, university, course).
+		 * Restrict access to WordPress site based on settings (everyone, university, approved_cas, user).
 		 * Hook: parse_request http://codex.wordpress.org/Plugin_API/Action_Reference/parse_request
 		 *
 		 * @param array $wp WordPress object.
@@ -491,22 +491,27 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$cas_settings = get_option( 'cas_settings' );
 
 			$has_access = (
-				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) || // Always allow access if WordPress is installing
-				( is_admin() ) || // Always allow access to admins
-				( $cas_settings['access_restriction'] == 'everyone' ) || // Allow access if option is set to 'everyone'
-				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to 'university' community
-				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) || // Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
-				( $cas_settings['access_restriction'] == 'course' && get_user_meta( get_current_user_id(), 'has_access', true ) ) || // Allow access to users enrolled in course if option is set to 'course' members only (check cached result first)
-				( $cas_settings['access_restriction'] == 'course' && $this->is_current_user_enrolled() ) // Allow access to users enrolled in course if option is set to 'course' members only (check against whitelist if no cached value is present)
+				// Always allow access if WordPress is installing
+				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
+				// Always allow access to admins
+				( is_admin() ) ||
+				// Allow access if option is set to 'everyone'
+				( $cas_settings['access_restriction'] == 'everyone' ) ||
+				// Allow access to logged in users if option is set to 'university' community
+				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
+				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
+				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
+				// Allow access to approved CAS users if option is set to 'approved_cas' (check cached result first)
+				( $cas_settings['access_restriction'] == 'approved_cas' && ( get_user_meta( get_current_user_id(), 'has_access', true ) || $this->is_current_user_approved() ) )
 			);
 			$is_restricted = !$has_access;
 
-			// Fringe case: User successfully logged in, but they don't have access
-			// to an allowed course. Flag these users, and redirect them to their
+			// Fringe case: User successfully logged in, but they aren't on the
+			// 'approved' whitelist. Flag these users, and redirect them to their
 			// profile page with a message (so we don't get into a redirect loop on
 			// the wp-login.php page).
 			$logged_in_but_no_access = false;
-			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $cas_settings['access_restriction'] == 'course' ) {
+			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $cas_settings['access_restriction'] == 'approved_cas' ) {
 				$logged_in_but_no_access = true;
 			}
 
@@ -568,14 +573,14 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 		/**
-		 * Determine if current user is enrolled by checking the whitelist.
+		 * Determine if current user is approved by checking the whitelist.
 		 *
 		 * @returns BOOL true if the currently logged in user is listed in the whitelist in the plugin options.
 		 */
-		function is_current_user_enrolled() {
+		function is_current_user_approved() {
 			$cas_settings = get_option( 'cas_settings' );
 
-			// Sanity check: only evaluate if access restriction is set to 'course' (not 'everyone' or 'university')
+			// Sanity check: only evaluate if access restriction is set to 'approved_cas' (not 'everyone' or 'university')
 			if ( $cas_settings['access_restriction'] == 'everyone' || $cas_settings['access_restriction'] == 'university' ) {
 				return true;
 			}
@@ -584,8 +589,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$has_access = false;
 
 			// See if the current user is in the whitelist of users with access
-			foreach ( $cas_settings['access_users_enrolled'] as $enrolled_user ) {
-				if ( $enrolled_user['username'] === $current_user->user_login ) {
+			foreach ( $cas_settings['access_users_approved'] as $approved_user ) {
+				if ( $approved_user['username'] === $current_user->user_login ) {
 					$has_access = true;
 					break;
 				}
@@ -807,7 +812,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access' // Section this setting is shown on
 			);
 /**
-@todo: remove refs to access_courses var and add refs to users_pending/enrolled/blocked
+@todo: remove refs to access_courses var and add refs to users_pending/approved/blocked
 */
 			// add_settings_field(
 			// 	'cas_settings_access_courses', // HTML element ID
@@ -824,9 +829,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_access_users_enrolled', // HTML element ID
+				'cas_settings_access_users_approved', // HTML element ID
 				'Approved CAS Users', // HTML element Title
-				array( $this, 'print_combo_cas_access_users_enrolled' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_access_users_approved' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -960,7 +965,7 @@ END TODO
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 		function print_combo_cas_access_users_pending( $args = '' ) {
@@ -983,32 +988,32 @@ END TODO
 			</ul>
 			<?php
 		}
-		function print_combo_cas_access_users_enrolled( $args = '' ) {
+		function print_combo_cas_access_users_approved( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_users_enrolled" style="margin:0;">
-				<?php if ( array_key_exists( 'users_enrolled', $cas_settings ) && is_array( $cas_settings['users_enrolled'] ) ) : ?>
-					<?php foreach ( $cas_settings['users_enrolled'] as $key => $email ): ?>
+			?><ul id="list_cas_settings_users_approved" style="margin:0;">
+				<?php if ( array_key_exists( 'users_approved', $cas_settings ) && is_array( $cas_settings['users_approved'] ) ) : ?>
+					<?php foreach ( $cas_settings['users_approved'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
-						<?php if ( ! ( $enrolled_user = get_user_by( 'email', $email ) ) ) continue; ?>
+						<?php if ( ! ( $approved_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= $enrolled_user->user_login ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_users_enrolled_<?= $key; ?>" name="cas_settings[users_enrolled][]" value="<?= $enrolled_user->user_email; ?>" readonly="true" style="width: 180px;" />
+							<input type="text" name="discard[]" value="<?= $approved_user->user_login ?>" readonly="true" style="width: 80px;" />
+							<input type="text" id="cas_settings_users_approved_<?= $key; ?>" name="cas_settings[users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
 							<select name="discard[]" disabled="disabled">
-								<option value="<?= array_shift( $enrolled_user->roles ); ?>"><?= array_shift( $enrolled_user->roles ); ?></option>
+								<option value="<?= array_shift( $approved_user->roles ); ?>"><?= array_shift( $approved_user->roles ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
-							<label for="cas_settings_users_enrolled_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $enrolled_user->user_registered ) ); ?></span></label>
+							<label for="cas_settings_users_approved_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $approved_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_cas_settings_users_enrolled">
-				<input type="text" name="new_enrolled_user_name" id="new_enrolled_user_name" placeholder="username" style="width: 80px;" />
-				<input type="text" name="new_enrolled_user_email" id="new_enrolled_user_email" placeholder="email address" style="width: 180px;" />
-				<select name="new_enrolled_user_role" id="new_enrolled_user_role">
+			<div id="new_cas_settings_users_approved">
+				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" />
+				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" />
+				<select name="new_approved_user_role" id="new_approved_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
 				</select>
-				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_enrolled'));" value="+" /><br />
+				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_approved'));" value="+" /><br />
 			</div>
 			<?php
 		}
@@ -1136,7 +1141,7 @@ END TODO
 			}
 
 			// If invalid input, set access restriction to only WP users.
-			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'course', 'user' ) ) ) {
+			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
 				$_POST['access_restriction'] = 'user';
 			}
 

@@ -97,14 +97,18 @@ jQuery(document).ready(function($){
   var cas_settings_access_redirect_to_url = $('#cas_settings_access_redirect_to_url').closest('tr');
   var cas_settings_access_redirect_to_message = $('#wp-cas_settings_access_redirect_to_message-wrap').closest('tr');
   var cas_settings_access_redirect_to_page = $('#cas_settings_access_redirect_to_page').closest('tr');
-  var cas_settings_access_courses = $('#list_cas_settings_access_courses').closest('tr');
+  var cas_settings_users_pending = $('#list_cas_settings_users_pending').closest('tr');
+  var cas_settings_users_approved = $('#list_cas_settings_users_approved').closest('tr');
+  var cas_settings_users_blocked = $('#list_cas_settings_users_blocked').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_page).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_courses).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_users_pending).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_users_approved).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_users_blocked).wrapInner('<div class="animated_wrapper" />');
 
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
@@ -116,8 +120,10 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', cas_settings_access_redirect_to_page).hide();
   }
 
-  if (!$('#radio_cas_settings_access_restriction_course').is(':checked')) {
-    $('div.animated_wrapper', cas_settings_access_courses).hide();
+  if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
+    $('div.animated_wrapper', cas_settings_users_pending).hide();
+    $('div.animated_wrapper', cas_settings_users_approved).hide();
+    $('div.animated_wrapper', cas_settings_users_blocked).hide();
   }
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
@@ -141,16 +147,25 @@ jQuery(document).ready(function($){
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="cas_settings[access_restriction]"]').change(function(){
-    if ($('#radio_cas_settings_access_restriction_everyone').is(':checked'))
+    if ($('#radio_cas_settings_access_restriction_everyone').is(':checked')) {
       $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideUp(animation_speed);
-    else
-      $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideDown(animation_speed);
-  
-    // Hide "Course Site IDs with access" unless "Students enrolled in specific course(s)" is checked
-    if (!$('#radio_cas_settings_access_restriction_course').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_courses).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_redirect_to_page).slideUp(animation_speed);
     } else {
-      $('div.animated_wrapper', cas_settings_access_courses).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideDown(animation_speed);
+      $('input[name="cas_settings[access_redirect]"]').trigger('change');
+    }
+  
+    // Hide user whitelist unless "Only specific students below" is checked
+    if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
+      $('div.animated_wrapper', cas_settings_users_pending).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_users_approved).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_users_blocked).slideUp(animation_speed);
+    } else {
+      $('div.animated_wrapper', cas_settings_users_pending).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_users_approved).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_users_blocked).slideDown(animation_speed);
     }
   });
 
