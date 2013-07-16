@@ -3,12 +3,15 @@ var shake_speed = 600;
 
 
 
-// Add user to blacklist.
-function cas_block_user(caller) {
+// Add user to list (list = blocked or approved).
+function cas_add_user(caller, list) {
+  // default to the approved list
+  list = typeof list !== 'undefined' ? list : 'approved';
+
   var username = jQuery(caller).parent().find('.cas-username');
   var email = jQuery(caller).parent().find('.cas-email');
   var role = jQuery(caller).parent().find('.cas-role');
-  var nextId = jQuery('#list_cas_settings_access_users_blocked li').length;
+  var nextId = jQuery('#list_cas_settings_access_users_' + list + ' li').length;
   var validated = true;
 
   if (jQuery.trim(username.val()) == '')
@@ -18,7 +21,7 @@ function cas_block_user(caller) {
   jQuery(caller).append('<img src="/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_users_blocked input.cas-username').each(function() {
+  jQuery('#list_cas_settings_access_users_' + list + ' input.cas-username').each(function() {
     if (this.value == username.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
@@ -28,7 +31,7 @@ function cas_block_user(caller) {
   });
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_users_blocked input.cas-email').each(function() {
+  jQuery('#list_cas_settings_access_users_' + list + ' input.cas-email').each(function() {
     if (this.value == email.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
@@ -40,17 +43,17 @@ function cas_block_user(caller) {
   if (validated) {
     jQuery(' \
       <li style="display: none;"> \
-        <input type="text" name="cas_settings[access_users_blocked][' + nextId + '][username]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> \
-        <input type="text" id="cas_settings_access_users_blocked_' + nextId + '" name="cas_settings[access_users_blocked][' + nextId + '][email]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> \
-        <select name="cas_settings[access_users_blocked][' + nextId + '][role]" class="cas-role"> \
+        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> \
+        <input type="text" id="cas_settings_access_users_' + list + '_' + nextId + '" name="cas_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> \
+        <select name="cas_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role"> \
           <option value="' + role.val() + '" selected="selected">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option> \
         </select> \
-        <input type="text" name="cas_settings[access_users_blocked][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" style="width: 65px;" class="cas-date-added" /> \
+        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" style="width: 65px;" class="cas-date-added" /> \
         <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> \
       </li> \
-    ').appendTo('#list_cas_settings_access_users_blocked').slideDown(250);
+    ').appendTo('#list_cas_settings_access_users_' + list + '').slideDown(250);
 
-    // Reset the new blocked user textboxes
+    // Reset the new user textboxes
     username.val('');
     email.val('');
     jQuery(caller).removeAttr('disabled');
@@ -58,7 +61,8 @@ function cas_block_user(caller) {
     return true;
   }
 }
-// Remove user from blacklist.
+
+// Remove user from list.
 function cas_ignore_user(caller) {
   jQuery(caller).parent().slideUp(250,function(){ jQuery(this).remove(); });
 }
@@ -116,7 +120,6 @@ function getRandomId() {
   return text;
 }
 
-
 // Helper function to return a short date (e.g., Jul 2013) for today's date
 function getShortDate(date) {
   date = typeof date !== 'undefined' ? date : new Date();
@@ -137,6 +140,7 @@ function getShortDate(date) {
   }
   return month + ' ' + date.getFullYear();
 }
+
 
 
 jQuery(document).ready(function($){

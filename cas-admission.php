@@ -975,29 +975,37 @@ END TODO
 		function print_combo_cas_access_users_approved( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_access_users_approved" style="margin:0;">
-				<?php if ( array_key_exists( 'users_approved', $cas_settings ) && is_array( $cas_settings['users_approved'] ) ) : ?>
-					<?php foreach ( $cas_settings['users_approved'] as $key => $email ): ?>
-						<?php if ( empty( $email ) ) continue; ?>
-						<?php //if ( ! ( $approved_user = get_user_by( 'email', $email ) ) ) continue; ?>
+				<?php if ( array_key_exists( 'access_users_approved', $cas_settings ) && is_array( $cas_settings['access_users_approved'] ) ) : ?>
+					<?php foreach ( $cas_settings['access_users_approved'] as $key => $approved_user ): ?>
+						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
+						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
+							<?php $approved_user['username'] = $approved_wp_user->user_login; ?>
+							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
+							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
+							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
+							<?php $approved_user['is_wp_user'] = true; ?>
+						<? else: ?>
+							<?php $approved_user['is_wp_user'] = false; ?>
+						<?php endif; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= $approved_user->user_login ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
-							<select name="discard[]" disabled="disabled">
-								<option value="<?= array_shift( $approved_user->roles ); ?>"><?= ucfirst( array_shift( $approved_user->roles ) ); ?></option>
+							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
+							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<select name="cas_settings[access_users_approved][<?= $key; ?>][role]" class="cas-role">
+								<option value="<?= $approved_user['role']; ?>" selected="selected"><?= ucfirst( $approved_user['role'] ); ?></option>
 							</select>
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
-							<label for="cas_settings_access_users_approved_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $approved_user->user_registered ) ); ?></span></label>
+							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" style="width: 65px;" class="cas-date-added" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_access_users_approved">
-				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" />
-				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" />
-				<select name="new_approved_user_role" id="new_approved_user_role">
+				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" class="cas-username" />
+				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" class="cas-email" />
+				<select name="new_approved_user_role" id="new_approved_user_role" class="cas-role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_access_users_approved'));" value="Approve" /><br />
+				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_add_user(this, 'approved');" value="Approve" /><br />
 			</div>
 			<?php
 		}
@@ -1035,7 +1043,7 @@ END TODO
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="cas-role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="block_user_new" onclick="cas_block_user(this);" value="Block" /><br />
+				<input class="button-primary" type="button" id="block_user_new" onclick="cas_add_user(this, 'blocked');" value="Block" /><br />
 			</div>
 			<?php
 		}
