@@ -1013,6 +1013,9 @@ END TODO
 							<?php $blocked_user['email'] = $blocked_wp_user->user_email; ?>
 							<?php $blocked_user['role'] = array_shift( $blocked_wp_user->roles ); ?>
 							<?php $blocked_user['date_added'] = $blocked_wp_user->user_registered; ?>
+							<?php $blocked_user['is_wp_user'] = true; ?>
+						<? else: ?>
+							<?php $blocked_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
 							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][username]" value="<?= $blocked_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
