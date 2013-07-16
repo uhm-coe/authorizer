@@ -1010,9 +1010,9 @@ END TODO
 						<?php if ( empty( $email ) ) continue; ?>
 						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" />
-							<select name="discard[]" disabled="disabled">
+							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" class="cas-username" />
+							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<select name="discard[]" disabled="disabled" class="cas-role">
 								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= ucfirst( array_shift( $blocked_user->roles ) ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />

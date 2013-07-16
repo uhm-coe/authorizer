@@ -9,6 +9,7 @@ function cas_block_user(caller) {
   var email = jQuery(caller).parent().find('.cas-email');
   var role = jQuery(caller).parent().find('.cas-role');
   var randomId = getRandomId();
+  var validated = true;
 
   if (jQuery.trim(username.val()) == '')
     return false;
@@ -17,33 +18,35 @@ function cas_block_user(caller) {
   jQuery(caller).append('<img src="/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_courses input[placeholder=username]').each(function() {
+  jQuery('#list_cas_settings_users_blocked input.cas-username').each(function() {
     if (this.value == username.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
       jQuery('#cas_loading').remove();
-      return false;
+      validated = false;
     }
   });
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_courses input[placeholder=email]').each(function() {
+  jQuery('#list_cas_settings_users_blocked input.cas-email').each(function() {
     if (this.value == email.val()) {
       jQuery(this).parent().effect('shake',shake_speed);
       jQuery(caller).removeAttr('disabled');
       jQuery('#cas_loading').remove();
-      return false;
+      validated = false;
     }
   });
 
-  jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" /> <select name="discard[]" disabled="disabled"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
+  if (validated) {
+    jQuery('<li style="display: none;"><input type="text" name="discard[]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> <input type="text" id="cas_settings_users_blocked_' + randomId + '" name="cas_settings[users_blocked][]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> <select name="discard[]" disabled="disabled" class="cas-role"><option value="' + role.val() + '">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option></select> <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> <label for="cas_settings_users_blocked_' + randomId + '"><span class="description"></span></label>').appendTo('#list_cas_settings_users_blocked').slideDown(250);
 
-  // Reset the new blocked user textboxes
-  username.val('');
-  email.val('');
-  jQuery(caller).removeAttr('disabled');
-  jQuery('#cas_loading').remove();
-  return true;
+    // Reset the new blocked user textboxes
+    username.val('');
+    email.val('');
+    jQuery(caller).removeAttr('disabled');
+    jQuery('#cas_loading').remove();
+    return true;
+  }
 }
 // Remove user from blacklist.
 function cas_ignore_user(caller) {
