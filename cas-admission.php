@@ -960,7 +960,7 @@ END TODO
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_course" name="cas_settings[access_restriction]" value="course"<?php checked( 'course' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 		function print_combo_cas_access_users_pending( $args = '' ) {
@@ -978,7 +978,7 @@ END TODO
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
-						<li><em>None</em></li>
+						<li><em>No pending users</em></li>
 				<?php endif; ?>
 			</ul>
 			<?php
