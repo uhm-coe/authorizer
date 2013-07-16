@@ -953,13 +953,13 @@ END TODO
 
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_users_pending" style="margin:0;">
-				<?php if ( array_key_exists( 'users_pending', $cas_settings ) && is_array( $cas_settings['users_pending'] ) && count( $cas_settings['users_pending'] ) > 0 ) : ?>
-					<?php foreach ( $cas_settings['users_pending'] as $key => $email ): ?>
+			?><ul id="list_cas_settings_access_users_pending" style="margin:0;">
+				<?php if ( array_key_exists( 'access_users_pending', $cas_settings ) && is_array( $cas_settings['access_users_pending'] ) && count( $cas_settings['access_users_pending'] ) > 0 ) : ?>
+					<?php foreach ( $cas_settings['access_users_pending'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
 						<li>
 							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_users_pending_<?= $key; ?>" name="cas_settings[users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 180px;" />
+							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 180px;" />
 							<input type="button" class="button" id="approve_user_<?= $key; ?>" onclick="cas_approve_user(jQuery(this).parent());" value="Approve" />
 							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(jQuery(this).parent());" value="Block" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
@@ -974,30 +974,30 @@ END TODO
 
 		function print_combo_cas_access_users_approved( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><ul id="list_cas_settings_users_approved" style="margin:0;">
+			?><ul id="list_cas_settings_access_users_approved" style="margin:0;">
 				<?php if ( array_key_exists( 'users_approved', $cas_settings ) && is_array( $cas_settings['users_approved'] ) ) : ?>
 					<?php foreach ( $cas_settings['users_approved'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
 						<?php if ( ! ( $approved_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
 							<input type="text" name="discard[]" value="<?= $approved_user->user_login ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_users_approved_<?= $key; ?>" name="cas_settings[users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
+							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
 							<select name="discard[]" disabled="disabled">
 								<option value="<?= array_shift( $approved_user->roles ); ?>"><?= ucfirst( array_shift( $approved_user->roles ) ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
-							<label for="cas_settings_users_approved_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $approved_user->user_registered ) ); ?></span></label>
+							<label for="cas_settings_access_users_approved_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $approved_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
-			<div id="new_cas_settings_users_approved">
+			<div id="new_cas_settings_access_users_approved">
 				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" />
 				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" />
 				<select name="new_approved_user_role" id="new_approved_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_users_approved'));" value="Approve" /><br />
+				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_approve_user(jQuery('#new_cas_settings_access_users_approved'));" value="Approve" /><br />
 			</div>
 			<?php
 		}
