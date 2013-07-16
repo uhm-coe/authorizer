@@ -668,12 +668,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function load_options_page() {
 			wp_enqueue_script(
 				'cas_admission',
-				plugins_url( 'assets/js/cas_admission.js', __FILE__ ),
+				plugins_url( 'assets/js/cas-admission.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 
-			wp_register_style( 'cas_admission-css', plugins_url( 'assets/css/cas_admission.css', __FILE__ ) );
-			wp_enqueue_style( 'cas_admission-css' );
+			wp_register_style( 'cas-admission-css', plugins_url( 'assets/css/cas-admission.css', __FILE__ ) );
+			wp_enqueue_style( 'cas-admission-css' );
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
@@ -689,8 +689,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			if ( $cas_settings['ldap_type'] === 'custom_uh' ):
 				?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas_admission-login.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas_admission-login.js', __FILE__ ); ?>"></script>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas-admission-login.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas-admission-login.js', __FILE__ ); ?>"></script>
 				<?php
 			endif;
 		}
@@ -819,21 +819,21 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			add_settings_field(
 				'cas_settings_access_users_pending', // HTML element ID
 				'Pending CAS Users', // HTML element Title
-				array( $this, 'print_select_cas_access_users_pending' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_access_users_pending' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_enrolled', // HTML element ID
 				'Approved CAS Users', // HTML element Title
-				array( $this, 'print_select_cas_access_users_enrolled' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_access_users_enrolled' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_blocked', // HTML element ID
 				'Blocked CAS Users', // HTML element Title
-				array( $this, 'print_select_cas_access_users_blocked' ), // Callback (echos form element)
+				array( $this, 'print_combo_cas_access_users_blocked' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -966,17 +966,19 @@ END TODO
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_users_pending" style="margin:0;">
-				<?php if ( array_key_exists( 'users_pending', $cas_settings ) && is_array( $cas_settings['users_pending'] ) ) : ?>
+				<?php if ( array_key_exists( 'users_pending', $cas_settings ) && is_array( $cas_settings['users_pending'] ) && count( $cas_settings['users_pending'] ) > 0 ) : ?>
 					<?php foreach ( $cas_settings['users_pending'] as $key => $email ): ?>
 						<?php if ( empty( $email ) ) continue; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 75px;" />
-							<input type="text" id="cas_settings_users_pending_<?= $key; ?>" name="cas_settings[users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 150px;" />
+							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 80px;" />
+							<input type="text" id="cas_settings_users_pending_<?= $key; ?>" name="cas_settings[users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 180px;" />
 							<input type="button" class="button" id="enroll_user_<?= $key; ?>" onclick="cas_enroll_user(this);" value="Enroll" />
 							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(this);" value="Block" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="X" />
 						</li>
 					<?php endforeach; ?>
+				<?php else: ?>
+						<li><em>None</em></li>
 				<?php endif; ?>
 			</ul>
 			<?php
@@ -989,24 +991,24 @@ END TODO
 						<?php if ( empty( $email ) ) continue; ?>
 						<?php if ( ! ( $enrolled_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= $enrolled_user->user_login ?>" readonly="true" style="width: 75px;" />
-							<input type="text" id="cas_settings_users_enrolled_<?= $key; ?>" name="cas_settings[users_enrolled][]" value="<?= $enrolled_user->user_email; ?>" readonly="true" style="width: 150px;" />
-							<select name="discard[]" disabled="disabled" style="width: 50px;">
+							<input type="text" name="discard[]" value="<?= $enrolled_user->user_login ?>" readonly="true" style="width: 80px;" />
+							<input type="text" id="cas_settings_users_enrolled_<?= $key; ?>" name="cas_settings[users_enrolled][]" value="<?= $enrolled_user->user_email; ?>" readonly="true" style="width: 180px;" />
+							<select name="discard[]" disabled="disabled">
 								<option value="<?= array_shift( $enrolled_user->roles ); ?>"><?= array_shift( $enrolled_user->roles ); ?></option>
 							</select>
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
 							<label for="cas_settings_users_enrolled_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $enrolled_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_users_enrolled">
-				<input type="text" name="new_enrolled_user_name" id="new_enrolled_user_name" placeholder="username" style="width: 75px;" />
-				<input type="text" name="new_enrolled_user_email" id="new_enrolled_user_email" placeholder="email address" style="width: 150px;" />
-				<select name="new_enrolled_user_role" id="new_enrolled_user_role" style="width: 50px;">
+				<input type="text" name="new_enrolled_user_name" id="new_enrolled_user_name" placeholder="username" style="width: 80px;" />
+				<input type="text" name="new_enrolled_user_email" id="new_enrolled_user_email" placeholder="email address" style="width: 180px;" />
+				<select name="new_enrolled_user_role" id="new_enrolled_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
 				</select>
-				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_enrolled'));" value="+" /><br />
+				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_enrolled'));" value="+" /><br />
 			</div>
 			<?php
 		}
@@ -1018,24 +1020,24 @@ END TODO
 						<?php if ( empty( $email ) ) continue; ?>
 						<?php if ( ! ( $blocked_user = get_user_by( 'email', $email ) ) ) continue; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 75px;" />
-							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 150px;" />
-							<select name="discard[]" disabled="disabled" style="width: 50px;">
+							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" />
+							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" />
+							<select name="discard[]" disabled="disabled">
 								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= array_shift( $blocked_user->roles ); ?></option>
 							</select>
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
 							<label for="cas_settings_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_users_blocked">
-				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 75px;" />
-				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 150px;" />
-				<select name="new_blocked_user_role" id="new_blocked_user_role" style="width: 50px;">
+				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" />
+				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" />
+				<select name="new_blocked_user_role" id="new_blocked_user_role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
 				</select>
-				<input class="button" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_blocked'));" value="X" /><br />
+				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_blocked'));" value="+" /><br />
 			</div>
 			<?php
 		}
