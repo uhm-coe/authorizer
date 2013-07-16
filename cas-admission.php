@@ -999,7 +999,7 @@ END TODO
 							<input type="text" name="discard[]" value="<?= $approved_user->user_login ?>" readonly="true" style="width: 80px;" />
 							<input type="text" id="cas_settings_users_approved_<?= $key; ?>" name="cas_settings[users_approved][]" value="<?= $approved_user->user_email; ?>" readonly="true" style="width: 180px;" />
 							<select name="discard[]" disabled="disabled">
-								<option value="<?= array_shift( $approved_user->roles ); ?>"><?= array_shift( $approved_user->roles ); ?></option>
+								<option value="<?= array_shift( $approved_user->roles ); ?>"><?= ucfirst( array_shift( $approved_user->roles ) ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
 							<label for="cas_settings_users_approved_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $approved_user->user_registered ) ); ?></span></label>
@@ -1011,7 +1011,7 @@ END TODO
 				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" />
 				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" />
 				<select name="new_approved_user_role" id="new_approved_user_role">
-					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
+					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
 				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_approved'));" value="+" /><br />
 			</div>
@@ -1028,7 +1028,7 @@ END TODO
 							<input type="text" name="discard[]" value="<?= $blocked_user->user_login ?>" readonly="true" style="width: 80px;" />
 							<input type="text" id="cas_settings_users_blocked_<?= $key; ?>" name="cas_settings[users_blocked][]" value="<?= $blocked_user->user_email; ?>" readonly="true" style="width: 180px;" />
 							<select name="discard[]" disabled="disabled">
-								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= array_shift( $blocked_user->roles ); ?></option>
+								<option value="<?= array_shift( $blocked_user->roles ); ?>"><?= ucfirst( array_shift( $blocked_user->roles ) ); ?></option>
 							</select>
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="x" />
 							<label for="cas_settings_users_blocked_<?= $key; ?>"><span class="description"><?= date( 'M Y', strtotime( $blocked_user->user_registered ) ); ?></span></label>
@@ -1040,9 +1040,9 @@ END TODO
 				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" />
 				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role">
-					<option value="<?= $cas_settings['access_default_role']; ?>"><?= $cas_settings['access_default_role']; ?></option>
+					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="enroll_user_new" onclick="cas_enroll_user(jQuery('#new_cas_settings_users_blocked'));" value="+" /><br />
+				<input class="button-primary" type="button" id="block_user_new" onclick="cas_block_user(jQuery('#new_cas_settings_users_blocked'));" value="+" /><br />
 			</div>
 			<?php
 		}
