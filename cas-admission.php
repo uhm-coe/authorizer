@@ -336,10 +336,11 @@ error_log('alraedy user.');
 				return $user;
 			}
 
-			if ( ! empty($_GET['wp_login'] ) && $_GET['wp_login'] === 'true' ) {
-error_log('qs: '.$_SERVER['QUERY_STRING']);
-error_log('bypassing cas authentication in favor of wordpress auth.');
-				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
+			// Admin bypass: skip cas login and proceed to WordPress login if
+			// querystring variable 'cas' is set to 'no' or 'false'--for example:
+			// https://www.example.com/wp-login.php?cas=no
+			if ( ! empty($_GET['cas'] ) && ( $_GET['cas'] === 'no' || $_GET['cas'] === 'false' ) ) {
+				return new WP_Error( 'no_cas', 'Bypassing CAS authentication in favor of WordPress authentication...' );
 			}
 
 			$cas_settings = get_option( 'cas_settings' );
@@ -722,7 +723,7 @@ error_log('no pass.');
 			$help_cas_settings_cas_content = '
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
 				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
-				<p><strong>CAS server path</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas/login).</p>
+				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas/login).</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -854,7 +855,7 @@ END TODO
 			);
 			add_settings_field(
 				'cas_settings_cas_path', // HTML element ID
-				'CAS server path', // HTML element Title
+				'CAS server path/context', // HTML element Title
 				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_cas' // Section this setting is shown on
@@ -915,7 +916,10 @@ END TODO
 		 */
 
 		function print_section_info_cas() {
-			print 'Enter your LDAP server settings below:';
+			print '<p><span class="red">Important Note</span>: If you\'re configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>';
+			print '<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />';
+			print '<a href="' . wp_login_url() . '?cas=no' . '">' . wp_login_url() . '?cas=no' . '</a></p>';
+			print '<p>Enter your CAS server settings below:</p>';
 		}
 
 		function print_text_cas_host( $args = '' ) {
@@ -930,7 +934,7 @@ END TODO
 
 		function print_text_cas_path( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas/login" /><?php
+			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas" /><?php
 		}
 
 
