@@ -329,10 +329,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return WP_User or WP_Error
 		 */
 		public function cas_authenticate( $user, $username, $password ) {
-error_log('in authenticate.');
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
-error_log('alraedy user.');
 				return $user;
 			}
 
@@ -343,99 +341,89 @@ error_log('alraedy user.');
 				return new WP_Error( 'no_cas', 'Bypassing CAS authentication in favor of WordPress authentication...' );
 			}
 
+			// Grab plugin settings.
 			$cas_settings = get_option( 'cas_settings' );
 
 			// If we're restricting access to only WP users, don't check against CAS;
 			// Instead, pass through to default WP authentication.
 			if ( $cas_settings['access_restriction'] === 'user' ) {
-error_log('no cas.');
 				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
 			}
 
 			// Set the CAS client configuration
 			phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 
-			// Check server certificate to ensure it's legitimate.
+			// Add server certificate bundle to ensure CAS server is legitimate.
 			phpCAS::setCasServerCACert( plugin_dir_path( __FILE__ ) . 'assets/inc/ca-bundle.crt' );
 
 			// Authenticate against CAS
-			if ( phpCAS::isAuthenticated() ) {
-error_log('what'.phpCAS::getUser());
-				// If the CAS user already has a WP account, log them in
-				if ( $user = get_user_by( 'login', phpCAS::getUser() ) ) {
-					wp_set_auth_cookie( $user->ID );
-					if ( isset( $_GET['redirect_to'] ) ) {
-						wp_redirect( preg_match( '/^http/', $_GET['redirect_to'] ) ? $_GET['redirect_to'] : site_url( $_GET['redirect_to'] ) );
-						die();
-					}
-					wp_redirect( site_url( '/wp-admin/' ) );
-					die();
-				} else {
-					// The CAS user does *not* have a WordPress account
-					if ( function_exists( 'wpcas_nowpuser' ) )
-						wpcas_nowpuser( phpCAS::getUser() );
-					else
-						die( __( 'you do not have permission here', 'wpcas' ) );
-				}
-			} else {
-				// sanity check: go back and authenticate
+			if ( ! phpCAS::isAuthenticated() ) {
 				phpCAS::forceAuthentication();
-error_log('what what.'.phpCAS::getUser());
 				die();
 			}
+				
+			// Get the TLD from the CAS host for use in matching email addresses
+			// For example: hawaii.edu is the TLD for login.its.hawaii.edu
+			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+			
+			// If the CAS user does not have a WordPress account, check the lists (pending, approved, blocked)
+			if ( ! $user = get_user_by( 'login', phpCAS::getUser() ) && ! $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
+				if ( is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
+					// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
 
-			// Fail with error message if username or password is blank.
-			if ( empty( $username ) ) {
-error_log('no user.');
-				return new WP_Error( 'empty_username', 'Username cannot be blank.' );
-			}
-			if ( empty( $password ) ) {
-error_log('no pass.');
-				return new WP_Error( 'empty_password', 'You must provide a password.' );
-			}
+				} else if ( is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
+					$result = wp_insert_user(
+						array(
+							'user_login' => $username,
+							'user_pass' => wp_generate_password(), // random password
+							'first_name' => $ldap_user['first'],
+							'last_name' => $ldap_user['last'],
+							'user_email' => $ldap_user['email'],
+							'user_registered' => date( 'Y-m-d H:i:s' ),
+							'role' => $cas_settings['access_default_role'],
+						)
+					);
 
-			// Successfully authenticated now, so create/update the WordPress user.
-			$user = get_user_by( 'login', $username );
+					// Check to see if there's an error because another user has the ldap
+					// user's email. If so, log user in as that WordPress user.
+					if ( is_wp_error( $result ) && array_key_exists( 'existing_user_email', $result->errors ) ) {
+						$result = get_user_by( 'email', $ldap_user['email'] );
+					}
 
-			// User doesn't exist in WordPress, so add it.
-			if ( ! ( $user && strcasecmp( $user->user_login, $username ) ) ) {
-				$result = wp_insert_user(
-					array(
-						'user_login' => $username,
-						'user_pass' => wp_generate_password(), // random password
-						'first_name' => $ldap_user['first'],
-						'last_name' => $ldap_user['last'],
-						'user_email' => $ldap_user['email'],
-						'user_registered' => date( 'Y-m-d H:i:s' ),
-						'role' => $cas_settings['access_default_role'],
-					)
-				);
+					// Check to see if there's an error because the user exists, but
+					// isn't added to this site (can occur in multisite installs).
+					if ( is_wp_error( $result ) && array_key_exists( 'existing_user_login', $result->errors ) ) {
+						global $current_blog;
+						$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $cas_settings['access_default_role'] );
+						if ( !is_wp_error( $result ) ) {
+							$result = $user->ID;
+						}
+					}
 
-				// Check to see if there's an error because another user has the ldap
-				// user's email. If so, log user in as that WordPress user.
-				if ( is_wp_error( $result ) && array_key_exists( 'existing_user_email', $result->errors ) ) {
-					$result = get_user_by( 'email', $ldap_user['email'] );
-				}
+					// Fail with message if error.
+					if ( is_wp_error( $result ) ) {
+						return $result;
+					}
 
-				// Check to see if there's an error because the user exists, but
-				// isn't added to this site (can occur in multisite installs).
-				if ( is_wp_error( $result ) && array_key_exists( 'existing_user_login', $result->errors ) ) {
-					global $current_blog;
-					$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $cas_settings['access_default_role'] );
-					if ( !is_wp_error( $result ) ) {
-						$result = $user->ID;
+					// Authenticate as new user (or as old user with same email address as ldap)
+					$user = new WP_User( $result );
+				} else {
+					// User doesn't have an account, is not blocked, and is not approved.
+					// Add them to the pending list and notify them and their instructor.
+
+					if ( ! is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
+						$pending_user = array();
+						$pending_user['username'] = phpCAS::getUser();
+						$pending_user['email'] = phpCAS::getUser() . '@' . $tld;
+						$pending_user['role'] = $cas_settings['access_default_role'];
+						$pending_user['date_added'] = '';
+						array_push( $cas_settings['access_users_pending'], $pending_user );
+						if ( current_user_can( 'edit_post' ) ) {
+							update_option( 'cas_settings', $cas_settings );
+						}
 					}
 				}
-
-				// Fail with message if error.
-				if ( is_wp_error( $result ) ) {
-					return $result;
-				}
-
-				// Authenticate as new user (or as old user with same email address as ldap)
-				$user = new WP_User( $result );
 			}
-
 
 			// Reset cached access so plugin checks against whitelist to make sure this newly-logged in user still has access (if restricting access by course)
 			update_user_meta( $user->ID, 'has_access', false );
@@ -1205,6 +1193,43 @@ TODO: modify pending user code to show list of cas users who have successfully l
 				$is_user_logged_in_and_blog_user = is_user_logged_in();
 			}
 			return $is_user_logged_in_and_blog_user;
+		}
+
+		/**
+		 * Helper function to determine whether a given username is in one of the
+		 * CAS plugin lists (pending, approved, blocked). Defaults to the list of
+		 * approved users.
+		 */
+		function is_username_in_list($username = '', $list = 'approved') {
+			if ( empty( $username ) )
+				return false;
+
+			$cas_settings = get_option( 'cas_settings' );
+
+			switch ( $list ) {
+				case 'pending':
+					return in_multi_array( $username, $cas_settings['access_users_pending'] );
+					break;
+				case 'blocked':
+					return in_multi_array( $username, $cas_settings['access_users_blocked'] );
+					break;
+				case 'approved':
+				default:
+					return in_multi_array( $username, $cas_settings['access_users_approved'] );
+					break;
+			}
+		}
+
+		/**
+		 * Helper function to search a multidimensional array for a value.
+		 */
+		function in_multi_array( $needle, $haystack, $strick = false ) {
+			foreach ( $haystack as $item ) {
+				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && in_multi_array( $needle, $item, $strict ) ) ) {
+					return true;
+				}
+			}
+			return false;
 		}
 
 	} // END class WP_Plugin_CAS_Admission
