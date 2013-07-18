@@ -141,6 +141,18 @@ function getShortDate(date) {
   return month + ' ' + date.getFullYear();
 }
 
+// Helper function to grab the TLD from a FQDN
+function getTLDFromFQDN(fqdn) {
+  fqdn = typeof fqdn !== 'undefined' ? fqdn : '';
+  var matches = fqdn.match(/[^.]*\.[^.]*$/);
+  return matches.length > 0 ? matches[0] : '';
+}
+
+// Helper function to get the username from an email address
+function getUsernameFromEmail(email) {
+  email = typeof email !== 'undefined' ? email : '';
+  return email.split("@")[0];
+}
 
 
 jQuery(document).ready(function($){
@@ -218,6 +230,19 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', cas_settings_users_pending).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_users_approved).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_access_users_blocked).slideDown(animation_speed);
+    }
+  });
+
+  // List management function: pressing enter in the username or email field adds the user to the list.
+  // Additionally, if the email field is blank, it gets constructed from the username field (and vice versa).
+  $('form input.cas-username, form input.cas-email').bind('keyup', function(e) {
+    if (e.which == 13) { // Enter key
+      $(this).siblings('input[type=button]').trigger('click');
+      return false;
+    } else if ($(this).hasClass('cas-username')) {
+      $(this).siblings('.cas-email').val($(this).val() + '@' + getTLDFromFQDN($('#cas_settings_cas_host').val()));
+    } else if ($(this).hasClass('cas-email')) {
+      $(this).siblings('.cas-username').val(getUsernameFromEmail($(this).val()));
     }
   });
 
