@@ -355,10 +355,8 @@ error_log('no cas.');
 			// Set the CAS client configuration
 			phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 
-			// Disable certificate check (while debugging)
-			phpCAS::setNoCasServerValidation();
 			// Check server certificate to ensure it's legitimate.
-			//phpCAS::setCasServerCACert();
+			phpCAS::setCasServerCACert( plugin_dir_path( __FILE__ ) . 'assets/inc/ca-bundle.crt' );
 
 			// Authenticate against CAS
 			if ( phpCAS::isAuthenticated() ) {
