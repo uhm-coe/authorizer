@@ -329,86 +329,71 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return WP_User or WP_Error
 		 */
 		public function cas_authenticate( $user, $username, $password ) {
+error_log('in authenticate.');
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
+error_log('alraedy user.');
 				return $user;
 			}
 
-			// Custom UH code: remove @hawaii.edu if it exists in the username
-			$username = str_replace( '@hawaii.edu', '', $username );
-
-			// Fail with error message if username or password is blank.
-			if ( empty( $username ) ) {
-				return new WP_Error( 'empty_username', 'Username cannot be blank.' );
+			if ( ! empty($_GET['wp_login'] ) && $_GET['wp_login'] === 'true' ) {
+error_log('qs: '.$_SERVER['QUERY_STRING']);
+error_log('bypassing cas authentication in favor of wordpress auth.');
+				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
 			}
-			if ( empty( $password ) ) {
-				return new WP_Error( 'empty_password', 'You must provide a password.' );
-			}
-
-			// Authenticate against LDAP using options provided in plugin settings.
-			$result = false;
-			$ldap_user = array(
-				'dn' => '0',
-				'first' => 'nobody',
-				'last' => '',
-				'email' => '',
-			);
 
 			$cas_settings = get_option( 'cas_settings' );
 
 			// If we're restricting access to only WP users, don't check against CAS;
 			// Instead, pass through to default WP authentication.
 			if ( $cas_settings['access_restriction'] === 'user' ) {
-				return new WP_Error( 'no_cas', 'Only authenticate against local WP install (not CAS).' );
+error_log('no cas.');
+				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
 			}
 
-			$ldap = ldap_connect( $cas_settings['ldap_host'] );
-			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-			if ( $cas_settings['ldap_tls'] == 1 ) {
-				ldap_start_tls( $ldap );
-			}
-			$result = ldap_bind( $ldap, $cas_settings['ldap_user'], $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) ) );
-			if ( !$result ) {
-				return new WP_Error( 'ldap_error', 'Could not authenticate.' );
-			}
-			// UH has an odd system; people cn's are their uhuuid's (8 digit
-			// numbers), not their uids (unique email address usernames).
-			// So here we need to do an extra search by uid to get a uhuuid,
-			// and then attempt to authenticate with uhuuid and password.
-			$ldap_search = ldap_search(
-				$ldap,
-				$cas_settings['ldap_search_base'],
-				"(uid=$username)",
-				array(
-					'givenName',
-					'sn',
-					'mail',
-					'uhUuid',
-				)
-			);
-			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+			// Set the CAS client configuration
+			phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 
-			// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
-			if ( $ldap_entries['count'] < 1 ) {
-				return new WP_Error( 'no_ldap', 'No LDAP user found.' );
-			}
+			// Disable certificate check (while debugging)
+			phpCAS::setNoCasServerValidation();
+			// Check server certificate to ensure it's legitimate.
+			//phpCAS::setCasServerCACert();
 
-			for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
-				$ldap_user['dn'] = $ldap_entries[$i]['dn'];
-				$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
-				$ldap_user['last'] = $ldap_entries[$i]['sn'][0];
-				$ldap_user['email'] = $ldap_entries[$i]['mail'][0];
+			// Authenticate against CAS
+			if ( phpCAS::isAuthenticated() ) {
+error_log('what'.phpCAS::getUser());
+				// If the CAS user already has a WP account, log them in
+				if ( $user = get_user_by( 'login', phpCAS::getUser() ) ) {
+					wp_set_auth_cookie( $user->ID );
+					if ( isset( $_GET['redirect_to'] ) ) {
+						wp_redirect( preg_match( '/^http/', $_GET['redirect_to'] ) ? $_GET['redirect_to'] : site_url( $_GET['redirect_to'] ) );
+						die();
+					}
+					wp_redirect( site_url( '/wp-admin/' ) );
+					die();
+				} else {
+					// The CAS user does *not* have a WordPress account
+					if ( function_exists( 'wpcas_nowpuser' ) )
+						wpcas_nowpuser( phpCAS::getUser() );
+					else
+						die( __( 'you do not have permission here', 'wpcas' ) );
+				}
+			} else {
+				// sanity check: go back and authenticate
+				phpCAS::forceAuthentication();
+error_log('what what.'.phpCAS::getUser());
+				die();
 			}
 
-			$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
-			if ( !$result ) {
-				// We have a real ldap user, but an invalid password, so we shouldn't
-				// pass through to wp authentication after failing ldap. Instead,
-				// remove the WordPress authenticate function, and return an error.
-				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
+			// Fail with error message if username or password is blank.
+			if ( empty( $username ) ) {
+error_log('no user.');
+				return new WP_Error( 'empty_username', 'Username cannot be blank.' );
 			}
-
+			if ( empty( $password ) ) {
+error_log('no pass.');
+				return new WP_Error( 'empty_password', 'You must provide a password.' );
+			}
 
 			// Successfully authenticated now, so create/update the WordPress user.
 			$user = get_user_by( 'login', $username );
