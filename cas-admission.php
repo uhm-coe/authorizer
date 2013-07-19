@@ -735,16 +735,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
-/**
-@todo: remove refs to access_courses var and add refs to users_pending/approved/blocked
-*/
-			// add_settings_field(
-			// 	'cas_settings_access_courses', // HTML element ID
-			// 	'Course Site IDs with access (one per line)', // HTML element Title
-			// 	array( $this, 'print_combo_cas_access_courses' ), // Callback (echos form element)
-			// 	'cas_admission', // Page this setting is shown on (slug)
-			// 	'cas_settings_access' // Section this setting is shown on
-			// );
 			add_settings_field(
 				'cas_settings_access_users_pending', // HTML element ID
 				'Pending CAS Users', // HTML element Title
@@ -1081,6 +1071,9 @@ TODO: modify pending user code to show list of cas users who have successfully l
 			}
 		}
 
+/**
+@todo: change dashboard widget to manage user lists instead of sakai list
+*/
 		function add_admission_dashboard_widget() {
 			$cas_settings = get_option( 'cas_settings' );
 			?>
@@ -1089,7 +1082,7 @@ TODO: modify pending user code to show list of cas users who have successfully l
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div><?php $this->print_radio_cas_access_restriction(); ?></div>
 					<br class="clear" />
-					<div><?php $this->print_combo_cas_access_courses(); ?></div>
+					<div><?php //$this->print_combo_cas_access_courses(); ?></div>
 					<br class="clear" />
 					<p class="submit">
 						<span class="save-action">
