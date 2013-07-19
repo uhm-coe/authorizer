@@ -361,66 +361,58 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				phpCAS::forceAuthentication();
 				die();
 			}
-				
-			// Get the TLD from the CAS host for use in matching email addresses
-			// For example: hawaii.edu is the TLD for login.its.hawaii.edu
-			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
-			
-			// If the CAS user does not have a WordPress account, check the lists (pending, approved, blocked)
-			if ( ! $user = get_user_by( 'login', phpCAS::getUser() ) && ! $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
-				if ( is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
-					// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
 
-				} else if ( is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
+			// Get the TLD from the CAS host for use in matching email addresses
+			// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
+			// 'bob' will have the following email address: bob@hawaii.edu.
+			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+
+			// If we've made it this far, we have a CAS authenticated user. Deal with
+			// them differently based on which list they're in (pending, blocked, or
+			// approved).
+			if ( is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
+				// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
+
+				// If the blocked CAS user has a WordPress account, remove it. In a
+				// multisite environment, just remove them from the current blog.
+				if ( $user = get_user_by( 'login', phpCAS::getUser() ) || $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
+				}
+			} else if ( is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
+				// If the approved CAS user does not have a WordPress account, create it
+				if ( ! $user = get_user_by( 'login', phpCAS::getUser() ) && ! $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
 					$result = wp_insert_user(
 						array(
-							'user_login' => $username,
+							'user_login' => phpCAS::getUser(),
 							'user_pass' => wp_generate_password(), // random password
-							'first_name' => $ldap_user['first'],
-							'last_name' => $ldap_user['last'],
-							'user_email' => $ldap_user['email'],
+							'first_name' => '',
+							'last_name' => '',
+							'user_email' => phpCAS::getUser() . '@' . $tld,
 							'user_registered' => date( 'Y-m-d H:i:s' ),
 							'role' => $cas_settings['access_default_role'],
 						)
 					);
-
-					// Check to see if there's an error because another user has the ldap
-					// user's email. If so, log user in as that WordPress user.
-					if ( is_wp_error( $result ) && array_key_exists( 'existing_user_email', $result->errors ) ) {
-						$result = get_user_by( 'email', $ldap_user['email'] );
-					}
-
-					// Check to see if there's an error because the user exists, but
-					// isn't added to this site (can occur in multisite installs).
-					if ( is_wp_error( $result ) && array_key_exists( 'existing_user_login', $result->errors ) ) {
-						global $current_blog;
-						$result = add_user_to_blog( $current_blog->blog_id, $user->ID, $cas_settings['access_default_role'] );
-						if ( !is_wp_error( $result ) ) {
-							$result = $user->ID;
-						}
-					}
 
 					// Fail with message if error.
 					if ( is_wp_error( $result ) ) {
 						return $result;
 					}
 
-					// Authenticate as new user (or as old user with same email address as ldap)
+					// Authenticate as new user
 					$user = new WP_User( $result );
-				} else {
-					// User doesn't have an account, is not blocked, and is not approved.
-					// Add them to the pending list and notify them and their instructor.
+				}
+			} else {
+				// User doesn't have an account, is not blocked, and is not approved.
+				// Add them to the pending list and notify them and their instructor.
 
-					if ( ! is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
-						$pending_user = array();
-						$pending_user['username'] = phpCAS::getUser();
-						$pending_user['email'] = phpCAS::getUser() . '@' . $tld;
-						$pending_user['role'] = $cas_settings['access_default_role'];
-						$pending_user['date_added'] = '';
-						array_push( $cas_settings['access_users_pending'], $pending_user );
-						if ( current_user_can( 'edit_post' ) ) {
-							update_option( 'cas_settings', $cas_settings );
-						}
+				if ( ! is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
+					$pending_user = array();
+					$pending_user['username'] = phpCAS::getUser();
+					$pending_user['email'] = phpCAS::getUser() . '@' . $tld;
+					$pending_user['role'] = $cas_settings['access_default_role'];
+					$pending_user['date_added'] = '';
+					array_push( $cas_settings['access_users_pending'], $pending_user );
+					if ( current_user_can( 'edit_post' ) ) {
+						update_option( 'cas_settings', $cas_settings );
 					}
 				}
 			}
