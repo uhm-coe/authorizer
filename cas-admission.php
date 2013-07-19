@@ -367,19 +367,32 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// 'bob' will have the following email address: bob@hawaii.edu.
 			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
+			// Check if the CAS user has a WordPress account (with the same username or email address)
+			$user = get_user_by( 'login', phpCAS::getUser() ) || get_user_by( 'email', phpCAS::getUser() . '@' . $tld;
+
 			// If we've made it this far, we have a CAS authenticated user. Deal with
 			// them differently based on which list they're in (pending, blocked, or
 			// approved).
 			if ( is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
 				// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
 
+				/**
+				@todo
+				*/
 				// If the blocked CAS user has a WordPress account, remove it. In a
 				// multisite environment, just remove them from the current blog.
-				if ( $user = get_user_by( 'login', phpCAS::getUser() ) || $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
+				if ( $user ) {
 				}
+
+				// Notify user about blocked status
+				$error = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				update_option( 'cas_settings_misc_login_error', $error );
+				wp_logout();
+				wp_redirect( wp_login_url(), 302 );
+				exit;
 			} else if ( is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
 				// If the approved CAS user does not have a WordPress account, create it
-				if ( ! $user = get_user_by( 'login', phpCAS::getUser() ) && ! $user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld ) ) {
+				if ( ! $user ) {
 					$result = wp_insert_user(
 						array(
 							'user_login' => phpCAS::getUser(),
@@ -400,10 +413,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					// Authenticate as new user
 					$user = new WP_User( $result );
 				}
+			} else if ( $user && ( in_array( $cas_settings['access_default_role'], $user->roles ) || in_array( 'subscriber', $user->roles ) ) ) {
+				// User has a WordPress account, but is not in the blocked or approved
+				// list. If they are any access level above the default CAS access
+				// level (or the default subscriber role), let them in.
 			} else {
-				// User doesn't have an account, is not blocked, and is not approved.
+				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
-
 				if ( ! is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
 					$pending_user = array();
 					$pending_user['username'] = phpCAS::getUser();
@@ -414,25 +430,22 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					if ( current_user_can( 'edit_post' ) ) {
 						update_option( 'cas_settings', $cas_settings );
 					}
+
+					// Notify instructor about new pending user
+					/**
+					@todo
+					*/
 				}
-			}
 
-			// Reset cached access so plugin checks against whitelist to make sure this newly-logged in user still has access (if restricting access by course)
-			update_user_meta( $user->ID, 'has_access', false );
-
-			// Make sure (if we're restricting access by courses) that the current user is approved
-			$logged_in_but_no_access = (
-				$cas_settings['access_restriction'] == 'approved_cas' &&
-				! $this->is_current_user_approved( $user->ID )
-			);
-			if ( $logged_in_but_no_access ) {
-				$error = 'Sorry ' . $username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				// Notify user about pending status and return without authenticating them.
+				$error = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				update_option( 'cas_settings_misc_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
 				exit;
 			}
 
+			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 			return $user;
 		}
 
@@ -467,10 +480,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				( $cas_settings['access_restriction'] == 'everyone' ) ||
 				// Allow access to logged in users if option is set to 'university' community
 				( $cas_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow ldap log in elsewhere)
+				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow CAS log in elsewhere)
 				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to approved CAS users if option is set to 'approved_cas' (check cached result first)
-				( $cas_settings['access_restriction'] == 'approved_cas' && ( get_user_meta( get_current_user_id(), 'has_access', true ) || $this->is_current_user_approved() ) )
+				// Allow access to approved CAS users and logged in users if option is set to 'approved_cas'
+				( $cas_settings['access_restriction'] == 'approved_cas' && && $this->is_user_logged_in_and_blog_user() )
 			);
 			$is_restricted = !$has_access;
 
@@ -538,36 +551,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
-		}
-
-		/**
-		 * Determine if current user is approved by checking the whitelist.
-		 *
-		 * @returns BOOL true if the currently logged in user is listed in the whitelist in the plugin options.
-		 */
-		function is_current_user_approved() {
-			$cas_settings = get_option( 'cas_settings' );
-
-			// Sanity check: only evaluate if access restriction is set to 'approved_cas' (not 'everyone' or 'university')
-			if ( $cas_settings['access_restriction'] == 'everyone' || $cas_settings['access_restriction'] == 'university' ) {
-				return true;
-			}
-
-			$current_user = wp_get_current_user();
-			$has_access = false;
-
-			// See if the current user is in the whitelist of users with access
-			foreach ( $cas_settings['access_users_approved'] as $approved_user ) {
-				if ( $approved_user['username'] === $current_user->user_login ) {
-					$has_access = true;
-					break;
-				}
-			}
-
-			// Store the result in user meta so we don't have to keep checking on every page load
-			update_user_meta( $current_user, 'has_access', $has_access );
-
-			return $has_access;
 		}
 
 
