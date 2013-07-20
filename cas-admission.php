@@ -368,7 +368,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
 			// Check if the CAS user has a WordPress account (with the same username or email address)
-			$user = get_user_by( 'login', phpCAS::getUser() ) || get_user_by( 'email', phpCAS::getUser() . '@' . $tld;
+			$user = get_user_by( 'login', phpCAS::getUser() ) || get_user_by( 'email', phpCAS::getUser() . '@' . $tld );
 
 			// If we've made it this far, we have a CAS authenticated user. Deal with
 			// them differently based on which list they're in (pending, blocked, or
@@ -483,7 +483,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow CAS log in elsewhere)
 				( $cas_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
 				// Allow access to approved CAS users and logged in users if option is set to 'approved_cas'
-				( $cas_settings['access_restriction'] == 'approved_cas' && && $this->is_user_logged_in_and_blog_user() )
+				( $cas_settings['access_restriction'] == 'approved_cas' && $this->is_user_logged_in_and_blog_user() )
 			);
 			$is_restricted = !$has_access;
 
