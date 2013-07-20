@@ -171,13 +171,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
 			}
 			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
-				$cas_settings['access_users_pending'] = '';
+				$cas_settings['access_users_pending'] = array();
 			}
 			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
-				$cas_settings['access_users_approved'] = '';
+				$cas_settings['access_users_approved'] = array();
 			}
 			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
-				$cas_settings['access_users_blocked'] = '';
+				$cas_settings['access_users_blocked'] = array();
 			}
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
@@ -332,6 +332,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
 				return $user;
+			} else {
+				$user = null;
 			}
 
 			// Admin bypass: skip cas login and proceed to WordPress login if
@@ -368,12 +370,17 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$tld = preg_match( '/[^.]*\.[^.]*$/', $cas_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
 			// Check if the CAS user has a WordPress account (with the same username or email address)
-			$user = get_user_by( 'login', phpCAS::getUser() ) || get_user_by( 'email', phpCAS::getUser() . '@' . $tld );
+			if ( ! $user ) {
+				$user = get_user_by( 'login', phpCAS::getUser() );
+			}
+			if ( ! $user ) {
+				$user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld );
+			}
 
 			// If we've made it this far, we have a CAS authenticated user. Deal with
 			// them differently based on which list they're in (pending, blocked, or
 			// approved).
-			if ( is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
+			if ( $this->is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
 				// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
 
 				/**
@@ -390,7 +397,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
 				exit;
-			} else if ( is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
+			} else if ( $this->is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
 				// If the approved CAS user does not have a WordPress account, create it
 				if ( ! $user ) {
 					$result = wp_insert_user(
@@ -413,19 +420,22 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					// Authenticate as new user
 					$user = new WP_User( $result );
 				}
-			} else if ( $user && ( in_array( $cas_settings['access_default_role'], $user->roles ) || in_array( 'subscriber', $user->roles ) ) ) {
+			} else if ( $user && ( ! in_array( $cas_settings['access_default_role'], $user->roles ) && ! in_array( 'subscriber', $user->roles ) ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
 				// list. If they are any access level above the default CAS access
 				// level (or the default subscriber role), let them in.
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
-				if ( ! is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
+				if ( ! $this->is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
 					$pending_user = array();
 					$pending_user['username'] = phpCAS::getUser();
 					$pending_user['email'] = phpCAS::getUser() . '@' . $tld;
 					$pending_user['role'] = $cas_settings['access_default_role'];
 					$pending_user['date_added'] = '';
+					if ( ! is_array ( $cas_settings['access_users_pending'] ) ) {
+						$cas_settings['access_users_pending'] = array();
+					}
 					array_push( $cas_settings['access_users_pending'], $pending_user );
 					if ( current_user_can( 'edit_post' ) ) {
 						update_option( 'cas_settings', $cas_settings );
@@ -1176,14 +1186,14 @@ TODO: modify pending user code to show list of cas users who have successfully l
 
 			switch ( $list ) {
 				case 'pending':
-					return in_multi_array( $username, $cas_settings['access_users_pending'] );
+					return $this->in_multi_array( $username, $cas_settings['access_users_pending'] );
 					break;
 				case 'blocked':
-					return in_multi_array( $username, $cas_settings['access_users_blocked'] );
+					return $this->in_multi_array( $username, $cas_settings['access_users_blocked'] );
 					break;
 				case 'approved':
 				default:
-					return in_multi_array( $username, $cas_settings['access_users_approved'] );
+					return $this->in_multi_array( $username, $cas_settings['access_users_approved'] );
 					break;
 			}
 		}
@@ -1191,9 +1201,11 @@ TODO: modify pending user code to show list of cas users who have successfully l
 		/**
 		 * Helper function to search a multidimensional array for a value.
 		 */
-		function in_multi_array( $needle, $haystack, $strick = false ) {
+		function in_multi_array( $needle = '', $haystack = array(), $strict = false ) {
+			if ( ! is_array( $haystack ) )
+				return false;
 			foreach ( $haystack as $item ) {
-				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && in_multi_array( $needle, $item, $strict ) ) ) {
+				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict ) ) ) {
 					return true;
 				}
 			}
