@@ -60,6 +60,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Custom wp authentication routine using CAS
 			add_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
 
+			// Custom logout action using CAS
+			add_action( 'wp_logout', array( $this, 'cas_logout' ) );
+
 			// Removing this bypasses Wordpress authentication (so if CAS auth fails,
 			// no one can log in); with it enabled, it will run if CAS auth fails.
 			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3);
@@ -320,7 +323,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 
 		/**
-		 * Authenticate using LDAP credentials.
+		 * Authenticate using CAS credentials.
 		 *
 		 * @param WP_User $user     user to authenticate
 		 * @param string  $username optional username to authenticate.
@@ -457,6 +460,23 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 			return $user;
+		}
+
+
+		/**
+		 * Log out of CAS.
+		 *
+		 * @return void
+		 */
+		public function cas_logout() {
+			// Grab plugin settings.
+			$cas_settings = get_option( 'cas_settings' );
+
+			// Set the CAS client configuration
+			phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
+
+			// Log out of CAS.
+			phpCAS::logout( array( 'url' => get_option( 'siteurl' ) ) );
 		}
 
 
@@ -1057,7 +1077,7 @@ TODO: modify pending user code to show list of cas users who have successfully l
 
 		function print_text_cas_misc_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/sessionid=nobody/am-sso-check-status" style="width: 400px;" /><?php
+			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_cas_misc_branding( $args = '' ) {
