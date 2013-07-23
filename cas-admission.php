@@ -1120,9 +1120,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function print_multiselect_cas_access_public_pages( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><select id="cas_settings_access_public_pages" multiple="multiple" name="cas_settings[access_public_pages][]">
-				<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
-				<?php foreach ( get_pages() as $page ): ?>
-					<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+				<optgroup label="Special">
+					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+				</optgroup>
+				<?php foreach ( get_post_types( '', 'names' ) as $post_type ): ?>
+					<optgroup label="<?php print ucfirst( $post_type ); ?>">
+					<?php foreach ( get_pages( array( 'post_type' => $post_type ) ) as $page ): ?>
+						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+					<?php endforeach; ?>
+					</optgroup>
 				<?php endforeach; ?>
 			</select><?php
 		}
