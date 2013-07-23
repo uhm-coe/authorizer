@@ -269,4 +269,7 @@ jQuery(document).ready(function($){
     }
   });
 
+  // Enable the user-friendly multiselect form element on the options page.
+  $('#cas_settings_access_public_pages').multiSelect();
+
 });

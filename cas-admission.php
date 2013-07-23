@@ -188,6 +188,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
 				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
 			}
+			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = array();
+			}
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
 			}
@@ -513,7 +516,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function restrict_access( $wp ) {
-error_log(print_r($wp,true));
 			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 );	// only need it the first time
 
 			$cas_settings = get_option( 'cas_settings' );
@@ -568,6 +570,11 @@ error_log(print_r($wp,true));
 			}
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
+
+			// Check to see if the requested page is public. If so, show it.
+			if ( in_array( $this->get_id_from_pagename( $wp->query_vars['pagename'] ), $cas_settings['access_public_pages'] ) ) {
+				return;
+			}
 
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
@@ -679,8 +686,17 @@ error_log(print_r($wp,true));
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 
+			wp_enqueue_script(
+				'jquery.multi-select',
+				plugins_url( 'assets/inc/jquery.multi-select/js/jquery.multi-select.js', __FILE__ ),
+				array( 'jquery' ), '1.8', true
+			);
+
 			wp_register_style( 'cas-admission-css', plugins_url( 'assets/css/cas-admission.css', __FILE__ ) );
 			wp_enqueue_style( 'cas-admission-css' );
+
+			wp_register_style( 'jquery-multi-select-css', plugins_url( 'assets/inc/jquery.multi-select/css/multi-select.css', __FILE__ ) );
+			wp_enqueue_style( 'jquery-multi-select-css' );
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
@@ -814,6 +830,13 @@ error_log(print_r($wp,true));
 				'cas_settings_access_pending_redirect_to_message', // HTML element ID
 				'What message should pending users see after attempting to log in?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_pending_redirect_to_message' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'cas_settings_access_public_pages', // HTML element ID
+				'What pages (if any) should be available to everyone?', // HTML element Title
+				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -1089,6 +1112,15 @@ error_log(print_r($wp,true));
 			);
 		}
 
+		function print_multiselect_cas_access_public_pages( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><select id="cas_settings_access_public_pages" multiple="multiple" name="cas_settings[access_public_pages][]">
+				<?php foreach ( get_pages() as $page ): ?>
+					<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+				<?php endforeach; ?>
+			</select><?php
+		}
+
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
@@ -1282,6 +1314,13 @@ error_log(print_r($wp,true));
 				}
 			}
 			return false;
+		}
+
+		// Helper function to get a WordPress page ID from the pagename.
+		function get_id_from_pagename( $pagename = '' ) {
+			global $wpdb;
+			$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = '" . sanitize_title_for_query( $pagename ) . "'");
+			return $page_id;
 		}
 
 	} // END class WP_Plugin_CAS_Admission
