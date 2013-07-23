@@ -1,3 +1,32 @@
 .ms-list li {
 	margin-bottom: 0;
 }
+
+#list_cas_settings_access_users_pending .cas-username,
+#list_cas_settings_access_users_pending .cas-email,
+#list_cas_settings_access_users_pending .cas-role {
+	border-color: #76B4CF;
+	background-color: #D4EBF5;
+}
+
+#list_cas_settings_access_users_approved .cas-username,
+#list_cas_settings_access_users_approved .cas-email,
+#list_cas_settings_access_users_approved .cas-role,
+#list_cas_settings_access_users_approved .cas-date-added,
+#new_cas_settings_access_users_approved .cas-username,
+#new_cas_settings_access_users_approved .cas-email,
+#new_cas_settings_access_users_approved .cas-role {
+	border-color: #87C495;
+	background-color: #CDECD3;
+}
+
+#list_cas_settings_access_users_blocked .cas-username,
+#list_cas_settings_access_users_blocked .cas-email,
+#list_cas_settings_access_users_blocked .cas-role,
+#list_cas_settings_access_users_blocked .cas-date-added,
+#new_cas_settings_access_users_blocked .cas-username,
+#new_cas_settings_access_users_blocked .cas-email,
+#new_cas_settings_access_users_blocked .cas-role {
+	border-color: #AA7966;
+	background-color: #ECC8C1;
+}
