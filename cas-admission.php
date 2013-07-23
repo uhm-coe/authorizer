@@ -576,6 +576,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				return;
 			}
 
+			// Check to see if the requested page is the home page and if it is public. If so, show it.
+			if ( empty( $wp->request ) && in_array( 'home', $cas_settings['access_public_pages'] ) ) {
+				return;
+			}
+
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				update_option( 'cas_settings_misc_login_error', $error );
@@ -1115,6 +1120,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function print_multiselect_cas_access_public_pages( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><select id="cas_settings_access_public_pages" multiple="multiple" name="cas_settings[access_public_pages][]">
+				<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
 				<?php foreach ( get_pages() as $page ): ?>
 					<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
 				<?php endforeach; ?>
