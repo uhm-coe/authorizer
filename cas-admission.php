@@ -661,7 +661,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function create_admin_page() {
 			?>
 			<div class="wrap">
-				<?php screen_icon(); ?>
+				<?php screen_icon( 'users' ); ?>
 				<h2>CAS Admission Settings</h2>
 				<form method="post" action="options.php" autocomplete="off">
 					<?php
@@ -854,14 +854,14 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_page', // HTML element ID
-				'Redirect to restricted notice page', // HTML element Title
+				'What page should people without access see?', // HTML element Title
 				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_message', // HTML element ID
-				'Restriction message', // HTML element Title
+				'What message should people without access see?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
