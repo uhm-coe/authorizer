@@ -174,20 +174,22 @@ jQuery(document).ready(function($){
   var cas_settings_access_redirect_to_url = $('#cas_settings_access_redirect_to_url').closest('tr');
   var cas_settings_access_redirect_to_message = $('#wp-cas_settings_access_redirect_to_message-wrap').closest('tr');
   var cas_settings_access_redirect_to_page = $('#cas_settings_access_redirect_to_page').closest('tr');
-  var cas_settings_access_pending_redirect_to_message = $('#wp-cas_settings_access_pending_redirect_to_message-wrap').closest('tr');
   var cas_settings_access_users_pending = $('#list_cas_settings_access_users_pending').closest('tr');
   var cas_settings_access_users_approved = $('#list_cas_settings_access_users_approved').closest('tr');
   var cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('tr');
+  var cas_settings_access_role_receive_pending_emails = $('#cas_settings_access_role_receive_pending_emails').closest('tr');
+  var cas_settings_access_pending_redirect_to_message = $('#wp-cas_settings_access_pending_redirect_to_message-wrap').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_page).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
 
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
@@ -203,6 +205,7 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', cas_settings_access_users_pending).hide();
     $('div.animated_wrapper', cas_settings_access_users_approved).hide();
     $('div.animated_wrapper', cas_settings_access_users_blocked).hide();
+    $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).hide();
     $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).hide();
   }
 
@@ -242,11 +245,13 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', cas_settings_access_users_pending).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_users_approved).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_users_blocked).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).slideUp(animation_speed);
     } else {
       $('div.animated_wrapper', cas_settings_access_users_pending).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_access_users_approved).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_access_users_blocked).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).slideDown(animation_speed);
       $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).slideDown(animation_speed);
     }
   });

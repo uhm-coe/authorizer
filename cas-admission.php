@@ -170,12 +170,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					$cas_settings['access_default_role'] = 'subscriber';
 				}
 			}
-			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
-				$cas_settings['access_role_receive_pending_emails'] = '---';
-			}
-			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
-			}
 			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
 				$cas_settings['access_restriction'] = 'everyone';
 			}
@@ -187,6 +181,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
 				$cas_settings['access_users_blocked'] = array();
+			}
+			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
+				$cas_settings['access_role_receive_pending_emails'] = '---';
+			}
+			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
 			}
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
@@ -776,20 +776,6 @@ error_log(print_r($wp,true));
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_access_role_receive_pending_emails', // HTML element ID
-				'Which role should receive email notifications about pending users?', // HTML element Title
-				array( $this, 'print_select_cas_access_role_receive_pending_emails' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_access_pending_redirect_to_message', // HTML element ID
-				'What message should pending users see after attempting to log in?', // HTML element Title
-				array( $this, 'print_wysiwyg_cas_access_pending_redirect_to_message' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
 				'cas_settings_access_restriction', // HTML element ID
 				'Who can access the site?', // HTML element Title
 				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
@@ -814,6 +800,20 @@ error_log(print_r($wp,true));
 				'cas_settings_access_users_blocked', // HTML element ID
 				'Blocked CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_blocked' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'cas_settings_access_role_receive_pending_emails', // HTML element ID
+				'Which role should receive email notifications about pending users?', // HTML element Title
+				array( $this, 'print_select_cas_access_role_receive_pending_emails' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'cas_settings_access_pending_redirect_to_message', // HTML element ID
+				'What message should pending users see after attempting to log in?', // HTML element Title
+				array( $this, 'print_wysiwyg_cas_access_pending_redirect_to_message' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -958,28 +958,6 @@ error_log(print_r($wp,true));
 			</select><?php
 		}
 
-		function print_select_cas_access_role_receive_pending_emails( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><select id="cas_settings_access_role_receive_pending_emails" name="cas_settings[access_role_receive_pending_emails]">
-				<option value="---" <?php selected( $cas_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
-				<?php wp_dropdown_roles( $cas_settings['access_role_receive_pending_emails'] ); ?>
-			</select><?php
-		}
-
-		function print_wysiwyg_cas_access_pending_redirect_to_message( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			wp_editor(
-				$cas_settings['access_pending_redirect_to_message'],
-				'cas_settings_access_pending_redirect_to_message',
-				array(
-					'media_buttons' => false,
-					'textarea_name' => 'cas_settings[access_pending_redirect_to_message]',
-					'textarea_rows' => 5,
-					'tinymce' => false,
-				)
-			);
-		}
-
 		function print_radio_cas_access_restriction( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
@@ -987,9 +965,7 @@ error_log(print_r($wp,true));
 				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
-/**
-TODO: modify pending user code to show list of cas users who have successfully logged in but who aren't in the 'approved' list below.
-*/
+
 		function print_combo_cas_access_users_pending( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_access_users_pending" style="margin:0;">
@@ -1089,6 +1065,28 @@ TODO: modify pending user code to show list of cas users who have successfully l
 				<input class="button-primary" type="button" id="block_user_new" onclick="cas_add_user(this, 'blocked');" value="Block" /><br />
 			</div>
 			<?php
+		}
+
+		function print_select_cas_access_role_receive_pending_emails( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><select id="cas_settings_access_role_receive_pending_emails" name="cas_settings[access_role_receive_pending_emails]">
+				<option value="---" <?php selected( $cas_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
+				<?php wp_dropdown_roles( $cas_settings['access_role_receive_pending_emails'] ); ?>
+			</select><?php
+		}
+
+		function print_wysiwyg_cas_access_pending_redirect_to_message( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			wp_editor(
+				$cas_settings['access_pending_redirect_to_message'],
+				'cas_settings_access_pending_redirect_to_message',
+				array(
+					'media_buttons' => false,
+					'textarea_name' => 'cas_settings[access_pending_redirect_to_message]',
+					'textarea_rows' => 5,
+					'tinymce' => false,
+				)
+			);
 		}
 
 		function print_radio_cas_access_redirect( $args = '' ) {
