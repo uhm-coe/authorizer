@@ -41,6 +41,7 @@ function cas_add_user(caller, list) {
   });
 
   if (validated) {
+    // Add the new item.
     jQuery(' \
       <li style="display: none;"> \
         <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> \
@@ -53,17 +54,29 @@ function cas_add_user(caller, list) {
       </li> \
     ').appendTo('#list_cas_settings_access_users_' + list + '').slideDown(250);
 
+    // Remove the 'empty list' item if it exists.
+    jQuery('#list_cas_settings_access_users_' + list + ' li.cas-empty').remove();
+
     // Reset the new user textboxes
     username.val('');
     email.val('');
     jQuery(caller).removeAttr('disabled');
     jQuery('#cas_loading').remove();
+
     return true;
   }
 }
 
 // Remove user from list.
-function cas_ignore_user(caller) {
+function cas_ignore_user(caller, listName) {
+  // Show an 'empty list' message if we're deleting the last item
+  listName = typeof listName !== 'undefined' ? listName : '';
+  var list = jQuery(caller).parent().parent();
+  if (jQuery('li', list).length <= 1) {
+    jQuery(list).append('<li class="cas-empty"><em>No ' + listName + ' users</em></li>');
+  }
+
+  // Remove the list item.
   jQuery(caller).parent().slideUp(250,function(){ jQuery(this).remove(); });
 }
 

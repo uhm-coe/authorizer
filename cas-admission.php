@@ -453,7 +453,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 						wp_mail(
 							$user_recipient->user_email,
 							'Action required: Pending user ' . $pending_user['email'] . ' at ' . get_bloginfo( 'name' ),
-							'A new user has tried to access the ' . get_bloginfo( 'name' ) . ' site you manage at:\n' . get_bloginfo( 'url' ) . '.\n\n Please log in to approve or deny their request:\n' . admin_url( 'options-general.php?page=cas_admission' )
+							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . ".\n\n Please log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=cas_admission' )
 						);
 					}
 				}
@@ -954,18 +954,22 @@ TODO: modify pending user code to show list of cas users who have successfully l
 			$cas_settings = get_option( 'cas_settings' );
 			?><ul id="list_cas_settings_access_users_pending" style="margin:0;">
 				<?php if ( array_key_exists( 'access_users_pending', $cas_settings ) && is_array( $cas_settings['access_users_pending'] ) && count( $cas_settings['access_users_pending'] ) > 0 ) : ?>
-					<?php foreach ( $cas_settings['access_users_pending'] as $key => $email ): ?>
-						<?php if ( empty( $email ) ) continue; ?>
+					<?php foreach ( $cas_settings['access_users_pending'] as $key => $pending_user ): ?>
+						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
+						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" name="discard[]" value="<?= array_shift( explode( '@', $email ) ); ?>" readonly="true" style="width: 80px;" />
-							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][]" value="<?= esc_attr( $email ); ?>" readonly="true" style="width: 180px;" />
-							<input type="button" class="button" id="approve_user_<?= $key; ?>" onclick="cas_approve_user(jQuery(this).parent());" value="Approve" />
-							<input type="button" class="button" id="block_user_<?= $key; ?>" onclick="cas_block_user(jQuery(this).parent());" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(jQuery(this).parent());" value="X" />
+							<input type="text" name="cas_settings[access_users_pending][<?= $key; ?>][username]" value="<?= $pending_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
+							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][<?= $key; ?>][email]" value="<?= $pending_user['email']; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<select name="cas_settings[access_users_pending][<?= $key; ?>][role]" class="cas-role">
+								<option value="<?= $pending_user['role']; ?>" selected="selected"><?= ucfirst( $pending_user['role'] ); ?></option>
+							</select>
+							<input type="button" class="button-primary" id="approve_user_<?= $key; ?>" onclick="cas_add_user(this, 'approved'); cas_ignore_user(this, 'pending');" value="Approve" />
+							<input type="button" class="button-primary" id="block_user_<?= $key; ?>" onclick="cas_add_user(this, 'blocked'); cas_ignore_user(this, 'pending');" value="Block" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
-						<li><em>No pending users</em></li>
+						<li class="cas-empty"><em>No pending users</em></li>
 				<?php endif; ?>
 			</ul>
 			<?php
@@ -993,7 +997,7 @@ TODO: modify pending user code to show list of cas users who have successfully l
 								<option value="<?= $approved_user['role']; ?>" selected="selected"><?= ucfirst( $approved_user['role'] ); ?></option>
 							</select>
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" style="width: 65px;" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1031,7 +1035,7 @@ TODO: modify pending user code to show list of cas users who have successfully l
 								<option value="<?= $blocked_user['role']; ?>" selected="selected"><?= ucfirst( $blocked_user['role'] ); ?></option>
 							</select>
 							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" style="width: 65px;" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
