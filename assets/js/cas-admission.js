@@ -270,6 +270,10 @@ jQuery(document).ready(function($){
   });
 
   // Enable the user-friendly multiselect form element on the options page.
-  $('#cas_settings_access_public_pages').multiSelect({ selectableOptgroup: true });
+  $('#cas_settings_access_public_pages').multiSelect({
+    selectableOptgroup: true,
+    selectableHeader: '<div class="custom-header">Private Pages</div>',
+    selectionHeader: '<div class="custom-header">Public Pages</div>',
+  });
 
 });

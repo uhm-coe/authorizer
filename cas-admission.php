@@ -188,9 +188,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
 				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
 			}
-			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
-				$cas_settings['access_redirect'] = array();
-			}
 			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
 				$cas_settings['access_redirect'] = 'login';
 			}
@@ -199,6 +196,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
 				$cas_settings['access_redirect_to_page'] = '';
+			}
+			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = array();
 			}
 
 			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
@@ -839,13 +839,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_access_public_pages', // HTML element ID
-				'What pages (if any) should be available to everyone?', // HTML element Title
-				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
 				'cas_settings_access_redirect', // HTML element ID
 				'What happens to people without access?', // HTML element Title
 				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
@@ -863,6 +856,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access_redirect_to_message', // HTML element ID
 				'What message should people without access see?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
+			add_settings_field(
+				'cas_settings_access_public_pages', // HTML element ID
+				'What pages (if any) should be available to everyone?', // HTML element Title
+				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -1117,22 +1117,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 		}
 
-		function print_multiselect_cas_access_public_pages( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><select id="cas_settings_access_public_pages" multiple="multiple" name="cas_settings[access_public_pages][]">
-				<optgroup label="Special">
-					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
-				</optgroup>
-				<?php foreach ( get_post_types( '', 'names' ) as $post_type ): ?>
-					<optgroup label="<?php print ucfirst( $post_type ); ?>">
-					<?php foreach ( get_pages( array( 'post_type' => $post_type ) ) as $page ): ?>
-						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
-					<?php endforeach; ?>
-					</optgroup>
-				<?php endforeach; ?>
-			</select><?php
-		}
-
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
@@ -1164,6 +1148,22 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					'id' => 'cas_settings_access_redirect_to_page',
 				)
 			);
+		}
+
+		function print_multiselect_cas_access_public_pages( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><select id="cas_settings_access_public_pages" multiple="multiple" name="cas_settings[access_public_pages][]">
+				<optgroup label="Special">
+					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+				</optgroup>
+				<?php foreach ( get_post_types( '', 'names' ) as $post_type ): ?>
+					<optgroup label="<?php print ucfirst( $post_type ); ?>">
+					<?php foreach ( get_pages( array( 'post_type' => $post_type ) ) as $page ): ?>
+						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+					<?php endforeach; ?>
+					</optgroup>
+				<?php endforeach; ?>
+			</select><?php
 		}
 
 
