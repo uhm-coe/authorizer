@@ -386,12 +386,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( $this->is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
 				// The user is in the blocked list, so show them a message or redirect them (based on plugin options)
 
-				/**
-				@todo
-				*/
 				// If the blocked CAS user has a WordPress account, remove it. In a
 				// multisite environment, just remove them from the current blog.
+				// IMPORTANT NOTE: this deletes all of the user's posts.
 				if ( $user ) {
+					if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+						remove_user_from_blog( $user->ID, get_current_blog_id() );
+					} else {
+						wp_delete_user( $user->ID );
+					}
 				}
 
 				// Notify user about blocked status
@@ -427,6 +430,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
 				// list. If they are any access level above the default CAS access
 				// level (or the default subscriber role), let them in.
+
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
@@ -469,14 +473,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function cas_logout() {
+			global $PHPCAS_CLIENT;
+
 			// Grab plugin settings.
 			$cas_settings = get_option( 'cas_settings' );
 
-			// Set the CAS client configuration
-			phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
+			// Set the CAS client configuration if it hasn't been set already.
+			if ( ! array_key_exists('PHPCAS_CLIENT', $GLOBALS ) ) {
+				phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
+			}
 
 			// Log out of CAS.
-			phpCAS::logout( array( 'url' => get_option( 'siteurl' ) ) );
+			phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+			//phpCAS::logoutWithUrl( get_option( 'siteurl' ) );
 		}
 
 
@@ -1182,7 +1191,7 @@ TODO: modify pending user code to show list of cas users who have successfully l
 		 */
 		function is_user_logged_in_and_blog_user() {
 			$is_user_logged_in_and_blog_user = false;
-			if ( is_multisite() ) {
+			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
 				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_user_member_of_blog( get_current_user_id() );
 			} else {
 				$is_user_logged_in_and_blog_user = is_user_logged_in();
