@@ -446,7 +446,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$cas_settings = get_option( 'cas_settings' );
 
 			// Set the CAS client configuration if it hasn't been set already.
-			if ( ! array_key_exists('PHPCAS_CLIENT', $GLOBALS ) ) {
+			if ( ! isset( $PHPCAS_CLIENT ) ) {
 				phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 			}
 
@@ -522,6 +522,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			 *   add_filter( 'cas_admission_has_access', 'my_rsa_feed_access_override' );
 			 */
 			if ( apply_filters( 'cas_admission_has_access', $has_access, $wp ) === true ) {
+				// Turn off the public notice about browsing anonymously
+				update_option( 'cas_settings_advanced_public_notice', false);
+
 				// We've determined that the current user has access, so simply return to grant access.
 				return;
 			}
