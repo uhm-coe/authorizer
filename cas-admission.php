@@ -363,12 +363,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				}
 
 				// Notify user about blocked status
-				$error = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				update_option( 'cas_settings_advanced_login_error', $error );
-				// Show blocked user a message or redirect them (based on plugin options)
-				wp_logout();
-				wp_redirect( wp_login_url(), 302 );
-				exit;
+				$error_message = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">OK</a></p>';
+				update_option( 'cas_settings_advanced_login_error', $error_message );
+				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
+				return;
 			} else if ( $this->is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
 				// If the approved CAS user does not have a WordPress account, create it
 				if ( ! $user ) {
