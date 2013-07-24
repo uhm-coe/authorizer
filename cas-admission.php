@@ -684,6 +684,50 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function admin_head() {
 			$screen = get_current_screen();
 			
+			// Add help tab for Access Lists Settings
+			$help_cas_settings_access_lists_content = '
+				<p><strong>Pending CAS Users</strong>: Pending users are users who have successfully logged in to the site, but who haven\'t yet been approved (or blocked) by you.</p>
+				<p><strong>Approved CAS Users</strong>: Approved users have access to the site once they successfully log in via CAS.</p>
+				<p><strong>Blocked CAS Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
+				<p>Users in the <strong>Pending</strong> list appear automatically after a new CAS user tries to log in. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons by a user in the <strong>Pending</strong> list.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_cas_settings_access_lists_content',
+					'title' => 'Access Lists',
+					'content' => $help_cas_settings_access_lists_content,
+				)
+			);
+
+			// Add help tab for Private Access Settings
+			$help_cas_settings_access_content = '
+				<p><strong>Who can access the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or a CAS account (<strong>university community</strong>), restrict it to WordPress users and only the CAS users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
+				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new CAS user successfully logs in. All users of the specified role will receive an email, and the CAS user will get a message (specified below) telling them their access is pending approval.</p>
+				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new CAS user will see once they try to log in to the site.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_cas_settings_access_content',
+					'title' => 'Private Access',
+					'content' => $help_cas_settings_access_content,
+				)
+			);
+
+			// Add help tab for Public Access Settings
+			$help_cas_settings_access_public_content = '
+				<p><strong>What happens to people without access?</strong>: Choose the response new users receive when visiting the site.</p>
+				<p><strong>What page should people without access see?</strong>: .</p>
+				<p><strong>What message should people without access see?</strong>: .</p>
+				<p><strong>What pages (if any) should be available to everyone?</strong>: .</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_cas_settings_access_public_content',
+					'title' => 'Public Access',
+					'content' => $help_cas_settings_access_public_content,
+				)
+			);
+
 			// Add help tab for CAS Settings
 			$help_cas_settings_cas_content = '
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
@@ -693,12 +737,22 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_cas_settings_cas_content',
-					'title' => 'CAS Settings',
+					'title' => 'CAS',
 					'content' => $help_cas_settings_cas_content,
 				)
 			);
 
-			// Add help tab for Access Settings      
+			// Add help tab for Advanced Settings
+			$help_cas_settings_advanced_content = '
+				<p><strong></strong>: .</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_cas_settings_advanced_content',
+					'title' => 'Advanced',
+					'content' => $help_cas_settings_advanced_content,
+				)
+			);
 		}
 
 
