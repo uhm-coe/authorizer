@@ -956,7 +956,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 * Settings sanitizer callback
-		 @todo: add sanitizer filters for the different options fields.
 		 */
 		function sanitize_options( $cas_settings ) {
 			// If the pending user list isn't a list, make it.
@@ -988,11 +987,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( filter_var( $cas_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
 				$cas_settings['cas_host'] = '';
 			}
-
-			// Sanitize ABC setting (template)
-			// if ( false ) {
-			// 	$cas_settings['somesetting'] = '';
-			// }
 
 			return $cas_settings;
 		}
@@ -1198,7 +1192,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_section_info_access_public() {
 			?><div id="section_info_access_public" class="section_info">
-				<p>If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
+				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
 			</div><?php
 		}
 
