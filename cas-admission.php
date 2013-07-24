@@ -715,7 +715,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			register_setting(
 				'cas_settings_group', // Option group
 				'cas_settings', // Option name
-				array( $this, 'sanitize_cas_settings' ) // Sanitize callback
+				array( $this, 'sanitize_options' ) // Sanitize callback
 			);
 
 			add_settings_section(
@@ -949,16 +949,37 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Settings sanitizer callback
 		 @todo: add sanitizer filters for the different options fields.
 		 */
-		function sanitize_cas_settings( $cas_settings ) {
+		function sanitize_options( $cas_settings ) {
+			// If the pending user list isn't a list, make it.
+			if ( ! is_array( $cas_settings['access_users_pending'] ) ) {
+				$cas_settings['access_users_pending'] = array();
+			}
+
+			// If the approved user list isn't a list, make it.
+			if ( ! is_array( $cas_settings['access_users_approved'] ) ) {
+				$cas_settings['access_users_approved'] = array();
+			}
+
+			// If the blocked user list isn't a list, make it.
+			if ( ! is_array( $cas_settings['access_users_blocked'] ) ) {
+				$cas_settings['access_users_blocked'] = array();
+			}
+
+			// Default to "Everyone" access restriction.
+			if ( ! in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
+				$cas_settings['access_restriction'] = 'everyone';
+			}
+
+			// Default to WordPress login access redirect.
+			if ( ! in_array( $cas_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
+				$cas_settings['access_redirect'] = 'login';
+			}
+
 			// Sanitize CAS Host setting
 			if ( filter_var( $cas_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
 				$cas_settings['cas_host'] = '';
 			}
-			// Default to "Everyone" access restriction
-			if ( !in_array( $cas_settings['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
-				$cas_settings['access_restriction'] = 'everyone';
-			}
-
+			
 			// Sanitize ABC setting (template)
 			// if ( false ) {
 			// 	$cas_settings['somesetting'] = '';
