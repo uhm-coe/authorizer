@@ -3,6 +3,20 @@ var shake_speed = 600;
 
 
 
+// Switch between option tabs.
+function chooseTab(listName) {
+  // default to the access list tab
+  listName = typeof listName !== 'undefined' ? listName : 'access_list';
+
+  // Hide all tab content, then show selected tab content
+  jQuery('div.section_info, div.section_info + table').hide();
+  jQuery('#section_info_' + listName + ', #section_info_' + listName + ' + table').show();
+
+  // Set active tab
+  jQuery('.nav-tab-wrapper a').removeClass('nav-tab-active');
+  jQuery('a.nav-tab-' + listName).addClass('nav-tab-active');
+}
+
 // Add user to list (list = blocked or approved).
 function cas_add_user(caller, list) {
   // default to the approved list

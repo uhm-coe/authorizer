@@ -77,9 +77,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			// If we have a custom login error, add the filter to show it.
-			$error = get_option( 'cas_settings_misc_login_error' );
+			$error = get_option( 'cas_settings_advanced_login_error' );
 			if ( $error && strlen( $error ) > 0 ) {
-				add_filter( 'login_errors', array( $this, 'show_misc_login_error' ) );
+				add_filter( 'login_errors', array( $this, 'show_advanced_login_error' ) );
 			}
 
 			// Register actions.
@@ -108,9 +108,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
 
 			// If we have a custom admin message, add the action to show it.
-			$notice = get_option( 'cas_settings_misc_admin_notice' );
+			$notice = get_option( 'cas_settings_advanced_admin_notice' );
 			if ( $notice && strlen( $notice ) > 0 ) {
-				add_action( 'admin_notices', array( $this, 'show_misc_admin_notice' ) );
+				add_action( 'admin_notices', array( $this, 'show_advanced_admin_notice' ) );
 			}
 
 		} // END __construct()
@@ -153,72 +153,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			global $wp_roles;
 
 			// Set meaningful defaults (but if values already exist in db, use those).
-			$cas_settings = get_option( 'cas_settings' );
-			if ( $cas_settings === FALSE ) {
-				$cas_settings = array();
-			}
+			$this->set_default_options();
 
-			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
-				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
-				$all_roles = $wp_roles->roles;
-				$editable_roles = apply_filters( 'editable_roles', $all_roles );
-				if ( array_key_exists( 'student', $editable_roles ) ) {
-					$cas_settings['access_default_role'] = 'student';
-				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
-					$cas_settings['access_default_role'] = 'subscriber';
-				} else {
-					$cas_settings['access_default_role'] = 'subscriber';
-				}
-			}
-			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
-				$cas_settings['access_restriction'] = 'everyone';
-			}
-			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
-				$cas_settings['access_users_pending'] = array();
-			}
-			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
-				$cas_settings['access_users_approved'] = array();
-			}
-			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
-				$cas_settings['access_users_blocked'] = array();
-			}
-			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
-				$cas_settings['access_role_receive_pending_emails'] = '---';
-			}
-			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
-			}
-			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
-				$cas_settings['access_redirect'] = 'login';
-			}
-			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
-			}
-			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_page'] = '';
-			}
-			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
-				$cas_settings['access_redirect'] = array();
-			}
-
-			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
-				$cas_settings['cas_host'] = '';
-			}
-			if ( !array_key_exists( 'cas_port', $cas_settings ) ) {
-				$cas_settings['cas_port'] = '';
-			}
-			if ( !array_key_exists( 'cas_path', $cas_settings ) ) {
-				$cas_settings['cas_path'] = '';
-			}
-
-			if ( !array_key_exists( 'misc_lostpassword_url', $cas_settings ) ) {
-				$cas_settings['misc_lostpassword_url'] = '';
-			}
-			if ( !array_key_exists( 'misc_branding', $cas_settings ) ) {
-				$cas_settings['misc_branding'] = 'default';
-			}
-
-			update_option( 'cas_settings', $cas_settings );
 		} // END activate()
 
 
@@ -242,8 +178,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( get_option( 'cas_settings' ) ) {
 				delete_option( 'cas_settings' );
 			}
-			if ( get_option( 'cas_settings_misc_admin_notice' ) ) {
-				delete_option( 'cas_settings_misc_admin_notice' );
+			if ( get_option( 'cas_settings_advanced_admin_notice' ) ) {
+				delete_option( 'cas_settings_advanced_admin_notice' );
 			}
 
 		} // END deactivate()
@@ -258,19 +194,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 * Overwrite the URL for the lost password link on the login form.
-		 * If we're authenticating against LDAP, standard WordPress password resets
+		 * If we're authenticating against CAS, standard WordPress password resets
 		 * won't work.
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
 			$cas_settings = get_option( 'cas_settings' );
 			if (
-				array_key_exists( 'misc_lostpassword_url', $cas_settings ) &&
-				filter_var( $cas_settings['misc_lostpassword_url'], FILTER_VALIDATE_URL ) &&
+				array_key_exists( 'advanced_lostpassword_url', $cas_settings ) &&
+				filter_var( $cas_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
 				array_key_exists( 'access_restriction', $cas_settings ) &&
 				$cas_settings['access_restriction'] !== 'everyone' &&
 				$cas_settings['access_restriction'] !== 'user'
 			) {
-				$lostpassword_url = $cas_settings['misc_lostpassword_url'];
+				$lostpassword_url = $cas_settings['advanced_lostpassword_url'];
 			}
 			return $lostpassword_url;
 		}
@@ -296,9 +232,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Show custom admin notice.
 		 * Filter: admin_notice
 		 */
-		function show_misc_admin_notice() {
-			$notice = get_option( 'cas_settings_misc_admin_notice' );
-			delete_option( 'cas_settings_misc_admin_notice' );
+		function show_advanced_admin_notice() {
+			$notice = get_option( 'cas_settings_advanced_admin_notice' );
+			delete_option( 'cas_settings_advanced_admin_notice' );
 
 			if ( $notice && strlen( $notice ) > 0 ) {
 				?>
@@ -313,9 +249,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Add custom error message to login screen.
 		 * Filter: login_errors
 		 */
-		function show_misc_login_error( $errors ) {
-			$error = get_option( 'cas_settings_misc_login_error' );
-			delete_option( 'cas_settings_misc_login_error' );
+		function show_advanced_login_error( $errors ) {
+			$error = get_option( 'cas_settings_advanced_login_error' );
+			delete_option( 'cas_settings_advanced_login_error' );
 
 			//$errors .= '    ' . $error . "<br />\n";
 			$errors = '    ' . $error . "<br />\n";
@@ -326,7 +262,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 ****************************
-		 * LDAP Authentication
+		 * CAS Authentication
 		 ****************************
 		 */
 
@@ -406,7 +342,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 				// Notify user about blocked status
 				$error = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				update_option( 'cas_settings_misc_login_error', $error );
+				update_option( 'cas_settings_advanced_login_error', $error );
 				// Show blocked user a message or redirect them (based on plugin options)
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
@@ -467,7 +403,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				// Notify user about pending status and return without authenticating them.
 				$error_message = $cas_settings['access_pending_redirect_to_message'];
 				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">OK</a></p>';
-				update_option( 'cas_settings_misc_login_error', $error_message );
+				update_option( 'cas_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
 			}
@@ -583,7 +519,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			if ( $logged_in_but_no_access ) {
 				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				update_option( 'cas_settings_misc_login_error', $error );
+				update_option( 'cas_settings_advanced_login_error', $error );
 				wp_logout();
 				wp_redirect( wp_login_url(), 302 );
 				exit;
@@ -716,7 +652,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function load_login_css_and_js() {
 			$cas_settings = get_option( 'cas_settings' );
 
-			if ( $cas_settings['misc_branding'] === 'custom_uh' ):
+			if ( $cas_settings['advanced_branding'] === 'custom_uh' ):
 				?>
 				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas-admission-login.css', __FILE__ ); ?>" />
 				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas-admission-login.js', __FILE__ ); ?>"></script>
@@ -756,8 +692,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_cas_settings_ldap',
-					'title' => 'LDAP Settings',
+					'id' => 'help_cas_settings_cas_content',
+					'title' => 'CAS Settings',
 					'content' => $help_cas_settings_cas_content,
 				)
 			);
@@ -774,53 +710,61 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function page_init() {
 			// Create one setting that holds all the options (array)
 			// @see http://codex.wordpress.org/Function_Reference/register_setting
+			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
 			register_setting(
 				'cas_settings_group', // Option group
 				'cas_settings', // Option name
 				array( $this, 'sanitize_cas_settings' ) // Sanitize callback
 			);
 
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
 			add_settings_section(
-				'cas_settings_access', // HTML element ID
-				'Access Settings', // HTML element Title
-				array( $this, 'print_section_info_access' ), // Callback (echos section content)
+				'cas_settings_tabs', // HTML element ID
+				'', // HTML element Title
+				array( $this, 'print_section_info_tabs' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
 			);
 
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
-			add_settings_field(
-				'cas_settings_access_default_role', // HTML element ID
-				'Default role for new CAS users', // HTML element Title
-				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_access_restriction', // HTML element ID
-				'Who can access the site?', // HTML element Title
-				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+			// Create Access Lists section
+			add_settings_section(
+				'cas_settings_lists', // HTML element ID
+				'', // HTML element Title
+				array( $this, 'print_section_info_access_lists' ), // Callback (echos section content)
+				'cas_admission' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_access_users_pending', // HTML element ID
 				'Pending CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_pending' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_approved', // HTML element ID
 				'Approved CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_approved' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_blocked', // HTML element ID
 				'Blocked CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_blocked' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_lists' // Section this setting is shown on
+			);
+
+			// Create Access Settings section
+			add_settings_section(
+				'cas_settings_access', // HTML element ID
+				'', // HTML element Title
+				array( $this, 'print_section_info_access' ), // Callback (echos section content)
+				'cas_admission' // Page this section is shown on (slug)
+			);
+			add_settings_field(
+				'cas_settings_access_restriction', // HTML element ID
+				'Who can access the site?', // HTML element Title
+				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
@@ -867,15 +811,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access' // Section this setting is shown on
 			);
 
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			// Create CAS Settings section
 			add_settings_section(
 				'cas_settings_cas', // HTML element ID
-				'CAS Settings', // HTML element Title
+				'', // HTML element Title
 				array( $this, 'print_section_info_cas' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
 			);
-
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
+			add_settings_field(
+				'cas_settings_access_default_role', // HTML element ID
+				'Default role for new CAS users', // HTML element Title
+				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
+				'cas_admission', // Page this setting is shown on (slug)
+				'cas_settings_access' // Section this setting is shown on
+			);
 			add_settings_field(
 				'cas_settings_cas_host', // HTML element ID
 				'CAS server hostname', // HTML element Title
@@ -898,30 +847,102 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_cas' // Section this setting is shown on
 			);
 
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			// Create Advanced Settings section
 			add_settings_section(
-				'cas_settings_misc', // HTML element ID
-				'Advanced Settings', // HTML element Title
-				array( $this, 'print_section_info_misc' ), // Callback (echos section content)
+				'cas_settings_advanced', // HTML element ID
+				'', // HTML element Title
+				array( $this, 'print_section_info_advanced' ), // Callback (echos section content)
 				'cas_admission' // Page this section is shown on (slug)
 			);
-
 			add_settings_field(
-				'cas_settings_misc_lostpassword_url', // HTML element ID
-				'Custom LDAP Lost Password URL', // HTML element Title
-				array( $this, 'print_text_cas_misc_lostpassword_url' ), // Callback (echos form element)
+				'cas_settings_advanced_lostpassword_url', // HTML element ID
+				'Custom Lost Password URL', // HTML element Title
+				array( $this, 'print_text_cas_advanced_lostpassword_url' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_misc' // Section this setting is shown on
+				'cas_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
-				'cas_settings_misc_branding', // HTML element ID
+				'cas_settings_advanced_branding', // HTML element ID
 				'Custom WordPress login branding', // HTML element Title
-				array( $this, 'print_radio_cas_misc_branding' ), // Callback (echos form element)
+				array( $this, 'print_radio_cas_advanced_branding' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_misc' // Section this setting is shown on
+				'cas_settings_advanced' // Section this setting is shown on
 			);
 		}
 
+
+		/**
+		 * Set meaningful defaults for the plugin options.
+		 * Note: This function is called on plugin activation.
+		 */
+		function set_default_options() {
+			$cas_settings = get_option( 'cas_settings' );
+			if ( $cas_settings === FALSE ) {
+				$cas_settings = array();
+			}
+
+			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
+				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
+				$all_roles = $wp_roles->roles;
+				$editable_roles = apply_filters( 'editable_roles', $all_roles );
+				if ( array_key_exists( 'student', $editable_roles ) ) {
+					$cas_settings['access_default_role'] = 'student';
+				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
+					$cas_settings['access_default_role'] = 'subscriber';
+				} else {
+					$cas_settings['access_default_role'] = 'subscriber';
+				}
+			}
+			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
+				$cas_settings['access_restriction'] = 'everyone';
+			}
+			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
+				$cas_settings['access_users_pending'] = array();
+			}
+			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
+				$cas_settings['access_users_approved'] = array();
+			}
+			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
+				$cas_settings['access_users_blocked'] = array();
+			}
+			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
+				$cas_settings['access_role_receive_pending_emails'] = '---';
+			}
+			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
+			}
+			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = 'login';
+			}
+			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
+			}
+			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_page'] = '';
+			}
+			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = array();
+			}
+
+			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
+				$cas_settings['cas_host'] = '';
+			}
+			if ( !array_key_exists( 'cas_port', $cas_settings ) ) {
+				$cas_settings['cas_port'] = '';
+			}
+			if ( !array_key_exists( 'cas_path', $cas_settings ) ) {
+				$cas_settings['cas_path'] = '';
+			}
+
+			if ( !array_key_exists( 'advanced_lostpassword_url', $cas_settings ) ) {
+				$cas_settings['advanced_lostpassword_url'] = '';
+			}
+			if ( !array_key_exists( 'advanced_branding', $cas_settings ) ) {
+				$cas_settings['advanced_branding'] = 'default';
+			}
+
+			update_option( 'cas_settings', $cas_settings );
+		}
 
 
 		/**
@@ -929,7 +950,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 @todo: add sanitizer filters for the different options fields.
 		 */
 		function sanitize_cas_settings( $cas_settings ) {
-			// Sanitize LDAP Host setting
+			// Sanitize CAS Host setting
 			if ( filter_var( $cas_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
 				$cas_settings['cas_host'] = '';
 			}
@@ -952,46 +973,25 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Settings print callbacks
 		 */
 
-		function print_section_info_cas() {
-			print '<p><span class="red">Important Note</span>: If you\'re configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>';
-			print '<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />';
-			print '<a href="' . wp_login_url() . '?cas=no' . '">' . wp_login_url() . '?cas=no' . '</a></p>';
-			print '<p>Enter your CAS server settings below:</p>';
+		function print_section_info_tabs() {
+			?><h2 class="nav-tab-wrapper">
+				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
+				<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Manage Access</a>
+				<a class="nav-tab nav-tab-cas" href="javascript:chooseTab('cas');">CAS</a>
+				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
+			</h2><?php
 		}
 
-		function print_text_cas_host( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" placeholder="login.its.hawaii.edu" /><?php
-		}
-
-		function print_text_cas_port( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" placeholder="443" style="width:50px;" /><?php
-		}
-
-		function print_text_cas_path( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas" /><?php
-		}
-
-
-		function print_section_info_access() {
-			print 'Choose how you want to restrict access to this site below:';
-		}
-
-		function print_select_cas_access_default_role( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><select id="cas_settings_access_default_role" name="cas_settings[access_default_role]">
-				<?php wp_dropdown_roles( $cas_settings['access_default_role'] ); ?>
-			</select><?php
-		}
-
-		function print_radio_cas_access_restriction( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only specific students below (Approved CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
+		function print_section_info_access_lists() {
+			?><div id="section_info_access_lists" class="section_info">
+				<p>Manage who has access to this site using these lists.</p>
+				<ol>
+					<li><strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.</li>
+					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
+					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
+				</ol>
+				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:chooseTab('access');">Manage Access</a> tab.</p>
+			</div><?php
 		}
 
 		function print_combo_cas_access_users_pending( $args = '' ) {
@@ -1095,6 +1095,53 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			<?php
 		}
 
+
+		function print_section_info_cas() {
+			?><div id="section_info_cas" class="section_info">
+				<p><span class="red">Important Note</span>: If you\'re configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>
+				<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />
+					<a href="<?php print wp_login_url() . '?cas=no'; ?>"><?php print wp_login_url() . '?cas=no'; ?></a></p>
+				<p>Enter your CAS server settings below:</p>
+			</div><?php
+		}
+
+		function print_text_cas_host( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?= $cas_settings['cas_host']; ?>" placeholder="login.its.hawaii.edu" /><?php
+		}
+
+		function print_text_cas_port( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_cas_port" name="cas_settings[cas_port]" value="<?= $cas_settings['cas_port']; ?>" placeholder="443" style="width:50px;" /><?php
+		}
+
+		function print_text_cas_path( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="text" id="cas_settings_cas_path" name="cas_settings[cas_path]" value="<?= $cas_settings['cas_path']; ?>" placeholder="/cas" /><?php
+		}
+
+
+		function print_section_info_access() {
+			?><div id="section_info_access" class="section_info">
+				<p>Choose how you want to restrict access to this site below:</p>
+			</div><?php
+		}
+
+		function print_select_cas_access_default_role( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><select id="cas_settings_access_default_role" name="cas_settings[access_default_role]">
+				<?php wp_dropdown_roles( $cas_settings['access_default_role'] ); ?>
+			</select><?php
+		}
+
+		function print_radio_cas_access_restriction( $args = '' ) {
+			$cas_settings = get_option( 'cas_settings' );
+			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');">approved users</a> (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
+		}
+
 		function print_select_cas_access_role_receive_pending_emails( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><select id="cas_settings_access_role_receive_pending_emails" name="cas_settings[access_role_receive_pending_emails]">
@@ -1167,19 +1214,21 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
-		function print_section_info_misc() {
-			print 'You may optionally specify some advanced settings below:';
+		function print_section_info_advanced() {
+			?><div id="section_info_advanced" class="section_info">
+				<p>You may optionally specify some advanced settings below:</p>
+			</div><?php
 		}
 
-		function print_text_cas_misc_lostpassword_url() {
+		function print_text_cas_advanced_lostpassword_url() {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="text" id="cas_settings_misc_lostpassword_url" name="cas_settings[misc_lostpassword_url]" value="<?= $cas_settings['misc_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
+			?><input type="text" id="cas_settings_advanced_lostpassword_url" name="cas_settings[advanced_lostpassword_url]" value="<?= $cas_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
-		function print_radio_cas_misc_branding( $args = '' ) {
+		function print_radio_cas_advanced_branding( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="radio" id="radio_cas_settings_misc_branding_default" name="cas_settings[misc_branding]" value="default"<?php checked( 'default' == $cas_settings['misc_branding'] ); ?> /> Default WordPress login screen<br />
-				<input type="radio" id="radio_cas_settings_misc_branding_custom_uh" name="cas_settings[misc_branding]" value="custom_uh"<?php checked( 'custom_uh' == $cas_settings['misc_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
+			?><input type="radio" id="radio_cas_settings_advanced_branding_default" name="cas_settings[advanced_branding]" value="default"<?php checked( 'default' == $cas_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />
+				<input type="radio" id="radio_cas_settings_advanced_branding_custom_uh" name="cas_settings[advanced_branding]" value="custom_uh"<?php checked( 'custom_uh' == $cas_settings['advanced_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
 		}
 
 
@@ -1244,7 +1293,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			$cas_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
 			$cas_settings['access_courses'] = $_POST['access_courses'];
-			$cas_settings['ldap_password'] = $this->decrypt( base64_decode( $cas_settings['ldap_password'] ) );
 
 			// Only users who can edit can see the Sakai dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
