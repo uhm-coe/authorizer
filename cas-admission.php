@@ -1126,7 +1126,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				<p><span class="red">Important Note</span>: If you\'re configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>
 				<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />
 					<a href="<?php print wp_login_url() . '?cas=no'; ?>"><?php print wp_login_url() . '?cas=no'; ?></a></p>
-				<p>Enter your CAS server settings below:</p>
+				<p>Enter your CAS server settings below.</p>
 			</div><?php
 		}
 
@@ -1148,7 +1148,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_section_info_access() {
 			?><div id="section_info_access" class="section_info">
-				<p>Choose how you want to restrict access to this site below:</p>
+				<p>Choose how you want to restrict access to this site below.</p>
 			</div><?php
 		}
 
@@ -1248,7 +1248,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_section_info_advanced() {
 			?><div id="section_info_advanced" class="section_info">
-				<p>You may optionally specify some advanced settings below:</p>
+				<p>You may optionally specify some advanced settings below.</p>
 			</div><?php
 		}
 
