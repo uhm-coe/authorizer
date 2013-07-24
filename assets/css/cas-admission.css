@@ -3,7 +3,7 @@
 }
 
 .cas-username {
-	width: 70px;
+	width: 75px;
 }
 
 .cas-email {
@@ -17,11 +17,13 @@
 #cas_dashboard_widget {
 	min-width: 460px;
 }
-#cas_dashboard_widget .cas-username {
-	width: 60px;
+
+#cas_dashboard_widget input[type="radio"] {
+	margin: 0 0 6px;
 }
-#cas_dashboard_widget .cas-email {
-	width: 110px;
+
+#cas_dashboard_widget #list_cas_settings_access_users_pending .cas-email {
+	width: 90px;
 }
 
 #list_cas_settings_access_users_pending .cas-username,
