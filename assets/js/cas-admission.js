@@ -290,4 +290,7 @@ jQuery(document).ready(function($){
     selectionHeader: '<div class="custom-header">Public Pages</div>',
   });
 
+  // Switch to the first tab.
+  chooseTab('access_lists');
+
 });
