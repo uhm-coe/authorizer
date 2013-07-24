@@ -823,7 +823,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'Default role for new CAS users', // HTML element Title
 				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_cas_host', // HTML element ID
