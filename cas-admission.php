@@ -101,7 +101,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
 			// ajax save options from dashboard widget
-			add_action( 'wp_ajax_save_admission_dashboard_widget', array( $this, 'ajax_save_admission_dashboard_widget' ) );
+			add_action( 'wp_ajax_save_cas_dashboard_widget', array( $this, 'ajax_save_cas_dashboard_widget' ) );
 
 			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
@@ -1027,8 +1027,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" name="cas_settings[access_users_pending][<?= $key; ?>][username]" value="<?= $pending_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
-							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][<?= $key; ?>][email]" value="<?= $pending_user['email']; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<input type="text" name="cas_settings[access_users_pending][<?= $key; ?>][username]" value="<?= $pending_user['username'] ?>" readonly="true" class="cas-username" />
+							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][<?= $key; ?>][email]" value="<?= $pending_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_pending][<?= $key; ?>][role]" class="cas-role">
 								<option value="<?= $pending_user['role']; ?>" selected="selected"><?= ucfirst( $pending_user['role'] ); ?></option>
 							</select>
@@ -1060,20 +1060,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 							<?php $approved_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
-							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="cas-username" />
+							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_approved][<?= $key; ?>][role]" class="cas-role">
 								<option value="<?= $approved_user['role']; ?>" selected="selected"><?= ucfirst( $approved_user['role'] ); ?></option>
 							</select>
-							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" style="width: 65px;" class="cas-date-added" />
+							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_access_users_approved">
-				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" style="width: 80px;" class="cas-username" />
-				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" style="width: 180px;" class="cas-email" />
+				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" class="cas-username" />
+				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="cas-email" />
 				<select name="new_approved_user_role" id="new_approved_user_role" class="cas-role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
@@ -1098,20 +1098,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 							<?php $blocked_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][username]" value="<?= $blocked_user['username'] ?>" readonly="true" style="width: 80px;" class="cas-username" />
-							<input type="text" id="cas_settings_access_users_blocked_<?= $key; ?>" name="cas_settings[access_users_blocked][<?= $key; ?>][email]" value="<?= $blocked_user['email']; ?>" readonly="true" style="width: 180px;" class="cas-email" />
+							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][username]" value="<?= $blocked_user['username'] ?>" readonly="true" class="cas-username" />
+							<input type="text" id="cas_settings_access_users_blocked_<?= $key; ?>" name="cas_settings[access_users_blocked][<?= $key; ?>][email]" value="<?= $blocked_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_blocked][<?= $key; ?>][role]" class="cas-role">
 								<option value="<?= $blocked_user['role']; ?>" selected="selected"><?= ucfirst( $blocked_user['role'] ); ?></option>
 							</select>
-							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" style="width: 65px;" class="cas-date-added" />
+							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="x" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</ul>
 			<div id="new_cas_settings_access_users_blocked">
-				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" style="width: 80px;" class="cas-username" />
-				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" style="width: 180px;" class="cas-email" />
+				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" class="cas-username" />
+				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="cas-email" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="cas-role">
 					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
 				</select>
@@ -1274,22 +1274,35 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Only users who can edit can see the admissions dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
 				// Add dashboard widget for adding/editing users with access
-				wp_add_dashboard_widget( 'admission_dashboard_widget', 'Course Admission Settings', array( $this, 'add_admission_dashboard_widget' ) );
+				wp_add_dashboard_widget( 'cas_dashboard_widget', 'Course Admission Settings', array( $this, 'add_cas_dashboard_widget' ) );
 			}
 		}
 
 /**
 @todo: change dashboard widget to manage user lists instead of sakai list
 */
-		function add_admission_dashboard_widget() {
+		function add_cas_dashboard_widget() {
 			$cas_settings = get_option( 'cas_settings' );
 			?>
 			<div class="inside">
 				<form method="post" id="cas_settings_access_form" action="">
 					<p><?php $this->print_section_info_access(); ?></p>
-					<div><?php $this->print_radio_cas_access_restriction(); ?></div>
-					<br class="clear" />
-					<div><?php //$this->print_combo_cas_access_courses(); ?></div>
+					<div>
+						<h2>Who can access the site?</h2>
+						<?php $this->print_radio_cas_access_restriction(); ?>
+					</div>
+					<div>
+						<h2>Pending Users</h2>
+						<?php $this->print_combo_cas_access_users_pending(); ?>
+					</div>
+					<div>
+						<h2>Approved Users</h2>
+						<?php $this->print_combo_cas_access_users_approved(); ?>
+					</div>
+					<div>
+						<h2>Blocked Users</h2>
+						<?php $this->print_combo_cas_access_users_blocked(); ?>
+					</div>
 					<br class="clear" />
 					<p class="submit">
 						<span class="save-action">
@@ -1305,9 +1318,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			<?php
 		}
 
-		function ajax_save_admission_dashboard_widget() {
+		function ajax_save_cas_dashboard_widget() {
 			// Make sure posted variables exist.
-			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['access_courses'] ) || empty( $_POST['nonce_save_cas_settings_access'] ) ) {
+			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_cas_settings_access'] ) ) {
 				die('');
 			}
 
@@ -1324,7 +1337,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$cas_settings = get_option( 'cas_settings' );
 
 			$cas_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
-			$cas_settings['access_courses'] = $_POST['access_courses'];
+			$cas_settings['access_users_pending'] = $_POST['access_users_pending'];
+			$cas_settings['access_users_approved'] = $_POST['access_users_approved'];
+			$cas_settings['access_users_blocked'] = $_POST['access_users_blocked'];
 
 			// Only users who can edit can see the Sakai dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {

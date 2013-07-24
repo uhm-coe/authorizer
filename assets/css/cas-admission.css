@@ -2,6 +2,28 @@
 	margin-bottom: 0;
 }
 
+.cas-username {
+	width: 70px;
+}
+
+.cas-email {
+	width: 150px;
+}
+
+.cas-date-added {
+	width: 61px;
+}
+
+#cas_dashboard_widget {
+	min-width: 460px;
+}
+#cas_dashboard_widget .cas-username {
+	width: 60px;
+}
+#cas_dashboard_widget .cas-email {
+	width: 110px;
+}
+
 #list_cas_settings_access_users_pending .cas-username,
 #list_cas_settings_access_users_pending .cas-email,
 #list_cas_settings_access_users_pending .cas-role {

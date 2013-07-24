@@ -58,12 +58,12 @@ function cas_add_user(caller, list) {
     // Add the new item.
     jQuery(' \
       <li style="display: none;"> \
-        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" style="width: 80px;" class="cas-username" /> \
-        <input type="text" id="cas_settings_access_users_' + list + '_' + nextId + '" name="cas_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" style="width: 180px;" class="cas-email" /> \
+        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="cas-username" /> \
+        <input type="text" id="cas_settings_access_users_' + list + '_' + nextId + '" name="cas_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="cas-email" /> \
         <select name="cas_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role"> \
           <option value="' + role.val() + '" selected="selected">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option> \
         </select> \
-        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" style="width: 65px;" class="cas-date-added" /> \
+        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
         <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> \
       </li> \
     ').appendTo('#list_cas_settings_access_users_' + list + '').slideDown(250);
@@ -102,16 +102,44 @@ function save_cas_settings_access(caller) {
   jQuery(caller).attr('disabled', 'disabled');
 
   var access_restriction = jQuery('#cas_settings_access_form input[name="cas_settings[access_restriction]"]:checked').val();
-  var access_courses = new Array();
-  jQuery('#cas_settings_access_form input[name="cas_settings[access_courses][]"]').each(function() {
-    access_courses.push(jQuery(this).val());
+
+  var access_users_pending = new Object();
+  jQuery('#list_cas_settings_access_users_pending li').each(function(index) {
+    var user = new Object();
+    user['username'] = jQuery('.cas-username', this).val();
+    user['email'] = jQuery('.cas-email', this).val();
+    user['role'] = jQuery('.cas-role', this).val();
+    access_users_pending[index] = user;
   });
+
+  var access_users_approved = new Object();
+  jQuery('#list_cas_settings_access_users_approved li').each(function(index) {
+    var user = new Object();
+    user['username'] = jQuery('.cas-username', this).val();
+    user['email'] = jQuery('.cas-email', this).val();
+    user['role'] = jQuery('.cas-role', this).val();
+    user['date_added'] = jQuery('.cas-date-added', this).val();
+    access_users_approved[index] = user;
+  });
+
+  var access_users_blocked = new Object();
+  jQuery('#list_cas_settings_access_users_blocked li').each(function(index) {
+    var user = new Object();
+    user['username'] = jQuery('.cas-username', this).val();
+    user['email'] = jQuery('.cas-email', this).val();
+    user['role'] = jQuery('.cas-role', this).val();
+    user['date_added'] = jQuery('.cas-date-added', this).val();
+    access_users_blocked[index] = user;
+  });
+
   var nonce_save_cas_settings_access = jQuery('#nonce_save_cas_settings_access').val();
 
   jQuery.post(ajaxurl, {
-    action: 'save_sakai_dashboard_widget',
+    action: 'save_cas_dashboard_widget',
     'access_restriction': access_restriction,
-    'access_courses': access_courses,
+    'access_users_pending': access_users_pending,
+    'access_users_approved': access_users_approved,
+    'access_users_blocked': access_users_blocked,
     'nonce_save_cas_settings_access': nonce_save_cas_settings_access,
   }, function(response) {
     jQuery('#cas_settings_access_form .spinner').hide();
