@@ -5,8 +5,8 @@
 #list_cas_settings_access_users_pending .cas-username,
 #list_cas_settings_access_users_pending .cas-email,
 #list_cas_settings_access_users_pending .cas-role {
-	border-color: #76B4CF;
-	background-color: #D4EBF5;
+	border-color: #CBCF76;
+	background-color: #F5F4D4;
 }
 
 #list_cas_settings_access_users_approved .cas-username,
