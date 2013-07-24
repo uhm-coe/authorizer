@@ -715,10 +715,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Add help tab for Public Access Settings
 			$help_cas_settings_access_public_content = '
-				<p><strong>What happens to people without access?</strong>: Choose the response new users receive when visiting the site.</p>
-				<p><strong>What page should people without access see?</strong>: .</p>
-				<p><strong>What message should people without access see?</strong>: .</p>
-				<p><strong>What pages (if any) should be available to everyone?</strong>: .</p>
+				<p><strong>What happens to people without access?</strong>: Choose the response new users receive when visiting the site. You can choose among immediately taking them to the <strong>login screen</strong>, redirecting them to a <strong>specific page</strong>, or simply showing them a <strong>message</strong>.</p>
+				<p><strong>What page should people without access see?</strong>: If you chose to redirect new users to a <strong>specific page</strong> above, choose that page here.</p>
+				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
+				<p><strong>What pages (if any) should be available to everyone?</strong>: If you\'d like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -730,9 +730,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Add help tab for CAS Settings
 			$help_cas_settings_cas_content = '
+				<p><strong>Default role for new CAS users</strong>: Specify which role new CAS users will get by default. Be sure to choose a role with limited permissions!</p>
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
 				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
-				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas/login).</p>
+				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -744,7 +745,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Add help tab for Advanced Settings
 			$help_cas_settings_advanced_content = '
-				<p><strong></strong>: .</p>
+				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have CAS users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change their CAS password here.</p>
+				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -919,7 +921,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 			add_settings_field(
 				'cas_settings_advanced_lostpassword_url', // HTML element ID
-				'Custom Lost Password URL', // HTML element Title
+				'Custom lost password URL', // HTML element Title
 				array( $this, 'print_text_cas_advanced_lostpassword_url' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_advanced' // Section this setting is shown on
@@ -1252,7 +1254,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the WordPress login screen<br />
+			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_page" name="cas_settings[access_redirect]" value="page"<?php checked( 'page' == $cas_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_message" name="cas_settings[access_redirect]" value="message"<?php checked( 'message' == $cas_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
