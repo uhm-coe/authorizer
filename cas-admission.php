@@ -1278,9 +1278,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 		}
 
-/**
-@todo: change dashboard widget to manage user lists instead of sakai list
-*/
 		function add_cas_dashboard_widget() {
 			$cas_settings = get_option( 'cas_settings' );
 			?>
