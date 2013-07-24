@@ -1090,7 +1090,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 							</select>
 							<input type="button" class="button-primary" id="approve_user_<?= $key; ?>" onclick="cas_add_user(this, 'approved'); cas_ignore_user(this, 'pending');" value="Approve" />
 							<input type="button" class="button-primary" id="block_user_<?= $key; ?>" onclick="cas_add_user(this, 'blocked'); cas_ignore_user(this, 'pending');" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -1122,7 +1122,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 								<option value="<?= $approved_user['role']; ?>" selected="selected"><?= ucfirst( $approved_user['role'] ); ?></option>
 							</select>
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1160,7 +1160,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 								<option value="<?= $blocked_user['role']; ?>" selected="selected"><?= ucfirst( $blocked_user['role'] ); ?></option>
 							</select>
 							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="x" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1291,9 +1291,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				<optgroup label="Special">
 					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
 				</optgroup>
-				<?php foreach ( get_post_types( '', 'names' ) as $post_type ): ?>
+				<?php $post_types = get_post_types( '', 'names' ); ?>
+				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
+				<?php foreach ( $post_types as $post_type ): ?>
 					<optgroup label="<?php print ucfirst( $post_type ); ?>">
-					<?php foreach ( get_pages( array( 'post_type' => $post_type ) ) as $page ): ?>
+					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
+					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
+					<?php foreach ( $pages as $page ): ?>
 						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
@@ -1330,7 +1334,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Only users who can edit can see the admissions dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
 				// Add dashboard widget for adding/editing users with access
-				wp_add_dashboard_widget( 'cas_dashboard_widget', 'Course Admission Settings', array( $this, 'add_cas_dashboard_widget' ) );
+				wp_add_dashboard_widget( 'cas_dashboard_widget', 'CAS Admission Settings', array( $this, 'add_cas_dashboard_widget' ) );
 			}
 		}
 
