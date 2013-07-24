@@ -754,7 +754,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_lists' // Section this setting is shown on
 			);
 
-			// Create Access Settings section
+			// Create Private Access section
 			add_settings_section(
 				'cas_settings_access', // HTML element ID
 				'', // HTML element Title
@@ -782,33 +782,42 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
+
+
+			// Create Public Access section
+			add_settings_section(
+				'cas_settings_access_public', // HTML element ID
+				'', // HTML element Title
+				array( $this, 'print_section_info_access_public' ), // Callback (echos section content)
+				'cas_admission' // Page this section is shown on (slug)
+			);
 			add_settings_field(
 				'cas_settings_access_redirect', // HTML element ID
 				'What happens to people without access?', // HTML element Title
 				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_page', // HTML element ID
 				'What page should people without access see?', // HTML element Title
 				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_message', // HTML element ID
 				'What message should people without access see?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_public_pages', // HTML element ID
 				'What pages (if any) should be available to everyone?', // HTML element Title
 				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access' // Section this setting is shown on
+				'cas_settings_access_public' // Section this setting is shown on
 			);
 
 			// Create CAS Settings section
@@ -979,7 +988,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			if ( filter_var( $cas_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
 				$cas_settings['cas_host'] = '';
 			}
-			
+
 			// Sanitize ABC setting (template)
 			// if ( false ) {
 			// 	$cas_settings['somesetting'] = '';
@@ -997,7 +1006,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function print_section_info_tabs() {
 			?><h2 class="nav-tab-wrapper">
 				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
-				<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Manage Access</a>
+				<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Private Access</a>
+				<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public');">Public Access</a>
 				<a class="nav-tab nav-tab-cas" href="javascript:chooseTab('cas');">CAS</a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
 			</h2><?php
@@ -1011,7 +1021,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
-				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:chooseTab('access');">Manage Access</a> tab.</p>
+				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
 			</div><?php
 		}
 
@@ -1183,6 +1193,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					'tinymce' => false,
 				)
 			);
+		}
+
+
+		function print_section_info_access_public() {
+			?><div id="section_info_access_public" class="section_info">
+				<p>If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
+			</div><?php
 		}
 
 		function print_radio_cas_access_redirect( $args = '' ) {

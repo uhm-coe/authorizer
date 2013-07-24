@@ -193,6 +193,7 @@ jQuery(document).ready(function($){
   var cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('tr');
   var cas_settings_access_role_receive_pending_emails = $('#cas_settings_access_role_receive_pending_emails').closest('tr');
   var cas_settings_access_pending_redirect_to_message = $('#wp-cas_settings_access_pending_redirect_to_message-wrap').closest('tr');
+  var cas_settings_access_public_pages = $('#cas_settings_access_public_pages').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
@@ -204,6 +205,7 @@ jQuery(document).ready(function($){
   $('th, td', cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', cas_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
 
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
@@ -249,8 +251,10 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_redirect_to_page).slideUp(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_public_pages).slideUp(animation_speed);
     } else {
       $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideDown(animation_speed);
+      $('div.animated_wrapper', cas_settings_access_public_pages).slideDown(animation_speed);
       $('input[name="cas_settings[access_redirect]"]').trigger('change');
     }
   
