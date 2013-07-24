@@ -113,6 +113,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				add_action( 'admin_notices', array( $this, 'show_advanced_admin_notice' ) );
 			}
 
+			// Load custom javascript for the main site (e.g., for displaying alerts).
+			add_action( 'wp_enqueue_scripts', array( $this, 'cas_public_scripts' ), 20 );
+
 		} // END __construct()
 
 
@@ -256,6 +259,25 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			//$errors .= '    ' . $error . "<br />\n";
 			$errors = '    ' . $error . "<br />\n";
 			return $errors;
+		}
+
+		/**
+		 * Enqueue scripts for the public-facing site.
+		 */
+		function cas_public_scripts() {
+			// Load (and localize) public scripts
+			wp_enqueue_script( 'cas_public_scripts', plugins_url( '/assets/js/cas-admission-public.js', __FILE__ ) );
+			$cas_localized = array(
+				'wp_login_url' => wp_login_url(),
+				'public_warning' => get_option( 'cas_settings_advanced_public_notice' )
+			);
+			wp_localize_script( 'cas_public_scripts', 'cas', $cas_localized );
+			//update_option( 'cas_settings_advanced_public_notice', false);
+
+			// Load public css
+			wp_register_style( 'cas-admission-public-css', plugins_url( 'assets/css/cas-admission-public.css', __FILE__ ) );
+			wp_enqueue_style( 'cas-admission-public-css' );
+
 		}
 
 
@@ -509,11 +531,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Check to see if the requested page is public. If so, show it.
 			if ( in_array( $this->get_id_from_pagename( $wp->query_vars['pagename'] ), $cas_settings['access_public_pages'] ) ) {
+				update_option( 'cas_settings_advanced_public_notice', true);
 				return;
 			}
 
 			// Check to see if the requested page is the home page and if it is public. If so, show it.
 			if ( empty( $wp->request ) && in_array( 'home', $cas_settings['access_public_pages'] ) ) {
+				update_option( 'cas_settings_advanced_public_notice', true);
 				return;
 			}
 
