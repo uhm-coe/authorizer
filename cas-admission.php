@@ -497,9 +497,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// 'approved' whitelist. Flag these users, and redirect them to their
 			// profile page with a message (so we don't get into a redirect loop on
 			// the wp-login.php page).
-			$logged_in_but_no_access = false;
 			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $cas_settings['access_restriction'] == 'approved_cas' ) {
-				$logged_in_but_no_access = true;
+				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				update_option( 'cas_settings_advanced_login_error', $error );
+				wp_logout();
+				wp_redirect( wp_login_url(), 302 );
+				exit;
 			}
 
 			/**
@@ -543,19 +546,12 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				return;
 			}
 
-			if ( $logged_in_but_no_access ) {
-				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				update_option( 'cas_settings_advanced_login_error', $error );
-				wp_logout();
-				wp_redirect( wp_login_url(), 302 );
-				exit;
-			}
-
 			switch ( $cas_settings['access_redirect'] ) :
 			case 'message':
 				wp_die( $cas_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
 				break;
 			case 'page':
+				update_option( 'cas_settings_advanced_public_notice', true);
 				$page_id = get_post_field( 'ID', $cas_settings['access_redirect_to_page'] );
 				if ( is_wp_error( $page_id ) ) {
 					wp_die( '<p>Access to this site is restricted.</p>', get_bloginfo( 'name' ) . ' - Site Access Restricted' );
