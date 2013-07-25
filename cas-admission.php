@@ -138,15 +138,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					foreach ( $blogids as $blog_id ) {
 						switch_to_blog( $blog_id );
 						// Set meaningful defaults (but if values already exist in db, use those).
-						$this->set_default_options();
+						self::set_default_options();
 					}
 					switch_to_blog( $old_blog );
 					return;
 				}
+			} else {
+				// Set meaningful defaults (but if values already exist in db, use those).
+				self::set_default_options();
 			}
-
-			// Set meaningful defaults (but if values already exist in db, use those).
-			$this->set_default_options();
 		}
 
 		/**
@@ -950,7 +950,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Set meaningful defaults for the plugin options.
 		 * Note: This function is called on plugin activation.
 		 */
-		function set_default_options() {
+		public static function set_default_options() {
 			$cas_settings = get_option( 'cas_settings' );
 			if ( $cas_settings === FALSE ) {
 				$cas_settings = array();
