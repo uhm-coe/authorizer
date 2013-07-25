@@ -127,6 +127,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 */
 		public function activate() {
 			global $wpdb;
+			global $wp_roles;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
 			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
@@ -136,30 +137,17 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					$blogids = $wpdb->get_col( $wpdb->prepare( "SELECT blog_id FROM $wpdb->blogs" ) );
 					foreach ( $blogids as $blog_id ) {
 						switch_to_blog( $blog_id );
-						self::_single_blog_activate();
+						// Set meaningful defaults (but if values already exist in db, use those).
+						$this->set_default_options();
 					}
 					switch_to_blog( $old_blog );
 					return;
 				}
 			}
 
-			// Activet the plugin for the current site
-			self::_single_blog_activate();
-		}
-
-		/**
-		 * Plugin activation.
-		 *
-		 * @return void
-		 */
-		private static function _single_blog_activate() {
-			global $wp_roles;
-
 			// Set meaningful defaults (but if values already exist in db, use those).
 			$this->set_default_options();
-
-		} // END activate()
-
+		}
 
 		/**
 		 * Plugin deactivation.
