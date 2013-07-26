@@ -1076,6 +1076,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$cas_settings['cas_host'] = '';
 			}
 
+			// Make sure public pages is an empty array if it's empty
+			if ( ! is_array ( $cas_settings['access_public_pages'] ) ) {
+				$cas_settings['access_public_pages'] = array();
+			}
+
 			return $cas_settings;
 		}
 
