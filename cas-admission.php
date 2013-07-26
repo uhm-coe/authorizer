@@ -684,13 +684,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		/**
 		 * Add notices to the top of the options page.
 		 * Run on action hook chain: load-settings_page_cas_admission > admin_notices
-		 @todo: add warning messages.
+		 * Description: Check for invalid settings combinations and show a warning message, e.g.:
+		 *   if (cas url inaccessible) {
+		 *     print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
+		 *   }
 		 */
 		public function admin_notices() {
-			// Check for invalid settings combinations and show a warning message, e.g.:
-			// if (sakai base url inaccessible) {
-			//   print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
-			// }
+			$cas_settings = get_option( 'cas_settings' );
+			$protocol = $cas_settings['cas_port'] == '80' ? 'http' : 'https';
+
+			// Check if provided CAS URL is accessible.
+			if ( ! $this->url_is_accessible( $protocol . '://' . $cas_settings['cas_host'] . $cas_settings['cas_path'] ) ) {
+				print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:chooseTab(\"cas\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
+			}
 		}
 
 
@@ -1203,7 +1209,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_section_info_cas() {
 			?><div id="section_info_cas" class="section_info">
-				<p><span class="red">Important Note</span>: If you\'re configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>
+				<p><span class="red">Important Note</span>: If you're configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>
 				<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />
 					<a href="<?php print wp_login_url() . '?cas=no'; ?>"><?php print wp_login_url() . '?cas=no'; ?></a></p>
 				<p>Enter your CAS server settings below.</p>
@@ -1520,6 +1526,19 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			global $wpdb;
 			$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = '" . sanitize_title_for_query( $pagename ) . "'");
 			return $page_id;
+		}
+
+		// Helper function to determine if a URL is accessible.
+		function url_is_accessible( $url ) {
+			// Use curl to retrieve the URL.
+			$handle = curl_init( $url );
+			curl_setopt( $handle,  CURLOPT_RETURNTRANSFER, TRUE );
+			$response = curl_exec( $handle );
+			$httpCode = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
+			curl_close( $handle );
+
+			// Return true if the document has loaded successfully without any redirection or error
+			return $httpCode >= 200 && $httpCode < 300;
 		}
 
 	} // END class WP_Plugin_CAS_Admission
