@@ -235,6 +235,17 @@ jQuery(document).ready(function($){
   $('th, td', cas_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
 
+  // If we're viewing the dashboard widget, reset a couple of the relevant
+  // option variables (since they're aren't nested in table rows).
+  if ($('#cas_dashboard_widget').length) {
+    cas_settings_access_users_pending = $('#list_cas_settings_access_users_pending').closest('div');
+    cas_settings_access_users_approved = $('#list_cas_settings_access_users_approved').closest('div');
+    cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('div');
+    $(cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
+    $(cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
+    $(cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
+  }
+
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
   }
