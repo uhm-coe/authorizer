@@ -183,102 +183,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 ****************************
-		 * Custom filters and actions
-		 ****************************
-		 */
-
-		/**
-		 * Overwrite the URL for the lost password link on the login form.
-		 * If we're authenticating against CAS, standard WordPress password resets
-		 * won't work.
-		 */
-		function custom_lostpassword_url( $lostpassword_url ) {
-			$cas_settings = get_option( 'cas_settings' );
-			if (
-				array_key_exists( 'advanced_lostpassword_url', $cas_settings ) &&
-				filter_var( $cas_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
-				array_key_exists( 'access_restriction', $cas_settings ) &&
-				$cas_settings['access_restriction'] !== 'everyone' &&
-				$cas_settings['access_restriction'] !== 'user'
-			) {
-				$lostpassword_url = $cas_settings['advanced_lostpassword_url'];
-			}
-			return $lostpassword_url;
-		}
-
-		/**
-		 * Overwrite the username and password labels on the login form.
-		 */
-		function custom_login_form_labels( $translated_text, $text, $domain ) {
-			$cas_settings = get_option( 'cas_settings' );
-
-			if ( $translated_text === 'Username' ) {
-				$translated_text = 'Username';
-			}
-
-			if ( $translated_text === 'Password' ) {
-				$translated_text = 'Password';
-			}
-
-			return $translated_text;
-		}
-
-		/**
-		 * Show custom admin notice.
-		 * Filter: admin_notice
-		 */
-		function show_advanced_admin_notice() {
-			$notice = get_option( 'cas_settings_advanced_admin_notice' );
-			delete_option( 'cas_settings_advanced_admin_notice' );
-
-			if ( $notice && strlen( $notice ) > 0 ) {
-				?>
-				<div class="error">
-					<p><?php _e( $notice ); ?></p>
-				</div>
-				<?php
-			}
-		}
-
-		/**
-		 * Add custom error message to login screen.
-		 * Filter: login_errors
-		 */
-		function show_advanced_login_error( $errors ) {
-			$error = get_option( 'cas_settings_advanced_login_error' );
-			delete_option( 'cas_settings_advanced_login_error' );
-
-			//$errors .= '    ' . $error . "<br />\n";
-			$errors = '    ' . $error . "<br />\n";
-			return $errors;
-		}
-
-		/**
-		 * Enqueue scripts for the public-facing site.
-		 */
-		function cas_public_scripts() {
-			// Load (and localize) public scripts
-			wp_enqueue_script( 'cas_public_scripts', plugins_url( '/assets/js/cas-admission-public.js', __FILE__ ) );
-			$cas_localized = array(
-				'wp_login_url' => wp_login_url(),
-				'public_warning' => get_option( 'cas_settings_advanced_public_notice' )
-			);
-			wp_localize_script( 'cas_public_scripts', 'cas', $cas_localized );
-			//update_option( 'cas_settings_advanced_public_notice', false);
-
-			// Load public css
-			wp_register_style( 'cas-admission-public-css', plugins_url( 'assets/css/cas-admission-public.css', __FILE__ ) );
-			wp_enqueue_style( 'cas-admission-public-css' );
-
-		}
-
-
-
-		/**
-		 ****************************
 		 * CAS Authentication
 		 ****************************
 		 */
+
 
 
 		/**
@@ -456,6 +364,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 */
 
 
+
 		/**
 		 * Restrict access to WordPress site based on settings (everyone, university, approved_cas, user).
 		 * Hook: parse_request http://codex.wordpress.org/Plugin_API/Action_Reference/parse_request
@@ -560,6 +469,102 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
+		}
+
+
+
+		/**
+		 ****************************
+		 * Custom filters and actions
+		 ****************************
+		 */
+
+
+
+		/**
+		 * Overwrite the URL for the lost password link on the login form.
+		 * If we're authenticating against CAS, standard WordPress password resets
+		 * won't work.
+		 */
+		function custom_lostpassword_url( $lostpassword_url ) {
+			$cas_settings = get_option( 'cas_settings' );
+			if (
+				array_key_exists( 'advanced_lostpassword_url', $cas_settings ) &&
+				filter_var( $cas_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
+				array_key_exists( 'access_restriction', $cas_settings ) &&
+				$cas_settings['access_restriction'] !== 'everyone' &&
+				$cas_settings['access_restriction'] !== 'user'
+			) {
+				$lostpassword_url = $cas_settings['advanced_lostpassword_url'];
+			}
+			return $lostpassword_url;
+		}
+
+		/**
+		 * Overwrite the username and password labels on the login form.
+		 */
+		function custom_login_form_labels( $translated_text, $text, $domain ) {
+			$cas_settings = get_option( 'cas_settings' );
+
+			if ( $translated_text === 'Username' ) {
+				$translated_text = 'Username';
+			}
+
+			if ( $translated_text === 'Password' ) {
+				$translated_text = 'Password';
+			}
+
+			return $translated_text;
+		}
+
+		/**
+		 * Show custom admin notice.
+		 * Filter: admin_notice
+		 */
+		function show_advanced_admin_notice() {
+			$notice = get_option( 'cas_settings_advanced_admin_notice' );
+			delete_option( 'cas_settings_advanced_admin_notice' );
+
+			if ( $notice && strlen( $notice ) > 0 ) {
+				?>
+				<div class="error">
+					<p><?php _e( $notice ); ?></p>
+				</div>
+				<?php
+			}
+		}
+
+		/**
+		 * Add custom error message to login screen.
+		 * Filter: login_errors
+		 */
+		function show_advanced_login_error( $errors ) {
+			$error = get_option( 'cas_settings_advanced_login_error' );
+			delete_option( 'cas_settings_advanced_login_error' );
+
+			//$errors .= '    ' . $error . "<br />\n";
+			$errors = '    ' . $error . "<br />\n";
+			return $errors;
+		}
+
+
+
+		/**
+		 * Load external resources for the public-facing site.
+		 */
+		function cas_public_scripts() {
+			// Load (and localize) public scripts
+			wp_enqueue_script( 'cas_public_scripts', plugins_url( '/assets/js/cas-admission-public.js', __FILE__ ) );
+			$cas_localized = array(
+				'wp_login_url' => wp_login_url(),
+				'public_warning' => get_option( 'cas_settings_advanced_public_notice' )
+			);
+			wp_localize_script( 'cas_public_scripts', 'cas', $cas_localized );
+			//update_option( 'cas_settings_advanced_public_notice', false);
+
+			// Load public css
+			wp_register_style( 'cas-admission-public-css', plugins_url( 'assets/css/cas-admission-public.css', __FILE__ ) );
+			wp_enqueue_style( 'cas-admission-public-css' );
 		}
 
 
@@ -693,7 +698,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		/**
 		 * Add help documentation to the options page.
 		 * Run on action hook chain: load-settings_page_cas_admission > admin_head
-		 @todo: add documentation.
 		 */
 		public function admin_head() {
 			$screen = get_current_screen();
@@ -1070,11 +1074,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		}
 
 
-
 		/**
 		 * Settings print callbacks
 		 */
-
 		function print_section_info_tabs() {
 			?><h2 class="nav-tab-wrapper">
 				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
@@ -1443,6 +1445,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Helper functions
 		 ****************************
 		 */
+
 
 
 		/**
