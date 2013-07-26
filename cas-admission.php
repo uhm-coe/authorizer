@@ -75,7 +75,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Create settings link on Plugins page
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
 
-			// Modify login page to help users use CAS to log in
+			// Modify login page to with custom password url and labels.
 			if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) {
 				add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
 				add_filter( 'gettext', array( $this, 'custom_login_form_labels' ), 20, 3 );
@@ -216,9 +216,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Grab plugin settings.
 			$cas_settings = get_option( 'cas_settings' );
 
-			// If we're restricting access to only WP users, don't check against CAS;
-			// Instead, pass through to default WP authentication.
-			if ( $cas_settings['access_restriction'] === 'user' ) {
+			// If we're restricting access to only WP users, or not restricting
+			// access at all, don't check against CAS; instead, pass through to
+			// default WP authentication.
+			if ( $cas_settings['access_restriction'] === 'user' || $cas_settings['access_restriction'] === 'everyone' ) {
 				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
 			}
 
