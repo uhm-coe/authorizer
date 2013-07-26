@@ -55,6 +55,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
+			// Installation and uninstallation hooks.
+			register_activation_hook( __FILE__, array( $this, 'activate' ) );
+			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+			register_uninstall_hook( __FILE__, array( $this, 'uninstall' ) );
+
 			// Register filters.
 
 			// Custom wp authentication routine using CAS
@@ -126,8 +131,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function activate() {
+error_log('in activate');
 			global $wpdb;
-			global $wp_roles;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
 			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
@@ -137,16 +142,16 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					$blogids = $wpdb->get_col( $wpdb->prepare( "SELECT blog_id FROM $wpdb->blogs" ) );
 					foreach ( $blogids as $blog_id ) {
 						switch_to_blog( $blog_id );
-						// Set meaningful defaults (but if values already exist in db, use those).
-						self::set_default_options();
+						// Set meaningful defaults for other sites in the network.
+						$this->set_default_options();
 					}
 					switch_to_blog( $old_blog );
 					return;
 				}
-			} else {
-				// Set meaningful defaults (but if values already exist in db, use those).
-				self::set_default_options();
 			}
+
+			// Set meaningful defaults for this site.
+			$this->set_default_options();
 		}
 
 		/**
@@ -155,6 +160,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function deactivate() {
+error_log('in deactivate');
 			// Do nothing.
 		} // END deactivate()
 
@@ -950,12 +956,51 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * Set meaningful defaults for the plugin options.
 		 * Note: This function is called on plugin activation.
 		 */
-		public static function set_default_options() {
+		function set_default_options() {
+			global $wp_roles;
+error_log('in default options');
 			$cas_settings = get_option( 'cas_settings' );
 			if ( $cas_settings === FALSE ) {
 				$cas_settings = array();
 			}
 
+			// Access Lists Defaults.
+			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
+				$cas_settings['access_users_pending'] = array();
+			}
+			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
+				$cas_settings['access_users_approved'] = array();
+			}
+			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
+				$cas_settings['access_users_blocked'] = array();
+			}
+
+			// Private Access Defaults.
+			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
+				$cas_settings['access_restriction'] = 'everyone';
+			}
+			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
+				$cas_settings['access_role_receive_pending_emails'] = '---';
+			}
+			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
+			}
+
+			// Public Access Defaults.
+			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
+				$cas_settings['access_redirect'] = 'login';
+			}
+			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
+			}
+			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
+				$cas_settings['access_redirect_to_page'] = '';
+			}
+			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
+				$cas_settings['access_public_pages'] = array();
+			}
+
+			// CAS Defaults.
 			if ( !array_key_exists( 'access_default_role', $cas_settings ) ) {
 				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 				$all_roles = $wp_roles->roles;
@@ -968,37 +1013,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					$cas_settings['access_default_role'] = 'subscriber';
 				}
 			}
-			if ( !array_key_exists( 'access_restriction', $cas_settings ) ) {
-				$cas_settings['access_restriction'] = 'everyone';
-			}
-			if ( !array_key_exists( 'access_users_pending', $cas_settings ) ) {
-				$cas_settings['access_users_pending'] = array();
-			}
-			if ( !array_key_exists( 'access_users_approved', $cas_settings ) ) {
-				$cas_settings['access_users_approved'] = array();
-			}
-			if ( !array_key_exists( 'access_users_blocked', $cas_settings ) ) {
-				$cas_settings['access_users_blocked'] = array();
-			}
-			if ( !array_key_exists( 'access_role_receive_pending_emails', $cas_settings ) ) {
-				$cas_settings['access_role_receive_pending_emails'] = '---';
-			}
-			if ( !array_key_exists( 'access_pending_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
-			}
-			if ( !array_key_exists( 'access_redirect', $cas_settings ) ) {
-				$cas_settings['access_redirect'] = 'login';
-			}
-			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
-			}
-			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_page'] = '';
-			}
-			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
-				$cas_settings['access_redirect'] = array();
-			}
-
 			if ( !array_key_exists( 'cas_host', $cas_settings ) ) {
 				$cas_settings['cas_host'] = '';
 			}
@@ -1009,6 +1023,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$cas_settings['cas_path'] = '';
 			}
 
+			// Advanced defaults.
 			if ( !array_key_exists( 'advanced_lostpassword_url', $cas_settings ) ) {
 				$cas_settings['advanced_lostpassword_url'] = '';
 			}
@@ -1509,13 +1524,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 	} // END class WP_Plugin_CAS_Admission
 }
-
-
-// Installation and uninstallation hooks.
-register_activation_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'activate' ) );
-register_deactivation_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'deactivate' ) );
-register_uninstall_hook( __FILE__, array( 'WP_Plugin_CAS_Admission', 'uninstall' ) );
-
 
 // Instantiate the plugin class.
 $wp_plugin_cas_admission = new WP_Plugin_CAS_Admission();
