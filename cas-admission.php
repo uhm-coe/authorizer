@@ -1229,7 +1229,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_restriction_everyone" name="cas_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $cas_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_university" name="cas_settings[access_restriction]" value="university"<?php checked( 'university' == $cas_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');">approved users</a> (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_cas_settings_access_restriction_approved_cas" name="cas_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $cas_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_cas_settings_access_restriction_user" name="cas_settings[access_restriction]" value="user"<?php checked( 'user' == $cas_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 

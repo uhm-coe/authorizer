@@ -244,6 +244,9 @@ jQuery(document).ready(function($){
     $(cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
     $(cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
     $(cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
+
+    // Remove the helper link, since there are no tabs on the dashboard widget
+    $('#dashboard_link_approved_users').contents().unwrap();
   }
 
   if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
