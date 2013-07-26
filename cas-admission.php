@@ -866,7 +866,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_page', // HTML element ID
-				'What page should people without access see?', // HTML element Title
+				'What page should people without access see first?', // HTML element Title
 				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access_public' // Section this setting is shown on
@@ -1285,14 +1285,24 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		function print_select_cas_access_redirect_to_page( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
-			wp_dropdown_pages(
-				array( 
-					'selected' => $cas_settings['access_redirect_to_page'],
-					'show_option_none' => 'Select a page',
-					'name' => 'cas_settings[access_redirect_to_page]',
-					'id' => 'cas_settings_access_redirect_to_page',
-				)
-			);
+			?><select id="cas_settings_access_redirect_to_page" name="cas_settings[access_redirect_to_page][]">
+				<optgroup label="Special">
+					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+				</optgroup>
+				<?php $post_types = get_post_types( '', 'names' ); ?>
+				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
+				<?php foreach ( $post_types as $post_type ): ?>
+					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
+					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
+					<?php if ( count( $pages ) > 0 ): ?>
+						<optgroup label="<?php print ucfirst( $post_type ); ?>">
+						<?php foreach ( $pages as $page ): ?>
+							<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+						<?php endforeach; ?>
+						</optgroup>
+					<?php endif; ?>
+				<?php endforeach; ?>
+			</select><?php
 		}
 
 		function print_multiselect_cas_access_public_pages( $args = '' ) {
