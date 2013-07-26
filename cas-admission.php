@@ -1543,7 +1543,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			curl_close( $handle );
 
 			// Return true if the document has loaded successfully without any redirection or error
-			return $httpCode >= 200 && $httpCode < 300;
+			return $httpCode >= 200 && $httpCode < 400;
 		}
 
 	} // END class WP_Plugin_CAS_Admission
