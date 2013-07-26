@@ -131,7 +131,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function activate() {
-error_log('in activate');
 			global $wpdb;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
@@ -160,7 +159,6 @@ error_log('in activate');
 		 * @return void
 		 */
 		public function deactivate() {
-error_log('in deactivate');
 			// Do nothing.
 		} // END deactivate()
 
@@ -958,7 +956,6 @@ error_log('in deactivate');
 		 */
 		function set_default_options() {
 			global $wp_roles;
-error_log('in default options');
 			$cas_settings = get_option( 'cas_settings' );
 			if ( $cas_settings === FALSE ) {
 				$cas_settings = array();
