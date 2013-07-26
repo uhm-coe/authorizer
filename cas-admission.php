@@ -341,13 +341,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return void
 		 */
 		public function cas_logout() {
-			global $PHPCAS_CLIENT;
-
 			// Grab plugin settings.
 			$cas_settings = get_option( 'cas_settings' );
 
 			// Set the CAS client configuration if it hasn't been set already.
-			if ( ! isset( $PHPCAS_CLIENT ) ) {
+			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 				phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 			}
 
