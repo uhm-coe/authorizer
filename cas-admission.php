@@ -1323,7 +1323,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					<?php if ( count( $pages ) > 0 ): ?>
 						<optgroup label="<?php print ucfirst( $post_type ); ?>">
 						<?php foreach ( $pages as $page ): ?>
-							<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+							<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_redirect_to_page'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
 						<?php endforeach; ?>
 						</optgroup>
 					<?php endif; ?>
