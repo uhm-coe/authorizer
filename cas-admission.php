@@ -210,7 +210,15 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// querystring variable 'cas' is set to 'no' or 'false'--for example:
 			// https://www.example.com/wp-login.php?cas=no
 			if ( ! empty($_GET['cas'] ) && ( $_GET['cas'] === 'no' || $_GET['cas'] === 'false' ) ) {
+				remove_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
 				return new WP_Error( 'no_cas', 'Bypassing CAS authentication in favor of WordPress authentication...' );
+			}
+
+			// Admin bypass: if we have populated username/password data,
+			// and the page we're coming from is the admin bypass, let
+			// WordPress handle the authentication (by passing on null).
+			if ( ! empty( $username ) && ! empty( $password ) && ( strpos( $_SERVER['HTTP_REFERER'], 'cas=no' ) !== false || strpos( $_SERVER['HTTP_REFERER'], 'cas=false' ) !== false ) ) {
+				return null;
 			}
 
 			// Grab plugin settings.
