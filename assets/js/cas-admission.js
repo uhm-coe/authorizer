@@ -317,6 +317,12 @@ jQuery(document).ready(function($){
       $(this).siblings('.cas-username').val(getUsernameFromEmail($(this).val()));
     }
   });
+  $('form input.cas-username, form input.cas-email').bind('keydown', function(e) {
+    if (e.which == 13) { // Enter key
+      e.preventDefault();
+      return false;
+    }
+  });
 
   // Enable the user-friendly multiselect form element on the options page.
   $('#cas_settings_access_public_pages').multiSelect({
