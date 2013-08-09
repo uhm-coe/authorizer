@@ -215,7 +215,6 @@ jQuery(document).ready(function($){
   var cas_settings_access_redirect_to_login = $('#radio_cas_settings_access_redirect_to_login').closest('tr');
   var cas_settings_access_redirect_to_url = $('#cas_settings_access_redirect_to_url').closest('tr');
   var cas_settings_access_redirect_to_message = $('#wp-cas_settings_access_redirect_to_message-wrap').closest('tr');
-  var cas_settings_access_redirect_to_page = $('#cas_settings_access_redirect_to_page').closest('tr');
   var cas_settings_access_users_pending = $('#list_cas_settings_access_users_pending').closest('tr');
   var cas_settings_access_users_approved = $('#list_cas_settings_access_users_approved').closest('tr');
   var cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('tr');
@@ -227,7 +226,6 @@ jQuery(document).ready(function($){
   $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_redirect_to_page).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
   $('th, td', cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
@@ -255,9 +253,6 @@ jQuery(document).ready(function($){
   if (!$('#radio_cas_settings_access_redirect_to_message').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_redirect_to_message).hide();
   }
-  if (!$('#radio_cas_settings_access_redirect_to_page').is(':checked')) {
-    $('div.animated_wrapper', cas_settings_access_redirect_to_page).hide();
-  }
 
   if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
     $('div.animated_wrapper', cas_settings_access_users_pending).hide();
@@ -279,11 +274,6 @@ jQuery(document).ready(function($){
     } else {
       $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
     }
-    if ($('#radio_cas_settings_access_redirect_to_page').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_page).slideDown(animation_speed);
-    } else {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_page).slideUp(animation_speed);
-    }
   });
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -292,7 +282,6 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_redirect_to_page).slideUp(animation_speed);
       $('div.animated_wrapper', cas_settings_access_public_pages).slideUp(animation_speed);
     } else {
       $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideDown(animation_speed);

@@ -454,22 +454,13 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				return;
 			}
 
+			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			switch ( $cas_settings['access_redirect'] ) :
 			case 'message':
-				wp_die( $cas_settings['access_redirect_to_message'], get_bloginfo( 'name' ) . ' - Site Access Restricted' );
+				wp_die( $cas_settings['access_redirect_to_message'] . '<hr /><p style="text-align:center;margin-bottom:-15px;"><a class="button" href="' . wp_login_url( $current_path ) . '">Log In</a></p>', get_bloginfo( 'name' ) . ' - Access Restricted' );
 				break;
-			case 'page':
-				update_option( 'cas_settings_advanced_public_notice', true);
-				$page_id = get_post_field( 'ID', $cas_settings['access_redirect_to_page'] );
-				if ( is_wp_error( $page_id ) ) {
-					wp_die( '<p>Access to this site is restricted.</p>', get_bloginfo( 'name' ) . ' - Site Access Restricted' );
-				}
-				unset( $wp->query_vars );
-				$wp->query_vars['page_id'] = $page_id;
-				return;
 			case 'login':
 			default:
-				$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
 			endswitch;
@@ -746,8 +737,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 			// Add help tab for Public Access Settings
 			$help_cas_settings_access_public_content = '
-				<p><strong>What happens to people without access?</strong>: Choose the response new users receive when visiting the site. You can choose among immediately taking them to the <strong>login screen</strong>, redirecting them to a <strong>specific page</strong>, or simply showing them a <strong>message</strong>.</p>
-				<p><strong>What page should people without access see?</strong>: If you chose to redirect new users to a <strong>specific page</strong> above, choose that page here.</p>
+				<p><strong>What happens to people without access when they visit a private page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
 				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
 				<p><strong>What pages (if any) should be available to everyone?</strong>: If you\'d like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
 			';
@@ -880,15 +870,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			);
 			add_settings_field(
 				'cas_settings_access_redirect', // HTML element ID
-				'What happens to people without access?', // HTML element Title
+				'What happens to people without access when they visit a private page?', // HTML element Title
 				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
-				'cas_settings_access_public' // Section this setting is shown on
-			);
-			add_settings_field(
-				'cas_settings_access_redirect_to_page', // HTML element ID
-				'What page should people without access see first?', // HTML element Title
-				array( $this, 'print_select_cas_access_redirect_to_page' ), // Callback (echos form element)
 				'cas_admission', // Page this setting is shown on (slug)
 				'cas_settings_access_public' // Section this setting is shown on
 			);
@@ -1005,10 +988,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$cas_settings['access_redirect'] = 'login';
 			}
 			if ( !array_key_exists( 'access_redirect_to_message', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_message'] = '<p>Access to this site is restricted.</p>';
-			}
-			if ( !array_key_exists( 'access_redirect_to_page', $cas_settings ) ) {
-				$cas_settings['access_redirect_to_page'] = '';
+				$cas_settings['access_redirect_to_message'] = '<p><strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.</p>';
 			}
 			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
 				$cas_settings['access_public_pages'] = array();
@@ -1282,7 +1262,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => 'cas_settings[access_pending_redirect_to_message]',
 					'textarea_rows' => 5,
-					'tinymce' => false,
+					'tinymce' => true,
+					'teeny' => true,
+					'quicktags' => false,
 				)
 			);
 		}
@@ -1297,7 +1279,6 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		function print_radio_cas_access_redirect( $args = '' ) {
 			$cas_settings = get_option( 'cas_settings' );
 			?><input type="radio" id="radio_cas_settings_access_redirect_to_login" name="cas_settings[access_redirect]" value="login"<?php checked( 'login' == $cas_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
-				<input type="radio" id="radio_cas_settings_access_redirect_to_page" name="cas_settings[access_redirect]" value="page"<?php checked( 'page' == $cas_settings['access_redirect'] ); ?> /> Show them a specific WordPress page<br />
 				<input type="radio" id="radio_cas_settings_access_redirect_to_message" name="cas_settings[access_redirect]" value="message"<?php checked( 'message' == $cas_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
 
@@ -1310,31 +1291,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => 'cas_settings[access_redirect_to_message]',
 					'textarea_rows' => 5,
-					'tinymce' => false,
+					'tinymce' => true,
+					'teeny' => true,
+					'quicktags' => false,
 				)
 			);
-		}
-
-		function print_select_cas_access_redirect_to_page( $args = '' ) {
-			$cas_settings = get_option( 'cas_settings' );
-			?><select id="cas_settings_access_redirect_to_page" name="cas_settings[access_redirect_to_page][]">
-				<optgroup label="Special">
-					<option value="home" <?php print in_array( 'home', $cas_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
-				</optgroup>
-				<?php $post_types = get_post_types( '', 'names' ); ?>
-				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
-				<?php foreach ( $post_types as $post_type ): ?>
-					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
-					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
-					<?php if ( count( $pages ) > 0 ): ?>
-						<optgroup label="<?php print ucfirst( $post_type ); ?>">
-						<?php foreach ( $pages as $page ): ?>
-							<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $cas_settings['access_redirect_to_page'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
-						<?php endforeach; ?>
-						</optgroup>
-					<?php endif; ?>
-				<?php endforeach; ?>
-			</select><?php
 		}
 
 		function print_multiselect_cas_access_public_pages( $args = '' ) {
