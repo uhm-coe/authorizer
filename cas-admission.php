@@ -991,7 +991,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				$cas_settings['access_redirect_to_message'] = '<p><strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.</p>';
 			}
 			if ( !array_key_exists( 'access_public_pages', $cas_settings ) ) {
-				$cas_settings['access_public_pages'] = array();
+				$cas_settings['access_public_pages'] = array('home');
 			}
 
 			// CAS Defaults.

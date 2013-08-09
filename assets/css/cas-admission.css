@@ -1,5 +1,13 @@
-.ms-list li {
+body.settings_page_cas_admission .ms-list li {
 	margin-bottom: 0;
+}
+
+body.settings_page_cas_admission .ms-container {
+	background-position-x: 250px;
+}
+
+body.settings_page_cas_admission .ms-container ul.ms-list {
+	width: 240px;
 }
 
 .cas-username {
