@@ -1,32 +1,31 @@
-=== CAS Admission ===
+=== Authorizer ===
 Contributors: figureone
-Tags: cas, authentication, authorization, access, education
+Tags: cas, authentication, authorization, access, education, ldap, limit login attempts
 Requires at least: 3.0.1
-Tested up to: 3.5.2
+Tested up to: 3.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-CAS Admission restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
+Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., LDAP, CAS).
 
 == Description ==
 
-*CAS Admission* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It replaces the default WordPress login/authorization system with one relying on a CAS server. Further, it maintains a course roster that it can use to restrict access to only students enrolled in a specific course. This course roster can be populated with usernames by an administrator, or an adminstrator can approve individuals from a log of prior CAS login attempts.
+*Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as CAS or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
-The primary difference between this plugin and other CAS offerings is that we offer the functionality to restrict all access to a WordPress site based on successful CAS logins.
+*Authorizer* requires the following:
 
-*CAS Admission* requires the following:
+* **CAS server** or **LDAP server** (plugin needs the URL)
 
-* **CAS server** (plugin needs the URL)
-
-*CAS Admission* provides the following options:
+*Authorizer* provides the following options:
 
 * **Authentication**: Local (no CAS); Local first, then CAS; CAS-only (except for admins)
 * **Access**: Everyone (all have access); University members (all local and all CAS); Specific users (all local and specific CAS)
+* **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
 
 == Installation ==
 
-1. Upload the `cas-admission` directory to the `/wp-content/plugins/` directory
+1. Upload the `authorizer` directory to the `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
 1. Specify your server details in the 'Settings' menu in WordPress
 
@@ -34,7 +33,7 @@ The primary difference between this plugin and other CAS offerings is that we of
 
 = Where is this plugin used? =
 
-The [University of Hawai'i][uh], which provides authentication for student, faculty, and staff members via CAS.
+The [University of Hawai'i][uh], which provides authentication for student, faculty, and staff members via a centralized service (CAS or LDAP).
 
 [uh]: http://hawaii.edu/
 
@@ -43,6 +42,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 1. Options screen.
 
 == Changelog ==
+
+= 1.1 =
+* Rename to Authorizer
+* Add LDAP support
 
 = 1.0 =
 * First stable release.

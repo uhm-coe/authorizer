@@ -1,16 +1,16 @@
 <?php
 /*
-Plugin Name: CAS Admission
+Plugin Name: Authorizer
 Plugin URI: http://hawaii.edu/coe/dcdc/
-Description: CAS Admission restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
-Version: 0.1
+Description: Authorizer restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
+Version: 1.1
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2
 */
 
 /*
-Copyright 2013  Paul Ryan  (email: prar@hawaii.edu)
+Copyright 2014  Paul Ryan  (email: prar@hawaii.edu)
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License, version 2, as 
@@ -39,17 +39,17 @@ if ( ! defined( 'PHPCAS_VERSION' ) ) {
 }
 
 
-if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
+if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 	/**
-	 * Define class for plugin: CAS Admission.
+	 * Define class for plugin: Authorizer.
 	 *
 	 * @category Authentication
-	 * @package  CAS_Admission
+	 * @package  Authorizer
 	 * @author   Paul Ryan <prar@hawaii.edu>
 	 * @license  http://www.gnu.org/licenses/gpl-2.0.html GPL2
-	 * @link     http://hawaii.edu/coe/dcdc/wordpress/cas_admission/doc/
+	 * @link     http://hawaii.edu/coe/dcdc/wordpress/authorizer/doc/
 	 */
-	class WP_Plugin_CAS_Admission {
+	class WP_Plugin_Authorizer {
 		
 		/**
 		 * Constructor.
@@ -96,7 +96,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
 			// Enqueue javascript and css only on the plugin's options page and the dashboard (for the widget)
-			add_action( 'load-settings_page_cas_admission', array( $this, 'load_options_page' ) );
+			add_action( 'load-settings_page_authorizer', array( $this, 'load_options_page' ) );
 			add_action( 'admin_head-index.php', array( $this, 'load_options_page' ) );
 
 			// Add custom css and js to wp-login.php
@@ -325,7 +325,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 						wp_mail(
 							$user_recipient->user_email,
 							'Action required: Pending user ' . $pending_user['email'] . ' at ' . get_bloginfo( 'name' ),
-							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . ".\n\n Please log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=cas_admission' )
+							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . ".\n\n Please log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=authorizer' )
 						);
 					}
 				}
@@ -414,7 +414,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			}
 
 			/**
-			 * Developers can use the `cas_admission_has_access` filter
+			 * Developers can use the `authorizer_has_access` filter
 			 * to override restricted access on certain pages. Note that the
 			 * restriction checks happens before WordPress executes any queries, so
 			 * use the global `$wp` variable to investigate what the visitor is
@@ -430,9 +430,9 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			 *       $has_access = true;
 			 *     return $has_access;
 			 *   }
-			 *   add_filter( 'cas_admission_has_access', 'my_rsa_feed_access_override' );
+			 *   add_filter( 'authorizer_has_access', 'my_rsa_feed_access_override' );
 			 */
-			if ( apply_filters( 'cas_admission_has_access', $has_access, $wp ) === true ) {
+			if ( apply_filters( 'authorizer_has_access', $has_access, $wp ) === true ) {
 				// Turn off the public notice about browsing anonymously
 				update_option( 'cas_settings_advanced_public_notice', false);
 
@@ -584,7 +584,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		 * @return array of links to show in the admin sidebar.
 		 */
 		public function plugin_settings_link( $links ) {
-			$settings_link = '<a href="options-general.php?page=cas_admission">Settings</a>';
+			$settings_link = '<a href="options-general.php?page=authorizer">Settings</a>';
 			array_unshift( $links, $settings_link );
 			return $links;
 		} // END plugin_settings_link()
@@ -598,10 +598,10 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 		public function add_plugin_page() {
 			// @see http://codex.wordpress.org/Function_Reference/add_options_page
 			add_options_page(
-				'CAS Admission', // Page title
-				'CAS Admission', // Menu title
+				'Authorizer', // Page title
+				'Authorizer', // Menu title
 				'manage_options', // Capability
-				'cas_admission', // Menu slug
+				'authorizer', // Menu slug
 				array( $this, 'create_admin_page' ) // function
 			);
 		}
@@ -615,7 +615,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			?>
 			<div class="wrap">
 				<?php screen_icon( 'users' ); ?>
-				<h2>CAS Admission Settings</h2>
+				<h2>Authorizer Settings</h2>
 				<form method="post" action="options.php" autocomplete="off">
 					<?php
 						// This prints out all hidden settings fields
@@ -623,7 +623,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 						settings_fields( 'cas_settings_group' );
 						// This prints out all the sections
 						// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
-						do_settings_sections( 'cas_admission' );
+						do_settings_sections( 'authorizer' );
 					?>
 					<?php submit_button(); ?>
 				</form>
@@ -635,11 +635,11 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 * Load external resources on this plugin's options page.
-		 * Run on action hook: load-settings_page_cas_admission
+		 * Run on action hook: load-settings_page_authorizer
 		 */
 		public function load_options_page() {
 			wp_enqueue_script(
-				'cas_admission',
+				'authorizer',
 				plugins_url( 'assets/js/cas-admission.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
@@ -681,7 +681,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 * Add notices to the top of the options page.
-		 * Run on action hook chain: load-settings_page_cas_admission > admin_notices
+		 * Run on action hook chain: load-settings_page_authorizer > admin_notices
 		 * Description: Check for invalid settings combinations and show a warning message, e.g.:
 		 *   if (cas url inaccessible) {
 		 *     print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
@@ -701,7 +701,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 
 		/**
 		 * Add help documentation to the options page.
-		 * Run on action hook chain: load-settings_page_cas_admission > admin_head
+		 * Run on action hook chain: load-settings_page_authorizer > admin_head
 		 */
 		public function admin_head() {
 			$screen = get_current_screen();
@@ -799,7 +799,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_tabs', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_tabs' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 
 			// Create Access Lists section
@@ -807,27 +807,27 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_lists', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_access_lists' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_access_users_pending', // HTML element ID
 				'Pending CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_pending' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_approved', // HTML element ID
 				'Approved CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_approved' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_users_blocked', // HTML element ID
 				'Blocked CAS Users', // HTML element Title
 				array( $this, 'print_combo_cas_access_users_blocked' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_lists' // Section this setting is shown on
 			);
 
@@ -836,27 +836,27 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_access' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_access_restriction', // HTML element ID
 				'Who can access the site?', // HTML element Title
 				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_role_receive_pending_emails', // HTML element ID
 				'Which role should receive email notifications about pending users?', // HTML element Title
 				array( $this, 'print_select_cas_access_role_receive_pending_emails' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_pending_redirect_to_message', // HTML element ID
 				'What message should pending users see after attempting to log in?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_pending_redirect_to_message' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access' // Section this setting is shown on
 			);
 
@@ -866,27 +866,27 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_access_public', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_access_public' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_access_redirect', // HTML element ID
 				'What happens to people without access when they visit a private page?', // HTML element Title
 				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_redirect_to_message', // HTML element ID
 				'What message should people without access see?', // HTML element Title
 				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_access_public_pages', // HTML element ID
 				'What pages (if any) should be available to everyone?', // HTML element Title
 				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_access_public' // Section this setting is shown on
 			);
 
@@ -895,34 +895,34 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_cas', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_cas' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_access_default_role', // HTML element ID
 				'Default role for new CAS users', // HTML element Title
 				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_cas_host', // HTML element ID
 				'CAS server hostname', // HTML element Title
 				array( $this, 'print_text_cas_host' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_cas_port', // HTML element ID
 				'CAS server port', // HTML element Title
 				array( $this, 'print_text_cas_port' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_cas' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_cas_path', // HTML element ID
 				'CAS server path/context', // HTML element Title
 				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_cas' // Section this setting is shown on
 			);
 
@@ -931,20 +931,20 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 				'cas_settings_advanced', // HTML element ID
 				'', // HTML element Title
 				array( $this, 'print_section_info_advanced' ), // Callback (echos section content)
-				'cas_admission' // Page this section is shown on (slug)
+				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
 				'cas_settings_advanced_lostpassword_url', // HTML element ID
 				'Custom lost password URL', // HTML element Title
 				array( $this, 'print_text_cas_advanced_lostpassword_url' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
 				'cas_settings_advanced_branding', // HTML element ID
 				'Custom WordPress login branding', // HTML element Title
 				array( $this, 'print_radio_cas_advanced_branding' ), // Callback (echos form element)
-				'cas_admission', // Page this setting is shown on (slug)
+				'authorizer', // Page this setting is shown on (slug)
 				'cas_settings_advanced' // Section this setting is shown on
 			);
 		}
@@ -1347,7 +1347,7 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			// Only users who can edit can see the admissions dashboard widget
 			if ( current_user_can( 'edit_post' ) ) {
 				// Add dashboard widget for adding/editing users with access
-				wp_add_dashboard_widget( 'cas_dashboard_widget', 'CAS Admission Settings', array( $this, 'add_cas_dashboard_widget' ) );
+				wp_add_dashboard_widget( 'cas_dashboard_widget', 'Authorizer Settings', array( $this, 'add_cas_dashboard_widget' ) );
 			}
 		}
 
@@ -1514,8 +1514,8 @@ if ( !class_exists( 'WP_Plugin_CAS_Admission' ) ) {
 			return $httpCode >= 200 && $httpCode < 400;
 		}
 
-	} // END class WP_Plugin_CAS_Admission
+	} // END class WP_Plugin_Authorizer
 }
 
 // Instantiate the plugin class.
-$wp_plugin_cas_admission = new WP_Plugin_CAS_Admission();
+$wp_plugin_authorizer = new WP_Plugin_Authorizer();
