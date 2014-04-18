@@ -1,10 +1,17 @@
 /* Restyle wp-login.php to reflect UH logins */
 
 /* Login Body */
-body.login { background: url('../images/texture-debut-light.jpg') #fbfbfb; }
+body.login {
+	background: url('../images/texture-debut-light.jpg') #fbfbfb;
+}
 
 /* Logo */
-body.login h1 a { background: url('../images/logo-uh-system.png') top center no-repeat; background-size: 277px 132px; height: 132px; }
+body.login h1 a {
+	background: url('../images/logo-uh-system.png') top center no-repeat;
+	background-size: 277px 132px;
+	height: 132px;
+	width: 277px;
+}
 
 /* Login Form */
 body.login #loginform {
