@@ -300,11 +300,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Authenticate as new user
 					$user = new WP_User( $result );
 				}
-			} else if ( $user && ( ! in_array( $cas_settings['access_default_role'], $user->roles ) && ! in_array( 'subscriber', $user->roles ) ) ) {
+			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
-				// list. If they are any access level above the default CAS access
-				// level (or the default subscriber role), let them in.
-
+				// list. If they are an administrator, let them in.
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
