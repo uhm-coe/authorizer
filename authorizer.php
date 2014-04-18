@@ -353,7 +353,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$cas_settings = get_option( 'cas_settings' );
 
 			// Set the CAS client configuration if it hasn't been set already.
-			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! array_key_exists( 'phpCAS', $_SESSION ) ) {
+			if ( ! array_key_exists( 'PHPCAS_CLIENT', $_GLOBALS ) && ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 				phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 			}
 
