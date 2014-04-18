@@ -401,15 +401,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			$is_restricted = !$has_access;
 
-			// Fringe case: User successfully logged in, but they aren't on the
-			// 'approved' whitelist. Flag these users, and redirect them to their
-			// profile page with a message (so we don't get into a redirect loop on
-			// the wp-login.php page).
-			if ( $this->is_user_logged_in_and_blog_user() && !$has_access && $cas_settings['access_restriction'] == 'approved_cas' ) {
-				$error = 'Sorry, it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				update_option( 'cas_settings_advanced_login_error', $error );
-				wp_logout();
-				wp_redirect( wp_login_url(), 302 );
+			// Fringe case: In a multisite, a user of a different blog can
+			// successfully log in, but they aren't on the 'approved' whitelist
+			// for this blog. Flag these users, and redirect them to their
+			// profile page with a message (so we don't get into a redirect
+			// loop on the wp-login.php page).
+			if ( function_exists( 'is_multisite' ) && is_multisite() && is_user_logged_in() && !$has_access ) {
+				wp_redirect( admin_url( 'profile.php' ), 302 );
 				exit;
 			}
 
