@@ -134,7 +134,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			global $wpdb;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
-			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+			if ( is_multisite() ) {
 				if ( isset($_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
 					$old_blog = $wpdb->blogid;
 					// Get all blog ids
@@ -264,7 +264,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// multisite environment, just remove them from the current blog.
 				// IMPORTANT NOTE: this deletes all of the user's posts.
 				if ( $user ) {
-					if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+					if ( is_multisite() ) {
 						remove_user_from_blog( $user->ID, get_current_blog_id() );
 					} else {
 						wp_delete_user( $user->ID );
@@ -404,7 +404,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// for this blog. Flag these users, and redirect them to their
 			// profile page with a message (so we don't get into a redirect
 			// loop on the wp-login.php page).
-			if ( function_exists( 'is_multisite' ) && is_multisite() && is_user_logged_in() && !$has_access ) {
+			if ( is_multisite() && is_user_logged_in() && !$has_access ) {
 				wp_redirect( admin_url( 'profile.php' ), 302 );
 				exit;
 			}
@@ -1443,7 +1443,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function is_user_logged_in_and_blog_user() {
 			$is_user_logged_in_and_blog_user = false;
-			if ( function_exists( 'is_multisite' ) && is_multisite() ) {
+			if ( is_multisite() ) {
 				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_user_member_of_blog( get_current_user_id() );
 			} else {
 				$is_user_logged_in_and_blog_user = is_user_logged_in();
