@@ -1363,7 +1363,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<div class="inside">
 				<form method="post" id="cas_settings_access_form" action="">
 					<p><?php $this->print_section_info_access(); ?></p>
-					<div>
+					<div style="display: none;">
 						<h2>Who can access the site?</h2>
 						<?php $this->print_radio_cas_access_restriction(); ?>
 					</div>
