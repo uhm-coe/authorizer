@@ -82,8 +82,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// If we have a custom login error, add the filter to show it.
+			// Caveat: Don't show the error on the admin bypass login.
 			$error = get_option( 'cas_settings_advanced_login_error' );
-			if ( $error && strlen( $error ) > 0 ) {
+			$is_admin_bypass = ! empty($_GET['cas'] ) && ( $_GET['cas'] === 'no' || $_GET['cas'] === 'false' );
+			if ( $error && strlen( $error ) > 0 && ! $is_admin_bypass ) {
 				add_filter( 'login_errors', array( $this, 'show_advanced_login_error' ) );
 			}
 
@@ -364,6 +366,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
 				phpCAS::client( CAS_VERSION_2_0, $cas_settings['cas_host'], intval($cas_settings['cas_port']), $cas_settings['cas_path'] );
 			}
+
+			// Reset option containing old error messages.
+			update_option( 'cas_settings_advanced_login_error', $error_message );
 
 			// Log out of CAS.
 			phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
