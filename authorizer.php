@@ -558,7 +558,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function cas_public_scripts() {
 			// Load (and localize) public scripts
-			wp_enqueue_script( 'cas_public_scripts', plugins_url( '/assets/js/cas-admission-public.js', __FILE__ ) );
+			wp_enqueue_script( 'cas_public_scripts', plugins_url( '/assets/js/authorizer-public.js', __FILE__ ) );
 			$cas_localized = array(
 				'wp_login_url' => wp_login_url(),
 				'public_warning' => get_option( 'cas_settings_advanced_public_notice' )
@@ -567,8 +567,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			//update_option( 'cas_settings_advanced_public_notice', false);
 
 			// Load public css
-			wp_register_style( 'cas-admission-public-css', plugins_url( 'assets/css/cas-admission-public.css', __FILE__ ) );
-			wp_enqueue_style( 'cas-admission-public-css' );
+			wp_register_style( 'authorizer-public-css', plugins_url( 'assets/css/authorizer-public.css', __FILE__ ) );
+			wp_enqueue_style( 'authorizer-public-css' );
 		}
 
 
@@ -656,8 +656,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'cas-admission-css', plugins_url( 'assets/css/cas-admission.css', __FILE__ ) );
-			wp_enqueue_style( 'cas-admission-css' );
+			wp_register_style( 'authorizer-css', plugins_url( 'assets/css/authorizer.css', __FILE__ ) );
+			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'assets/inc/jquery.multi-select/css/multi-select.css', __FILE__ ) );
 			wp_enqueue_style( 'jquery-multi-select-css' );
@@ -677,8 +677,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( $cas_settings['advanced_branding'] === 'custom_uh' ):
 				?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/cas-admission-login.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/cas-admission-login.js', __FILE__ ); ?>"></script>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
 				<?php
 			endif;
 		}
