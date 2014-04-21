@@ -250,10 +250,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check if the CAS user has a WordPress account (with the same username or email address)
 			if ( ! $user ) {
-				$user = get_user_by( 'login', phpCAS::getUser() );
+				$user = get_user_by( 'login', strtolower( phpCAS::getUser() ) );
 			}
 			if ( ! $user ) {
-				$user = get_user_by( 'email', phpCAS::getUser() . '@' . $tld );
+				$user = get_user_by( 'email', strtolower( phpCAS::getUser() . '@' . $tld ) );
 			}
 
 			// If we've made it this far, we have a CAS authenticated user. Deal with
@@ -272,7 +272,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Notify user about blocked status
-				$error_message = 'Sorry ' . phpCAS::getUser() . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				$error_message = 'Sorry ' . strtolower( phpCAS::getUser() ) . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">OK</a></p>';
 				update_option( 'cas_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
@@ -282,11 +282,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! $user ) {
 					$result = wp_insert_user(
 						array(
-							'user_login' => phpCAS::getUser(),
+							'user_login' => strtolower( phpCAS::getUser() ),
 							'user_pass' => wp_generate_password(), // random password
 							'first_name' => '',
 							'last_name' => '',
-							'user_email' => phpCAS::getUser() . '@' . $tld,
+							'user_email' => strtolower( phpCAS::getUser() . '@' . $tld ),
 							'user_registered' => date( 'Y-m-d H:i:s' ),
 							'role' => $cas_settings['access_default_role'],
 						)
@@ -318,8 +318,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Add them to the pending list and notify them and their instructor.
 				if ( ! $this->is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
 					$pending_user = array();
-					$pending_user['username'] = phpCAS::getUser();
-					$pending_user['email'] = phpCAS::getUser() . '@' . $tld;
+					$pending_user['username'] = strtolower( phpCAS::getUser() );
+					$pending_user['email'] = strtolower( phpCAS::getUser() . '@' . $tld );
 					$pending_user['role'] = $cas_settings['access_default_role'];
 					$pending_user['date_added'] = '';
 					if ( ! is_array ( $cas_settings['access_users_pending'] ) ) {
@@ -1489,11 +1489,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Helper function to search a multidimensional array for a value.
 		 */
-		function in_multi_array( $needle = '', $haystack = array(), $strict = false ) {
-			if ( ! is_array( $haystack ) )
+		function in_multi_array( $needle = '', $haystack = array(), $strict = false, $case_sensitive = false ) {
+			if ( ! is_array( $haystack ) ) {
 				return false;
+			}
+			if ( ! $case_sensitive ) {
+				$needle = strtolower( $needle );
+			}
 			foreach ( $haystack as $item ) {
-				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict ) ) ) {
+				if ( ! $case_sensitive && ! is_array( $item ) ) {
+					$item = strtolower( $item );
+				}
+				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict, $case_sensitive ) ) ) {
 					return true;
 				}
 			}
