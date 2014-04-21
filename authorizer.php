@@ -1386,7 +1386,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<span class="spinner"></span>
 						</span>
 						<?php wp_nonce_field( 'save_cas_settings_access', 'nonce_save_cas_settings_access' ); ?>
-						<input type="hidden" id="cas_settings_sakai_base_url" name="cas_settings[sakai_base_url]" value="<?php print $cas_settings['sakai_base_url']; ?>" />
+						<input type="hidden" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?php print $cas_settings['cas_host']; ?>" />
 					</p>
 					<br class="clear" />
 				</form>
