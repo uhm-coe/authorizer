@@ -300,6 +300,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Authenticate as new user
 					$user = new WP_User( $result );
 				}
+
+				// If this is multisite, add new user to current blog.
+				if ( is_multisite() && ! is_user_member_of_blog( $user->ID ) ) {
+					$result = add_user_to_blog( get_current_blog_id(), $user->ID, $cas_settings['access_default_role'] );
+
+					// Fail with message if error.
+					if ( is_wp_error( $result ) ) {
+						return $result;
+					}
+				}
 			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
 				// list. If they are an administrator, let them in.
