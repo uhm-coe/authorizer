@@ -1014,8 +1014,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$editable_roles = apply_filters( 'editable_roles', $all_roles );
 				if ( array_key_exists( 'student', $editable_roles ) ) {
 					$cas_settings['access_default_role'] = 'student';
-				} else if ( array_key_exists( 'subscriber', $editable_roles ) ) {
-					$cas_settings['access_default_role'] = 'subscriber';
 				} else {
 					$cas_settings['access_default_role'] = 'subscriber';
 				}
@@ -1121,7 +1119,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<input type="text" name="cas_settings[access_users_pending][<?= $key; ?>][username]" value="<?= $pending_user['username'] ?>" readonly="true" class="cas-username" />
 							<input type="text" id="cas_settings_access_users_pending_<?= $key; ?>" name="cas_settings[access_users_pending][<?= $key; ?>][email]" value="<?= $pending_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_pending][<?= $key; ?>][role]" class="cas-role">
-								<option value="<?= $pending_user['role']; ?>" selected="selected"><?= ucfirst( $pending_user['role'] ); ?></option>
+								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
 							<input type="button" class="button-primary" id="approve_user_<?= $key; ?>" onclick="cas_add_user(this, 'approved'); cas_ignore_user(this, 'pending');" value="Approve" />
 							<input type="button" class="button-primary" id="block_user_<?= $key; ?>" onclick="cas_add_user(this, 'blocked'); cas_ignore_user(this, 'pending');" value="Block" />
@@ -1154,7 +1152,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="cas-username" />
 							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_approved][<?= $key; ?>][role]" class="cas-role">
-								<option value="<?= $approved_user['role']; ?>" selected="selected"><?= ucfirst( $approved_user['role'] ); ?></option>
+								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="&times;" />
@@ -1166,7 +1164,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" class="cas-username" />
 				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="cas-email" />
 				<select name="new_approved_user_role" id="new_approved_user_role" class="cas-role">
-					<option value="<?= $cas_settings['access_default_role']; ?>"><?= ucfirst( $cas_settings['access_default_role'] ); ?></option>
+					<?php $this->wp_dropdown_permitted_roles( $cas_settings['access_default_role'] ); ?>
 				</select>
 				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_add_user(this, 'approved');" value="Approve" /><br />
 			</div>
@@ -1192,7 +1190,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][username]" value="<?= $blocked_user['username'] ?>" readonly="true" class="cas-username" />
 							<input type="text" id="cas_settings_access_users_blocked_<?= $key; ?>" name="cas_settings[access_users_blocked][<?= $key; ?>][email]" value="<?= $blocked_user['email']; ?>" readonly="true" class="cas-email" />
 							<select name="cas_settings[access_users_blocked][<?= $key; ?>][role]" class="cas-role">
-								<option value="<?= $blocked_user['role']; ?>" selected="selected"><?= ucfirst( $blocked_user['role'] ); ?></option>
+								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 							</select>
 							<input type="text" name="cas_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="&times;" />
@@ -1532,6 +1530,34 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Return true if the document has loaded successfully without any redirection or error
 			return $httpCode >= 200 && $httpCode < 400;
+		}
+
+		// Helper function that builds option tags for a select element for all
+		// roles the current user has permission to assign.
+		function wp_dropdown_permitted_roles( $selected_role = 'subscriber' ) {
+			$roles = get_editable_roles();
+			$current_user = wp_get_current_user();
+			$next_level = 'level_' . ($current_user->user_level + 1);
+
+			// Remove unpermitted roles from the roles array.
+			foreach ($roles as $name => $role) {
+				if ( isset( $role['capabilities'][$next_level] ) ) {
+					unset( $roles[$name] );
+				}
+			}
+
+			// If the specified $selected_role is not permitted, the select
+			// element will be readonly/disabled.
+			if ( ! array_key_exists( $selected_role, $roles ) ) {
+				?><option value="<?php print $selected_role; ?>" disabled="disabled"><?php print ucfirst( $selected_role ); ?></option><?php
+				return;
+			}
+
+			// Print an option element for each permitted role.
+			foreach ($roles as $name => $role) {
+				$selected = $selected_role == $name ? ' selected="selected"' : '';
+				?><option value="<?php print $name; ?>"<?php print $selected; ?>><?php print $role['name']; ?></option><?php
+			}
 		}
 
 	} // END class WP_Plugin_Authorizer
