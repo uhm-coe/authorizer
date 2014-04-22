@@ -654,6 +654,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				plugins_url( 'assets/js/cas-admission.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
+			$js_cas_config = array( 'baseurl' => get_bloginfo( 'url' ) );
+			wp_localize_script( 'cas_admission', 'cas_config',  $js_cas_config );
 
 			wp_enqueue_script(
 				'jquery.multi-select',

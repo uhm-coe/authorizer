@@ -32,27 +32,33 @@ function cas_add_user(caller, list) {
     return false;
 
   jQuery(caller).attr('disabled', 'disabled');
-  jQuery(caller).append('<img src="/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
+  jQuery(caller).after('<img src="' + cas_config.baseurl + '/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_users_' + list + ' input.cas-username').each(function() {
-    if (this.value == username.val()) {
-      jQuery(this).parent().effect('shake',shake_speed);
-      jQuery(caller).removeAttr('disabled');
-      jQuery('#cas_loading').remove();
-      validated = false;
-    }
-  });
+  if (validated) {
+    jQuery('#list_cas_settings_access_users_' + list + ' input.cas-username').each(function() {
+      if (this.value == username.val()) {
+        validated = false;
+        jQuery(this).parent().effect('shake', shake_speed);
+        jQuery(caller).removeAttr('disabled');
+        jQuery('#cas_loading').remove();
+        return false;
+      }
+    });
+  }
 
-  // Check if the course being added already exists in the list.
-  jQuery('#list_cas_settings_access_users_' + list + ' input.cas-email').each(function() {
-    if (this.value == email.val()) {
-      jQuery(this).parent().effect('shake',shake_speed);
-      jQuery(caller).removeAttr('disabled');
-      jQuery('#cas_loading').remove();
-      validated = false;
-    }
-  });
+  // Check if the name being added already exists in the list.
+  if (validated) {
+    jQuery('#list_cas_settings_access_users_' + list + ' input.cas-email').each(function() {
+      if (this.value == email.val()) {
+        validated = false;
+        jQuery(this).parent().effect('shake', shake_speed);
+        jQuery(caller).removeAttr('disabled');
+        jQuery('#cas_loading').remove();
+        return false;
+      }
+    });
+  }
 
   if (validated) {
     // Add the new item.
