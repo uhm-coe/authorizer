@@ -54,11 +54,13 @@ body.settings_page_cas_admission .ms-container ul.ms-list {
 
 #list_cas_settings_access_users_blocked .cas-username,
 #list_cas_settings_access_users_blocked .cas-email,
-#list_cas_settings_access_users_blocked .cas-role,
 #list_cas_settings_access_users_blocked .cas-date-added,
 #new_cas_settings_access_users_blocked .cas-username,
-#new_cas_settings_access_users_blocked .cas-email,
-#new_cas_settings_access_users_blocked .cas-role {
+#new_cas_settings_access_users_blocked .cas-email {
 	border-color: #AA7966;
 	background-color: #ECC8C1;
+}
+#list_cas_settings_access_users_blocked .cas-role,
+#new_cas_settings_access_users_blocked .cas-role {
+	display: none;
 }
