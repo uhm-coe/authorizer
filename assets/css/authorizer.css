@@ -26,6 +26,10 @@ body.settings_page_cas_admission .ms-container ul.ms-list {
 	min-width: 460px;
 }
 
+#cas_dashboard_widget input, #cas_dashboard_widget select {
+	font-size: 90%;
+}
+
 #cas_dashboard_widget input[type="radio"] {
 	margin: 0 0 6px;
 }
