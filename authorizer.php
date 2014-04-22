@@ -312,6 +312,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						return $result;
 					}
 				}
+
+				// Ensure user has the same role as their entry in the approved list.
+				// (This is just a precaution, the role should already be set when
+				// saving admin options in the sanitizing function.)
+				$user_info = $this->get_user_info_from_list( $user->user_login, $cas_settings['access_users_approved'] );
+				if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
+					$user->set_role( $user_info['role'] );
+				}
+
 			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
 				// list. If they are an administrator, let them in.
@@ -1054,6 +1063,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$cas_settings['access_users_approved'] = array();
 			}
 
+			// Make sure the WordPress user accounts for people in the approved
+			// list have the same role as what's chosen in the approved list.
+			foreach( $cas_settings['access_users_approved'] as $user_info ) {
+				$wp_user = get_user_by( 'email', $user_info['email'] );
+				if ( $wp_user && ! array_key_exists( $user_info['role'], $wp_user->roles ) ) {
+					$wp_user->set_role( $user_info['role'] );
+				}
+			}
+
 			// If the blocked user list isn't a list, make it.
 			if ( ! is_array( $cas_settings['access_users_blocked'] ) ) {
 				$cas_settings['access_users_blocked'] = array();
@@ -1558,6 +1576,19 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
 				?><option value="<?php print $name; ?>"<?php print $selected; ?>><?php print $role['name']; ?></option><?php
 			}
+		}
+
+		// Helper function to get a single user info array from one of the
+		// access control lists (pending, approved, or blocked).
+		// Returns: false if not found; otherwise
+		// 	array( 'username' => '', 'email' => '', 'role' => '', 'date_added' => '');
+		function get_user_info_from_list( $username, $list ) {
+			foreach ( $list as $user_info ) {
+				if ( $user_info['username'] === $username ) {
+					return $user_info;
+				}
+			}
+			return false;
 		}
 
 	} // END class WP_Plugin_Authorizer
