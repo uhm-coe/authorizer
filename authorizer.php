@@ -1356,7 +1356,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function add_dashboard_widgets() {
 			// Only users who can edit can see the admissions dashboard widget
-			if ( current_user_can( 'edit_post' ) ) {
+			if ( current_user_can( 'edit_posts' ) ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'cas_dashboard_widget', 'Authorizer Settings', array( $this, 'add_cas_dashboard_widget' ) );
 			}
@@ -1423,7 +1423,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$cas_settings['access_users_blocked'] = $_POST['access_users_blocked'];
 
 			// Only users who can edit can see the Sakai dashboard widget
-			if ( current_user_can( 'edit_post' ) ) {
+			if ( current_user_can( 'edit_posts' ) ) {
 				update_option( 'cas_settings', $cas_settings );
 			}
 		}
