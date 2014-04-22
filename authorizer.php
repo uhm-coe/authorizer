@@ -280,17 +280,19 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
 			} else if ( $this->is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
+				$user_info = $this->get_user_info_from_list( phpCAS::getUser(), $cas_settings['access_users_approved'] );
+
 				// If the approved CAS user does not have a WordPress account, create it
 				if ( ! $user ) {
 					$result = wp_insert_user(
 						array(
-							'user_login' => strtolower( phpCAS::getUser() ),
+							'user_login' => strtolower( $user_info['username'] ),
 							'user_pass' => wp_generate_password(), // random password
 							'first_name' => '',
 							'last_name' => '',
-							'user_email' => strtolower( phpCAS::getUser() . '@' . $tld ),
+							'user_email' => strtolower( $user_info['email'] ),
 							'user_registered' => date( 'Y-m-d H:i:s' ),
-							'role' => $cas_settings['access_default_role'],
+							'role' => $user_info['role'],
 						)
 					);
 
@@ -305,7 +307,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// If this is multisite, add new user to current blog.
 				if ( is_multisite() && ! is_user_member_of_blog( $user->ID ) ) {
-					$result = add_user_to_blog( get_current_blog_id(), $user->ID, $cas_settings['access_default_role'] );
+					$result = add_user_to_blog( get_current_blog_id(), $user->ID, $user_info['role'] );
 
 					// Fail with message if error.
 					if ( is_wp_error( $result ) ) {
@@ -316,7 +318,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Ensure user has the same role as their entry in the approved list.
 				// (This is just a precaution, the role should already be set when
 				// saving admin options in the sanitizing function.)
-				$user_info = $this->get_user_info_from_list( $user->user_login, $cas_settings['access_users_approved'] );
 				if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
 					$user->set_role( $user_info['role'] );
 				}
