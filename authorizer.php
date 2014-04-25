@@ -635,7 +635,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function create_admin_page() {
 			?>
 			<div class="wrap">
-				<?php screen_icon( 'users' ); ?>
 				<h2>Authorizer Settings</h2>
 				<form method="post" action="options.php" autocomplete="off">
 					<?php
