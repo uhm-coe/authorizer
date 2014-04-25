@@ -1169,7 +1169,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<li>
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="cas-username" />
 							<input type="text" id="cas_settings_access_users_approved_<?= $key; ?>" name="cas_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="cas-email" />
-							<select name="cas_settings[access_users_approved][<?= $key; ?>][role]" class="cas-role">
+							<select name="cas_settings[access_users_approved][<?= $key; ?>][role]" class="cas-role" onchange="save_cas_settings_access(this);">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="cas_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
@@ -1386,6 +1386,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div class="inside">
 				<form method="post" id="cas_settings_access_form" action="">
+					<input type="hidden" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?php print $cas_settings['cas_host']; ?>" />
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
 						<h2>Who can access the site?</h2>
@@ -1403,13 +1404,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<h2>Blocked Users</h2>
 						<?php $this->print_combo_cas_access_users_blocked(); ?>
 					</div>
-					<br class="clear" />
-					<p class="submit">
-						<span class="save-action">
-							<input type="button" name="button_save_cas_settings_access" id="button_save_cas_settings_access" class="button-primary" value="Save" onclick="save_cas_settings_access(this);" style="float: right;" />
-						</span>
-						<input type="hidden" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?php print $cas_settings['cas_host']; ?>" />
-					</p>
 					<br class="clear" />
 				</form>
 			</div>

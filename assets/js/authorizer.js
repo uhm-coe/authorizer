@@ -32,7 +32,6 @@ function cas_add_user(caller, list) {
     return false;
 
   jQuery(caller).attr('disabled', 'disabled');
-  jQuery(caller).after('<img src="' + cas_config.baseurl + '/wp-admin/images/loading.gif" style="vertical-align: middle; padding-left: 4px;" id="cas_loading" />');
 
   // Check if the course being added already exists in the list.
   if (validated) {
@@ -41,7 +40,6 @@ function cas_add_user(caller, list) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
         jQuery(caller).removeAttr('disabled');
-        jQuery('#cas_loading').remove();
         return false;
       }
     });
@@ -54,7 +52,6 @@ function cas_add_user(caller, list) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
         jQuery(caller).removeAttr('disabled');
-        jQuery('#cas_loading').remove();
         return false;
       }
     });
@@ -63,16 +60,21 @@ function cas_add_user(caller, list) {
   if (validated) {
     // Add the new item.
     jQuery(' \
-      <li style="display: none;"> \
+      <li id="new_user_' + nextId + '" style="display: none;"> \
         <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="cas-username" /> \
         <input type="text" id="cas_settings_access_users_' + list + '_' + nextId + '" name="cas_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="cas-email" /> \
-        <select name="cas_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role"> \
-          <option value="' + role.val() + '" selected="selected">' + role.val().charAt(0).toUpperCase() + role.val().slice(1) + '</option> \
+        <select name="cas_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role" onchange="save_cas_settings_access(this);"> \
         </select> \
         <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
-        <input type="button" class="button" onclick="cas_ignore_user(this);" value="x" /> \
+        <input type="button" class="button" onclick="cas_ignore_user(this);" value="&times;" /> \
+        <span class="spinner"></span> \
       </li> \
     ').appendTo('#list_cas_settings_access_users_' + list + '').slideDown(250);
+
+    // Populate the role dropdown in the new element. Because clone() doesn't
+    // save selected state on select elements, set that too.
+    jQuery('option', role).clone().appendTo('#new_user_' + nextId + ' .cas-role');
+    jQuery('#new_user_' + nextId + ' .cas-role').val(role.val());
 
     // Remove the 'empty list' item if it exists.
     jQuery('#list_cas_settings_access_users_' + list + ' li.cas-empty').remove();
@@ -81,7 +83,9 @@ function cas_add_user(caller, list) {
     username.val('');
     email.val('');
     jQuery(caller).removeAttr('disabled');
-    jQuery('#cas_loading').remove();
+
+    // Update the options in the database with this change.
+    save_cas_settings_access(caller);
 
     return true;
   }
@@ -96,22 +100,22 @@ function cas_ignore_user(caller, listName) {
     jQuery(list).append('<li class="cas-empty"><em>No ' + listName + ' users</em></li>');
   }
 
-  // If we're removing this user from the approved list, remove the WordPress user if it exists.
-  if (listName === 'approved') {
-    $.postajax
-  }
+  jQuery(caller).parent().slideUp(250,function() {
+    // Remove the list item.
+    jQuery(this).remove();
 
-  // Remove the list item.
-  jQuery(caller).parent().slideUp(250,function(){ jQuery(this).remove(); });
+    // Update the options in the database with this change.
+    save_cas_settings_access(caller);
+  });
 }
 
 
 
 // Save options from dashboard widget.
 function save_cas_settings_access(caller) {
+  jQuery(caller).attr('disabled', 'disabled');
   jQuery(caller).after('<span class="spinner"></span>');
   jQuery('form .spinner').show();
-  jQuery(caller).attr('disabled', 'disabled');
 
   var access_restriction = jQuery('form input[name="cas_settings[access_restriction]"]:checked').val();
 

@@ -10,6 +10,13 @@ body.settings_page_cas_admission .ms-container ul.ms-list {
 	width: 240px;
 }
 
+body.settings_page_cas_admission .spinner {
+	display: inline-block;
+	float: none;
+	vertical-align: text-bottom;
+	margin: 0 5px;
+}
+
 .cas-username {
 	width: 75px;
 }
