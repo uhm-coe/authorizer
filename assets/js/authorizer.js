@@ -96,6 +96,11 @@ function cas_ignore_user(caller, listName) {
     jQuery(list).append('<li class="cas-empty"><em>No ' + listName + ' users</em></li>');
   }
 
+  // If we're removing this user from the approved list, remove the WordPress user if it exists.
+  if (listName === 'approved') {
+    $.postajax
+  }
+
   // Remove the list item.
   jQuery(caller).parent().slideUp(250,function(){ jQuery(this).remove(); });
 }
@@ -104,10 +109,11 @@ function cas_ignore_user(caller, listName) {
 
 // Save options from dashboard widget.
 function save_cas_settings_access(caller) {
-  jQuery('#cas_settings_access_form .spinner').show();
+  jQuery(caller).after('<span class="spinner"></span>');
+  jQuery('form .spinner').show();
   jQuery(caller).attr('disabled', 'disabled');
 
-  var access_restriction = jQuery('#cas_settings_access_form input[name="cas_settings[access_restriction]"]:checked').val();
+  var access_restriction = jQuery('form input[name="cas_settings[access_restriction]"]:checked').val();
 
   var access_users_pending = new Object();
   jQuery('#list_cas_settings_access_users_pending li').each(function(index) {
@@ -148,11 +154,11 @@ function save_cas_settings_access(caller) {
     'access_users_blocked': access_users_blocked,
     'nonce_save_cas_settings_access': nonce_save_cas_settings_access,
   }, function(response) {
-    jQuery('#cas_settings_access_form .spinner').hide();
+    jQuery('form .spinner').hide();
     jQuery(caller).removeAttr('disabled');
-    if (response==0) { // failed checking course
+    if (response==0) { // failed
       return false;
-    } else { // succeeded checking course
+    } else { // succeeded
       return true;
     }
   });

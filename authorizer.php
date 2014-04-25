@@ -1255,6 +1255,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_section_info_access() {
 			?><div id="section_info_access" class="section_info">
+				<?php wp_nonce_field( 'save_cas_settings_access', 'nonce_save_cas_settings_access' ); ?>
 				<p>Choose how you want to restrict access to this site below.</p>
 			</div><?php
 		}
@@ -1406,9 +1407,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<p class="submit">
 						<span class="save-action">
 							<input type="button" name="button_save_cas_settings_access" id="button_save_cas_settings_access" class="button-primary" value="Save" onclick="save_cas_settings_access(this);" style="float: right;" />
-							<span class="spinner"></span>
 						</span>
-						<?php wp_nonce_field( 'save_cas_settings_access', 'nonce_save_cas_settings_access' ); ?>
 						<input type="hidden" id="cas_settings_cas_host" name="cas_settings[cas_host]" value="<?php print $cas_settings['cas_host']; ?>" />
 					</p>
 					<br class="clear" />
