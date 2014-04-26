@@ -84,7 +84,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we have a custom login error, add the filter to show it.
 			// Caveat: Don't show the error on the admin bypass login.
 			$error = get_option( 'auth_settings_advanced_login_error' );
-			$is_admin_bypass = ! empty($_GET['cas'] ) && ( $_GET['cas'] === 'no' || $_GET['cas'] === 'false' );
+			$is_admin_bypass = ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress';
 			if ( $error && strlen( $error ) > 0 && ! $is_admin_bypass ) {
 				add_filter( 'login_errors', array( $this, 'show_advanced_login_error' ) );
 			}
@@ -209,17 +209,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Admin bypass: skip cas login and proceed to WordPress login if
-			// querystring variable 'cas' is set to 'no' or 'false'--for example:
-			// https://www.example.com/wp-login.php?cas=no
-			if ( ! empty($_GET['cas'] ) && ( $_GET['cas'] === 'no' || $_GET['cas'] === 'false' ) ) {
+			// querystring variable 'login' is set to 'wordpress'--for example:
+			// https://www.example.com/wp-login.php?login=wordpress
+			if ( ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress' ) {
 				remove_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
-				return new WP_Error( 'no_cas', 'Bypassing CAS authentication in favor of WordPress authentication...' );
+				return new WP_Error( 'using_wp_authentication', 'Bypassing external authentication in favor of WordPress authentication...' );
 			}
 
 			// Admin bypass: if we have populated username/password data,
 			// and the page we're coming from is the admin bypass, let
 			// WordPress handle the authentication (by passing on null).
-			if ( ! empty( $username ) && ! empty( $password ) && ( strpos( $_SERVER['HTTP_REFERER'], 'cas=no' ) !== false || strpos( $_SERVER['HTTP_REFERER'], 'cas=false' ) !== false ) ) {
+			if ( ! empty( $username ) && ! empty( $password ) && strpos( $_SERVER['HTTP_REFERER'], 'login=wordpress' ) !== false ) {
 				return null;
 			}
 
@@ -230,7 +230,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// access at all, don't check against CAS; instead, pass through to
 			// default WP authentication.
 			if ( $auth_settings['access_restriction'] === 'user' || $auth_settings['access_restriction'] === 'everyone' ) {
-				return new WP_Error( 'no_cas', 'Moving on to WordPress authentication...' );
+				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 			}
 
 			// Set the CAS client configuration
@@ -1230,9 +1230,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_section_info_cas() {
 			?><div id="section_info_cas" class="section_info">
-				<p><span class="red">Important Note</span>: If you're configuring CAS for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure CAS works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test CAS logins, and leave your adminstrator account logged in here.</p>
-				<p>As a safeguard, you can always access the default WordPress login panel (and bypass CAS) by visiting wp-login.php?cas=no like so:<br />
-					<a href="<?php print wp_login_url() . '?cas=no'; ?>"><?php print wp_login_url() . '?cas=no'; ?></a></p>
+				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
+				<p>As a safeguard, you can always access the default WordPress login panel (and bypass any external authentication system) by visiting wp-login.php?login=wordpress like so:<br />
+					<a href="<?php print wp_login_url() . '?login=wordpress'; ?>"><?php print wp_login_url() . '?login=wordpress'; ?></a></p>
 				<p>Enter your CAS server settings below.</p>
 			</div><?php
 		}
