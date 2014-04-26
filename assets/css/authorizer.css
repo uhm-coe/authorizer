@@ -1,16 +1,16 @@
-body.settings_page_cas_admission .ms-list li {
+body.settings_page_authorizer .ms-list li {
 	margin-bottom: 0;
 }
 
-body.settings_page_cas_admission .ms-container {
+body.settings_page_authorizer .ms-container {
 	background-position-x: 250px;
 }
 
-body.settings_page_cas_admission .ms-container ul.ms-list {
+body.settings_page_authorizer .ms-container ul.ms-list {
 	width: 240px;
 }
 
-body.settings_page_cas_admission .spinner {
+body.settings_page_authorizer .spinner {
 	display: inline-block;
 	float: none;
 	vertical-align: text-bottom;
