@@ -19,8 +19,8 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* provides the following options:
 
-* **Authentication**: Local (no CAS); Local first, then CAS; CAS-only (except for admins)
-* **Access**: Everyone (all have access); University members (all local and all CAS); Specific users (all local and specific CAS)
+* **Authentication**: Local (no external service); Local first, then external; external-only (except for admins)
+* **Access**: Everyone (all have access); University members (all local and all external); Specific users (all local and approved external)
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
 
 == Installation ==
