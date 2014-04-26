@@ -396,7 +396,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Restrict access to WordPress site based on settings (everyone, university, approved_cas, user).
+		 * Restrict access to WordPress site based on settings (everyone, university, approved_users, user).
 		 * Hook: parse_request http://codex.wordpress.org/Plugin_API/Action_Reference/parse_request
 		 *
 		 * @param array $wp WordPress object.
@@ -419,8 +419,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( $auth_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
 				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow CAS log in elsewhere)
 				( $auth_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to approved CAS users and logged in users if option is set to 'approved_cas'
-				( $auth_settings['access_restriction'] == 'approved_cas' && $this->is_user_logged_in_and_blog_user() )
+				// Allow access to approved CAS users and logged in users if option is set to 'approved_users'
+				( $auth_settings['access_restriction'] == 'approved_users' && $this->is_user_logged_in_and_blog_user() )
 			);
 			$is_restricted = !$has_access;
 
@@ -1078,7 +1078,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Default to "Everyone" access restriction.
-			if ( ! in_array( $auth_settings['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
+			if ( ! in_array( $auth_settings['access_restriction'], array( 'everyone', 'university', 'approved_users', 'user' ) ) ) {
 				$auth_settings['access_restriction'] = 'everyone';
 			}
 
@@ -1271,7 +1271,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 				<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_approved_cas" name="auth_settings[access_restriction]" value="approved_cas"<?php checked( 'approved_cas' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved CAS and all WordPress users)<br />
+				<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved CAS and all WordPress users)<br />
 				<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 
@@ -1422,7 +1422,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// If invalid input, set access restriction to only WP users.
-			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_cas', 'user' ) ) ) {
+			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_users', 'user' ) ) ) {
 				$_POST['access_restriction'] = 'user';
 			}
 

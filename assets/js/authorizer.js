@@ -270,7 +270,7 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', auth_settings_access_redirect_to_message).hide();
   }
 
-  if (!$('#radio_auth_settings_access_restriction_approved_cas').is(':checked')) {
+  if (!$('#radio_auth_settings_access_restriction_approved_users').is(':checked')) {
     $('div.animated_wrapper', auth_settings_access_users_pending).hide();
     $('div.animated_wrapper', auth_settings_access_users_approved).hide();
     $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
@@ -306,7 +306,7 @@ jQuery(document).ready(function($){
     }
   
     // Hide user whitelist unless "Only specific students below" is checked
-    if (!$('#radio_auth_settings_access_restriction_approved_cas').is(':checked')) {
+    if (!$('#radio_auth_settings_access_restriction_approved_users').is(':checked')) {
       $('div.animated_wrapper', auth_settings_access_users_pending).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_users_approved).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_users_blocked).slideUp(animation_speed);
