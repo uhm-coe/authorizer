@@ -578,7 +578,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'wp_login_url' => wp_login_url(),
 				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
 			);
-			wp_localize_script( 'auth_public_scripts', 'cas', $auth_localized );
+			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 			//update_option( 'auth_settings_advanced_public_notice', false);
 
 			// Load public css
