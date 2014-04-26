@@ -151,7 +151,7 @@ function save_auth_settings_access(caller) {
   var nonce_save_auth_settings_access = jQuery('#nonce_save_auth_settings_access').val();
 
   jQuery.post(ajaxurl, {
-    action: 'save_cas_dashboard_widget',
+    action: 'save_auth_dashboard_widget',
     'access_restriction': access_restriction,
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
@@ -251,7 +251,7 @@ jQuery(document).ready(function($){
 
   // If we're viewing the dashboard widget, reset a couple of the relevant
   // option variables (since they're aren't nested in table rows).
-  if ($('#cas_dashboard_widget').length) {
+  if ($('#auth_dashboard_widget').length) {
     auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('div');
     auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('div');
     auth_settings_access_users_blocked = $('#list_auth_settings_access_users_blocked').closest('div');

@@ -108,7 +108,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
 			// ajax save options from dashboard widget
-			add_action( 'wp_ajax_save_cas_dashboard_widget', array( $this, 'ajax_save_cas_dashboard_widget' ) );
+			add_action( 'wp_ajax_save_auth_dashboard_widget', array( $this, 'ajax_save_auth_dashboard_widget' ) );
 
 			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
@@ -1377,11 +1377,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Only users who can edit can see the admissions dashboard widget
 			if ( current_user_can( 'edit_posts' ) ) {
 				// Add dashboard widget for adding/editing users with access
-				wp_add_dashboard_widget( 'cas_dashboard_widget', 'Authorizer Settings', array( $this, 'add_cas_dashboard_widget' ) );
+				wp_add_dashboard_widget( 'auth_dashboard_widget', 'Authorizer Settings', array( $this, 'add_auth_dashboard_widget' ) );
 			}
 		}
 
-		function add_cas_dashboard_widget() {
+		function add_auth_dashboard_widget() {
 			$auth_settings = get_option( 'auth_settings' );
 			?>
 			<div class="inside">
@@ -1410,7 +1410,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php
 		}
 
-		function ajax_save_cas_dashboard_widget() {
+		function ajax_save_auth_dashboard_widget() {
 			// Make sure posted variables exist.
 			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_auth_settings_access'] ) ) {
 				die('');

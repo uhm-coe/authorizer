@@ -29,19 +29,19 @@ body.settings_page_authorizer .spinner {
 	width: 80px;
 }
 
-#cas_dashboard_widget {
+#auth_dashboard_widget {
 	min-width: 460px;
 }
 
-#cas_dashboard_widget input, #cas_dashboard_widget select {
+#auth_dashboard_widget input, #auth_dashboard_widget select {
 	font-size: 90%;
 }
 
-#cas_dashboard_widget input[type="radio"] {
+#auth_dashboard_widget input[type="radio"] {
 	margin: 0 0 6px;
 }
 
-#cas_dashboard_widget #list_auth_settings_access_users_pending .cas-email {
+#auth_dashboard_widget #list_auth_settings_access_users_pending .cas-email {
 	width: 90px;
 }
 
