@@ -25,7 +25,7 @@ function cas_add_user(caller, list) {
   var username = jQuery(caller).parent().find('.cas-username');
   var email = jQuery(caller).parent().find('.cas-email');
   var role = jQuery(caller).parent().find('.cas-role');
-  var nextId = jQuery('#list_cas_settings_access_users_' + list + ' li').length;
+  var nextId = jQuery('#list_auth_settings_access_users_' + list + ' li').length;
   var validated = true;
 
   if (jQuery.trim(username.val()) == '')
@@ -35,7 +35,7 @@ function cas_add_user(caller, list) {
 
   // Check if the course being added already exists in the list.
   if (validated) {
-    jQuery('#list_cas_settings_access_users_' + list + ' input.cas-username').each(function() {
+    jQuery('#list_auth_settings_access_users_' + list + ' input.cas-username').each(function() {
       if (this.value == username.val()) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
@@ -47,7 +47,7 @@ function cas_add_user(caller, list) {
 
   // Check if the name being added already exists in the list.
   if (validated) {
-    jQuery('#list_cas_settings_access_users_' + list + ' input.cas-email').each(function() {
+    jQuery('#list_auth_settings_access_users_' + list + ' input.cas-email').each(function() {
       if (this.value == email.val()) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
@@ -61,15 +61,15 @@ function cas_add_user(caller, list) {
     // Add the new item.
     jQuery(' \
       <li id="new_user_' + nextId + '" style="display: none;"> \
-        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="cas-username" /> \
-        <input type="text" id="cas_settings_access_users_' + list + '_' + nextId + '" name="cas_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="cas-email" /> \
-        <select name="cas_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role" onchange="save_cas_settings_access(this);"> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="cas-username" /> \
+        <input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="cas-email" /> \
+        <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role" onchange="save_auth_settings_access(this);"> \
         </select> \
-        <input type="text" name="cas_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
         <input type="button" class="button" onclick="cas_ignore_user(this);" value="&times;" /> \
         <span class="spinner"></span> \
       </li> \
-    ').appendTo('#list_cas_settings_access_users_' + list + '').slideDown(250);
+    ').appendTo('#list_auth_settings_access_users_' + list + '').slideDown(250);
 
     // Populate the role dropdown in the new element. Because clone() doesn't
     // save selected state on select elements, set that too.
@@ -77,7 +77,7 @@ function cas_add_user(caller, list) {
     jQuery('#new_user_' + nextId + ' .cas-role').val(role.val());
 
     // Remove the 'empty list' item if it exists.
-    jQuery('#list_cas_settings_access_users_' + list + ' li.cas-empty').remove();
+    jQuery('#list_auth_settings_access_users_' + list + ' li.cas-empty').remove();
 
     // Reset the new user textboxes
     username.val('');
@@ -85,7 +85,7 @@ function cas_add_user(caller, list) {
     jQuery(caller).removeAttr('disabled');
 
     // Update the options in the database with this change.
-    save_cas_settings_access(caller);
+    save_auth_settings_access(caller);
 
     return true;
   }
@@ -105,22 +105,22 @@ function cas_ignore_user(caller, listName) {
     jQuery(this).remove();
 
     // Update the options in the database with this change.
-    save_cas_settings_access(caller);
+    save_auth_settings_access(caller);
   });
 }
 
 
 
 // Save options from dashboard widget.
-function save_cas_settings_access(caller) {
+function save_auth_settings_access(caller) {
   jQuery(caller).attr('disabled', 'disabled');
   jQuery(caller).after('<span class="spinner"></span>');
   jQuery('form .spinner').show();
 
-  var access_restriction = jQuery('form input[name="cas_settings[access_restriction]"]:checked').val();
+  var access_restriction = jQuery('form input[name="auth_settings[access_restriction]"]:checked').val();
 
   var access_users_pending = new Object();
-  jQuery('#list_cas_settings_access_users_pending li').each(function(index) {
+  jQuery('#list_auth_settings_access_users_pending li').each(function(index) {
     var user = new Object();
     user['username'] = jQuery('.cas-username', this).val();
     user['email'] = jQuery('.cas-email', this).val();
@@ -129,7 +129,7 @@ function save_cas_settings_access(caller) {
   });
 
   var access_users_approved = new Object();
-  jQuery('#list_cas_settings_access_users_approved li').each(function(index) {
+  jQuery('#list_auth_settings_access_users_approved li').each(function(index) {
     var user = new Object();
     user['username'] = jQuery('.cas-username', this).val();
     user['email'] = jQuery('.cas-email', this).val();
@@ -139,7 +139,7 @@ function save_cas_settings_access(caller) {
   });
 
   var access_users_blocked = new Object();
-  jQuery('#list_cas_settings_access_users_blocked li').each(function(index) {
+  jQuery('#list_auth_settings_access_users_blocked li').each(function(index) {
     var user = new Object();
     user['username'] = jQuery('.cas-username', this).val();
     user['email'] = jQuery('.cas-email', this).val();
@@ -148,7 +148,7 @@ function save_cas_settings_access(caller) {
     access_users_blocked[index] = user;
   });
 
-  var nonce_save_cas_settings_access = jQuery('#nonce_save_cas_settings_access').val();
+  var nonce_save_auth_settings_access = jQuery('#nonce_save_auth_settings_access').val();
 
   jQuery.post(ajaxurl, {
     action: 'save_cas_dashboard_widget',
@@ -156,7 +156,7 @@ function save_cas_settings_access(caller) {
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
     'access_users_blocked': access_users_blocked,
-    'nonce_save_cas_settings_access': nonce_save_cas_settings_access,
+    'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
   }, function(response) {
     jQuery('form .spinner').hide();
     jQuery(caller).removeAttr('disabled');
@@ -228,96 +228,96 @@ function getUsernameFromEmail(email) {
 
 jQuery(document).ready(function($){
   // Show and hide specific options on page load
-  var cas_settings_access_redirect_to_login = $('#radio_cas_settings_access_redirect_to_login').closest('tr');
-  var cas_settings_access_redirect_to_url = $('#cas_settings_access_redirect_to_url').closest('tr');
-  var cas_settings_access_redirect_to_message = $('#wp-cas_settings_access_redirect_to_message-wrap').closest('tr');
-  var cas_settings_access_users_pending = $('#list_cas_settings_access_users_pending').closest('tr');
-  var cas_settings_access_users_approved = $('#list_cas_settings_access_users_approved').closest('tr');
-  var cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('tr');
-  var cas_settings_access_role_receive_pending_emails = $('#cas_settings_access_role_receive_pending_emails').closest('tr');
-  var cas_settings_access_pending_redirect_to_message = $('#wp-cas_settings_access_pending_redirect_to_message-wrap').closest('tr');
-  var cas_settings_access_public_pages = $('#cas_settings_access_public_pages').closest('tr');
+  var auth_settings_access_redirect_to_login = $('#radio_auth_settings_access_redirect_to_login').closest('tr');
+  var auth_settings_access_redirect_to_url = $('#auth_settings_access_redirect_to_url').closest('tr');
+  var auth_settings_access_redirect_to_message = $('#wp-auth_settings_access_redirect_to_message-wrap').closest('tr');
+  var auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('tr');
+  var auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('tr');
+  var auth_settings_access_users_blocked = $('#list_auth_settings_access_users_blocked').closest('tr');
+  var auth_settings_access_role_receive_pending_emails = $('#auth_settings_access_role_receive_pending_emails').closest('tr');
+  var auth_settings_access_pending_redirect_to_message = $('#wp-auth_settings_access_pending_redirect_to_message-wrap').closest('tr');
+  var auth_settings_access_public_pages = $('#auth_settings_access_public_pages').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
-  $('th, td', cas_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', cas_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
 
   // If we're viewing the dashboard widget, reset a couple of the relevant
   // option variables (since they're aren't nested in table rows).
   if ($('#cas_dashboard_widget').length) {
-    cas_settings_access_users_pending = $('#list_cas_settings_access_users_pending').closest('div');
-    cas_settings_access_users_approved = $('#list_cas_settings_access_users_approved').closest('div');
-    cas_settings_access_users_blocked = $('#list_cas_settings_access_users_blocked').closest('div');
-    $(cas_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
-    $(cas_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
-    $(cas_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
+    auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('div');
+    auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('div');
+    auth_settings_access_users_blocked = $('#list_auth_settings_access_users_blocked').closest('div');
+    $(auth_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
+    $(auth_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
+    $(auth_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
 
     // Remove the helper link, since there are no tabs on the dashboard widget
     $('#dashboard_link_approved_users').contents().unwrap();
   }
 
-  if (!$('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
-    $('div.animated_wrapper', cas_settings_access_redirect_to_url).hide();
+  if (!$('#radio_auth_settings_access_redirect_to_url').is(':checked')) {
+    $('div.animated_wrapper', auth_settings_access_redirect_to_url).hide();
   }
-  if (!$('#radio_cas_settings_access_redirect_to_message').is(':checked')) {
-    $('div.animated_wrapper', cas_settings_access_redirect_to_message).hide();
+  if (!$('#radio_auth_settings_access_redirect_to_message').is(':checked')) {
+    $('div.animated_wrapper', auth_settings_access_redirect_to_message).hide();
   }
 
-  if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
-    $('div.animated_wrapper', cas_settings_access_users_pending).hide();
-    $('div.animated_wrapper', cas_settings_access_users_approved).hide();
-    $('div.animated_wrapper', cas_settings_access_users_blocked).hide();
-    $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).hide();
-    $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).hide();
+  if (!$('#radio_auth_settings_access_restriction_approved_cas').is(':checked')) {
+    $('div.animated_wrapper', auth_settings_access_users_pending).hide();
+    $('div.animated_wrapper', auth_settings_access_users_approved).hide();
+    $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
+    $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).hide();
+    $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).hide();
   }
 
   // show and hide specific options based on "Handle unauthorized visitors" selection
-  $('input[name="cas_settings[access_redirect]"]').change(function() {
-    if ($('#radio_cas_settings_access_redirect_to_url').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideDown(animation_speed);
+  $('input[name="auth_settings[access_redirect]"]').change(function() {
+    if ($('#radio_auth_settings_access_redirect_to_url').is(':checked')) {
+      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideDown(animation_speed);
     } else {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideUp(animation_speed);
     }
-    if ($('#radio_cas_settings_access_redirect_to_message').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideDown(animation_speed);
+    if ($('#radio_auth_settings_access_redirect_to_message').is(':checked')) {
+      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideDown(animation_speed);
     } else {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
     }
   });
 
   // Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
-  $('input[name="cas_settings[access_restriction]"]').change(function(){
-    if ($('#radio_cas_settings_access_restriction_everyone').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_redirect_to_url).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_redirect_to_message).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_public_pages).slideUp(animation_speed);
+  $('input[name="auth_settings[access_restriction]"]').change(function(){
+    if ($('#radio_auth_settings_access_restriction_everyone').is(':checked')) {
+      $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_public_pages).slideUp(animation_speed);
     } else {
-      $('div.animated_wrapper', cas_settings_access_redirect_to_login).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_public_pages).slideDown(animation_speed);
-      $('input[name="cas_settings[access_redirect]"]').trigger('change');
+      $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_public_pages).slideDown(animation_speed);
+      $('input[name="auth_settings[access_redirect]"]').trigger('change');
     }
   
     // Hide user whitelist unless "Only specific students below" is checked
-    if (!$('#radio_cas_settings_access_restriction_approved_cas').is(':checked')) {
-      $('div.animated_wrapper', cas_settings_access_users_pending).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_users_approved).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_users_blocked).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).slideUp(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).slideUp(animation_speed);
+    if (!$('#radio_auth_settings_access_restriction_approved_cas').is(':checked')) {
+      $('div.animated_wrapper', auth_settings_access_users_pending).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_users_approved).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_users_blocked).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).slideUp(animation_speed);
     } else {
-      $('div.animated_wrapper', cas_settings_access_users_pending).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_users_approved).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_users_blocked).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_role_receive_pending_emails).slideDown(animation_speed);
-      $('div.animated_wrapper', cas_settings_access_pending_redirect_to_message).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_users_pending).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_users_approved).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_users_blocked).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).slideDown(animation_speed);
     }
   });
 
@@ -328,7 +328,7 @@ jQuery(document).ready(function($){
       $(this).siblings('input[type=button]').trigger('click');
       return false;
     } else if ($(this).hasClass('cas-username')) {
-      $(this).siblings('.cas-email').val($(this).val() + '@' + getTLDFromFQDN($('#cas_settings_cas_host').val()));
+      $(this).siblings('.cas-email').val($(this).val() + '@' + getTLDFromFQDN($('#auth_settings_cas_host').val()));
     } else if ($(this).hasClass('cas-email')) {
       $(this).siblings('.cas-username').val(getUsernameFromEmail($(this).val()));
     }
@@ -341,7 +341,7 @@ jQuery(document).ready(function($){
   });
 
   // Enable the user-friendly multiselect form element on the options page.
-  $('#cas_settings_access_public_pages').multiSelect({
+  $('#auth_settings_access_public_pages').multiSelect({
     selectableOptgroup: true,
     selectableHeader: '<div class="custom-header">Private Pages</div>',
     selectionHeader: '<div class="custom-header">Public Pages</div>',

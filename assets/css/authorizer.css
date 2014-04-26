@@ -41,37 +41,37 @@ body.settings_page_cas_admission .spinner {
 	margin: 0 0 6px;
 }
 
-#cas_dashboard_widget #list_cas_settings_access_users_pending .cas-email {
+#cas_dashboard_widget #list_auth_settings_access_users_pending .cas-email {
 	width: 90px;
 }
 
-#list_cas_settings_access_users_pending .cas-username,
-#list_cas_settings_access_users_pending .cas-email,
-#list_cas_settings_access_users_pending .cas-role {
+#list_auth_settings_access_users_pending .cas-username,
+#list_auth_settings_access_users_pending .cas-email,
+#list_auth_settings_access_users_pending .cas-role {
 	border-color: #CBCF76;
 	background-color: #F5F4D4;
 }
 
-#list_cas_settings_access_users_approved .cas-username,
-#list_cas_settings_access_users_approved .cas-email,
-#list_cas_settings_access_users_approved .cas-role,
-#list_cas_settings_access_users_approved .cas-date-added,
-#new_cas_settings_access_users_approved .cas-username,
-#new_cas_settings_access_users_approved .cas-email,
-#new_cas_settings_access_users_approved .cas-role {
+#list_auth_settings_access_users_approved .cas-username,
+#list_auth_settings_access_users_approved .cas-email,
+#list_auth_settings_access_users_approved .cas-role,
+#list_auth_settings_access_users_approved .cas-date-added,
+#new_auth_settings_access_users_approved .cas-username,
+#new_auth_settings_access_users_approved .cas-email,
+#new_auth_settings_access_users_approved .cas-role {
 	border-color: #87C495;
 	background-color: #CDECD3;
 }
 
-#list_cas_settings_access_users_blocked .cas-username,
-#list_cas_settings_access_users_blocked .cas-email,
-#list_cas_settings_access_users_blocked .cas-date-added,
-#new_cas_settings_access_users_blocked .cas-username,
-#new_cas_settings_access_users_blocked .cas-email {
+#list_auth_settings_access_users_blocked .cas-username,
+#list_auth_settings_access_users_blocked .cas-email,
+#list_auth_settings_access_users_blocked .cas-date-added,
+#new_auth_settings_access_users_blocked .cas-username,
+#new_auth_settings_access_users_blocked .cas-email {
 	border-color: #AA7966;
 	background-color: #ECC8C1;
 }
-#list_cas_settings_access_users_blocked .cas-role,
-#new_cas_settings_access_users_blocked .cas-role {
+#list_auth_settings_access_users_blocked .cas-role,
+#new_auth_settings_access_users_blocked .cas-role {
 	display: none;
 }
