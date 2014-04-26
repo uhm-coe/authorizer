@@ -417,9 +417,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( $auth_settings['access_restriction'] == 'everyone' ) ||
 				// Allow access to logged in users if option is set to 'university' community
 				( $auth_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow CAS log in elsewhere)
+				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow external log in elsewhere)
 				( $auth_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to approved CAS users and logged in users if option is set to 'approved_users'
+				// Allow access to approved external users and logged in users if option is set to 'approved_users'
 				( $auth_settings['access_restriction'] == 'approved_users' && $this->is_user_logged_in_and_blog_user() )
 			);
 			$is_restricted = !$has_access;
@@ -502,8 +502,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Overwrite the URL for the lost password link on the login form.
-		 * If we're authenticating against CAS, standard WordPress password resets
-		 * won't work.
+		 * If we're authenticating against an external service, standard
+		 * WordPress password resets won't work.
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -730,10 +730,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			
 			// Add help tab for Access Lists Settings
 			$help_auth_settings_access_lists_content = '
-				<p><strong>Pending CAS Users</strong>: Pending users are users who have successfully logged in to the site, but who haven\'t yet been approved (or blocked) by you.</p>
-				<p><strong>Approved CAS Users</strong>: Approved users have access to the site once they successfully log in via CAS.</p>
-				<p><strong>Blocked CAS Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
-				<p>Users in the <strong>Pending</strong> list appear automatically after a new CAS user tries to log in. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons by a user in the <strong>Pending</strong> list.</p>
+				<p><strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven\'t yet been approved (or blocked) by you.</p>
+				<p><strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.</p>
+				<p><strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
+				<p>Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -745,9 +745,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Private Access Settings
 			$help_auth_settings_access_content = '
-				<p><strong>Who can access the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or a CAS account (<strong>university community</strong>), restrict it to WordPress users and only the CAS users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
-				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new CAS user successfully logs in. All users of the specified role will receive an email, and the CAS user will get a message (specified below) telling them their access is pending approval.</p>
-				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new CAS user will see once they try to log in to the site.</p>
+				<p><strong>Who can access the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or an account on an external service like CAS or LDAP (<strong>university community</strong>), restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
+				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.</p>
+				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -772,23 +772,23 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			// Add help tab for CAS Settings
-			$help_auth_settings_auth_content = '
-				<p><strong>Default role for new CAS users</strong>: Specify which role new CAS users will get by default. Be sure to choose a role with limited permissions!</p>
+			$help_auth_settings_cas_content = '
+				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
 				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
 				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</p>
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_auth_content',
+					'id' => 'help_auth_settings_cas_content',
 					'title' => 'CAS',
-					'content' => $help_auth_settings_auth_content,
+					'content' => $help_auth_settings_cas_content,
 				)
 			);
 
 			// Add help tab for Advanced Settings
 			$help_auth_settings_advanced_content = '
-				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have CAS users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change their CAS password here.</p>
+				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
 				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
 			';
 			$screen->add_help_tab(
@@ -921,7 +921,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_access_default_role', // HTML element ID
-				'Default role for new CAS users', // HTML element Title
+				'Default role for new users', // HTML element Title
 				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_cas' // Section this setting is shown on
@@ -1270,9 +1270,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_radio_auth_access_restriction( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved CAS and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
+				<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
+				<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br />
+				<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No external users and all WordPress users)<br /><?php
 		}
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -1465,8 +1465,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		/**
-		 * Helper function to determine whether a given username is in one of the
-		 * CAS plugin lists (pending, approved, blocked). Defaults to the list of
+		 * Helper function to determine whether a given username is in one of
+		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
 		 */
 		function is_username_in_list($username = '', $list = 'approved') {
