@@ -17,15 +17,15 @@ body.settings_page_authorizer .spinner {
 	margin: 0 5px;
 }
 
-.cas-username {
+.auth-username {
 	width: 75px;
 }
 
-.cas-email {
+.auth-email {
 	width: 150px;
 }
 
-.cas-date-added {
+.auth-date-added {
 	width: 80px;
 }
 
@@ -41,37 +41,37 @@ body.settings_page_authorizer .spinner {
 	margin: 0 0 6px;
 }
 
-#auth_dashboard_widget #list_auth_settings_access_users_pending .cas-email {
+#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email {
 	width: 90px;
 }
 
-#list_auth_settings_access_users_pending .cas-username,
-#list_auth_settings_access_users_pending .cas-email,
-#list_auth_settings_access_users_pending .cas-role {
+#list_auth_settings_access_users_pending .auth-username,
+#list_auth_settings_access_users_pending .auth-email,
+#list_auth_settings_access_users_pending .auth-role {
 	border-color: #CBCF76;
 	background-color: #F5F4D4;
 }
 
-#list_auth_settings_access_users_approved .cas-username,
-#list_auth_settings_access_users_approved .cas-email,
-#list_auth_settings_access_users_approved .cas-role,
-#list_auth_settings_access_users_approved .cas-date-added,
-#new_auth_settings_access_users_approved .cas-username,
-#new_auth_settings_access_users_approved .cas-email,
-#new_auth_settings_access_users_approved .cas-role {
+#list_auth_settings_access_users_approved .auth-username,
+#list_auth_settings_access_users_approved .auth-email,
+#list_auth_settings_access_users_approved .auth-role,
+#list_auth_settings_access_users_approved .auth-date-added,
+#new_auth_settings_access_users_approved .auth-username,
+#new_auth_settings_access_users_approved .auth-email,
+#new_auth_settings_access_users_approved .auth-role {
 	border-color: #87C495;
 	background-color: #CDECD3;
 }
 
-#list_auth_settings_access_users_blocked .cas-username,
-#list_auth_settings_access_users_blocked .cas-email,
-#list_auth_settings_access_users_blocked .cas-date-added,
-#new_auth_settings_access_users_blocked .cas-username,
-#new_auth_settings_access_users_blocked .cas-email {
+#list_auth_settings_access_users_blocked .auth-username,
+#list_auth_settings_access_users_blocked .auth-email,
+#list_auth_settings_access_users_blocked .auth-date-added,
+#new_auth_settings_access_users_blocked .auth-username,
+#new_auth_settings_access_users_blocked .auth-email {
 	border-color: #AA7966;
 	background-color: #ECC8C1;
 }
-#list_auth_settings_access_users_blocked .cas-role,
-#new_auth_settings_access_users_blocked .cas-role {
+#list_auth_settings_access_users_blocked .auth-role,
+#new_auth_settings_access_users_blocked .auth-role {
 	display: none;
 }

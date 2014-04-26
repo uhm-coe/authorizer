@@ -22,9 +22,9 @@ function auth_add_user(caller, list) {
   // default to the approved list
   list = typeof list !== 'undefined' ? list : 'approved';
 
-  var username = jQuery(caller).parent().find('.cas-username');
-  var email = jQuery(caller).parent().find('.cas-email');
-  var role = jQuery(caller).parent().find('.cas-role');
+  var username = jQuery(caller).parent().find('.auth-username');
+  var email = jQuery(caller).parent().find('.auth-email');
+  var role = jQuery(caller).parent().find('.auth-role');
   var nextId = jQuery('#list_auth_settings_access_users_' + list + ' li').length;
   var validated = true;
 
@@ -35,7 +35,7 @@ function auth_add_user(caller, list) {
 
   // Check if the course being added already exists in the list.
   if (validated) {
-    jQuery('#list_auth_settings_access_users_' + list + ' input.cas-username').each(function() {
+    jQuery('#list_auth_settings_access_users_' + list + ' input.auth-username').each(function() {
       if (this.value == username.val()) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
@@ -47,7 +47,7 @@ function auth_add_user(caller, list) {
 
   // Check if the name being added already exists in the list.
   if (validated) {
-    jQuery('#list_auth_settings_access_users_' + list + ' input.cas-email').each(function() {
+    jQuery('#list_auth_settings_access_users_' + list + ' input.auth-email').each(function() {
       if (this.value == email.val()) {
         validated = false;
         jQuery(this).parent().effect('shake', shake_speed);
@@ -61,11 +61,11 @@ function auth_add_user(caller, list) {
     // Add the new item.
     jQuery(' \
       <li id="new_user_' + nextId + '" style="display: none;"> \
-        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="cas-username" /> \
-        <input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="cas-email" /> \
-        <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role" onchange="save_auth_settings_access(this);"> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
+        <input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
+        <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="auth-role" onchange="save_auth_settings_access(this);"> \
         </select> \
-        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
         <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> \
         <span class="spinner"></span> \
       </li> \
@@ -73,11 +73,11 @@ function auth_add_user(caller, list) {
 
     // Populate the role dropdown in the new element. Because clone() doesn't
     // save selected state on select elements, set that too.
-    jQuery('option', role).clone().appendTo('#new_user_' + nextId + ' .cas-role');
-    jQuery('#new_user_' + nextId + ' .cas-role').val(role.val());
+    jQuery('option', role).clone().appendTo('#new_user_' + nextId + ' .auth-role');
+    jQuery('#new_user_' + nextId + ' .auth-role').val(role.val());
 
     // Remove the 'empty list' item if it exists.
-    jQuery('#list_auth_settings_access_users_' + list + ' li.cas-empty').remove();
+    jQuery('#list_auth_settings_access_users_' + list + ' li.auth-empty').remove();
 
     // Reset the new user textboxes
     username.val('');
@@ -97,7 +97,7 @@ function auth_ignore_user(caller, listName) {
   listName = typeof listName !== 'undefined' ? listName : '';
   var list = jQuery(caller).parent().parent();
   if (jQuery('li', list).length <= 1) {
-    jQuery(list).append('<li class="cas-empty"><em>No ' + listName + ' users</em></li>');
+    jQuery(list).append('<li class="auth-empty"><em>No ' + listName + ' users</em></li>');
   }
 
   jQuery(caller).parent().slideUp(250,function() {
@@ -122,29 +122,29 @@ function save_auth_settings_access(caller) {
   var access_users_pending = new Object();
   jQuery('#list_auth_settings_access_users_pending li').each(function(index) {
     var user = new Object();
-    user['username'] = jQuery('.cas-username', this).val();
-    user['email'] = jQuery('.cas-email', this).val();
-    user['role'] = jQuery('.cas-role', this).val();
+    user['username'] = jQuery('.auth-username', this).val();
+    user['email'] = jQuery('.auth-email', this).val();
+    user['role'] = jQuery('.auth-role', this).val();
     access_users_pending[index] = user;
   });
 
   var access_users_approved = new Object();
   jQuery('#list_auth_settings_access_users_approved li').each(function(index) {
     var user = new Object();
-    user['username'] = jQuery('.cas-username', this).val();
-    user['email'] = jQuery('.cas-email', this).val();
-    user['role'] = jQuery('.cas-role', this).val();
-    user['date_added'] = jQuery('.cas-date-added', this).val();
+    user['username'] = jQuery('.auth-username', this).val();
+    user['email'] = jQuery('.auth-email', this).val();
+    user['role'] = jQuery('.auth-role', this).val();
+    user['date_added'] = jQuery('.auth-date-added', this).val();
     access_users_approved[index] = user;
   });
 
   var access_users_blocked = new Object();
   jQuery('#list_auth_settings_access_users_blocked li').each(function(index) {
     var user = new Object();
-    user['username'] = jQuery('.cas-username', this).val();
-    user['email'] = jQuery('.cas-email', this).val();
-    user['role'] = jQuery('.cas-role', this).val();
-    user['date_added'] = jQuery('.cas-date-added', this).val();
+    user['username'] = jQuery('.auth-username', this).val();
+    user['email'] = jQuery('.auth-email', this).val();
+    user['role'] = jQuery('.auth-role', this).val();
+    user['date_added'] = jQuery('.auth-date-added', this).val();
     access_users_blocked[index] = user;
   });
 
@@ -323,17 +323,17 @@ jQuery(document).ready(function($){
 
   // List management function: pressing enter in the username or email field adds the user to the list.
   // Additionally, if the email field is blank, it gets constructed from the username field (and vice versa).
-  $('form input.cas-username, form input.cas-email').bind('keyup', function(e) {
+  $('form input.auth-username, form input.auth-email').bind('keyup', function(e) {
     if (e.which == 13) { // Enter key
       $(this).siblings('input[type=button]').trigger('click');
       return false;
-    } else if ($(this).hasClass('cas-username')) {
-      $(this).siblings('.cas-email').val($(this).val() + '@' + getTLDFromFQDN($('#auth_settings_cas_host').val()));
-    } else if ($(this).hasClass('cas-email')) {
-      $(this).siblings('.cas-username').val(getUsernameFromEmail($(this).val()));
+    } else if ($(this).hasClass('auth-username')) {
+      $(this).siblings('.auth-email').val($(this).val() + '@' + getTLDFromFQDN($('#auth_settings_cas_host').val()));
+    } else if ($(this).hasClass('auth-email')) {
+      $(this).siblings('.auth-username').val(getUsernameFromEmail($(this).val()));
     }
   });
-  $('form input.cas-username, form input.cas-email').bind('keydown', function(e) {
+  $('form input.auth-username, form input.auth-email').bind('keydown', function(e) {
     if (e.which == 13) { // Enter key
       e.preventDefault();
       return false;
