@@ -958,14 +958,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_settings_field(
 				'auth_settings_advanced_lostpassword_url', // HTML element ID
 				'Custom lost password URL', // HTML element Title
-				array( $this, 'print_text_cas_advanced_lostpassword_url' ), // Callback (echos form element)
+				array( $this, 'print_text_auth_advanced_lostpassword_url' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_advanced_branding', // HTML element ID
 				'Custom WordPress login branding', // HTML element Title
-				array( $this, 'print_radio_cas_advanced_branding' ), // Callback (echos form element)
+				array( $this, 'print_radio_auth_advanced_branding' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
@@ -1355,12 +1355,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		}
 
-		function print_text_cas_advanced_lostpassword_url() {
+		function print_text_auth_advanced_lostpassword_url() {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
-		function print_radio_cas_advanced_branding( $args = '' ) {
+		function print_radio_auth_advanced_branding( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_advanced_branding_default" name="auth_settings[advanced_branding]" value="default"<?php checked( 'default' == $auth_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />
 				<input type="radio" id="radio_auth_settings_advanced_branding_custom_uh" name="auth_settings[advanced_branding]" value="custom_uh"<?php checked( 'custom_uh' == $auth_settings['advanced_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
