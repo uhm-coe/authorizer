@@ -18,7 +18,7 @@ function chooseTab(listName) {
 }
 
 // Add user to list (list = blocked or approved).
-function cas_add_user(caller, list) {
+function auth_add_user(caller, list) {
   // default to the approved list
   list = typeof list !== 'undefined' ? list : 'approved';
 
@@ -66,7 +66,7 @@ function cas_add_user(caller, list) {
         <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="cas-role" onchange="save_auth_settings_access(this);"> \
         </select> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="cas-date-added" /> \
-        <input type="button" class="button" onclick="cas_ignore_user(this);" value="&times;" /> \
+        <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> \
         <span class="spinner"></span> \
       </li> \
     ').appendTo('#list_auth_settings_access_users_' + list + '').slideDown(250);
@@ -92,7 +92,7 @@ function cas_add_user(caller, list) {
 }
 
 // Remove user from list.
-function cas_ignore_user(caller, listName) {
+function auth_ignore_user(caller, listName) {
   // Show an 'empty list' message if we're deleting the last item
   listName = typeof listName !== 'undefined' ? listName : '';
   var list = jQuery(caller).parent().parent();

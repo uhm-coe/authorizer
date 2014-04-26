@@ -834,21 +834,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_settings_field(
 				'auth_settings_access_users_pending', // HTML element ID
 				'Pending CAS Users', // HTML element Title
-				array( $this, 'print_combo_cas_access_users_pending' ), // Callback (echos form element)
+				array( $this, 'print_combo_auth_access_users_pending' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_users_approved', // HTML element ID
 				'Approved CAS Users', // HTML element Title
-				array( $this, 'print_combo_cas_access_users_approved' ), // Callback (echos form element)
+				array( $this, 'print_combo_auth_access_users_approved' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_users_blocked', // HTML element ID
 				'Blocked CAS Users', // HTML element Title
-				array( $this, 'print_combo_cas_access_users_blocked' ), // Callback (echos form element)
+				array( $this, 'print_combo_auth_access_users_blocked' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
 			);
@@ -863,21 +863,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_settings_field(
 				'auth_settings_access_restriction', // HTML element ID
 				'Who can access the site?', // HTML element Title
-				array( $this, 'print_radio_cas_access_restriction' ), // Callback (echos form element)
+				array( $this, 'print_radio_auth_access_restriction' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_role_receive_pending_emails', // HTML element ID
 				'Which role should receive email notifications about pending users?', // HTML element Title
-				array( $this, 'print_select_cas_access_role_receive_pending_emails' ), // Callback (echos form element)
+				array( $this, 'print_select_auth_access_role_receive_pending_emails' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_pending_redirect_to_message', // HTML element ID
 				'What message should pending users see after attempting to log in?', // HTML element Title
-				array( $this, 'print_wysiwyg_cas_access_pending_redirect_to_message' ), // Callback (echos form element)
+				array( $this, 'print_wysiwyg_auth_access_pending_redirect_to_message' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access' // Section this setting is shown on
 			);
@@ -893,21 +893,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_settings_field(
 				'auth_settings_access_redirect', // HTML element ID
 				'What happens to people without access when they visit a private page?', // HTML element Title
-				array( $this, 'print_radio_cas_access_redirect' ), // Callback (echos form element)
+				array( $this, 'print_radio_auth_access_redirect' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_redirect_to_message', // HTML element ID
 				'What message should people without access see?', // HTML element Title
-				array( $this, 'print_wysiwyg_cas_access_redirect_to_message' ), // Callback (echos form element)
+				array( $this, 'print_wysiwyg_auth_access_redirect_to_message' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_public_pages', // HTML element ID
 				'What pages (if any) should be available to everyone?', // HTML element Title
-				array( $this, 'print_multiselect_cas_access_public_pages' ), // Callback (echos form element)
+				array( $this, 'print_multiselect_auth_access_public_pages' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_public' // Section this setting is shown on
 			);
@@ -922,7 +922,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_settings_field(
 				'auth_settings_access_default_role', // HTML element ID
 				'Default role for new CAS users', // HTML element Title
-				array( $this, 'print_select_cas_access_default_role' ), // Callback (echos form element)
+				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_cas' // Section this setting is shown on
 			);
@@ -1126,7 +1126,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		}
 
-		function print_combo_cas_access_users_pending( $args = '' ) {
+		function print_combo_auth_access_users_pending( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><ul id="list_auth_settings_access_users_pending" style="margin:0;">
 				<?php if ( array_key_exists( 'access_users_pending', $auth_settings ) && is_array( $auth_settings['access_users_pending'] ) && count( $auth_settings['access_users_pending'] ) > 0 ) : ?>
@@ -1139,9 +1139,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<select name="auth_settings[access_users_pending][<?= $key; ?>][role]" class="cas-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<input type="button" class="button-primary" id="approve_user_<?= $key; ?>" onclick="cas_add_user(this, 'approved'); cas_ignore_user(this, 'pending');" value="Approve" />
-							<input type="button" class="button-primary" id="block_user_<?= $key; ?>" onclick="cas_add_user(this, 'blocked'); cas_ignore_user(this, 'pending');" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this);" value="&times;" />
+							<input type="button" class="button-primary" id="approve_user_<?= $key; ?>" onclick="auth_add_user(this, 'approved'); auth_ignore_user(this, 'pending');" value="Approve" />
+							<input type="button" class="button-primary" id="block_user_<?= $key; ?>" onclick="auth_add_user(this, 'blocked'); auth_ignore_user(this, 'pending');" value="Block" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="auth_ignore_user(this);" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -1151,7 +1151,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php
 		}
 
-		function print_combo_cas_access_users_approved( $args = '' ) {
+		function print_combo_auth_access_users_approved( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( array_key_exists( 'access_users_approved', $auth_settings ) && is_array( $auth_settings['access_users_approved'] ) ) : ?>
@@ -1173,7 +1173,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="auth_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'approved');" value="&times;" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="auth_ignore_user(this, 'approved');" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1184,12 +1184,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select name="new_approved_user_role" id="new_approved_user_role" class="cas-role">
 					<?php $this->wp_dropdown_permitted_roles( $auth_settings['access_default_role'] ); ?>
 				</select>
-				<input class="button-primary" type="button" id="approve_user_new" onclick="cas_add_user(this, 'approved');" value="Approve" /><br />
+				<input class="button-primary" type="button" id="approve_user_new" onclick="auth_add_user(this, 'approved');" value="Approve" /><br />
 			</div>
 			<?php
 		}
 
-		function print_combo_cas_access_users_blocked( $args = '' ) {
+		function print_combo_auth_access_users_blocked( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><ul id="list_auth_settings_access_users_blocked" style="margin:0;">
 				<?php if ( array_key_exists( 'access_users_blocked', $auth_settings ) && is_array( $auth_settings['access_users_blocked'] ) ) : ?>
@@ -1211,7 +1211,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 							</select>
 							<input type="text" name="auth_settings[access_users_blocked][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="cas-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="cas_ignore_user(this, 'blocked');" value="&times;" />
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="auth_ignore_user(this, 'blocked');" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1222,7 +1222,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="cas-role">
 					<option value="<?= $auth_settings['access_default_role']; ?>"><?= ucfirst( $auth_settings['access_default_role'] ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="block_user_new" onclick="cas_add_user(this, 'blocked');" value="Block" /><br />
+				<input class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');" value="Block" /><br />
 			</div>
 			<?php
 		}
@@ -1260,14 +1260,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		}
 
-		function print_select_cas_access_default_role( $args = '' ) {
+		function print_select_auth_access_default_role( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><select id="auth_settings_access_default_role" name="auth_settings[access_default_role]">
 				<?php wp_dropdown_roles( $auth_settings['access_default_role'] ); ?>
 			</select><?php
 		}
 
-		function print_radio_cas_access_restriction( $args = '' ) {
+		function print_radio_auth_access_restriction( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 				<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All CAS and all WordPress users)<br />
@@ -1275,7 +1275,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No CAS and all WordPress users)<br /><?php
 		}
 
-		function print_select_cas_access_role_receive_pending_emails( $args = '' ) {
+		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><select id="auth_settings_access_role_receive_pending_emails" name="auth_settings[access_role_receive_pending_emails]">
 				<option value="---" <?php selected( $auth_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
@@ -1283,7 +1283,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</select><?php
 		}
 
-		function print_wysiwyg_cas_access_pending_redirect_to_message( $args = '' ) {
+		function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			wp_editor(
 				$auth_settings['access_pending_redirect_to_message'],
@@ -1306,13 +1306,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		}
 
-		function print_radio_cas_access_redirect( $args = '' ) {
+		function print_radio_auth_access_redirect( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_redirect_to_login" name="auth_settings[access_redirect]" value="login"<?php checked( 'login' == $auth_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
 				<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them a simple message<?php
 		}
 
-		function print_wysiwyg_cas_access_redirect_to_message( $args = '' ) {
+		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			wp_editor(
 				$auth_settings['access_redirect_to_message'],
@@ -1328,7 +1328,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 		}
 
-		function print_multiselect_cas_access_public_pages( $args = '' ) {
+		function print_multiselect_auth_access_public_pages( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><select id="auth_settings_access_public_pages" multiple="multiple" name="auth_settings[access_public_pages][]">
 				<optgroup label="Special">
@@ -1390,19 +1390,19 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
 						<h2>Who can access the site?</h2>
-						<?php $this->print_radio_cas_access_restriction(); ?>
+						<?php $this->print_radio_auth_access_restriction(); ?>
 					</div>
 					<div>
 						<h2>Pending Users</h2>
-						<?php $this->print_combo_cas_access_users_pending(); ?>
+						<?php $this->print_combo_auth_access_users_pending(); ?>
 					</div>
 					<div>
 						<h2>Approved Users</h2>
-						<?php $this->print_combo_cas_access_users_approved(); ?>
+						<?php $this->print_combo_auth_access_users_approved(); ?>
 					</div>
 					<div>
 						<h2>Blocked Users</h2>
-						<?php $this->print_combo_cas_access_users_blocked(); ?>
+						<?php $this->print_combo_auth_access_users_blocked(); ?>
 					</div>
 					<br class="clear" />
 				</form>
