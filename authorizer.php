@@ -1450,19 +1450,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Basic encryption using a public (not secret!) key. Used for general
-		 * database obfuscation of passwords.
-		 */
-		private static $key = '8QxnrvjdtweisvCBKEY!+0';
-		function encrypt( $text ) {
-			return mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
-		}
-		function decrypt( $secret ) {
-			$str = '';
-			return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$str" );
-		}
-
-		/**
 		 * In a multisite environment, returns true if the current user is logged
 		 * in and a user of the current blog. In single site mode, simply returns
 		 * true if the current user is logged in.
