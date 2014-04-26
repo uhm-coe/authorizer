@@ -772,7 +772,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			// Add help tab for CAS Settings
-			$help_auth_settings_cas_content = '
+			$help_auth_settings_auth_content = '
 				<p><strong>Default role for new CAS users</strong>: Specify which role new CAS users will get by default. Be sure to choose a role with limited permissions!</p>
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
 				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
@@ -780,9 +780,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_cas_content',
+					'id' => 'help_auth_settings_auth_content',
 					'title' => 'CAS',
-					'content' => $help_auth_settings_cas_content,
+					'content' => $help_auth_settings_auth_content,
 				)
 			);
 
