@@ -2,7 +2,8 @@
 
 /* Login Body */
 body.login {
-	background: url('../images/texture-debut-light.jpg') #fbfbfb;
+	background: #fbfbfb url('../images/texture-debut-light.jpg') repeat-y right top;
+	height: auto;
 }
 
 /* Logo */
