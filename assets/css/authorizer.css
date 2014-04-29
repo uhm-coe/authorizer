@@ -1,3 +1,11 @@
+body.settings_page_authorizer .ms-selectable,
+body.settings_page_authorizer .ms-selection {
+	background-color: transparent;
+}
+body.settings_page_authorizer .ms-list {
+	background-color: white;
+}
+
 body.settings_page_authorizer .ms-list li {
 	margin-bottom: 0;
 }
