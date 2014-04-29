@@ -236,8 +236,20 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Set the CAS client configuration
 			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
 
-			// Add server certificate bundle to ensure CAS server is legitimate.
-			phpCAS::setCasServerCACert( plugin_dir_path( __FILE__ ) . 'assets/inc/ca-bundle.crt' );
+			// Update server certificate bundle if it doesn't exist or is older
+			// than 3 months, then use it to ensure CAS server is legitimate.
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
+			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
+			$time_90_days_ago = time() - $time_90_days;
+			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
+				$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
+				if ( $cacert_contents !== false ) {
+					file_put_contents( $cacert_path, $cacert_contents );
+				} else {
+					return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
+				}
+			}
+			phpCAS::setCasServerCACert( $cacert_path );
 
 			// Authenticate against CAS
 			if ( ! phpCAS::isAuthenticated() ) {
@@ -265,6 +277,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// If the blocked CAS user has a WordPress account, remove it. In a
 				// multisite environment, just remove them from the current blog.
 				// IMPORTANT NOTE: this deletes all of the user's posts.
+				// @TODO: switch this up to use a "blocked" or "inactive" flag in usermeta, so we don't have to delete user accounts (and possibly lose user data). this makes further sense if we tie the approved list to, say, UH Groupings, where we can specify a class roster. this roster is likely to change over time, which might mean removing users. note, however, that they will probably not go on the block list. as it stands right now, they just are removed from the approved list, but still have wordpress accounts. if they try to log in again, they'll be put on the pending list. HOLE: the one security hole is if they know about wp-login.php?login=wordpress, where they can fill out the lost password form with their email, reset their password, and then log in with their wordpress account. we need to decide how to deal with this, and if it's worth it.
 				if ( $user ) {
 					if ( is_multisite() ) {
 						remove_user_from_blog( $user->ID, get_current_blog_id() );
