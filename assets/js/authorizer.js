@@ -321,9 +321,10 @@ jQuery(document).ready(function($){
     }
   });
 
-  // List management function: pressing enter in the username or email field adds the user to the list.
-  // Additionally, if the email field is blank, it gets constructed from the username field (and vice versa).
-  $('form input.auth-username, form input.auth-email').bind('keyup', function(e) {
+  // List management function: pressing enter in the username, email, or role
+  // field adds the user to the list. Additionally, if the email field is
+  // blank, it gets constructed from the username field (and vice versa).
+  $('form input.auth-username, form input.auth-email, form select.auth-role').bind('keyup', function(e) {
     if (e.which == 13) { // Enter key
       $(this).siblings('input[type=button]').trigger('click');
       return false;
