@@ -288,7 +288,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Notify user about blocked status
 				$error_message = 'Sorry ' . strtolower( phpCAS::getUser() ) . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a></p>';
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
@@ -365,7 +365,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Notify user about pending status and return without authenticating them.
 				$error_message = $auth_settings['access_pending_redirect_to_message'];
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a></p>';
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
