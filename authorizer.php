@@ -673,7 +673,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function load_options_page() {
 			wp_enqueue_script(
 				'authorizer',
-				plugins_url( 'assets/js/auth-admission.js', __FILE__ ),
+				plugins_url( 'assets/js/authorizer.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 			$js_auth_config = array( 'baseurl' => get_bloginfo( 'url' ) );
@@ -1387,7 +1387,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 ****************************
 		 */
 		function add_dashboard_widgets() {
-			// Only users who can edit can see the admissions dashboard widget
+			// Only users who can edit can see the authorizer dashboard widget
 			if ( current_user_can( 'edit_posts' ) ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'auth_dashboard_widget', 'Authorizer Settings', array( $this, 'add_auth_dashboard_widget' ) );

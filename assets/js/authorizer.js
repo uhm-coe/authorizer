@@ -158,7 +158,7 @@ function save_auth_settings_access(caller) {
     'access_users_blocked': access_users_blocked,
     'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
   }, function(response) {
-    jQuery('form .spinner').hide();
+    jQuery('form .spinner').remove();
     jQuery(caller).removeAttr('disabled');
     if (response==0) { // failed
       return false;
