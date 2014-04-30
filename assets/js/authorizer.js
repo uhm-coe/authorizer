@@ -227,7 +227,7 @@ function getUsernameFromEmail(email) {
 
 
 jQuery(document).ready(function($){
-  // Show and hide specific options on page load
+  // Grab references to form elements that we will show/hide on page load
   var auth_settings_access_redirect_to_login = $('#radio_auth_settings_access_redirect_to_login').closest('tr');
   var auth_settings_access_redirect_to_url = $('#auth_settings_access_redirect_to_url').closest('tr');
   var auth_settings_access_redirect_to_message = $('#wp-auth_settings_access_redirect_to_message-wrap').closest('tr');
@@ -237,6 +237,14 @@ jQuery(document).ready(function($){
   var auth_settings_access_role_receive_pending_emails = $('#auth_settings_access_role_receive_pending_emails').closest('tr');
   var auth_settings_access_pending_redirect_to_message = $('#wp-auth_settings_access_pending_redirect_to_message-wrap').closest('tr');
   var auth_settings_access_public_pages = $('#auth_settings_access_public_pages').closest('tr');
+  var auth_settings_external_cas_host = $('#auth_settings_cas_host').closest('tr');
+  var auth_settings_external_cas_port = $('#auth_settings_cas_port').closest('tr');
+  var auth_settings_external_cas_path = $('#auth_settings_cas_path').closest('tr');
+  var auth_settings_external_ldap_host = $('#auth_settings_ldap_host').closest('tr');
+  var auth_settings_external_ldap_search_base = $('#auth_settings_ldap_search_base').closest('tr');
+  var auth_settings_external_ldap_user = $('#auth_settings_ldap_user').closest('tr');
+  var auth_settings_external_ldap_password = $('#auth_settings_ldap_password').closest('tr');
+  var auth_settings_external_ldap_tls = $('#auth_settings_ldap_tls').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', auth_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
@@ -248,6 +256,14 @@ jQuery(document).ready(function($){
   $('th, td', auth_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_cas_host).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_cas_port).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_cas_path).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_host).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_search_base).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_user).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_password).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_tls).wrapInner('<div class="animated_wrapper" />');
 
   // If we're viewing the dashboard widget, reset a couple of the relevant
   // option variables (since they're aren't nested in table rows).
@@ -263,6 +279,7 @@ jQuery(document).ready(function($){
     $('#dashboard_link_approved_users').contents().unwrap();
   }
 
+  // Show/hide redirect options
   if (!$('#radio_auth_settings_access_redirect_to_url').is(':checked')) {
     $('div.animated_wrapper', auth_settings_access_redirect_to_url).hide();
   }
@@ -270,6 +287,7 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', auth_settings_access_redirect_to_message).hide();
   }
 
+  // Show/hide pending/approved/blocked list options
   if (!$('#radio_auth_settings_access_restriction_approved_users').is(':checked')) {
     $('div.animated_wrapper', auth_settings_access_users_pending).hide();
     $('div.animated_wrapper', auth_settings_access_users_approved).hide();

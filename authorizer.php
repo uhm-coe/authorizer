@@ -2,7 +2,7 @@
 /*
 Plugin Name: Authorizer
 Plugin URI: http://hawaii.edu/coe/dcdc/
-Description: Authorizer restricts access to students enrolled in university courses, using CAS for authentication and a whitelist of users with permission to access the site.
+Description: Authorizer restricts access to students enrolled in university courses, using CAS or LDAP for authentication and a whitelist of users with permission to access the site.
 Version: 1.1
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
@@ -62,14 +62,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Register filters.
 
-			// Custom wp authentication routine using CAS
-			add_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
+			// Custom wp authentication routine using external service.
+			add_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
 
-			// Custom logout action using CAS
-			add_action( 'wp_logout', array( $this, 'cas_logout' ) );
+			// Custom logout action using external service.
+			add_action( 'wp_logout', array( $this, 'custom_logout' ) );
 
-			// Removing this bypasses Wordpress authentication (so if CAS auth fails,
-			// no one can log in); with it enabled, it will run if CAS auth fails.
+			// Removing this bypasses Wordpress authentication (so if external auth fails,
+			// no one can log in); with it enabled, it will run if external auth fails.
 			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3);
 
 			// Create settings link on Plugins page
@@ -166,7 +166,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Plugin uninstallation.
+		 * Plugin uninstallation. Runs when plugin is deleted (not disabled).
 		 *
 		 * @return void
 		 */
@@ -185,14 +185,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
-		 * CAS Authentication
+		 * External Authentication
 		 ****************************
 		 */
 
 
 
 		/**
-		 * Authenticate using CAS credentials.
+		 * Authenticate against an external service.
 		 *
 		 * @param WP_User $user     user to authenticate
 		 * @param string  $username optional username to authenticate.
@@ -200,7 +200,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return WP_User or WP_Error
 		 */
-		public function cas_authenticate( $user, $username, $password ) {
+		public function custom_authenticate( $user, $username, $password ) {
 			// Pass through if already authenticated.
 			if ( is_a( $user, 'WP_User' ) ) {
 				return $user;
@@ -212,7 +212,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// querystring variable 'login' is set to 'wordpress'--for example:
 			// https://www.example.com/wp-login.php?login=wordpress
 			if ( ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress' ) {
-				remove_filter( 'authenticate', array( $this, 'cas_authenticate' ), 1, 3 );
+				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
 				return new WP_Error( 'using_wp_authentication', 'Bypassing external authentication in favor of WordPress authentication...' );
 			}
 
@@ -227,54 +227,68 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = get_option( 'auth_settings' );
 
 			// If we're restricting access to only WP users, or not restricting
-			// access at all, don't check against CAS; instead, pass through to
-			// default WP authentication.
+			// access at all, don't check against an external service; instead,
+			// pass through to default WP authentication.
 			if ( $auth_settings['access_restriction'] === 'user' || $auth_settings['access_restriction'] === 'everyone' ) {
 				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 			}
 
-			// Set the CAS client configuration
-			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+			// Start external authentication.
+			if ( $auth_settings['external_service'] === 'cas' ) {
+				// Set the CAS client configuration
+				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
 
-			// Update server certificate bundle if it doesn't exist or is older
-			// than 3 months, then use it to ensure CAS server is legitimate.
-			$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
-			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
-			$time_90_days_ago = time() - $time_90_days;
-			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
-				$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
-				if ( $cacert_contents !== false ) {
-					file_put_contents( $cacert_path, $cacert_contents );
-				} else {
-					return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
+				// Update server certificate bundle if it doesn't exist or is older
+				// than 3 months, then use it to ensure CAS server is legitimate.
+				$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
+				$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
+				$time_90_days_ago = time() - $time_90_days;
+				if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
+					$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
+					if ( $cacert_contents !== false ) {
+						file_put_contents( $cacert_path, $cacert_contents );
+					} else {
+						return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
+					}
 				}
+				phpCAS::setCasServerCACert( $cacert_path );
+
+				// Authenticate against CAS
+				if ( ! phpCAS::isAuthenticated() ) {
+					phpCAS::forceAuthentication();
+					die();
+				}
+
+				// Get the TLD from the CAS host for use in matching email addresses
+				// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
+				// 'bob' will have the following email address: bob@hawaii.edu.
+				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+
+				// Get username that successfully authenticated against the external service (CAS).
+				$externally_authenticated_username = strtolower( phpCAS::getUser() );
+
+			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
+				// Log out via LDAP (custom UH-specific LDAP).
+
+				// @TODO
 			}
-			phpCAS::setCasServerCACert( $cacert_path );
 
-			// Authenticate against CAS
-			if ( ! phpCAS::isAuthenticated() ) {
-				phpCAS::forceAuthentication();
-				die();
-			}
+			// If we've made it this far, we have an externally authenticated user.
+			// $externally_authenticated_username and $tld should both be set.
 
-			// Get the TLD from the CAS host for use in matching email addresses
-			// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
-			// 'bob' will have the following email address: bob@hawaii.edu.
-			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
-
-			// Check if the CAS user has a WordPress account (with the same username or email address)
+			// Check if the external user has a WordPress account (with the same username or email address)
 			if ( ! $user ) {
-				$user = get_user_by( 'login', strtolower( phpCAS::getUser() ) );
+				$user = get_user_by( 'login', $externally_authenticated_username );
 			}
 			if ( ! $user ) {
-				$user = get_user_by( 'email', strtolower( phpCAS::getUser() . '@' . $tld ) );
+				$user = get_user_by( 'email', $externally_authenticated_username . '@' . $tld );
 			}
 
-			// If we've made it this far, we have a CAS authenticated user. Deal with
-			// them differently based on which list they're in (pending, blocked, or
-			// approved).
-			if ( $this->is_username_in_list( phpCAS::getUser(), 'blocked' ) ) {
-				// If the blocked CAS user has a WordPress account, remove it. In a
+			// If we've made it this far, we have an externally authenticated
+			// user. Deal with them differently based on which list they're in
+			// (pending, blocked, or approved).
+			if ( $this->is_username_in_list( $externally_authenticated_username, 'blocked' ) ) {
+				// If the blocked external user has a WordPress account, remove it. In a
 				// multisite environment, just remove them from the current blog.
 				// IMPORTANT NOTE: this deletes all of the user's posts.
 				// @TODO: switch this up to use a "blocked" or "inactive" flag in usermeta, so we don't have to delete user accounts (and possibly lose user data). this makes further sense if we tie the approved list to, say, UH Groupings, where we can specify a class roster. this roster is likely to change over time, which might mean removing users. note, however, that they will probably not go on the block list. as it stands right now, they just are removed from the approved list, but still have wordpress accounts. if they try to log in again, they'll be put on the pending list. HOLE: the one security hole is if they know about wp-login.php?login=wordpress, where they can fill out the lost password form with their email, reset their password, and then log in with their wordpress account. we need to decide how to deal with this, and if it's worth it.
@@ -287,15 +301,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Notify user about blocked status
-				$error_message = 'Sorry ' . strtolower( phpCAS::getUser() ) . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
+				$error_message = 'Sorry ' . $externally_authenticated_username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
 				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
-			} else if ( $this->is_username_in_list( phpCAS::getUser(), 'approved' ) ) {
-				$user_info = $this->get_user_info_from_list( phpCAS::getUser(), $auth_settings['access_users_approved'] );
+			} else if ( $this->is_username_in_list( $externally_authenticated_username, 'approved' ) ) {
+				$user_info = $this->get_user_info_from_list( $externally_authenticated_username, $auth_settings['access_users_approved'] );
 
-				// If the approved CAS user does not have a WordPress account, create it
+				// If the approved external user does not have a WordPress account, create it
 				if ( ! $user ) {
 					$result = wp_insert_user(
 						array(
@@ -341,10 +355,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
-				if ( ! $this->is_username_in_list( phpCAS::getUser(), 'pending' ) ) {
+				if ( ! $this->is_username_in_list( $externally_authenticated_username, 'pending' ) ) {
 					$pending_user = array();
-					$pending_user['username'] = strtolower( phpCAS::getUser() );
-					$pending_user['email'] = strtolower( phpCAS::getUser() . '@' . $tld );
+					$pending_user['username'] = $externally_authenticated_username;
+					$pending_user['email'] = $externally_authenticated_username . '@' . $tld;
 					$pending_user['role'] = $auth_settings['access_default_role'];
 					$pending_user['date_added'] = '';
 					if ( ! is_array ( $auth_settings['access_users_pending'] ) ) {
@@ -377,25 +391,32 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Log out of CAS.
+		 * Log out of the attached external service.
 		 *
 		 * @return void
 		 */
-		public function cas_logout() {
+		public function custom_logout() {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
-
-			// Set the CAS client configuration if it hasn't been set already.
-			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
-				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
-			}
 
 			// Reset option containing old error messages.
 			update_option( 'auth_settings_advanced_login_error', $error_message );
 
-			// Log out of CAS.
-			phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
-			//phpCAS::logoutWithUrl( get_option( 'siteurl' ) );
+			// Log out of external service.
+			if ( $auth_settings['external_service'] === 'cas' ) {
+				// Set the CAS client configuration if it hasn't been set already.
+				if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
+					phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+				}
+
+				// Log out of CAS.
+				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+
+			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
+				// Log out of LDAP (custom UH-specific LDAP).
+
+				// @TODO
+			}
 		}
 
 
@@ -724,11 +745,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function admin_notices() {
 			$auth_settings = get_option( 'auth_settings' );
-			$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
 
-			// Check if provided CAS URL is accessible.
-			if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
-				print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:chooseTab(\"cas\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
+			if ( $auth_settings['external_service'] === 'cas' ) {
+				// Check if provided CAS URL is accessible.
+				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
+				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
+					print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:chooseTab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
+				}
 			}
 		}
 
@@ -784,18 +807,26 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for CAS Settings
-			$help_auth_settings_cas_content = '
+			// Add help tab for External Service (CAS, LDAP) Settings
+			// @TODO: add ldap settings, and select dropdown to choose between the two
+			$help_auth_settings_external_content = '
+				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You\'ll have to fill out different fields below depending on which service you choose.</p>
 				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
+				<p><strong><em>If you chose CAS as the external service type:</em></strong></p>
 				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
 				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
 				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</p>
-			';
+				<p><strong><em>If you chose LDAP as the external service type:</em></strong></p>
+				<p><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</p>
+				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=yourcompany,dc=com</p>
+				<p><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</p>
+				<p><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</p>
+				<p><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</p>			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_cas_content',
-					'title' => 'CAS',
-					'content' => $help_auth_settings_cas_content,
+					'id' => 'help_auth_settings_external_content',
+					'title' => 'External Service',
+					'content' => $help_auth_settings_external_content,
 				)
 			);
 
@@ -846,21 +877,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_access_users_pending', // HTML element ID
-				'Pending CAS Users', // HTML element Title
+				'Pending Users', // HTML element Title
 				array( $this, 'print_combo_auth_access_users_pending' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_users_approved', // HTML element ID
-				'Approved CAS Users', // HTML element Title
+				'Approved Users', // HTML element Title
 				array( $this, 'print_combo_auth_access_users_approved' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_users_blocked', // HTML element ID
-				'Blocked CAS Users', // HTML element Title
+				'Blocked Users', // HTML element Title
 				array( $this, 'print_combo_auth_access_users_blocked' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_lists' // Section this setting is shown on
@@ -925,40 +956,82 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_access_public' // Section this setting is shown on
 			);
 
-			// Create CAS Settings section
+			// Create External Service Settings section
 			add_settings_section(
-				'auth_settings_cas', // HTML element ID
+				'auth_settings_external', // HTML element ID
 				'', // HTML element Title
-				array( $this, 'print_section_info_cas' ), // Callback (echos section content)
+				array( $this, 'print_section_info_external' ), // Callback (echos section content)
 				'authorizer' // Page this section is shown on (slug)
+			);
+			add_settings_field(
+				'auth_settings_external_service', // HTML element ID
+				'Type of external service to authenticate against', // HTML element Title
+				array( $this, 'print_radio_auth_external_service' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_default_role', // HTML element ID
 				'Default role for new users', // HTML element Title
 				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_cas' // Section this setting is shown on
+				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_cas_host', // HTML element ID
 				'CAS server hostname', // HTML element Title
 				array( $this, 'print_text_cas_host' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_cas' // Section this setting is shown on
+				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_cas_port', // HTML element ID
 				'CAS server port', // HTML element Title
 				array( $this, 'print_text_cas_port' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_cas' // Section this setting is shown on
+				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_cas_path', // HTML element ID
 				'CAS server path/context', // HTML element Title
 				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_cas' // Section this setting is shown on
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_host', // HTML element ID
+				'LDAP Host', // HTML element Title
+				array( $this, 'print_text_ldap_host' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_search_base', // HTML element ID
+				'LDAP Search Base', // HTML element Title
+				array( $this, 'print_text_ldap_search_base' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_user', // HTML element ID
+				'LDAP Directory User', // HTML element Title
+				array( $this, 'print_text_ldap_user' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_password', // HTML element ID
+				'LDAP Directory User Password', // HTML element Title
+				array( $this, 'print_password_ldap_password' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_tls', // HTML element ID
+				'Secure Connection (TLS)', // HTML element Title
+				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
 			);
 
 			// Create Advanced Settings section
@@ -1029,7 +1102,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_public_pages'] = array('home');
 			}
 
-			// CAS Defaults.
+			// External Service Defaults.
 			if ( !array_key_exists( 'access_default_role', $auth_settings ) ) {
 				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 				$all_roles = $wp_roles->roles;
@@ -1040,6 +1113,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['access_default_role'] = 'subscriber';
 				}
 			}
+			if ( !array_key_exists( 'external_service', $auth_settings ) ) {
+				$auth_settings['external_service'] = 'cas';
+			}
+
 			if ( !array_key_exists( 'cas_host', $auth_settings ) ) {
 				$auth_settings['cas_host'] = '';
 			}
@@ -1048,6 +1125,22 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( !array_key_exists( 'cas_path', $auth_settings ) ) {
 				$auth_settings['cas_path'] = '';
+			}
+
+			if ( !array_key_exists( 'ldap_host', $auth_settings ) ) {
+				$auth_settings['ldap_host'] = '';
+			}
+			if ( !array_key_exists( 'ldap_search_base', $auth_settings ) ) {
+				$auth_settings['ldap_search_base'] = '';
+			}
+			if ( !array_key_exists( 'ldap_user', $auth_settings ) ) {
+				$auth_settings['ldap_user'] = '';
+			}
+			if ( !array_key_exists( 'ldap_password', $auth_settings ) ) {
+				$auth_settings['ldap_password'] = '';
+			}
+			if ( !array_key_exists( 'ldap_tls', $auth_settings ) ) {
+				$auth_settings['ldap_tls'] = '1';
 			}
 
 			// Advanced defaults.
@@ -1105,6 +1198,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['cas_host'] = '';
 			}
 
+			// Sanitize LDAP Host setting
+			if ( filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
+				$auth_settings['ldap_host'] = '';
+			}
+			// Obfuscate LDAP directory user password
+			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
+				// encrypt the directory user password for some minor obfuscation in the database.
+				$auth_settings['ldap_password'] = base64_encode( $this->encrypt( $auth_settings['ldap_password'] ) );
+			}
+
 			// Make sure public pages is an empty array if it's empty
 			if ( ! is_array ( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
@@ -1122,7 +1225,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
 				<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Private Access</a>
 				<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public');">Public Access</a>
-				<a class="nav-tab nav-tab-cas" href="javascript:chooseTab('cas');">CAS</a>
+				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
 			</h2><?php
 		}
@@ -1241,13 +1344,26 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_cas() {
-			?><div id="section_info_cas" class="section_info">
+		function print_section_info_external() {
+			?><div id="section_info_external" class="section_info">
 				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
 				<p>As a safeguard, you can always access the default WordPress login panel (and bypass any external authentication system) by visiting wp-login.php?login=wordpress like so:<br />
 					<a href="<?php print wp_login_url() . '?login=wordpress'; ?>"><?php print wp_login_url() . '?login=wordpress'; ?></a></p>
 				<p>Enter your CAS server settings below.</p>
 			</div><?php
+		}
+
+		function print_select_auth_access_default_role( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><select id="auth_settings_access_default_role" name="auth_settings[access_default_role]">
+				<?php wp_dropdown_roles( $auth_settings['access_default_role'] ); ?>
+			</select><?php
+		}
+
+		function print_radio_auth_external_service( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="radio" id="radio_auth_settings_external_service_cas" name="auth_settings[external_service]" value="cas"<?php checked( 'cas' == $auth_settings['external_service'] ); ?> /> CAS<br />
+			<input type="radio" id="radio_auth_settings_external_service_ldap_uh" name="auth_settings[external_service]" value="ldap_uh"<?php checked( 'ldap_uh' == $auth_settings['external_service'] ); ?> /> LDAP (custom UH LDAP)<br /><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
@@ -1265,6 +1381,28 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="auth_settings_cas_path" name="auth_settings[cas_path]" value="<?= $auth_settings['cas_path']; ?>" placeholder="/cas" /><?php
 		}
 
+		function print_text_ldap_host( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap1.its.hawaii.edu" /><?php
+		}
+		function print_text_ldap_search_base( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=People,dc=hawaii,dc=edu" style="width:225px;" /><?php
+		}
+		function print_text_ldap_user( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="" style="width:310px;" /><?php
+		}
+		function print_password_ldap_password( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
+			<input type="password" id="auth_settings_ldap_password" name="auth_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($auth_settings['ldap_password'])); ?>" autocomplete="off" /><?php
+		}
+		function print_checkbox_ldap_tls( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="checkbox" id="auth_settings_ldap_tls" name="auth_settings[ldap_tls]" value="1"<?php checked( 1 == $auth_settings['ldap_tls'] ); ?> /> Use TLS<?php
+		}
+
 
 		function print_section_info_access() {
 			?><div id="section_info_access" class="section_info">
@@ -1273,19 +1411,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		}
 
-		function print_select_auth_access_default_role( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			?><select id="auth_settings_access_default_role" name="auth_settings[access_default_role]">
-				<?php wp_dropdown_roles( $auth_settings['access_default_role'] ); ?>
-			</select><?php
-		}
-
 		function print_radio_auth_access_restriction( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br />
-				<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No external users and all WordPress users)<br /><?php
+			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No external users and all WordPress users)<br /><?php
 		}
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -1461,6 +1592,19 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 
 
+
+		/**
+		 * Basic encryption using a public (not secret!) key. Used for general
+		 * database obfuscation of passwords.
+		 */
+		private static $key = '8QxnrvjdtweisvCBKEY!+0';
+		function encrypt( $text ) {
+			return mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
+		}
+		function decrypt( $secret ) {
+			$str = '';
+			return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$str" );
+		}
 
 		/**
 		 * In a multisite environment, returns true if the current user is logged
