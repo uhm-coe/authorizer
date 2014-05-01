@@ -1349,7 +1349,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
 				<p>As a safeguard, you can always access the default WordPress login panel (and bypass any external authentication system) by visiting wp-login.php?login=wordpress like so:<br />
 					<a href="<?php print wp_login_url() . '?login=wordpress'; ?>"><?php print wp_login_url() . '?login=wordpress'; ?></a></p>
-				<p>Enter your CAS server settings below.</p>
+				<p>Enter your external server settings below.</p>
 			</div><?php
 		}
 
