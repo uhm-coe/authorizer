@@ -275,7 +275,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Fail with error message if username or password is blank.
 				if ( empty( $username ) ) {
-					return new WP_Error( 'empty_username', 'Username cannot be blank.' );
+					return null;
 				}
 				if ( empty( $password ) ) {
 					return new WP_Error( 'empty_password', 'You must provide a password.' );
