@@ -270,7 +270,80 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
 				// Log out via LDAP (custom UH-specific LDAP).
 
-				// @TODO
+				// Custom UH code: remove @hawaii.edu if it exists in the username
+				$username = str_replace( '@hawaii.edu', '', $username );
+
+				// Fail with error message if username or password is blank.
+				if ( empty( $username ) ) {
+					return new WP_Error( 'empty_username', 'Username cannot be blank.' );
+				}
+				if ( empty( $password ) ) {
+					return new WP_Error( 'empty_password', 'You must provide a password.' );
+				}
+
+				// Authenticate against LDAP using options provided in plugin settings.
+				$result = false;
+				$ldap_user = array(
+					'dn' => '0',
+					'first' => 'nobody',
+					'last' => '',
+					'email' => '',
+				);
+
+				$ldap = ldap_connect( $auth_settings['ldap_host'] );
+				ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
+				if ( $auth_settings['ldap_tls'] == 1 ) {
+					ldap_start_tls( $ldap );
+				}
+				$result = ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
+				if ( !$result ) {
+					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
+				}
+				// UH has an odd system; people cn's are their uhuuid's (8 digit
+				// numbers), not their uids (unique email address usernames).
+				// So here we need to do an extra search by uid to get a uhuuid,
+				// and then attempt to authenticate with uhuuid and password.
+				$ldap_search = ldap_search(
+					$ldap,
+					$auth_settings['ldap_search_base'],
+					"(uid=$username)",
+					array(
+						'givenName',
+						'sn',
+						'mail',
+						'uhUuid',
+					)
+				);
+				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+
+				// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
+				if ( $ldap_entries['count'] < 1 ) {
+					return new WP_Error( 'no_ldap', 'No LDAP user found.' );
+				}
+
+				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
+					$ldap_user['dn'] = $ldap_entries[$i]['dn'];
+					$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
+					$ldap_user['last'] = $ldap_entries[$i]['sn'][0];
+					$ldap_user['email'] = $ldap_entries[$i]['mail'][0];
+				}
+
+				$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
+				if ( !$result ) {
+					// We have a real ldap user, but an invalid password, so we shouldn't
+					// pass through to wp authentication after failing ldap. Instead,
+					// remove the WordPress authenticate function, and return an error.
+					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+					return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
+				}
+
+				// Get the TLD from the LDAP host for use in matching email addresses
+				// For example: hawaii.edu is the TLD for ldap1.its.hawaii.edu, so user
+				// 'bob' will have the following email address: bob@hawaii.edu.
+				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+
+				// User successfully authenticated against LDAP, so set the relevant variables.
+				$externally_authenticated_username = $username;
 			}
 
 			// If we've made it this far, we have an externally authenticated user.
@@ -414,8 +487,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
 				// Log out of LDAP (custom UH-specific LDAP).
-
-				// @TODO
+				// Nothing to do here.
 			}
 		}
 
