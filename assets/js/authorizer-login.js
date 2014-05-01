@@ -14,7 +14,7 @@ window.onload = function modifyLoginPage() {
 	formElement.appendChild(formElementChildren);
 
 	if (hasPlaceholder) {
-		userFormElement.setAttribute('placeholder', 'WordPress Username');
+		userFormElement.setAttribute('placeholder', 'Username');
 		passFormElement.setAttribute('placeholder', 'Password');
 	} else {
 		userFormElement.setAttribute('value','Username');
