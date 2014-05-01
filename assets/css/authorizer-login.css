@@ -119,10 +119,3 @@ body.login #backtoblog a {
 	max-width: 138px;
 	font-size: 11px;
 }
-
-/* Retina Images */
-@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
-	body.login h1 a { width: 277px; background: url('../images/retina/logo-uh-system-@2X.png') top center no-repeat; }
-	body.login #loginform #user_login { background: url('../images/icon-user.png-@2X.jpg') #FFF 16px 17px no-repeat; }
-	body.login #loginform #user_pass { background: url('../images/icon-pass.png-@2X.jpg') #FFF 13px 19px no-repeat;
-}
