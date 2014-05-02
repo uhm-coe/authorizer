@@ -297,6 +297,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$result = ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
 				if ( !$result ) {
+					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
 				}
 				// UH has an odd system; people cn's are their uhuuid's (8 digit
@@ -338,7 +339,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Get the TLD from the LDAP host for use in matching email addresses
-				// For example: hawaii.edu is the TLD for ldap1.its.hawaii.edu, so user
+				// For example: hawaii.edu is the TLD for ldap.its.hawaii.edu, so user
 				// 'bob' will have the following email address: bob@hawaii.edu.
 				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
 
@@ -1455,15 +1456,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_text_ldap_host( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap1.its.hawaii.edu" /><?php
+			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap.hawaii.edu" /><?php
 		}
 		function print_text_ldap_search_base( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=People,dc=hawaii,dc=edu" style="width:225px;" /><?php
+			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=people,dc=hawaii,dc=edu" style="width:225px;" /><?php
 		}
 		function print_text_ldap_user( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="" style="width:310px;" /><?php
+			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="" style="width:330px;" /><?php
 		}
 		function print_password_ldap_password( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
