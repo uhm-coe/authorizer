@@ -297,7 +297,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$result = ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
 				if ( !$result ) {
-					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+					// Can't connect to LDAP, so fall back to WordPress authentication.
 					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
 				}
 				// UH has an odd system; people cn's are their uhuuid's (8 digit
