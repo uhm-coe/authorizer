@@ -268,7 +268,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$externally_authenticated_username = strtolower( phpCAS::getUser() );
 
 			} else if ( $auth_settings['external_service'] === 'ldap' ) {
-				// Log out via LDAP (custom UH-specific LDAP).
 
 				// Custom UH code: remove @hawaii.edu if it exists in the username
 				$username = str_replace( '@hawaii.edu', '', $username );
@@ -487,8 +486,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
 
 			} else if ( $auth_settings['external_service'] === 'ldap' ) {
-				// Log out of LDAP (custom UH-specific LDAP).
-				// Nothing to do here.
+				// Log out of LDAP.
+				// Nothing to do here, just pass on to wp logout.
 			}
 		}
 
