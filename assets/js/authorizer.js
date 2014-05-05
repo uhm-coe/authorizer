@@ -243,7 +243,9 @@ jQuery(document).ready(function($){
   var auth_settings_external_cas_port = $('#auth_settings_cas_port').closest('tr');
   var auth_settings_external_cas_path = $('#auth_settings_cas_path').closest('tr');
   var auth_settings_external_ldap_host = $('#auth_settings_ldap_host').closest('tr');
+  var auth_settings_external_ldap_port = $('#auth_settings_ldap_port').closest('tr');
   var auth_settings_external_ldap_search_base = $('#auth_settings_ldap_search_base').closest('tr');
+  var auth_settings_external_ldap_uid = $('#auth_settings_ldap_uid').closest('tr');
   var auth_settings_external_ldap_user = $('#auth_settings_ldap_user').closest('tr');
   var auth_settings_external_ldap_password = $('#auth_settings_ldap_password').closest('tr');
   var auth_settings_external_ldap_tls = $('#auth_settings_ldap_tls').closest('tr');
@@ -262,7 +264,9 @@ jQuery(document).ready(function($){
   $('th, td', auth_settings_external_cas_port).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_path).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_host).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_port).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_search_base).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_uid).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_user).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_password).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_tls).wrapInner('<div class="animated_wrapper" />');
@@ -301,13 +305,17 @@ jQuery(document).ready(function($){
   // On load: Show/hide CAS/LDAP options based on which is selected
   if ($('#radio_auth_settings_external_service_cas').is(':checked')) {
     $('div.animated_wrapper', auth_settings_external_ldap_host).hide();
+    $('div.animated_wrapper', auth_settings_external_ldap_port).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_search_base).hide();
+    $('div.animated_wrapper', auth_settings_external_ldap_uid).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_user).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_password).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_tls).hide();
 
     $('td, th', auth_settings_external_ldap_host).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_ldap_port).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_search_base).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_ldap_uid).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_user).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_password).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_tls).animate({ padding: '0px' }, { duration: animation_speed });
@@ -372,7 +380,9 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', auth_settings_external_cas_path).slideDown(animation_speed);
 
       $('div.animated_wrapper', auth_settings_external_ldap_host).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_external_ldap_port).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_search_base).slideUp(animation_speed);
+      $('div.animated_wrapper', auth_settings_external_ldap_uid).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_user).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_password).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_tls).slideUp(animation_speed);
@@ -385,7 +395,9 @@ jQuery(document).ready(function($){
       $('td', auth_settings_external_cas_path).animate({ padding: '15px 10px' }, { duration: animation_speed });
 
       $('td, th', auth_settings_external_ldap_host).animate(       { padding: '0px' }, { duration: animation_speed });
+      $('td, th', auth_settings_external_ldap_port).animate(       { padding: '0px' }, { duration: animation_speed });
       $('td, th', auth_settings_external_ldap_search_base).animate({ padding: '0px' }, { duration: animation_speed });
+      $('td, th', auth_settings_external_ldap_uid).animate(        { padding: '0px' }, { duration: animation_speed });
       $('td, th', auth_settings_external_ldap_user).animate(       { padding: '0px' }, { duration: animation_speed });
       $('td, th', auth_settings_external_ldap_password).animate(   { padding: '0px' }, { duration: animation_speed });
       $('td, th', auth_settings_external_ldap_tls).animate(        { padding: '0px' }, { duration: animation_speed });
@@ -395,7 +407,9 @@ jQuery(document).ready(function($){
       $('div.animated_wrapper', auth_settings_external_cas_path).slideUp(animation_speed);
 
       $('div.animated_wrapper', auth_settings_external_ldap_host).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_external_ldap_port).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_search_base).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_external_ldap_uid).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_user).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_password).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_ldap_tls).slideDown(animation_speed);
@@ -405,12 +419,16 @@ jQuery(document).ready(function($){
       $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
 
       $('th', auth_settings_external_ldap_host).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
+      $('th', auth_settings_external_ldap_port).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
       $('th', auth_settings_external_ldap_search_base).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
+      $('th', auth_settings_external_ldap_uid).animate(        { padding: '20px 10px 20px 0' }, { duration: animation_speed });
       $('th', auth_settings_external_ldap_user).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
       $('th', auth_settings_external_ldap_password).animate(   { padding: '20px 10px 20px 0' }, { duration: animation_speed });
       $('th', auth_settings_external_ldap_tls).animate(        { padding: '20px 10px 20px 0' }, { duration: animation_speed });
       $('td', auth_settings_external_ldap_host).animate(       { padding: '15px 10px' }, { duration: animation_speed });
+      $('td', auth_settings_external_ldap_port).animate(       { padding: '15px 10px' }, { duration: animation_speed });
       $('td', auth_settings_external_ldap_search_base).animate({ padding: '15px 10px' }, { duration: animation_speed });
+      $('td', auth_settings_external_ldap_uid).animate(        { padding: '15px 10px' }, { duration: animation_speed });
       $('td', auth_settings_external_ldap_user).animate(       { padding: '15px 10px' }, { duration: animation_speed });
       $('td', auth_settings_external_ldap_password).animate(   { padding: '15px 10px' }, { duration: animation_speed });
       $('td', auth_settings_external_ldap_tls).animate(        { padding: '15px 10px' }, { duration: animation_speed });

@@ -282,14 +282,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Authenticate against LDAP using options provided in plugin settings.
 				$result = false;
-				$ldap_user = array(
-					'dn' => '0',
-					'first' => 'nobody',
-					'last' => '',
-					'email' => '',
-				);
+				$ldap_user_dn = '';
 
-				$ldap = ldap_connect( $auth_settings['ldap_host'] );
+				$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
 				ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 				if ( $auth_settings['ldap_tls'] == 1 ) {
 					ldap_start_tls( $ldap );
@@ -299,20 +294,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Can't connect to LDAP, so fall back to WordPress authentication.
 					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
 				}
-				// UH has an odd system; people cn's are their uhuuid's (8 digit
-				// numbers), not their uids (unique email address usernames).
-				// So here we need to do an extra search by uid to get a uhuuid,
-				// and then attempt to authenticate with uhuuid and password.
+				// Look up the bind DN of the user trying to log in by
+				// performing an LDAP search for the login username in the
+				// field specified in the LDAP settings. This setup is common.
 				$ldap_search = ldap_search(
 					$ldap,
 					$auth_settings['ldap_search_base'],
-					"(uid=$username)",
-					array(
-						'givenName',
-						'sn',
-						'mail',
-						'uhUuid',
-					)
+					"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
+					array('dn') // Just get the dn (no other attributes)
 				);
 				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 
@@ -321,25 +310,23 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					return new WP_Error( 'no_ldap', 'No LDAP user found.' );
 				}
 
+				// Get the bind dn; if there are multiple results returned, just get the last one.
 				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
-					$ldap_user['dn'] = $ldap_entries[$i]['dn'];
-					$ldap_user['first'] = $ldap_entries[$i]['givenname'][0];
-					$ldap_user['last'] = $ldap_entries[$i]['sn'][0];
-					$ldap_user['email'] = $ldap_entries[$i]['mail'][0];
+					$ldap_user_dn = $ldap_entries[$i]['dn'];
 				}
 
-				$result = ldap_bind( $ldap, $ldap_user['dn'], $password );
+				$result = ldap_bind( $ldap, $ldap_user_dn, $password );
 				if ( !$result ) {
 					// We have a real ldap user, but an invalid password, so we shouldn't
 					// pass through to wp authentication after failing ldap. Instead,
 					// remove the WordPress authenticate function, and return an error.
 					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-					return new WP_Error( 'ldap_error', "<strong>ERROR</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
+					return new WP_Error( 'ldap_error', "<strong>Error</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
 				}
 
 				// Get the TLD from the LDAP host for use in matching email addresses
-				// For example: hawaii.edu is the TLD for ldap.its.hawaii.edu, so user
-				// 'bob' will have the following email address: bob@hawaii.edu.
+				// For example: example.edu is the TLD for ldap.example.edu, so user
+				// 'bob' will have the following email address: bob@example.edu.
 				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
 
 				// User successfully authenticated against LDAP, so set the relevant variables.
@@ -1078,9 +1065,23 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_ldap_port', // HTML element ID
+				'LDAP Port', // HTML element Title
+				array( $this, 'print_text_ldap_port' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_ldap_search_base', // HTML element ID
 				'LDAP Search Base', // HTML element Title
 				array( $this, 'print_text_ldap_search_base' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_uid', // HTML element ID
+				'LDAP attribute containing username', // HTML element Title
+				array( $this, 'print_text_ldap_uid' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -1202,8 +1203,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( !array_key_exists( 'ldap_host', $auth_settings ) ) {
 				$auth_settings['ldap_host'] = '';
 			}
+			if ( !array_key_exists( 'ldap_port', $auth_settings ) ) {
+				$auth_settings['ldap_port'] = '';
+			}
 			if ( !array_key_exists( 'ldap_search_base', $auth_settings ) ) {
 				$auth_settings['ldap_search_base'] = '';
+			}
+			if ( !array_key_exists( 'ldap_uid', $auth_settings ) ) {
+				$auth_settings['ldap_uid'] = '';
 			}
 			if ( !array_key_exists( 'ldap_user', $auth_settings ) ) {
 				$auth_settings['ldap_user'] = '';
@@ -1266,14 +1273,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sanitize CAS Host setting
-			if ( filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL ) === FALSE ) {
-				$auth_settings['cas_host'] = '';
-			}
+			$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
+
+			// Sanitize LDAP and CAS Port (int)
+			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
+			$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
 			// Sanitize LDAP Host setting
-			if ( filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL ) === FALSE ) {
-				$auth_settings['ldap_host'] = '';
-			}
+			$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
+
+			// Sanitize LDAP attributes (basically make sure they don't have any parantheses)
+			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
+
 			// Obfuscate LDAP directory user password
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
 				// encrypt the directory user password for some minor obfuscation in the database.
@@ -1440,7 +1451,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_text_cas_host( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?= $auth_settings['cas_host']; ?>" placeholder="login.its.hawaii.edu" /><?php
+			?><input type="text" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?= $auth_settings['cas_host']; ?>" placeholder="login.its.example.edu" /><?php
 		}
 
 		function print_text_cas_port( $args = '' ) {
@@ -1455,15 +1466,23 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_text_ldap_host( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap.hawaii.edu" /><?php
+			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap.example.edu" /><?php
+		}
+		function print_text_ldap_port( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="text" id="auth_settings_ldap_port" name="auth_settings[ldap_port]" value="<?= $auth_settings['ldap_port']; ?>" placeholder="389" /><?php
 		}
 		function print_text_ldap_search_base( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=people,dc=hawaii,dc=edu" style="width:225px;" /><?php
+			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
+		}
+		function print_text_ldap_uid( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="text" id="auth_settings_ldap_uid" name="auth_settings[ldap_uid]" value="<?= $auth_settings['ldap_uid']; ?>" placeholder="uid" /><?php
 		}
 		function print_text_ldap_user( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="" style="width:330px;" /><?php
+			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
 		}
 		function print_password_ldap_password( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
