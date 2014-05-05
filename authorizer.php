@@ -267,7 +267,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Get username that successfully authenticated against the external service (CAS).
 				$externally_authenticated_username = strtolower( phpCAS::getUser() );
 
-			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
+			} else if ( $auth_settings['external_service'] === 'ldap' ) {
 				// Log out via LDAP (custom UH-specific LDAP).
 
 				// Custom UH code: remove @hawaii.edu if it exists in the username
@@ -486,7 +486,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Log out of CAS.
 				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
 
-			} else if ( $auth_settings['external_service'] === 'ldap_uh' ) {
+			} else if ( $auth_settings['external_service'] === 'ldap' ) {
 				// Log out of LDAP (custom UH-specific LDAP).
 				// Nothing to do here.
 			}
@@ -1436,7 +1436,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_radio_auth_external_service( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_external_service_cas" name="auth_settings[external_service]" value="cas"<?php checked( 'cas' == $auth_settings['external_service'] ); ?> /> CAS<br />
-			<input type="radio" id="radio_auth_settings_external_service_ldap_uh" name="auth_settings[external_service]" value="ldap_uh"<?php checked( 'ldap_uh' == $auth_settings['external_service'] ); ?> /> LDAP (custom UH LDAP)<br /><?php
+			<input type="radio" id="radio_auth_settings_external_service_ldap" name="auth_settings[external_service]" value="ldap"<?php checked( 'ldap' == $auth_settings['external_service'] ); ?> /> LDAP<br /><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
