@@ -26,7 +26,7 @@ window.onload = function modifyLoginPage() {
 
 	// Decrement seconds counter if it exists
 	var seconds_element = document.getElementById( 'seconds_remaining' );
-	if ( typeof seconds_element != 'undefined' ) {
+	if ( seconds_element != null ) {
 		var seconds_interval = setInterval( function() {
 			var seconds = seconds_element.getAttribute( 'data-seconds' );
 			if ( seconds < 1 ) {
