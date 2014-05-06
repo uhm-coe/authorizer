@@ -241,17 +241,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check if we need to institute a lockout delay
 			if ( $time_since_last_fail > $reset_duration ) {
-error_log('reset');
-error_log(date(DATE_RFC2822, $last_attempt));
-error_log('attempts: '.$num_attempts);
 				// Enough time has passed since the last invalid attempt and
 				// now that we can reset the failed attempt count, and let this
 				// login attempt go through.
 				$num_attempts = 0; // This does nothing, but include it for semantic meaning.
 			} else if ( $num_attempts > $num_attempts_long_lockout && $seconds_remaining_long_lockout > 0 ) {
-error_log('long delay');
-error_log(date(DATE_RFC2822, $last_attempt));
-error_log('attempts: '.$num_attempts);
 				// Stronger lockout (1st/2nd round of invalid attempts reached)
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
@@ -259,9 +253,6 @@ error_log('attempts: '.$num_attempts);
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_long_lockout, $this->seconds_as_sentence( $seconds_remaining_long_lockout ), wp_lostpassword_url() ) );
 			} else if ( $num_attempts > $num_attempts_short_lockout && $seconds_remaining_short_lockout > 0 ) {
-error_log('short delay');
-error_log(date(DATE_RFC2822, $last_attempt));
-error_log('attempts: '.$num_attempts);
 				// Normal lockout (1st round of invalid attempts reached)
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
@@ -269,9 +260,6 @@ error_log('attempts: '.$num_attempts);
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_short_lockout, $this->seconds_as_sentence( $seconds_remaining_short_lockout ), wp_lostpassword_url() ) );
 			}
-error_log('no lockout, trying this login attempt...');
-error_log(date(DATE_RFC2822, $last_attempt));
-error_log('attempts: '.$num_attempts);
 
 
 			// Admin bypass: skip cas login and proceed to WordPress login if
@@ -664,7 +652,6 @@ error_log('attempts: '.$num_attempts);
 		 * Keep track of time of last failed attempt and number of failed attempts.
 		 */
 		function update_login_failed_count( $username ) {
-error_log('*** firing failed login.');
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
