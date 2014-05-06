@@ -216,7 +216,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
 			$unauthenticated_user = get_user_by( 'login', $username );
-			if ( ! is_wp_error( $unauthenticated_user ) ) {
+			if ( $unauthenticated_user !== FALSE ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 			} else {
@@ -224,11 +224,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
 			}
 
-			// Reset the failed count and last attempt if either is unset.
-			if ( $last_attempt === FALSE || $num_attempts === FALSE || strlen( $last_attempt ) < 1 || strlen( $num_attempts ) < 1 ) {
-				$last_attempt = 0;
-				$num_attempts = 0;
-			}
+			// Make sure $last_attempt (time) and $num_attempts are positive integers.
+			// Note: this addresses resetting them if either is unset from above.
+			$last_attempt = abs( intval( $last_attempt ) );
+			$num_attempts = abs( intval( $num_attempts ) );
 
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
@@ -252,7 +251,8 @@ error_log('attempts: '.$num_attempts);
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again.' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_2'] * 60 ) ) );
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again. <a href="%3$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_2'] * 60 ), wp_lostpassword_url() ) );
 			} else if ( $num_attempts > $auth_settings['advanced_lockouts']['attempts_1'] ) {
 error_log('short delay');
 error_log(date(DATE_RFC2822, $last_attempt));
@@ -261,7 +261,8 @@ error_log('attempts: '.$num_attempts);
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again.' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_1'] * 60 ) ) );
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again. <a href="%3$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_1'] * 60 ), wp_lostpassword_url() ) );
 			}
 error_log('no lockout, trying this login attempt...');
 error_log(date(DATE_RFC2822, $last_attempt));
@@ -670,7 +671,7 @@ error_log('*** firing failed login.');
 			// accounts get locked out on multiple invalid attempts.
 			$user = get_user_by( 'login', $username );
 
-			if ( ! is_wp_error( $user ) ) {
+			if ( $user !== FALSE ) {
 				$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 			} else {
@@ -678,11 +679,10 @@ error_log('*** firing failed login.');
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
 			}
 
-			// Reset the failed attempt count if either variable is unset.
-			if ( $last_attempt === FALSE || $num_attempts === FALSE || strlen( $last_attempt ) < 1 || strlen( $num_attempts ) < 1 ) {
-				$last_attempt = time();
-				$num_attempts = 0;
-			}
+			// Make sure $last_attempt (time) and $num_attempts are positive integers.
+			// Note: this addresses resetting them if either is unset from above.
+			$last_attempt = abs( intval( $last_attempt ) );
+			$num_attempts = abs( intval( $num_attempts ) );
 
 			// Reset the failed attempt count if the time since the last
 			// failed attempt is greater than the reset duration.
@@ -693,7 +693,7 @@ error_log('*** firing failed login.');
 			}
 
 			// Set last failed time to now and increment last failed count.
-			if ( ! is_wp_error( $user ) ) {
+			if ( $user !== FALSE ) {
 				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', time() );
 				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
 			} else {
