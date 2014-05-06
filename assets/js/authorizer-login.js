@@ -14,7 +14,7 @@ domReady(function() {
 			seconds_element.setAttribute( 'data-seconds', seconds );
 		}, 1000);
 	}
-}
+});
 
 function seconds_as_sentence( seconds ) {
 	units = {
@@ -46,4 +46,4 @@ function seconds_as_sentence( seconds ) {
 	}
 
 	return s.substring( 0, s.length - 2 ); // trim off last ', '
-});
+}
