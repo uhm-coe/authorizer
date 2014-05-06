@@ -28,7 +28,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 /*
 Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
-Portions forked from wpCAS plugin:  http://wordpress.org/extend/plugins/cas-authentication/
+Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
+Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
 */
 
 
@@ -90,6 +91,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Register actions.
+
+			// Update the user meta with this user's failed login attempt.
+			add_action('wp_login_failed', array( $this, 'update_login_failed_count' ) );
 
 			// Create menu item in Settings
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
@@ -208,6 +212,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user = null;
 			}
 
+			// Check to make sure that $username is not locked out due to too
+			// many invalid login attempts. If it is, tell the user how much
+			// time remains until they can try again.
+
 			// Admin bypass: skip cas login and proceed to WordPress login if
 			// querystring variable 'login' is set to 'wordpress'--for example:
 			// https://www.example.com/wp-login.php?login=wordpress
@@ -321,7 +329,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// pass through to wp authentication after failing ldap. Instead,
 					// remove the WordPress authenticate function, and return an error.
 					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-					return new WP_Error( 'ldap_error', "<strong>Error</strong>: The password you entered for the username <strong>$username</strong> is incorrect." );
+					return new WP_Error( 'incorrect_password', sprintf( __( '<strong>ERROR</strong>: The password you entered for the username <strong>%1$s</strong> is incorrect. <a href="%2$s" title="Password Lost and Found">Lost your password</a>?' ), $username, wp_lostpassword_url() ) );
 				}
 
 				// Get the TLD from the LDAP host for use in matching email addresses
@@ -592,6 +600,54 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 
 
+		/**
+		 * Implements hook: do_action( 'wp_login_failed', $username );
+		 * Update the user meta for the user that just failed logging in.
+		 * Keep track of time of last failed attempt and number of failed attempts.
+		 */
+		function update_login_failed_count( $username ) {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Get user trying to log in.
+			// If this isn't a real user, update the global failed attempt
+			// variables. We'll use these global variables to institute the
+			// lockouts on nonexistent accounts. We do this so an attacker
+			// won't be able to determine which accounts are real by which
+			// accounts get locked out on multiple invalid attempts.
+			$user = get_user_by( 'login', $username );
+
+			if ( ! is_wp_error( $user ) ) {
+				$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
+				$num_attempts = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
+			} else {
+				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
+				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+			}
+
+			// Reset the failed attempt count if either variable is unset.
+			if ( $last_attempt === FALSE || $num_attempts === FALSE || strlen( $last_attempt ) < 1 || strlen( $num_attempts ) < 1 ) {
+				$last_attempt = time();
+				$num_attempts = 0;
+			}
+
+			// Reset the failed attempt count if the time since the last
+			// failed attempt is greater than the reset duration.
+			$time_since_last_fail = time() - $last_attempt;
+			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
+			if ( $time_since_last_fail > $reset_duration ) {
+				$num_attempts = 0;
+			}
+
+			// Set last failed time to now and increment last failed count.
+			if ( ! is_wp_error( $user ) ) {
+				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', time() );
+				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			} else {
+				update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
+				update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			}
+		}
 
 		/**
 		 * Overwrite the URL for the lost password link on the login form.
@@ -1115,6 +1171,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
+				'auth_settings_advanced_lockouts', // HTML element ID
+				'Limit invalid login attempts', // HTML element Title
+				array( $this, 'print_text_auth_advanced_lockouts' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_advanced_lostpassword_url', // HTML element ID
 				'Custom lost password URL', // HTML element Title
 				array( $this, 'print_text_auth_advanced_lostpassword_url' ), // Callback (echos form element)
@@ -1223,6 +1286,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Advanced defaults.
+			if ( !array_key_exists( 'advanced_lockouts', $auth_settings ) ) {
+				$auth_settings['advanced_lockouts'] = array(
+					'attempts_1' => 10,
+					'duration_1' => 1,
+					'attempts_2' => 10,
+					'duration_2' => 30,
+					'reset_duration' => 240,
+				);
+			}
 			if ( !array_key_exists( 'advanced_lostpassword_url', $auth_settings ) ) {
 				$auth_settings['advanced_lostpassword_url'] = '';
 			}
@@ -1294,6 +1366,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Make sure public pages is an empty array if it's empty
 			if ( ! is_array ( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
+			}
+
+			// Make sure all lockout options are integers (attempts_1,
+			// duration_1, attempts_2, duration_2, reset_duration).
+			foreach ( $auth_settings['advanced_lockouts'] as $key => $value ) {
+				$auth_settings['advanced_lockouts'][$key] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
 			}
 
 			return $auth_settings;
@@ -1588,6 +1666,25 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><div id="section_info_advanced" class="section_info">
 				<p>You may optionally specify some advanced settings below.</p>
 			</div><?php
+		}
+
+		function print_text_auth_advanced_lockouts() {
+			$auth_settings = get_option( 'auth_settings' );
+			?>After
+			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?= $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
+			invalid password attempts, delay further attempts on that username for
+			<input type="text" id="auth_settings_advanced_lockouts_duration_1" name="auth_settings[advanced_lockouts][duration_1]" value="<?= $auth_settings['advanced_lockouts']['duration_1']; ?>" placeholder="1" style="width:30px;" />
+			minute(s).
+			<br />
+			After
+			<input type="text" id="auth_settings_advanced_lockouts_attempts_2" name="auth_settings[advanced_lockouts][attempts_2]" value="<?= $auth_settings['advanced_lockouts']['attempts_2']; ?>" placeholder="10" style="width:30px;" />
+			invalid attempts with the delay, increase the delay to
+			<input type="text" id="auth_settings_advanced_lockouts_duration_2" name="auth_settings[advanced_lockouts][duration_2]" value="<?= $auth_settings['advanced_lockouts']['duration_2']; ?>" placeholder="30" style="width:30px;" />
+			minutes.
+			<br />
+			Reset the delays after
+			<input type="text" id="auth_settings_advanced_lockouts_reset_duration" name="auth_settings[advanced_lockouts][reset_duration]" value="<?= $auth_settings['advanced_lockouts']['reset_duration']; ?>" placeholder="240" style="width:40px;" />
+			minutes with no invalid attempts.<?php
 		}
 
 		function print_text_auth_advanced_lostpassword_url() {
