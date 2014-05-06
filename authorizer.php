@@ -885,10 +885,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function load_login_css_and_js() {
 			$auth_settings = get_option( 'auth_settings' );
 
+			?>
+			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
+			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
+			<?php
+
 			if ( $auth_settings['advanced_branding'] === 'custom_uh' ):
 				?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login-custom_uh.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login-custom_uh.js', __FILE__ ); ?>"></script>
 				<?php
 			endif;
 		}
