@@ -355,7 +355,7 @@ error_log('attempts: '.$num_attempts);
 				if ( $auth_settings['ldap_tls'] == 1 ) {
 					ldap_start_tls( $ldap );
 				}
-				$result = ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
+				$result = @ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
 				if ( !$result ) {
 					// Can't connect to LDAP, so fall back to WordPress authentication.
 					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
@@ -381,7 +381,7 @@ error_log('attempts: '.$num_attempts);
 					$ldap_user_dn = $ldap_entries[$i]['dn'];
 				}
 
-				$result = ldap_bind( $ldap, $ldap_user_dn, $password );
+				$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
 				if ( !$result ) {
 					// We have a real ldap user, but an invalid password, so we shouldn't
 					// pass through to wp authentication after failing ldap. Instead,
