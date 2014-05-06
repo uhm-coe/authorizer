@@ -215,6 +215,58 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check to make sure that $username is not locked out due to too
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
+			$unauthenticated_user = get_user_by( 'login', $username );
+			if ( ! is_wp_error( $unauthenticated_user ) ) {
+				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
+				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
+			} else {
+				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
+				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+			}
+
+			// Reset the failed count and last attempt if either is unset.
+			if ( $last_attempt === FALSE || $num_attempts === FALSE || strlen( $last_attempt ) < 1 || strlen( $num_attempts ) < 1 ) {
+				$last_attempt = 0;
+				$num_attempts = 0;
+			}
+
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Check if we need to institute a lockout delay
+			$time_since_last_fail = time() - $last_attempt;
+			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
+			if ( $time_since_last_fail > $reset_duration ) {
+error_log('reset');
+error_log(date(DATE_RFC2822, $last_attempt));
+error_log('attempts: '.$num_attempts);
+				// Enough time has passed since the last invalid attempt and
+				// now that we can reset the failed attempt count, and let this
+				// login attempt go through.
+				$num_attempts = 0; // This does nothing, but include it for semantic meaning.
+			} else if ( $num_attempts > $auth_settings['advanced_lockouts']['attempts_1'] + $auth_settings['advanced_lockouts']['attempts_2'] ) {
+error_log('long delay');
+error_log(date(DATE_RFC2822, $last_attempt));
+error_log('attempts: '.$num_attempts);
+				// Stronger lockout (1st/2nd round of invalid attempts reached)
+				// Note: set the error code to 'empty_password' so it doesn't
+				// trigger the wp_login_failed hook, which would continue to
+				// increment the failed attempt count.
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again.' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_2'] * 60 ) ) );
+			} else if ( $num_attempts > $auth_settings['advanced_lockouts']['attempts_1'] ) {
+error_log('short delay');
+error_log(date(DATE_RFC2822, $last_attempt));
+error_log('attempts: '.$num_attempts);
+				// Normal lockout (1st round of invalid attempts reached)
+				// Note: set the error code to 'empty_password' so it doesn't
+				// trigger the wp_login_failed hook, which would continue to
+				// increment the failed attempt count.
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again.' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_1'] * 60 ) ) );
+			}
+error_log('no lockout, trying this login attempt...');
+error_log(date(DATE_RFC2822, $last_attempt));
+error_log('attempts: '.$num_attempts);
+
 
 			// Admin bypass: skip cas login and proceed to WordPress login if
 			// querystring variable 'login' is set to 'wordpress'--for example:
@@ -606,6 +658,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Keep track of time of last failed attempt and number of failed attempts.
 		 */
 		function update_login_failed_count( $username ) {
+error_log('*** firing failed login.');
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
@@ -1291,8 +1344,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'attempts_1' => 10,
 					'duration_1' => 1,
 					'attempts_2' => 10,
-					'duration_2' => 30,
-					'reset_duration' => 240,
+					'duration_2' => 10,
+					'reset_duration' => 120,
 				);
 			}
 			if ( !array_key_exists( 'advanced_lostpassword_url', $auth_settings ) ) {
@@ -1678,8 +1731,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<br />
 			After
 			<input type="text" id="auth_settings_advanced_lockouts_attempts_2" name="auth_settings[advanced_lockouts][attempts_2]" value="<?= $auth_settings['advanced_lockouts']['attempts_2']; ?>" placeholder="10" style="width:30px;" />
-			invalid attempts with the delay, increase the delay to
-			<input type="text" id="auth_settings_advanced_lockouts_duration_2" name="auth_settings[advanced_lockouts][duration_2]" value="<?= $auth_settings['advanced_lockouts']['duration_2']; ?>" placeholder="30" style="width:30px;" />
+			more invalid attempts, increase the delay to
+			<input type="text" id="auth_settings_advanced_lockouts_duration_2" name="auth_settings[advanced_lockouts][duration_2]" value="<?= $auth_settings['advanced_lockouts']['duration_2']; ?>" placeholder="10" style="width:30px;" />
 			minutes.
 			<br />
 			Reset the delays after
@@ -1914,6 +1967,33 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return false;
+		}
+
+		// Helper function to convert seconds to human readable text.
+		// Source: http://csl.name/php-secs-to-human-text/
+		function seconds_as_sentence($secs) {
+			$units = array(
+				"week"   => 7*24*3600,
+				"day"    =>   24*3600,
+				"hour"   =>      3600,
+				"minute" =>        60,
+				"second" =>         1,
+			);
+
+			// specifically handle zero
+			if ( $secs == 0 ) return "0 seconds";
+
+			$s = "";
+
+			foreach ( $units as $name => $divisor ) {
+				if ( $quot = intval($secs / $divisor) ) {
+					$s .= "$quot $name";
+					$s .= (abs($quot) > 1 ? "s" : "") . ", ";
+					$secs -= $quot * $divisor;
+				}
+			}
+
+			return substr($s, 0, -2);
 		}
 
 	} // END class WP_Plugin_Authorizer
