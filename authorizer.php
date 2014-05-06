@@ -229,12 +229,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$last_attempt = abs( intval( $last_attempt ) );
 			$num_attempts = abs( intval( $num_attempts ) );
 
-			// Grab plugin settings.
+			// Grab plugin settings and create semantic lockout variables.
 			$auth_settings = get_option( 'auth_settings' );
+			$lockouts = $auth_settings['advanced_lockouts'];
+			$time_since_last_fail = time() - $last_attempt;
+			$reset_duration = $lockouts['reset_duration'] * 60; // minutes to seconds
+			$num_attempts_long_lockout = $lockouts['attempts_1'] + $lockouts['attempts_2'];
+			$num_attempts_short_lockout = $lockouts['attempts_1'];
+			$seconds_remaining_long_lockout = $lockouts['duration_2'] * 60 - $time_since_last_fail;
+			$seconds_remaining_short_lockout = $lockouts['duration_1'] * 60 - $time_since_last_fail;
 
 			// Check if we need to institute a lockout delay
-			$time_since_last_fail = time() - $last_attempt;
-			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
 			if ( $time_since_last_fail > $reset_duration ) {
 error_log('reset');
 error_log(date(DATE_RFC2822, $last_attempt));
@@ -243,7 +248,7 @@ error_log('attempts: '.$num_attempts);
 				// now that we can reset the failed attempt count, and let this
 				// login attempt go through.
 				$num_attempts = 0; // This does nothing, but include it for semantic meaning.
-			} else if ( $num_attempts > $auth_settings['advanced_lockouts']['attempts_1'] + $auth_settings['advanced_lockouts']['attempts_2'] ) {
+			} else if ( $num_attempts > $num_attempts_long_lockout && $seconds_remaining_long_lockout > 0 ) {
 error_log('long delay');
 error_log(date(DATE_RFC2822, $last_attempt));
 error_log('attempts: '.$num_attempts);
@@ -252,8 +257,8 @@ error_log('attempts: '.$num_attempts);
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again. <a href="%3$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_2'] * 60 ), wp_lostpassword_url() ) );
-			} else if ( $num_attempts > $auth_settings['advanced_lockouts']['attempts_1'] ) {
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_long_lockout, $this->seconds_as_sentence( $seconds_remaining_long_lockout ), wp_lostpassword_url() ) );
+			} else if ( $num_attempts > $num_attempts_short_lockout && $seconds_remaining_short_lockout > 0 ) {
 error_log('short delay');
 error_log(date(DATE_RFC2822, $last_attempt));
 error_log('attempts: '.$num_attempts);
@@ -262,7 +267,7 @@ error_log('attempts: '.$num_attempts);
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong>%2$s</strong> before trying again. <a href="%3$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $this->seconds_as_sentence( $auth_settings['advanced_lockouts']['duration_1'] * 60 ), wp_lostpassword_url() ) );
+				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_short_lockout, $this->seconds_as_sentence( $seconds_remaining_short_lockout ), wp_lostpassword_url() ) );
 			}
 error_log('no lockout, trying this login attempt...');
 error_log(date(DATE_RFC2822, $last_attempt));
