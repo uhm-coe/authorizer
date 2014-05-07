@@ -229,8 +229,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$last_attempt = abs( intval( $last_attempt ) );
 			$num_attempts = abs( intval( $num_attempts ) );
 
-			// Grab plugin settings and create semantic lockout variables.
+			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
+
+			// Create semantic lockout variables.
 			$lockouts = $auth_settings['advanced_lockouts'];
 			$time_since_last_fail = time() - $last_attempt;
 			$reset_duration = $lockouts['reset_duration'] * 60; // minutes to seconds
@@ -277,13 +279,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// If we're restricting access to only WP users, or not restricting
-			// access at all, don't check against an external service; instead,
-			// pass through to default WP authentication.
-			if ( $auth_settings['access_restriction'] === 'user' || $auth_settings['access_restriction'] === 'everyone' ) {
+			// If we're not restricting view access access at all, don't check
+			// against an external service; instead, pass through to default
+			// WP authentication.
+			if ( $auth_settings['access_restriction'] === 'everyone' ) {
 				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 			}
 
@@ -564,12 +563,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( $auth_settings['access_restriction'] == 'everyone' ) ||
 				// Allow access to logged in users if option is set to 'university' community
 				( $auth_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
-				// Allow access to logged in users if option is set to WP users (note: when this is set, don't allow external log in elsewhere)
-				( $auth_settings['access_restriction'] == 'user' && $this->is_user_logged_in_and_blog_user() ) ||
 				// Allow access to approved external users and logged in users if option is set to 'approved_users'
 				( $auth_settings['access_restriction'] == 'approved_users' && $this->is_user_logged_in_and_blog_user() )
 			);
-			$is_restricted = !$has_access;
 
 			// Fringe case: In a multisite, a user of a different blog can
 			// successfully log in, but they aren't on the 'approved' whitelist
@@ -705,8 +701,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
 				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
 				array_key_exists( 'access_restriction', $auth_settings ) &&
-				$auth_settings['access_restriction'] !== 'everyone' &&
-				$auth_settings['access_restriction'] !== 'user'
+				$auth_settings['access_restriction'] !== 'everyone'
 			) {
 				$lostpassword_url = $auth_settings['advanced_lostpassword_url'];
 			}
@@ -1384,8 +1379,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_users_blocked'] = array();
 			}
 
-			// Default to "Everyone" access restriction.
-			if ( ! in_array( $auth_settings['access_restriction'], array( 'everyone', 'university', 'approved_users', 'user' ) ) ) {
+			// Default to "Everyone" view access restriction.
+			if ( ! in_array( $auth_settings['access_restriction'], array( 'everyone', 'university', 'approved_users' ) ) ) {
 				$auth_settings['access_restriction'] = 'everyone';
 			}
 
@@ -1635,7 +1630,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_user" name="auth_settings[access_restriction]" value="user"<?php checked( 'user' == $auth_settings['access_restriction'] ); ?> /> Only users with prior access (No external users and all WordPress users)<br /><?php
 		}
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -1803,9 +1797,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die('');
 			}
 
-			// If invalid input, set access restriction to only WP users.
-			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_users', 'user' ) ) ) {
-				$_POST['access_restriction'] = 'user';
+			// If invalid input, set access restriction to only approved users.
+			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_users' ) ) ) {
+				$_POST['access_restriction'] = 'approved_users';
 			}
 
 			$auth_settings = get_option( 'auth_settings' );
@@ -1930,7 +1924,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function wp_dropdown_permitted_roles( $selected_role = 'subscriber' ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
-			$next_level = 'level_' . ($current_user->user_level + 1);
+			$next_level = 'level_' . ( $current_user->user_level + 1 );
 
 			// Remove unpermitted roles from the roles array.
 			foreach ($roles as $name => $role) {
