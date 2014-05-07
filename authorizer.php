@@ -1945,7 +1945,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print an option element for each permitted role.
 			foreach ($roles as $name => $role) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
-				$disabled = $is_current_user ? ' disabled="disabled"' : '';
+				$disabled = $is_current_user ? ' disabled="disabled"' : ''; // Don't let a user change their own role
 				?><option value="<?php print $name; ?>"<?= $selected . $disabled; ?>><?php print $role['name']; ?></option><?php
 			}
 		}
