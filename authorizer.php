@@ -946,7 +946,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Private Access Settings
 			$help_auth_settings_access_content = '
-				<p><strong>Who can access the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or an account on an external service like CAS or LDAP (<strong>university community</strong>), restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
+				<p><strong>Who can view the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or an account on an external service like CAS or LDAP (<strong>university community</strong>), restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
 				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.</p>
 				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.</p>
 			';
@@ -1071,7 +1071,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_access_restriction', // HTML element ID
-				'Who can access the site?', // HTML element Title
+				'Who can view the site?', // HTML element Title
 				array( $this, 'print_radio_auth_access_restriction' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access' // Section this setting is shown on
@@ -1771,7 +1771,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<input type="hidden" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?php print $auth_settings['cas_host']; ?>" />
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
-						<h2>Who can access the site?</h2>
+						<h2>Who can view the site?</h2>
 						<?php $this->print_radio_auth_access_restriction(); ?>
 					</div>
 					<div>
