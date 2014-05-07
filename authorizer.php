@@ -1485,7 +1485,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 							<?php $approved_user['is_wp_user'] = true; ?>
-						<? else: ?>
+						<?php else: ?>
 							<?php $approved_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
@@ -1523,7 +1523,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $blocked_user['role'] = array_shift( $blocked_wp_user->roles ); ?>
 							<?php $blocked_user['date_added'] = $blocked_wp_user->user_registered; ?>
 							<?php $blocked_user['is_wp_user'] = true; ?>
-						<? else: ?>
+						<?php else: ?>
 							<?php $blocked_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
