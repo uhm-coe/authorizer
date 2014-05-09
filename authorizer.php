@@ -978,7 +978,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</p>
 				<p><strong><em>If you chose LDAP as the external service type:</em></strong></p>
 				<p><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</p>
-				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=yourcompany,dc=com</p>
+				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</p>
 				<p><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</p>
 				<p><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</p>
 				<p><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</p>			';
