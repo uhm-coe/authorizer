@@ -1479,6 +1479,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( array_key_exists( 'access_users_approved', $auth_settings ) && is_array( $auth_settings['access_users_approved'] ) ) : ?>
 					<?php foreach ( $auth_settings['access_users_approved'] as $key => $approved_user ): ?>
 						<?php $is_current_user = false; ?>
+						<?php $local_user_icon = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true' ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : ''; ?>
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
 						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
 							<?php $approved_user['username'] = $approved_wp_user->user_login; ?>
@@ -1498,6 +1499,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							</select>
 							<input type="text" name="auth_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="auth_ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) print 'disabled="disabled" '; ?>/>
+							<?php print $local_user_icon; ?>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -1508,7 +1510,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select name="new_approved_user_role" id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $auth_settings['access_default_role'] ); ?>
 				</select>
-				<input class="button-primary" type="button" id="approve_user_new" onclick="auth_add_user(this, 'approved');" value="Approve" /><br />
+				<div class="btn-group">
+					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="auth_add_user(this, 'approved');" value="Approve" />
+					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
+						<span class="caret"></span>
+						<span class="sr-only">Toggle Dropdown</span>
+					</button>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="javascript:void(0);" onclick="auth_add_user( document.getElementById('approve_user_new'), 'approved', true);">Create a local WordPress <br />account instead, and email <br />the user their password.</a></li>
+					</ul>
+				</div>
 			</div>
 			<?php
 		}
