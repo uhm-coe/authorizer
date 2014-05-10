@@ -1921,16 +1921,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Figure out if any of the users in the blocked list were removed (ignored).
 			// Remove their auth_blocked user_meta flag if they still have a WP account.
-			$new_blocked_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_blocked'] );
-			foreach ( $auth_settings['access_users_blocked'] as $blocked_user ) {
-				if ( ! in_array( $blocked_user['email'], $new_blocked_list ) ) {
-					$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
-					if ( $unblocked_user !== false ) {
-						if ( is_multisite() ) {
-							remove_user_from_blog( $unblocked_user->ID, get_current_blog_id() );
-						} else {
-							// Mark this user as unblocked.
-							delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
+			if ( is_array( $_POST['access_users_blocked'] ) ) {
+				$new_blocked_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_blocked'] );
+				foreach ( $auth_settings['access_users_blocked'] as $blocked_user ) {
+					if ( ! in_array( $blocked_user['email'], $new_blocked_list ) ) {
+						$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
+						if ( $unblocked_user !== false ) {
+							if ( is_multisite() ) {
+								remove_user_from_blog( $unblocked_user->ID, get_current_blog_id() );
+							} else {
+								// Mark this user as unblocked.
+								delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
+							}
 						}
 					}
 				}
