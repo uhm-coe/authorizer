@@ -197,6 +197,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				foreach ( $inactive_users as $inactive_user ) {
 					wp_delete_user( $inactive_user->ID, $current_user->ID );
 				}
+
+				$blocked_users = get_users( array(
+					'meta_key' => 'auth_blocked',
+					'meta_value' => 'yes',
+				));
+				$current_user = wp_get_current_user();
+				foreach ( $blocked_users as $blocked_user ) {
+					wp_delete_user( $blocked_user->ID, $current_user->ID );
+				}
 			}
 
 		} // END deactivate()
@@ -232,12 +241,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
 			$unauthenticated_user = get_user_by( 'login', $username );
-			$unauthenticated_user_is_inactive = false;
+			$unauthenticated_user_is_blocked = false;
 			if ( $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
-				$unauthenticated_user_is_inactive = get_user_meta( $unauthenticated_user->ID, 'auth_inactive', true ) === 'yes';
+				$unauthenticated_user_is_blocked = get_user_meta( $unauthenticated_user->ID, 'auth_blocked', true ) === 'yes';
 			} else {
 				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
@@ -245,7 +254,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Inactive users should be treated like deleted users (we just
 			// do this to preserve any content they created).
-			if ( $unauthenticated_user_is_inactive ) {
+			if ( $unauthenticated_user_is_blocked ) {
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.' ) );
 			}
@@ -439,13 +448,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						wp_set_password( wp_generate_password(), $user->ID );
 
 						// Mark user as inactive (enforce inactivity in this->authenticate()).
-						update_user_meta( $user->ID, 'auth_inactive', 'yes' );
+						update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 					}
 				}
 
 				// Notify user about blocked status
-				$error_message = 'Sorry ' . $externally_authenticated_username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '. If this is a mistake, please contact your instructor.';
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
+				$error_message = 'Sorry ' . $externally_authenticated_username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
@@ -1899,6 +1907,23 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( ! is_wp_error( $result ) ) {
 							// Email password to new user
 							wp_new_user_notification( $result, $plaintext_password );
+						}
+					}
+				}
+			}
+
+			// Figure out if any of the users in the blocked list were removed (ignored).
+			// Remove their auth_blocked user_meta flag if they still have a WP account.
+			$new_blocked_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_blocked'] );
+			foreach ( $auth_settings['access_users_blocked'] as $blocked_user ) {
+				if ( ! in_array( $blocked_user['email'], $new_blocked_list ) ) {
+					$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
+					if ( $unblocked_user !== false ) {
+						if ( is_multisite() ) {
+							remove_user_from_blog( $unblocked_user->ID, get_current_blog_id() );
+						} else {
+							// Mark this user as unblocked.
+							delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
 						}
 					}
 				}
