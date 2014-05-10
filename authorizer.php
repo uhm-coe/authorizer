@@ -432,6 +432,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user = get_user_by( 'email', $externally_authenticated_username . '@' . $tld );
 			}
 
+			// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+			$user_is_inactive = false;
+			if ( $user ) {
+				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
+			}
+
 			// If we've made it this far, we have an externally authenticated
 			// user. Deal with them differently based on which list they're in
 			// (pending, blocked, or approved).
@@ -457,7 +463,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
-			} else if ( $this->is_username_in_list( $externally_authenticated_username, 'approved' ) ) {
+			} else if ( $this->is_username_in_list( $externally_authenticated_username, 'approved' ) && ! $user_is_inactive ) {
 				$user_info = $this->get_user_info_from_list( $externally_authenticated_username, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
@@ -506,6 +512,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
+				// (Note: this will include 'inactive' existing users.)
 				if ( ! $this->is_username_in_list( $externally_authenticated_username, 'pending' ) ) {
 					$pending_user = array();
 					$pending_user['username'] = $externally_authenticated_username;
