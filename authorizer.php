@@ -1904,11 +1904,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
+			// Update user lists
 			$auth_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
 			$auth_settings['access_users_pending'] = $_POST['access_users_pending'];
 			$auth_settings['access_users_approved'] = $_POST['access_users_approved'];
 			$auth_settings['access_users_blocked'] = $_POST['access_users_blocked'];
 
+			// Since we're resaving the entire options array, make sure to
+			// decrypt the ldap_password option, since it gets re-encrypted
+			// when the fields are sanitized.
+			$auth_settings['ldap_password'] = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) );
+
+			// Update options.
 			update_option( 'auth_settings', $auth_settings );
 		}
 
