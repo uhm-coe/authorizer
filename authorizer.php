@@ -183,6 +183,22 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				delete_option( 'auth_settings_advanced_admin_notice' );
 			}
 
+			// For security, delete inactive users (since we can't enforce their
+			// inactivity without this plugin enabled, which means they would be
+			// able to reset their passwords and log in). If they have any
+			// content, reassign it to the current user (the user uninstalling
+			// the plugin).
+			if ( ! is_multisite() ) {
+				$inactive_users = get_users( array(
+					'meta_key' => 'auth_inactive',
+					'meta_value' => 'yes',
+				));
+				$current_user = wp_get_current_user();
+				foreach ( $inactive_users as $inactive_user ) {
+					wp_delete_user( $inactive_user->ID, $current_user->ID );
+				}
+			}
+
 		} // END deactivate()
 
 
@@ -216,12 +232,22 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
 			$unauthenticated_user = get_user_by( 'login', $username );
-			if ( $unauthenticated_user !== FALSE ) {
+			$unauthenticated_user_is_inactive = false;
+			if ( $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
+				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+				$unauthenticated_user_is_inactive = get_user_meta( $unauthenticated_user->ID, 'auth_inactive', true ) === 'yes';
 			} else {
 				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+			}
+
+			// Inactive users should be treated like deleted users (we just
+			// do this to preserve any content they created).
+			if ( $unauthenticated_user_is_inactive ) {
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.' ) );
 			}
 
 			// Make sure $last_attempt (time) and $num_attempts are positive integers.
@@ -409,7 +435,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( is_multisite() ) {
 						remove_user_from_blog( $user->ID, get_current_blog_id() );
 					} else {
-						wp_delete_user( $user->ID );
+						// Reset user's password (change it to something they don't know, just in case)
+						wp_set_password( wp_generate_password(), $user->ID );
+
+						// Mark user as inactive (enforce inactivity in this->authenticate()).
+						update_user_meta( $user->ID, 'auth_inactive', 'yes' );
 					}
 				}
 
@@ -1800,6 +1830,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		function ajax_save_auth_dashboard_widget() {
+			// Only users who can edit can update options.
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				die('');
+			}
+
 			// Make sure posted variables exist.
 			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_auth_settings_access'] ) ) {
 				die('');
@@ -1817,15 +1852,64 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$auth_settings = get_option( 'auth_settings' );
 
+			// Figure out if any of the users in the approved list were removed (ignored).
+			// Remove their access by setting the auth_inactive user_meta flag.
+			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
+			foreach ( $auth_settings['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
+					$ignored_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $ignored_user !== false ) {
+						if ( is_multisite() ) {
+							remove_user_from_blog( $ignored_user->ID, get_current_blog_id() );
+						} else {
+							// Mark this ignored user as inactive (enforce inactivity in this->authenticate()).
+							update_user_meta( $ignored_user->ID, 'auth_inactive', 'yes' );
+						}
+					}
+				}
+			}
+
+			// Figure out if any of the users in the approved list were added (new).
+			// Remove the auth_inactive flag from their WP account if either exists.
+			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_settings['access_users_approved'] );
+			foreach ( $_POST['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
+					$new_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $new_user !== false ) {
+						if ( is_multisite() ) {
+							add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
+						} else {
+							// Mark this new user as active if they have a WP account.
+							delete_user_meta( $new_user->ID, 'auth_inactive', 'yes' );
+						}
+					} else if ( $approved_user['local_user'] === 'true' ) {
+						// Create a WP account for this new *local* user and email the password.
+						$plaintext_password = wp_generate_password(); // random password
+						$result = wp_insert_user(
+							array(
+								'user_login' => strtolower( $approved_user['username'] ),
+								'user_pass' => $plaintext_password,
+								'first_name' => '',
+								'last_name' => '',
+								'user_email' => strtolower( $approved_user['email'] ),
+								'user_registered' => date( 'Y-m-d H:i:s' ),
+								'role' => $approved_user['role'],
+							)
+						);
+						if ( ! is_wp_error( $result ) ) {
+							// Email password to new user
+							wp_new_user_notification( $result, $plaintext_password );
+						}
+					}
+				}
+			}
+
 			$auth_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
 			$auth_settings['access_users_pending'] = $_POST['access_users_pending'];
 			$auth_settings['access_users_approved'] = $_POST['access_users_approved'];
 			$auth_settings['access_users_blocked'] = $_POST['access_users_blocked'];
 
-			// Only users who can edit can see the Sakai dashboard widget
-			if ( current_user_can( 'edit_posts' ) ) {
-				update_option( 'auth_settings', $auth_settings );
-			}
+			update_option( 'auth_settings', $auth_settings );
 		}
 
 
