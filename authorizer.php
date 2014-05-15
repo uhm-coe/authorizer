@@ -655,13 +655,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check to see if the requested page is public. If so, show it.
 			if ( in_array( $this->get_id_from_pagename( $wp->query_vars['pagename'] ), $auth_settings['access_public_pages'] ) ) {
-				update_option( 'auth_settings_advanced_public_notice', true);
+				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
+					update_option( 'auth_settings_advanced_public_notice', false);
+				} else {
+					update_option( 'auth_settings_advanced_public_notice', true);
+				}
 				return;
 			}
 
 			// Check to see if the requested page is the home page and if it is public. If so, show it.
 			if ( empty( $wp->request ) && in_array( 'home', $auth_settings['access_public_pages'] ) ) {
-				update_option( 'auth_settings_advanced_public_notice', true);
+				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
+					update_option( 'auth_settings_advanced_public_notice', false);
+				} else {
+					update_option( 'auth_settings_advanced_public_notice', true);
+				}
 				return;
 			}
 
@@ -1142,6 +1150,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
+				'auth_settings_access_public_pages', // HTML element ID
+				'What pages (if any) should be available to everyone?', // HTML element Title
+				array( $this, 'print_multiselect_auth_access_public_pages' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_access_public' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_access_redirect', // HTML element ID
 				'What happens to people without access when they visit a private page?', // HTML element Title
 				array( $this, 'print_radio_auth_access_redirect' ), // Callback (echos form element)
@@ -1149,16 +1164,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_access_redirect_to_message', // HTML element ID
-				'What message should people without access see?', // HTML element Title
-				array( $this, 'print_wysiwyg_auth_access_redirect_to_message' ), // Callback (echos form element)
+				'auth_settings_access_public_warning', // HTML element ID
+				'What happens to people without access when they visit a public page?', // HTML element Title
+				array( $this, 'print_radio_auth_access_public_warning' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_public' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_access_public_pages', // HTML element ID
-				'What pages (if any) should be available to everyone?', // HTML element Title
-				array( $this, 'print_multiselect_auth_access_public_pages' ), // Callback (echos form element)
+				'auth_settings_access_redirect_to_message', // HTML element ID
+				'What message should people without access see?', // HTML element Title
+				array( $this, 'print_wysiwyg_auth_access_redirect_to_message' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_public' // Section this setting is shown on
 			);
@@ -1319,16 +1334,20 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
 			}
 
-			// Public Access Defaults.
+			// Public Access to Private Page Defaults.
+			if ( !array_key_exists( 'access_public_pages', $auth_settings ) ) {
+				$auth_settings['access_public_pages'] = array('home');
+			}
 			if ( !array_key_exists( 'access_redirect', $auth_settings ) ) {
 				$auth_settings['access_redirect'] = 'login';
+			}
+			if ( !array_key_exists( 'access_public_warning', $auth_settings ) ) {
+				$auth_settings['access_public_warning'] = 'warning';
 			}
 			if ( !array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_redirect_to_message'] = '<p><strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.</p>';
 			}
-			if ( !array_key_exists( 'access_public_pages', $auth_settings ) ) {
-				$auth_settings['access_public_pages'] = array('home');
-			}
+
 
 			// External Service Defaults.
 			if ( !array_key_exists( 'access_default_role', $auth_settings ) ) {
@@ -1434,6 +1453,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Default to WordPress login access redirect.
 			if ( ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
 				$auth_settings['access_redirect'] = 'login';
+			}
+
+			// Default to warning message for anonymous users on public pages.
+			if ( ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
+				$auth_settings['access_public_warning'] = 'warning';
 			}
 
 			// Sanitize CAS Host setting
@@ -1726,7 +1750,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_radio_auth_access_redirect( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_redirect_to_login" name="auth_settings[access_redirect]" value="login"<?php checked( 'login' == $auth_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
-				<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them a simple message<?php
+			<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them the anonymous access message (below)<?php
+		}
+
+		function print_radio_auth_access_public_warning( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page (without the anonymous access message)<br />
+			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page with the anonymous access message above the content<?php
 		}
 
 		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {

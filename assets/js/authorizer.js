@@ -251,7 +251,6 @@ function getUsernameFromEmail(email) {
 jQuery(document).ready(function($){
   // Grab references to form elements that we will show/hide on page load
   var auth_settings_access_redirect_to_login = $('#radio_auth_settings_access_redirect_to_login').closest('tr');
-  var auth_settings_access_redirect_to_url = $('#auth_settings_access_redirect_to_url').closest('tr');
   var auth_settings_access_redirect_to_message = $('#wp-auth_settings_access_redirect_to_message-wrap').closest('tr');
   var auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('tr');
   var auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('tr');
@@ -274,7 +273,6 @@ jQuery(document).ready(function($){
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', auth_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', auth_settings_access_redirect_to_url).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
@@ -305,14 +303,6 @@ jQuery(document).ready(function($){
 
     // Remove the helper link, since there are no tabs on the dashboard widget
     $('#dashboard_link_approved_users').contents().unwrap();
-  }
-
-  // On load: Show/hide redirect options
-  if (!$('#radio_auth_settings_access_redirect_to_url').is(':checked')) {
-    $('div.animated_wrapper', auth_settings_access_redirect_to_url).hide();
-  }
-  if (!$('#radio_auth_settings_access_redirect_to_message').is(':checked')) {
-    $('div.animated_wrapper', auth_settings_access_redirect_to_message).hide();
   }
 
   // On load: Show/hide pending/approved/blocked list options
@@ -351,29 +341,15 @@ jQuery(document).ready(function($){
     $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
   }
 
-  // Event handler: show and hide specific options based on "Handle unauthorized visitors" selection
-  $('input[name="auth_settings[access_redirect]"]').change(function() {
-    if ($('#radio_auth_settings_access_redirect_to_url').is(':checked')) {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideDown(animation_speed);
-    } else {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideUp(animation_speed);
-    }
-    if ($('#radio_auth_settings_access_redirect_to_message').is(':checked')) {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideDown(animation_speed);
-    } else {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
-    }
-  });
-
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="auth_settings[access_restriction]"]').change(function(){
     if ($('#radio_auth_settings_access_restriction_everyone').is(':checked')) {
       $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_redirect_to_url).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_public_pages).slideUp(animation_speed);
     } else {
       $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideDown(animation_speed);
+      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_access_public_pages).slideDown(animation_speed);
       $('input[name="auth_settings[access_redirect]"]').trigger('change');
     }
