@@ -405,11 +405,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
 				if ( !$result ) {
-					// We have a real ldap user, but an invalid password, so we shouldn't
-					// pass through to wp authentication after failing ldap. Instead,
-					// remove the WordPress authenticate function, and return an error.
-					remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-					return new WP_Error( 'incorrect_password', sprintf( __( '<strong>ERROR</strong>: The password you entered for the username <strong>%1$s</strong> is incorrect. <a href="%2$s" title="Password Lost and Found">Lost your password</a>?' ), $username, wp_lostpassword_url() ) );
+					// We have a real ldap user, but an invalid password. Pass
+					// through to wp authentication after failing LDAP (since
+					// this could be a local account that happens to be the
+					// same name as an LDAP user).
+					return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 				}
 
 				// Get the TLD from the LDAP host for use in matching email addresses
