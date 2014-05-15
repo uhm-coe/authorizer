@@ -242,11 +242,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// time remains until they can try again.
 			$unauthenticated_user = get_user_by( 'login', $username );
 			$unauthenticated_user_is_blocked = false;
+			$unauthenticated_user_is_inactive = false;
 			if ( $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
-				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+				// Also check the auth_blocked user_meta flag (users in blocked list will get this flag)
 				$unauthenticated_user_is_blocked = get_user_meta( $unauthenticated_user->ID, 'auth_blocked', true ) === 'yes';
+				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+				$unauthenticated_user_is_inactive = get_user_meta( $unauthenticated_user->ID, 'auth_inactive', true ) === 'yes';
 			} else {
 				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
@@ -299,17 +302,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 
-			// Admin bypass: skip cas login and proceed to WordPress login if
-			// querystring variable 'login' is set to 'wordpress'--for example:
-			// https://www.example.com/wp-login.php?login=wordpress
-			if ( ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress' ) {
+			// Admin bypass: skip external login and proceed to WordPress login
+			// if querystring variable 'login' is set to 'wordpress'--for
+			// example: https://www.example.com/wp-login.php?login=wordpress
+			// Note: only allow this if the user is not marked as inactive.
+			if ( ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress'  && ! $unauthenticated_user_is_inactive ) {
 				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
 				return new WP_Error( 'using_wp_authentication', 'Bypassing external authentication in favor of WordPress authentication...' );
 			}
-
-			// Admin bypass: if we have populated username/password data,
-			// and the page we're coming from is the admin bypass, let
-			// WordPress handle the authentication (by passing on null).
+			// Admin bypass: if we have populated username/password data, and
+			// the page we're coming from is the admin bypass, let WordPress
+			// handle the authentication (by passing on null).
 			if ( ! empty( $username ) && ! empty( $password ) && strpos( $_SERVER['HTTP_REFERER'], 'login=wordpress' ) !== false ) {
 				return null;
 			}
@@ -433,7 +436,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
-			$user_is_inactive = false;
+			$user_is_inactive = $unauthenticated_user_is_inactive;
 			if ( $user ) {
 				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
 			}
@@ -442,10 +445,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// user. Deal with them differently based on which list they're in
 			// (pending, blocked, or approved).
 			if ( $this->is_username_in_list( $externally_authenticated_username, 'blocked' ) ) {
-				// If the blocked external user has a WordPress account, remove it. In a
-				// multisite environment, just remove them from the current blog.
-				// IMPORTANT NOTE: this deletes all of the user's posts.
-				// @TODO: switch this up to use a "blocked" or "inactive" flag in usermeta, so we don't have to delete user accounts (and possibly lose user data). this makes further sense if we tie the approved list to, say, UH Groupings, where we can specify a class roster. this roster is likely to change over time, which might mean removing users. note, however, that they will probably not go on the block list. as it stands right now, they just are removed from the approved list, but still have wordpress accounts. if they try to log in again, they'll be put on the pending list. HOLE: the one security hole is if they know about wp-login.php?login=wordpress, where they can fill out the lost password form with their email, reset their password, and then log in with their wordpress account. we need to decide how to deal with this, and if it's worth it.
+				// If the blocked external user has a WordPress account, change
+				// its password and mark it as blocked. In a multisite
+				// environment, just remove them from the current blog.
 				if ( $user ) {
 					if ( is_multisite() ) {
 						remove_user_from_blog( $user->ID, get_current_blog_id() );
