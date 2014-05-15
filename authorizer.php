@@ -1010,9 +1010,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Public Access Settings
 			$help_auth_settings_access_public_content = '
-				<p><strong>What happens to people without access when they visit a private page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
-				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
 				<p><strong>What pages (if any) should be available to everyone?</strong>: If you\'d like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
+				<p><strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
+				<p><strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between showing them the page without any message, or showing them a the page with a message above the content.</p>
+				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
 			';
 			$screen->add_help_tab(
 				array(
@@ -1023,20 +1024,25 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			// Add help tab for External Service (CAS, LDAP) Settings
-			// @TODO: add ldap settings, and select dropdown to choose between the two
 			$help_auth_settings_external_content = '
 				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You\'ll have to fill out different fields below depending on which service you choose.</p>
 				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
-				<p><strong><em>If you chose CAS as the external service type:</em></strong></p>
-				<p><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</p>
-				<p><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</p>
-				<p><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</p>
-				<p><strong><em>If you chose LDAP as the external service type:</em></strong></p>
-				<p><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</p>
-				<p><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</p>
-				<p><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</p>
-				<p><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</p>
-				<p><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</p>			';
+				<p><strong><em>If you choose CAS:</em></strong></p>
+				<ul>
+					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</li>
+					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
+					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
+				</ul>
+				<p><strong><em>If you choose LDAP:</em></strong></p>
+				<ul>
+					<li><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</li>
+					<li><strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.</li>
+					<li><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</li>
+					<li><strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.</li>
+					<li><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</li>
+					<li><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</li>
+					<li><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</li>
+				</ul>';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_external_content',
@@ -1047,6 +1053,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Advanced Settings
 			$help_auth_settings_advanced_content = '
+				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
 				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
 				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
 			';
@@ -1186,16 +1193,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
-				'auth_settings_external_service', // HTML element ID
-				'Type of external service to authenticate against', // HTML element Title
-				array( $this, 'print_radio_auth_external_service' ), // Callback (echos form element)
+				'auth_settings_access_default_role', // HTML element ID
+				'Default role for new users', // HTML element Title
+				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_access_default_role', // HTML element ID
-				'Default role for new users', // HTML element Title
-				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
+				'auth_settings_external_service', // HTML element ID
+				'Type of external service to authenticate against', // HTML element Title
+				array( $this, 'print_radio_auth_external_service' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
