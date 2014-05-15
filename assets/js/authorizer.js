@@ -73,6 +73,7 @@ function auth_add_user(caller, list, create_local_account) {
 
   if (validated) {
     // Add the new item.
+    var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
     jQuery(' \
       <li id="new_user_' + nextId + '" style="display: none;"> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
@@ -80,7 +81,7 @@ function auth_add_user(caller, list, create_local_account) {
         <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="auth-role" onchange="save_auth_settings_access(this);"> \
         </select> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
-        <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> \
+        <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> ' + local_icon + ' \
         <span class="spinner"></span> \
       </li> \
     ').appendTo('#list_auth_settings_access_users_' + list + '').slideDown(250);
