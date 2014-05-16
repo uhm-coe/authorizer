@@ -127,6 +127,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Load custom javascript for the main site (e.g., for displaying alerts).
 			add_action( 'wp_enqueue_scripts', array( $this, 'auth_public_scripts' ), 20 );
 
+			// If multisite, add network admin options page (global settings for all sites)
+			if ( is_multisite() ) {
+				add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
+			}
+
 		} // END __construct()
 
 
@@ -839,6 +844,50 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 
 
+		/**
+		 * Network Admin menu item
+		 * Hook: network_admin_menu
+		 *
+		 * @param  none
+		 * @return void
+		 */
+		public function network_admin_menu() {
+			// @see http://codex.wordpress.org/Function_Reference/add_menu_page
+			add_menu_page(
+				'Authorizer', // Page title
+				'Authorizer', // Menu title
+				'manage_network_options', // Capability
+				'authorizer', // Menu slug
+				array( $this, 'create_network_admin_page' ),
+				'dashicons-groups', // Icon URL
+				89 // Position
+			);
+		}
+
+		/**
+		 * Output the HTML for the options page
+		 */
+		public function create_network_admin_page() {
+			if ( ! current_user_can('manage_network_options') ) {
+				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+			}
+			?>
+			<div class="wrap">
+				<h2>Authorizer Settings</h2>
+				<form method="post" action="options.php" autocomplete="off">
+					<?php
+						// This prints out all hidden settings fields
+						// @see http://codex.wordpress.org/Function_Reference/settings_fields
+						settings_fields( 'auth_settings_group' );
+						// This prints out all the sections
+						// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
+						do_settings_sections( 'authorizer' );
+					?>
+					<?php submit_button(); ?>
+				</form>
+			</div>
+			<?php
+		}
 
 		/**
 		 * Add a link to this plugin's settings page from the WordPress Plugins page.
