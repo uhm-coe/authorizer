@@ -874,7 +874,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div class="wrap">
 				<h2>Authorizer Settings</h2>
-				<form method="post" action="options.php" autocomplete="off">
+				<form method="post" action="" autocomplete="off">
 					<?php
 						// This prints out all hidden settings fields
 						// @see http://codex.wordpress.org/Function_Reference/settings_fields
