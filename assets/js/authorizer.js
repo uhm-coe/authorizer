@@ -441,7 +441,13 @@ jQuery(document).ready(function($){
       $(this).parent().find('input[type="button"]').trigger('click');
       return false;
     } else if ($(this).hasClass('auth-username')) {
-      $(this).siblings('.auth-email').val($(this).val() + '@' + getTLDFromFQDN($('#auth_settings_cas_host').val()));
+      var host = '';
+      if ( $('#radio_auth_settings_external_service_cas').is(':checked') || $('#auth_settings_external_service').val() == 'cas' ) {
+        host = $('#auth_settings_cas_host').val();
+      } else if ( $('#radio_auth_settings_external_service_ldap').is(':checked') || $('#auth_settings_external_service').val() == 'ldap' ) {
+        host = $('#auth_settings_ldap_host').val();
+      }
+      $(this).siblings('.auth-email').val($(this).val() + '@' + getTLDFromFQDN(host));
     } else if ($(this).hasClass('auth-email')) {
       $(this).siblings('.auth-username').val(getUsernameFromEmail($(this).val()));
     }

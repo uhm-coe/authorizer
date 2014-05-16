@@ -101,9 +101,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Create options page
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
-			// Enqueue javascript and css only on the plugin's options page and the dashboard (for the widget)
+			// Enqueue javascript and css on the plugin's options page, the
+			// dashboard (for the widget), and the network admin.
 			add_action( 'load-settings_page_authorizer', array( $this, 'load_options_page' ) );
 			add_action( 'admin_head-index.php', array( $this, 'load_options_page' ) );
+			add_action( 'load-toplevel_page_authorizer', array( $this, 'load_options_page' ) );
 
 			// Add custom css and js to wp-login.php
 			add_action( 'login_head', array( $this, 'load_login_css_and_js' ) );
@@ -839,7 +841,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
-		 * Options page
+		 * Network Admin Options page
 		 ****************************
 		 */
 
@@ -871,23 +873,115 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! current_user_can('manage_network_options') ) {
 				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 			}
+			$auth_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
+
+			// We don't have a network option for some things, so set meaningful defaults.
+			$auth_settings['external_service'] = 'ldap';
+			$auth_settings['cas_host'] = 'hawaii.edu';
+			$auth_settings['ldap_host'] = 'hawaii.edu';
 			?>
 			<div class="wrap">
 				<h2>Authorizer Settings</h2>
 				<form method="post" action="" autocomplete="off">
-					<?php
-						// This prints out all hidden settings fields
-						// @see http://codex.wordpress.org/Function_Reference/settings_fields
-						settings_fields( 'auth_settings_group' );
-						// This prints out all the sections
-						// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
-						do_settings_sections( 'authorizer' );
-					?>
-					<?php submit_button(); ?>
+					<p>Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>.</p>
+					<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
+					<input type="hidden" id="auth_settings_external_service" name="auth_settings[external_service]" value="<?php print $auth_settings['external_service']; ?>" />
+					<input type="hidden" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?php print $auth_settings['cas_host']; ?>" />
+					<input type="hidden" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?php print $auth_settings['ldap_host']; ?>" />
+					<div>
+						<h2>Globally Approved Users (All Sites)</h2>
+						<?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?>
+					</div>
+					<br class="clear" />
+					<php submit_button() prob replace this with button with ajax event and disable events on approved list; >
 				</form>
 			</div>
 			<?php
 		}
+
+		/**
+		 * Save multisite settings (ajax call).
+		 */
+		function ajax_save_auth_multisite_settings() {
+			if ( ! current_user_can ('manage_network_options' ) ) {
+				die('');
+			}
+
+			// Make sure posted variables exist.
+			if ( empty( $_POST['nonce_save_auth_settings_access'] ) ) {
+				die('');
+			}
+
+			// Nonce check.
+			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings_access'], 'save_auth_settings_access' ) ) {
+				die('');
+			}
+
+			$auth_multisite_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
+
+			// Create default settings if they don't exist.
+			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
+				$auth_multisite_settings['access_users_approved'] = array();
+			}
+
+			// Figure out if any of the users in the approved list were removed (ignored).
+			// Remove their access by setting the auth_inactive user_meta flag.
+			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
+			foreach ( $auth_multisite_settings['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
+					$ignored_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $ignored_user !== false ) {
+						remove_user_from_blog( $ignored_user->ID, get_current_blog_id() );
+					}
+				}
+			}
+
+			// Figure out if any of the users in the approved list were added (new).
+			// Remove the auth_inactive flag from their WP account if either exists.
+			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_multisite_settings['access_users_approved'] );
+			foreach ( $_POST['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
+					$new_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $new_user !== false ) {
+						add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
+					} else if ( $approved_user['local_user'] === 'true' ) {
+						// Create a WP account for this new *local* user and email the password.
+						$plaintext_password = wp_generate_password(); // random password
+						$result = wp_insert_user(
+							array(
+								'user_login' => strtolower( $approved_user['username'] ),
+								'user_pass' => $plaintext_password,
+								'first_name' => '',
+								'last_name' => '',
+								'user_email' => strtolower( $approved_user['email'] ),
+								'user_registered' => date( 'Y-m-d H:i:s' ),
+								'role' => $approved_user['role'],
+							)
+						);
+						if ( ! is_wp_error( $result ) ) {
+							// Email password to new user
+							wp_new_user_notification( $result, $plaintext_password );
+						}
+					}
+				}
+			}
+
+			// Update the approved user list with the new copy
+			$auth_multisite_settings['access_users_pending'] = $_POST['access_users_pending'];
+
+			// Update options.
+			update_blog_option( get_current_blog_id(), 'auth_settings', $auth_settings );
+		}
+
+
+
+		/**
+		 ****************************
+		 * Options page
+		 ****************************
+		 */
+
+
 
 		/**
 		 * Add a link to this plugin's settings page from the WordPress Plugins page.
@@ -1601,7 +1695,22 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		function print_combo_auth_access_users_approved( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're showing the "globally" approved list on the network
+				// admin plugin options page, so we need to load the global
+				// approved list instead of a site-specific approved list.
+				$auth_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
+
+				// We also will need to change the AJAX destinations for
+				// actions (ignore user; add user; add local user).
+				$js_function_prefix = 'auth_multisite_';
+
+				// We don't have a network option for default role, so just set it to the lowest default.
+				$auth_settings['access_default_role'] = 'subscriber';
+			} else {
+				$auth_settings = get_option( 'auth_settings' );
+				$js_function_prefix = 'auth_';
+			}
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( array_key_exists( 'access_users_approved', $auth_settings ) && is_array( $auth_settings['access_users_approved'] ) ) : ?>
 					<?php foreach ( $auth_settings['access_users_approved'] as $key => $approved_user ): ?>
@@ -1621,11 +1730,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<li>
 							<input type="text" name="auth_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="auth-username" />
 							<input type="text" id="auth_settings_access_users_approved_<?= $key; ?>" name="auth_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[access_users_approved][<?= $key; ?>][role]" class="auth-role" onchange="save_auth_settings_access(this);">
+							<select name="auth_settings[access_users_approved][<?= $key; ?>][role]" class="auth-role" onchange="save_<?= $js_function_prefix; ?>settings_access(this);">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
 							</select>
 							<input type="text" name="auth_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="auth_ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) print 'disabled="disabled" '; ?>/>
+							<input type="button" class="button" id="ignore_user_<?= $key; ?>" onclick="<?= $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) print 'disabled="disabled" '; ?>/>
 							<?php print $local_user_icon; ?>
 						</li>
 					<?php endforeach; ?>
@@ -1638,13 +1747,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php $this->wp_dropdown_permitted_roles( $auth_settings['access_default_role'] ); ?>
 				</select>
 				<div class="btn-group">
-					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="auth_add_user(this, 'approved');" value="Approve" />
+					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?= $js_function_prefix; ?>add_user(this, 'approved');" value="Approve" />
 					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="javascript:void(0);" onclick="auth_add_user( document.getElementById('approve_user_new'), 'approved', true);">Create a local WordPress <br />account instead, and email <br />the user their password.</a></li>
+						<li><a href="javascript:void(0);" onclick="<?= $js_function_prefix; ?>add_user( document.getElementById('approve_user_new'), 'approved', true);">Create a local WordPress <br />account instead, and email <br />the user their password.</a></li>
 					</ul>
 				</div>
 			</div>
@@ -1908,7 +2017,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div class="inside">
 				<form method="post" id="auth_settings_access_form" action="">
+					<input type="hidden" id="auth_settings_external_service" name="auth_settings[external_service]" value="<?php print $auth_settings['external_service']; ?>" />
 					<input type="hidden" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?php print $auth_settings['cas_host']; ?>" />
+					<input type="hidden" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?php print $auth_settings['ldap_host']; ?>" />
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
 						<h2>Who can view the site?</h2>
