@@ -191,7 +191,6 @@ function save_auth_settings_access(caller, create_local_account) {
 }
 
 
-
 // Helper function to grab a querystring param value by name
 function getParameterByName(needle, haystack) {
   needle = needle.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -237,6 +236,7 @@ function getShortDate(date) {
 // Helper function to grab the TLD from a FQDN
 function getTLDFromFQDN(fqdn) {
   fqdn = typeof fqdn !== 'undefined' ? fqdn : '';
+  if (fqdn == '') return 'example.com';
   var matches = fqdn.match(/[^.]*\.[^.]*$/);
   return matches.length > 0 ? matches[0] : '';
 }
@@ -469,7 +469,40 @@ jQuery(document).ready(function($){
   // Switch to the first tab.
   chooseTab('access_lists');
 
+  // Hide/show multisite settings based on override checkbox.
+  $('input[name="auth_settings[multisite_override]"]').change(function() {
+    hide_multisite_settings_if_disabled();
+  });
+  hide_multisite_settings_if_disabled();
+
 });
+
+
+// Hide or show (with overlay) the multisite settings based on the "multisite override" setting.
+function hide_multisite_settings_if_disabled() {
+  var $ = jQuery;
+
+  if ( $('#auth_settings_multisite_override').length == 0 )
+    return;
+
+  var settings = $('#auth_multisite_settings');
+  var overlay = $('#auth_multisite_settings_disabled_overlay')
+
+  if ( $('#auth_settings_multisite_override').is(':checked') ) {
+    overlay.hide(animation_speed);
+  } else {
+    overlay.css({
+      'background-color': '#f1f1f1',
+      'opacity': 0.8,
+      'position': 'absolute',
+      'top': settings.position().top,
+      'left': settings.position().left,
+      'width': settings.width(),
+      'height': settings.height(),
+    });
+    overlay.show(animation_speed);
+  }
+}
 
 
 /**

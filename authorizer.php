@@ -873,27 +873,108 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! current_user_can('manage_network_options') ) {
 				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
 			}
-			$auth_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
-
-			// We don't have a network option for some things, so set meaningful defaults.
-			$auth_settings['external_service'] = 'ldap';
-			$auth_settings['cas_host'] = 'hawaii.edu';
-			$auth_settings['ldap_host'] = 'hawaii.edu';
+			$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
-				<h2>Authorizer Settings</h2>
 				<form method="post" action="" autocomplete="off">
-					<p>Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>.</p>
-					<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
-					<input type="hidden" id="auth_settings_external_service" name="auth_settings[external_service]" value="<?php print $auth_settings['external_service']; ?>" />
-					<input type="hidden" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?php print $auth_settings['cas_host']; ?>" />
-					<input type="hidden" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?php print $auth_settings['ldap_host']; ?>" />
-					<div>
-						<h2>Globally Approved Users (All Sites)</h2>
-						<?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?>
+					<h2>Authorizer Settings</h2>
+					<p>Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.</p>
+
+					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 == $auth_settings['multisite_override'] ); ?> /> Override individual site settings with the settings below
+
+					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
+
+					<div class="wrap" id="auth_multisite_settings">
+						<?php $this->print_section_info_tabs( array( 'multisite_admin' => true ) ); ?>
+
+						<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
+
+						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked) ?>
+						<div id="section_info_access_lists" class="section_info">
+							<p>Manage who has access to all sites in the network.</p>
+						</div>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Who can view the sites in this network?</th>
+								<td><?php $this->print_radio_auth_access_restriction(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Approved Users (All Sites)</th>
+								<td><?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+						</tbody></table>
+
+						<?php $this->print_section_info_external(); ?>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Default role for new users</th>
+								<td><?php $this->print_select_auth_access_default_role(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Type of external service to authenticate against</th>
+								<td><?php $this->print_radio_auth_external_service(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server hostname</th>
+								<td><?php $this->print_text_cas_host(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server port</th>
+								<td><?php $this->print_text_cas_port(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server path/context</th>
+								<td><?php $this->print_text_cas_path(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Host</th>
+								<td><?php $this->print_text_ldap_host(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Port</th>
+								<td><?php $this->print_text_ldap_port(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Search Base</th>
+								<td><?php $this->print_text_ldap_search_base(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute containing username</th>
+								<td><?php $this->print_text_ldap_uid(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Directory User</th>
+								<td><?php $this->print_text_ldap_user(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Directory User Password</th>
+								<td><?php $this->print_password_ldap_password(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Secure Connection (TLS)</th>
+								<td><?php $this->print_checkbox_ldap_tls(); ?></td>
+							</tr>
+						</tbody></table>
+
+						<?php $this->print_section_info_advanced(); ?>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Limit invalid login attempts</th>
+								<td><?php $this->print_text_auth_advanced_lockouts(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Custom lost password URL</th>
+								<td><?php $this->print_text_auth_advanced_lostpassword_url(); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Custom WordPress login branding</th>
+								<td><?php $this->print_radio_auth_advanced_branding(); ?></td>
+							</tr>
+						</tbody></table>
+
+						<br class="clear" />
+						<?php //submit_button() prob replace this with button with ajax event and disable events on approved list; ?>
 					</div>
-					<br class="clear" />
-					<php submit_button() prob replace this with button with ajax event and disable events on approved list; >
 				</form>
 			</div>
 			<?php
@@ -917,7 +998,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die('');
 			}
 
-			$auth_multisite_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
 			// Create default settings if they don't exist.
 			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
@@ -970,7 +1051,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_multisite_settings['access_users_pending'] = $_POST['access_users_pending'];
 
 			// Update options.
-			update_blog_option( get_current_blog_id(), 'auth_settings', $auth_settings );
+			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 		}
 
 
@@ -1563,7 +1644,91 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['advanced_branding'] = 'default';
 			}
 
+			// Save default options to database.
 			update_option( 'auth_settings', $auth_settings );
+
+			// Multisite defaults.
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+
+				if ( $auth_multisite_settings === FALSE ) {
+					$auth_multisite_settings = array();
+				}
+				// Global switch for enabling multisite options.
+				if ( !array_key_exists( 'multisite_override', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['multisite_override'] = '';
+				}
+				// Access Lists Defaults.
+				if ( !array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['access_users_approved'] = array();
+				}
+				// Private Access Defaults.
+				if ( !array_key_exists( 'access_restriction', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['access_restriction'] = 'everyone';
+				}
+				// External Service Defaults.
+				if ( !array_key_exists( 'access_default_role', $auth_multisite_settings ) ) {
+					// Set default role to 'student' if that role exists, 'subscriber' otherwise.
+					$all_roles = $wp_roles->roles;
+					$editable_roles = apply_filters( 'editable_roles', $all_roles );
+					if ( array_key_exists( 'student', $editable_roles ) ) {
+						$auth_multisite_settings['access_default_role'] = 'student';
+					} else {
+						$auth_multisite_settings['access_default_role'] = 'subscriber';
+					}
+				}
+				if ( !array_key_exists( 'external_service', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['external_service'] = 'cas';
+				}
+				if ( !array_key_exists( 'cas_host', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_host'] = '';
+				}
+				if ( !array_key_exists( 'cas_port', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_port'] = '';
+				}
+				if ( !array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_path'] = '';
+				}
+				if ( !array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_host'] = '';
+				}
+				if ( !array_key_exists( 'ldap_port', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_port'] = '';
+				}
+				if ( !array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_search_base'] = '';
+				}
+				if ( !array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_uid'] = '';
+				}
+				if ( !array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_user'] = '';
+				}
+				if ( !array_key_exists( 'ldap_password', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_password'] = '';
+				}
+				if ( !array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_tls'] = '1';
+				}
+				// Advanced defaults.
+				if ( !array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_lockouts'] = array(
+						'attempts_1' => 10,
+						'duration_1' => 1,
+						'attempts_2' => 10,
+						'duration_2' => 10,
+						'reset_duration' => 120,
+					);
+				}
+				if ( !array_key_exists( 'advanced_lostpassword_url', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_lostpassword_url'] = '';
+				}
+				if ( !array_key_exists( 'advanced_branding', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_branding'] = 'default';
+				}
+				// Save default network options to database.
+				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+			}
 		}
 
 
@@ -1647,17 +1812,25 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Settings print callbacks
 		 */
-		function print_section_info_tabs() {
-			?><h2 class="nav-tab-wrapper">
-				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
-				<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Private Access</a>
-				<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public');">Public Access</a>
-				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
-				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
-			</h2><?php
+		function print_section_info_tabs( $args = '' ) {
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ): ?>
+				<h2 class="nav-tab-wrapper">
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
+					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
+				</h2>
+			<?php else: ?>
+				<h2 class="nav-tab-wrapper">
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
+					<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Private Access</a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public');">Public Access</a>
+					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
+				</h2>
+			<?php endif;
 		}
 
-		function print_section_info_access_lists() {
+		function print_section_info_access_lists( $args = '' ) {
 			?><div id="section_info_access_lists" class="section_info">
 				<p>Manage who has access to this site using these lists.</p>
 				<ol>
@@ -1699,14 +1872,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// We're showing the "globally" approved list on the network
 				// admin plugin options page, so we need to load the global
 				// approved list instead of a site-specific approved list.
-				$auth_settings = get_blog_option( get_current_blog_id(), 'auth_multisite_settings', array() );
+				// Note: BLOG_ID_CURRENT_SITE (typically set to 1) points
+				// to the "Main Site" for the network (usually the first site).
+				$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
 				// We also will need to change the AJAX destinations for
 				// actions (ignore user; add user; add local user).
 				$js_function_prefix = 'auth_multisite_';
-
-				// We don't have a network option for default role, so just set it to the lowest default.
-				$auth_settings['access_default_role'] = 'subscriber';
 			} else {
 				$auth_settings = get_option( 'auth_settings' );
 				$js_function_prefix = 'auth_';
@@ -1799,7 +1971,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_external() {
+		function print_section_info_external( $args = '' ) {
 			?><div id="section_info_external" class="section_info">
 				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
 				<p>As a safeguard, you can always access the default WordPress login panel (and bypass any external authentication system) by visiting wp-login.php?login=wordpress like so:<br />
@@ -1867,7 +2039,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_access() {
+		function print_section_info_access( $args = '' ) {
 			?><div id="section_info_access" class="section_info">
 				<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
 				<p>Choose how you want to restrict access to this site below.</p>
@@ -1906,7 +2078,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_access_public() {
+		function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
 				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
 			</div><?php
@@ -1961,13 +2133,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_advanced() {
+		function print_section_info_advanced( $args = '' ) {
 			?><div id="section_info_advanced" class="section_info">
 				<p>You may optionally specify some advanced settings below.</p>
 			</div><?php
 		}
 
-		function print_text_auth_advanced_lockouts() {
+		function print_text_auth_advanced_lockouts( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?>After
 			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?= $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
@@ -1986,7 +2158,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			minutes with no invalid attempts.<?php
 		}
 
-		function print_text_auth_advanced_lostpassword_url() {
+		function print_text_auth_advanced_lostpassword_url( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
