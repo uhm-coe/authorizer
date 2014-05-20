@@ -39,7 +39,7 @@ function auth_add_user(caller, list, create_local_account) {
     buttons = jQuery(caller).parent().children();
   }
 
-  var nextId = jQuery('#list_auth_settings_access_users_' + list + ' li').length;
+  var next_id = jQuery('#list_auth_settings_access_users_' + list + ' li').length;
   var validated = true;
 
   if (jQuery.trim(username.val()) == '')
@@ -75,12 +75,12 @@ function auth_add_user(caller, list, create_local_account) {
     // Add the new item.
     var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
     jQuery(' \
-      <li id="new_user_' + nextId + '" style="display: none;"> \
-        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
-        <input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
-        <select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="auth-role" onchange="save_auth_settings_access(this);"> \
+      <li id="new_user_' + next_id + '" style="display: none;"> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
+        <input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
+        <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="save_auth_settings_access(this);"> \
         </select> \
-        <input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
+        <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
         <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> ' + local_icon + ' \
         <span class="spinner"></span> \
       </li> \
@@ -88,8 +88,8 @@ function auth_add_user(caller, list, create_local_account) {
 
     // Populate the role dropdown in the new element. Because clone() doesn't
     // save selected state on select elements, set that too.
-    jQuery('option', role).clone().appendTo('#new_user_' + nextId + ' .auth-role');
-    jQuery('#new_user_' + nextId + ' .auth-role').val(role.val());
+    jQuery('option', role).clone().appendTo('#new_user_' + next_id + ' .auth-role');
+    jQuery('#new_user_' + next_id + ' .auth-role').val(role.val());
 
     // Remove the 'empty list' item if it exists.
     jQuery('#list_auth_settings_access_users_' + list + ' li.auth-empty').remove();
