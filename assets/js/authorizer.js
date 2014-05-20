@@ -19,9 +19,17 @@ function chooseTab( list_name ) {
   $('a.nav-tab-' + list_name).addClass('nav-tab-active');
 }
 
+// Remove user from list (multisite options page).
+function auth_multisite_add_user( caller, list_name ) {
+  var is_multisite = true;
+  auth_add_user( caller, list_name, is_multisite );
+}
 // Add user to list (list = blocked or approved).
-function auth_add_user( caller, list, create_local_account ) {
+function auth_add_user( caller, list, create_local_account, is_multisite ) {
   var $ = jQuery;
+
+  // Set default for multisite flag (run different save routine if multisite)
+  is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
   // default to the approved list
   list = typeof list !== 'undefined' ? list : 'approved';
@@ -104,7 +112,11 @@ function auth_add_user( caller, list, create_local_account ) {
     $(buttons).removeAttr('disabled');
 
     // Update the options in the database with this change.
-    save_auth_settings_access( buttons, create_local_account );
+    if ( is_multisite ) {
+      save_auth_multisite_settings( caller, create_local_account );
+    } else {
+      save_auth_settings_access( buttons, create_local_account );
+    }
 
     return true;
   }
@@ -115,11 +127,11 @@ function auth_multisite_ignore_user( caller, list_name ) {
   var is_multisite = true;
   auth_ignore_user( caller, list_name, is_multisite );
 }
-
 // Remove user from list.
 function auth_ignore_user( caller, list_name, is_multisite ) {
   var $ = jQuery;
 
+  // Set default for multisite flag (run different save routine if multisite)
   is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
   // Show an 'empty list' message if we're deleting the last item
