@@ -106,6 +106,12 @@ function auth_add_user(caller, list, create_local_account) {
   }
 }
 
+// Remove user from list (multisite options page).
+function auth_multisite_ignore_user(caller, listName) {
+  var is_multisite = true;
+  auth_ignore_user( caller, listName, is_multisite );
+}
+
 // Remove user from list.
 function auth_ignore_user(caller, listName, is_multisite) {
   is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
@@ -128,12 +134,6 @@ function auth_ignore_user(caller, listName, is_multisite) {
       save_auth_settings_access( caller );
     }
   });
-}
-
-// Remove user from list (multisite options page).
-function auth_multisite_ignore_user(caller, listName) {
-  var is_multisite = true;
-  auth_ignore_user( caller, listName, is_multisite );
 }
 
 
