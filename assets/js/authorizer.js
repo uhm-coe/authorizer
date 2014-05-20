@@ -20,9 +20,10 @@ function chooseTab( list_name ) {
 }
 
 // Remove user from list (multisite options page).
-function auth_multisite_add_user( caller, list_name ) {
+function auth_multisite_add_user( caller, list, create_local_account ) {
+  create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
   var is_multisite = true;
-  auth_add_user( caller, list_name, is_multisite );
+  auth_add_user( caller, list, create_local_account, is_multisite );
 }
 // Add user to list (list = blocked or approved).
 function auth_add_user( caller, list, create_local_account, is_multisite ) {
