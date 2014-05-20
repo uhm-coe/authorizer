@@ -231,10 +231,13 @@ function save_auth_multisite_settings( caller ) {
   $(caller).last().after('<span class="spinner"></span>');
   $('form .spinner').show();
 
+  // Get form elements to save
+
+  var nonce_save_auth_settings = $('#nonce_save_auth_settings').val();
+
+  var multisite_override = $('#auth_settings_multisite_override').is(':checked') ? '1' : '';
+
   var access_restriction = $('form input[name="auth_settings[access_restriction]"]:checked').val();
-
-
-
 
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function( index ) {
@@ -247,13 +250,55 @@ function save_auth_multisite_settings( caller ) {
     access_users_approved[index] = user;
   });
 
-  var nonce_save_auth_settings = $('#nonce_save_auth_settings').val();
+  var access_default_role = $('#auth_settings_access_default_role').val();
 
-  $.post(ajaxurl, {
+  var external_service = $('form input[name="auth_settings[external_service]"]:checked').val();
+
+  var cas_host = $('#auth_settings_cas_host').val();
+  var cas_port = $('#auth_settings_cas_port').val();
+  var cas_path = $('#auth_settings_cas_path').val();
+
+  var ldap_host = $('#auth_settings_ldap_host').val();
+  var ldap_port = $('#auth_settings_ldap_port').val();
+  var ldap_search_base = $('#auth_settings_ldap_search_base').val();
+  var ldap_uid = $('#auth_settings_ldap_uid').val();
+  var ldap_user = $('#auth_settings_ldap_user').val();
+  var ldap_password = $('#auth_settings_ldap_password').val();
+  var ldap_tls = $('#auth_settings_ldap_tls').is(':checked') ? '1' : '';
+
+  var advanced_lockouts = {
+    'attempts_1': $('#auth_settings_advanced_lockouts_attempts_1').val(),
+    'duration_1': $('#auth_settings_advanced_lockouts_duration_1').val(),
+    'attempts_2': $('#auth_settings_advanced_lockouts_attempts_2').val(),
+    'duration_2': $('#auth_settings_advanced_lockouts_duration_2').val(),
+    'reset_duration': $('#auth_settings_advanced_lockouts_reset_duration').val()
+  }
+
+  var advanced_lostpassword_url = $('#auth_settings_advanced_lostpassword_url').val();
+
+  var advanced_branding = $('form input[name="auth_settings[advanced_branding]"]:checked').val();
+
+  $.post(ajdaxurl, {
     action: 'save_auth_multisite_settings',
+    'nonce_save_auth_settings': nonce_save_auth_settings,
+    'multisite_override': multisite_override,
     'access_restriction': access_restriction,
     'access_users_approved': access_users_approved,
-    'nonce_save_auth_settings': nonce_save_auth_settings,
+    'access_default_role': access_default_role,
+    'external_service': external_service,
+    'cas_host': cas_host,
+    'cas_port': cas_port,
+    'cas_path': cas_path,
+    'ldap_host': ldap_host,
+    'ldap_port': ldap_port,
+    'ldap_search_base': ldap_search_base,
+    'ldap_uid': ldap_uid,
+    'ldap_user': ldap_user,
+    'ldap_password': ldap_password,
+    'ldap_tls': ldap_tls,
+    'advanced_lockouts': advanced_lockouts,
+    'advanced_lostpassword_url': advanced_lostpassword_url,
+    'advanced_branding': advanced_branding,
   }, function( response ) {
     $('form .spinner').remove();
     $(caller).removeAttr('disabled');
