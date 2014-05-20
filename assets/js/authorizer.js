@@ -107,7 +107,9 @@ function auth_add_user(caller, list, create_local_account) {
 }
 
 // Remove user from list.
-function auth_ignore_user(caller, listName) {
+function auth_ignore_user(caller, listName, is_multisite) {
+  is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+
   // Show an 'empty list' message if we're deleting the last item
   listName = typeof listName !== 'undefined' ? listName : '';
   var list = jQuery(caller).parent().parent();
@@ -120,10 +122,19 @@ function auth_ignore_user(caller, listName) {
     jQuery(this).remove();
 
     // Update the options in the database with this change.
-    save_auth_settings_access(caller);
+    if ( is_multisite ) {
+      save_auth_multisite_settings( caller );
+    } else {
+      save_auth_settings_access( caller );
+    }
   });
 }
 
+// Remove user from list (multisite options page).
+function auth_multisite_ignore_user(caller, listName) {
+  var is_multisite = true;
+  auth_ignore_user( caller, listName, is_multisite );
+}
 
 
 // Save options from dashboard widget.
