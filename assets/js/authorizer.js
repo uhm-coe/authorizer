@@ -90,7 +90,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
       <li id="new_user_' + next_id + '" style="display: none;"> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
         <input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
-        <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="save_auth_settings_access(this);"> \
+        <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="save_auth_settings(this);"> \
         </select> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
         <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> ' + local_icon + ' \
@@ -115,7 +115,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
     if ( is_multisite ) {
       save_auth_multisite_settings( caller, create_local_account );
     } else {
-      save_auth_settings_access( buttons, create_local_account );
+      save_auth_settings( buttons, create_local_account );
     }
 
     return true;
@@ -149,14 +149,14 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
     if ( is_multisite ) {
       save_auth_multisite_settings( caller );
     } else {
-      save_auth_settings_access( caller );
+      save_auth_settings( caller );
     }
   });
 }
 
 
 // Save options from dashboard widget.
-function save_auth_settings_access( caller, create_local_account ) {
+function save_auth_settings( caller, create_local_account ) {
   var $ = jQuery;
 
   $(caller).attr('disabled', 'disabled');
@@ -201,7 +201,7 @@ function save_auth_settings_access( caller, create_local_account ) {
     access_users_blocked[index] = user;
   });
 
-  var nonce_save_auth_settings_access = $('#nonce_save_auth_settings_access').val();
+  var nonce_save_auth_settings = $('#nonce_save_auth_settings').val();
 
   $.post(ajaxurl, {
     action: 'save_auth_dashboard_widget',
@@ -209,7 +209,7 @@ function save_auth_settings_access( caller, create_local_account ) {
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
     'access_users_blocked': access_users_blocked,
-    'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
+    'nonce_save_auth_settings': nonce_save_auth_settings,
   }, function( response ) {
     $('form .spinner').remove();
     $(caller).removeAttr('disabled');
@@ -246,13 +246,13 @@ function save_auth_multisite_settings( caller ) {
     access_users_approved[index] = user;
   });
 
-  var nonce_save_auth_settings_access = $('#nonce_save_auth_settings_access').val();
+  var nonce_save_auth_settings = $('#nonce_save_auth_settings').val();
 
   $.post(ajaxurl, {
     action: 'save_auth_multisite_settings',
     'access_restriction': access_restriction,
     'access_users_approved': access_users_approved,
-    'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
+    'nonce_save_auth_settings': nonce_save_auth_settings,
   }, function( response ) {
     $('form .spinner').remove();
     $(caller).removeAttr('disabled');

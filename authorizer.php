@@ -890,7 +890,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<div class="wrap" id="auth_multisite_settings">
 						<?php $this->print_section_info_tabs( array( 'multisite_admin' => true ) ); ?>
 
-						<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
+						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 
 						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked) ?>
 						<div id="section_info_access_lists" class="section_info">
@@ -994,12 +994,12 @@ error_log('sdhrgblaaaaaar'); die('');
 			}
 
 			// Make sure posted variables exist.
-			if ( empty( $_POST['nonce_save_auth_settings_access'] ) ) {
+			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
 				die('');
 			}
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings_access'], 'save_auth_settings_access' ) ) {
+			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
 				die('');
 			}
 
@@ -2046,7 +2046,7 @@ error_log('sdhrgblaaaaaar'); die('');
 
 		function print_section_info_access( $args = '' ) {
 			?><div id="section_info_access" class="section_info">
-				<?php wp_nonce_field( 'save_auth_settings_access', 'nonce_save_auth_settings_access' ); ?>
+				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 				<p>Choose how you want to restrict access to this site below.</p>
 			</div><?php
 		}
@@ -2227,12 +2227,12 @@ error_log('sdhrgblaaaaaar'); die('');
 			}
 
 			// Make sure posted variables exist.
-			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_auth_settings_access'] ) ) {
+			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_auth_settings'] ) ) {
 				die('');
 			}
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings_access'], 'save_auth_settings_access' ) ) {
+			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
 				die('');
 			}
 
