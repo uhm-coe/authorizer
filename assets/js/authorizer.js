@@ -278,7 +278,7 @@ function save_auth_multisite_settings( caller ) {
 
   var advanced_branding = $('form input[name="auth_settings[advanced_branding]"]:checked').val();
 
-  $.post(ajdaxurl, {
+  $.post(ajaxurl, {
     action: 'save_auth_multisite_settings',
     'nonce_save_auth_settings': nonce_save_auth_settings,
     'multisite_override': multisite_override,

@@ -18,7 +18,8 @@ body.settings_page_authorizer .ms-container ul.ms-list {
 	width: 240px;
 }
 
-body.settings_page_authorizer .spinner {
+body.settings_page_authorizer .spinner,
+body.toplevel_page_authorizer .spinner {
 	display: inline-block;
 	float: none;
 	vertical-align: text-bottom;
