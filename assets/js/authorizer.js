@@ -273,8 +273,7 @@ function hide_multisite_settings_if_disabled() {
 // Helper function to grab a querystring param value by name
 function getParameterByName(needle, haystack) {
   needle = needle.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-  var regexS = "[\\?&]" + needle + "=([^&#]*)";
-  var regex = new RegExp(regexS);
+  var regex = new RegExp("[\\?&]" + needle + "=([^&#]*)");
   var results = regex.exec(haystack);
   if(results == null)
     return "";
