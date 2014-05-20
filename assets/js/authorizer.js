@@ -4,28 +4,32 @@ var shake_speed = 600;
 
 
 // Switch between option tabs.
-function chooseTab(list_name) {
+function chooseTab( list_name ) {
+  var $ = jQuery;
+
   // default to the access list tab
   list_name = typeof list_name !== 'undefined' ? list_name : 'access_list';
 
   // Hide all tab content, then show selected tab content
-  jQuery('div.section_info, div.section_info + table').hide();
-  jQuery('#section_info_' + list_name + ', #section_info_' + list_name + ' + table').show();
+  $('div.section_info, div.section_info + table').hide();
+  $('#section_info_' + list_name + ', #section_info_' + list_name + ' + table').show();
 
   // Set active tab
-  jQuery('.nav-tab-wrapper a').removeClass('nav-tab-active');
-  jQuery('a.nav-tab-' + list_name).addClass('nav-tab-active');
+  $('.nav-tab-wrapper a').removeClass('nav-tab-active');
+  $('a.nav-tab-' + list_name).addClass('nav-tab-active');
 }
 
 // Add user to list (list = blocked or approved).
-function auth_add_user(caller, list, create_local_account) {
+function auth_add_user( caller, list, create_local_account ) {
+  var $ = jQuery;
+
   // default to the approved list
   list = typeof list !== 'undefined' ? list : 'approved';
   create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 
-  var username = jQuery(caller).parent().find('.auth-username');
-  var email = jQuery(caller).parent().find('.auth-email');
-  var role = jQuery(caller).parent().find('.auth-role');
+  var username = $(caller).parent().find('.auth-username');
+  var email = $(caller).parent().find('.auth-email');
+  var role = $(caller).parent().find('.auth-role');
 
   // Helper variable for disabling buttons while processing. This will be
   // set differently if our clicked button is nested in a div (below).
@@ -33,48 +37,48 @@ function auth_add_user(caller, list, create_local_account) {
 
   // Button (caller) might be nested in a div, so we need to walk up one more level
   if ( username.length === 0 || email.length === 0 || role.length === 0 ) {
-    username = jQuery(caller).parent().parent().find('.auth-username');
-    email = jQuery(caller).parent().parent().find('.auth-email');
-    role = jQuery(caller).parent().parent().find('.auth-role');
-    buttons = jQuery(caller).parent().children();
+    username = $(caller).parent().parent().find('.auth-username');
+    email = $(caller).parent().parent().find('.auth-email');
+    role = $(caller).parent().parent().find('.auth-role');
+    buttons = $(caller).parent().children();
   }
 
-  var next_id = jQuery('#list_auth_settings_access_users_' + list + ' li').length;
+  var next_id = $('#list_auth_settings_access_users_' + list + ' li').length;
   var validated = true;
 
-  if (jQuery.trim(username.val()) == '')
+  if ( $.trim(username.val()) == '' )
     return false;
 
-  jQuery(buttons).attr('disabled', 'disabled');
+  $(buttons).attr('disabled', 'disabled');
 
   // Check if the course being added already exists in the list.
-  if (validated) {
-    jQuery('#list_auth_settings_access_users_' + list + ' input.auth-username').each(function() {
-      if (this.value == username.val()) {
+  if ( validated ) {
+    $('#list_auth_settings_access_users_' + list + ' input.auth-username').each(function() {
+      if ( this.value == username.val() ) {
         validated = false;
-        jQuery(this).parent().effect('shake', shake_speed);
-        jQuery(buttons).removeAttr('disabled');
+        $(this).parent().effect('shake', shake_speed);
+        $(buttons).removeAttr('disabled');
         return false;
       }
     });
   }
 
   // Check if the name being added already exists in the list.
-  if (validated) {
-    jQuery('#list_auth_settings_access_users_' + list + ' input.auth-email').each(function() {
-      if (this.value == email.val()) {
+  if ( validated ) {
+    $('#list_auth_settings_access_users_' + list + ' input.auth-email').each(function() {
+      if ( this.value == email.val() ) {
         validated = false;
-        jQuery(this).parent().effect('shake', shake_speed);
-        jQuery(buttons).removeAttr('disabled');
+        $(this).parent().effect('shake', shake_speed);
+        $(buttons).removeAttr('disabled');
         return false;
       }
     });
   }
 
-  if (validated) {
+  if ( validated ) {
     // Add the new item.
     var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-    jQuery(' \
+    $(' \
       <li id="new_user_' + next_id + '" style="display: none;"> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
         <input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
@@ -88,44 +92,46 @@ function auth_add_user(caller, list, create_local_account) {
 
     // Populate the role dropdown in the new element. Because clone() doesn't
     // save selected state on select elements, set that too.
-    jQuery('option', role).clone().appendTo('#new_user_' + next_id + ' .auth-role');
-    jQuery('#new_user_' + next_id + ' .auth-role').val(role.val());
+    $('option', role).clone().appendTo('#new_user_' + next_id + ' .auth-role');
+    $('#new_user_' + next_id + ' .auth-role').val(role.val());
 
     // Remove the 'empty list' item if it exists.
-    jQuery('#list_auth_settings_access_users_' + list + ' li.auth-empty').remove();
+    $('#list_auth_settings_access_users_' + list + ' li.auth-empty').remove();
 
     // Reset the new user textboxes
     username.val('');
     email.val('');
-    jQuery(buttons).removeAttr('disabled');
+    $(buttons).removeAttr('disabled');
 
     // Update the options in the database with this change.
-    save_auth_settings_access(buttons, create_local_account);
+    save_auth_settings_access( buttons, create_local_account );
 
     return true;
   }
 }
 
 // Remove user from list (multisite options page).
-function auth_multisite_ignore_user(caller, list_name) {
+function auth_multisite_ignore_user( caller, list_name ) {
   var is_multisite = true;
   auth_ignore_user( caller, list_name, is_multisite );
 }
 
 // Remove user from list.
-function auth_ignore_user(caller, list_name, is_multisite) {
+function auth_ignore_user( caller, list_name, is_multisite ) {
+  var $ = jQuery;
+
   is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
   // Show an 'empty list' message if we're deleting the last item
   list_name = typeof list_name !== 'undefined' ? list_name : '';
-  var list = jQuery(caller).parent().parent();
-  if (jQuery('li', list).length <= 1) {
-    jQuery(list).append('<li class="auth-empty"><em>No ' + list_name + ' users</em></li>');
+  var list = $(caller).parent().parent();
+  if ( $('li', list).length <= 1 ) {
+    $(list).append('<li class="auth-empty"><em>No ' + list_name + ' users</em></li>');
   }
 
-  jQuery(caller).parent().slideUp(250,function() {
+  $(caller).parent().slideUp(250, function() {
     // Remove the list item.
-    jQuery(this).remove();
+    $(this).remove();
 
     // Update the options in the database with this change.
     if ( is_multisite ) {
@@ -138,61 +144,63 @@ function auth_ignore_user(caller, list_name, is_multisite) {
 
 
 // Save options from dashboard widget.
-function save_auth_settings_access(caller, create_local_account) {
-  jQuery(caller).attr('disabled', 'disabled');
-  jQuery(caller).last().after('<span class="spinner"></span>');
-  jQuery('form .spinner').show();
+function save_auth_settings_access( caller, create_local_account ) {
+  var $ = jQuery;
 
-  var access_restriction = jQuery('form input[name="auth_settings[access_restriction]"]:checked').val();
+  $(caller).attr('disabled', 'disabled');
+  $(caller).last().after('<span class="spinner"></span>');
+  $('form .spinner').show();
+
+  var access_restriction = $('form input[name="auth_settings[access_restriction]"]:checked').val();
 
   var access_users_pending = new Object();
-  jQuery('#list_auth_settings_access_users_pending li').each(function(index) {
+  $('#list_auth_settings_access_users_pending li').each(function(index) {
     var user = new Object();
-    user['username'] = jQuery('.auth-username', this).val();
-    user['email'] = jQuery('.auth-email', this).val();
-    user['role'] = jQuery('.auth-role', this).val();
+    user['username'] = $('.auth-username', this).val();
+    user['email'] = $('.auth-email', this).val();
+    user['role'] = $('.auth-role', this).val();
     access_users_pending[index] = user;
   });
 
   var access_users_approved = new Object();
-  jQuery('#list_auth_settings_access_users_approved li').each(function(index) {
+  $('#list_auth_settings_access_users_approved li').each(function(index) {
     var user = new Object();
-    user['username'] = jQuery('.auth-username', this).val();
-    user['email'] = jQuery('.auth-email', this).val();
-    user['role'] = jQuery('.auth-role', this).val();
-    user['date_added'] = jQuery('.auth-date-added', this).val();
-    user['local_user'] = jQuery('.auth-local-user', this).length !== 0;
+    user['username'] = $('.auth-username', this).val();
+    user['email'] = $('.auth-email', this).val();
+    user['role'] = $('.auth-role', this).val();
+    user['date_added'] = $('.auth-date-added', this).val();
+    user['local_user'] = $('.auth-local-user', this).length !== 0;
     access_users_approved[index] = user;
   });
 
   // If admin clicked 'add local user', mark the last user in the list of approved
   // users as a local user (the last user is the user the admin just added).
   if ( create_local_account ) {
-    access_users_approved[Object.keys(access_users_approved).length-1]['local_user'] = true;
+    access_users_approved[Object.keys( access_users_approved ).length - 1]['local_user'] = true;
   }
 
   var access_users_blocked = new Object();
-  jQuery('#list_auth_settings_access_users_blocked li').each(function(index) {
+  $('#list_auth_settings_access_users_blocked li').each(function( index ) {
     var user = new Object();
-    user['username'] = jQuery('.auth-username', this).val();
-    user['email'] = jQuery('.auth-email', this).val();
-    user['role'] = jQuery('.auth-role', this).val();
-    user['date_added'] = jQuery('.auth-date-added', this).val();
+    user['username'] = $('.auth-username', this).val();
+    user['email'] = $('.auth-email', this).val();
+    user['role'] = $('.auth-role', this).val();
+    user['date_added'] = $('.auth-date-added', this).val();
     access_users_blocked[index] = user;
   });
 
-  var nonce_save_auth_settings_access = jQuery('#nonce_save_auth_settings_access').val();
+  var nonce_save_auth_settings_access = $('#nonce_save_auth_settings_access').val();
 
-  jQuery.post(ajaxurl, {
+  $.post(ajaxurl, {
     action: 'save_auth_dashboard_widget',
     'access_restriction': access_restriction,
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
     'access_users_blocked': access_users_blocked,
     'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
-  }, function(response) {
-    jQuery('form .spinner').remove();
-    jQuery(caller).removeAttr('disabled');
+  }, function( response ) {
+    $('form .spinner').remove();
+    $(caller).removeAttr('disabled');
     if (response==0) { // failed
       return false;
     } else { // succeeded
@@ -203,38 +211,40 @@ function save_auth_settings_access(caller, create_local_account) {
 
 
 // Multisite functions
-function save_auth_multisite_settings(caller) {
-  jQuery(caller).attr('disabled', 'disabled');
-  jQuery(caller).last().after('<span class="spinner"></span>');
-  jQuery('form .spinner').show();
+function save_auth_multisite_settings( caller ) {
+  var $ = jQuery;
 
-  var access_restriction = jQuery('form input[name="auth_settings[access_restriction]"]:checked').val();
+  $(caller).attr('disabled', 'disabled');
+  $(caller).last().after('<span class="spinner"></span>');
+  $('form .spinner').show();
+
+  var access_restriction = $('form input[name="auth_settings[access_restriction]"]:checked').val();
 
 
 
 
   var access_users_approved = new Object();
-  jQuery('#list_auth_settings_access_users_approved li').each(function(index) {
+  $('#list_auth_settings_access_users_approved li').each(function( index ) {
     var user = new Object();
-    user['username'] = jQuery('.auth-username', this).val();
-    user['email'] = jQuery('.auth-email', this).val();
-    user['role'] = jQuery('.auth-role', this).val();
-    user['date_added'] = jQuery('.auth-date-added', this).val();
-    user['local_user'] = jQuery('.auth-local-user', this).length !== 0;
+    user['username'] = $('.auth-username', this).val();
+    user['email'] = $('.auth-email', this).val();
+    user['role'] = $('.auth-role', this).val();
+    user['date_added'] = $('.auth-date-added', this).val();
+    user['local_user'] = $('.auth-local-user', this).length !== 0;
     access_users_approved[index] = user;
   });
 
-  var nonce_save_auth_settings_access = jQuery('#nonce_save_auth_settings_access').val();
+  var nonce_save_auth_settings_access = $('#nonce_save_auth_settings_access').val();
 
-  jQuery.post(ajaxurl, {
+  $.post(ajaxurl, {
     action: 'save_auth_multisite_settings',
     'access_restriction': access_restriction,
     'access_users_approved': access_users_approved,
     'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
-  }, function(response) {
-    jQuery('form .spinner').remove();
-    jQuery(caller).removeAttr('disabled');
-    if (response==0) { // failed
+  }, function( response ) {
+    $('form .spinner').remove();
+    $(caller).removeAttr('disabled');
+    if ( response==0 ) { // failed
       return false;
     } else { // succeeded
       return true;
@@ -271,30 +281,30 @@ function hide_multisite_settings_if_disabled() {
 
 
 // Helper function to grab a querystring param value by name
-function getParameterByName(needle, haystack) {
-  needle = needle.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-  var regex = new RegExp("[\\?&]" + needle + "=([^&#]*)");
-  var results = regex.exec(haystack);
-  if(results == null)
-    return "";
+function getParameterByName( needle, haystack ) {
+  needle = needle.replace( /[\[]/, "\\\[").replace(/[\]]/, "\\\]" );
+  var regex = new RegExp( "[\\?&]" + needle + "=([^&#]*)" );
+  var results = regex.exec( haystack );
+  if( results == null )
+    return '';
   else
-    return decodeURIComponent(results[1].replace(/\+/g, " "));
+    return decodeURIComponent( results[1].replace( /\+/g, " " ) );
 }
 
 // Helper function to generate a random string
 function getRandomId() {
   var text = "";
   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (var i=0; i < 5; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  for ( var i=0; i < 5; i++ )
+    text += possible.charAt( Math.floor( Math.random() * possible.length ) );
   return text;
 }
 
 // Helper function to return a short date (e.g., Jul 2013) for today's date
-function getShortDate(date) {
+function getShortDate( date ) {
   date = typeof date !== 'undefined' ? date : new Date();
   var month = '';
-  switch (date.getMonth()) {
+  switch ( date.getMonth() ) {
     case 0: month = 'Jan'; break;
     case 1: month = 'Feb'; break;
     case 2: month = 'Mar'; break;
@@ -312,17 +322,17 @@ function getShortDate(date) {
 }
 
 // Helper function to grab the TLD from a FQDN
-function getTLDFromFQDN(fqdn) {
+function getTLDFromFQDN( fqdn ) {
   fqdn = typeof fqdn !== 'undefined' ? fqdn : '';
-  if (fqdn == '') return 'example.com';
-  var matches = fqdn.match(/[^.]*\.[^.]*$/);
+  if ( fqdn == '' ) return 'example.com';
+  var matches = fqdn.match( /[^.]*\.[^.]*$/ );
   return matches.length > 0 ? matches[0] : '';
 }
 
 // Helper function to get the username from an email address
-function getUsernameFromEmail(email) {
+function getUsernameFromEmail( email ) {
   email = typeof email !== 'undefined' ? email : '';
-  return email.split("@")[0];
+  return email.split( "@" )[0];
 }
 
 
@@ -371,7 +381,7 @@ jQuery(document).ready(function($){
 
   // If we're viewing the dashboard widget, reset a couple of the relevant
   // option variables (since they're aren't nested in table rows).
-  if ($('#auth_dashboard_widget').length) {
+  if ( $('#auth_dashboard_widget').length ) {
     auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('div');
     auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('div');
     auth_settings_access_users_blocked = $('#list_auth_settings_access_users_blocked').closest('div');
@@ -384,7 +394,7 @@ jQuery(document).ready(function($){
   }
 
   // On load: Show/hide pending/approved/blocked list options
-  if (!$('#radio_auth_settings_access_restriction_approved_users').is(':checked')) {
+  if ( !$('#radio_auth_settings_access_restriction_approved_users').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_access_users_pending).hide();
     $('div.animated_wrapper', auth_settings_access_users_approved).hide();
     $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
@@ -393,7 +403,7 @@ jQuery(document).ready(function($){
   }
 
   // On load: Show/hide CAS/LDAP options based on which is selected
-  if ($('#radio_auth_settings_external_service_cas').is(':checked')) {
+  if ( $('#radio_auth_settings_external_service_cas').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_external_ldap_host).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_port).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_search_base).hide();
@@ -421,7 +431,7 @@ jQuery(document).ready(function($){
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="auth_settings[access_restriction]"]').change(function(){
-    if ($('#radio_auth_settings_access_restriction_everyone').is(':checked')) {
+    if ( $('#radio_auth_settings_access_restriction_everyone').is(':checked') ) {
       $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_public_pages).slideUp(animation_speed);
@@ -433,7 +443,7 @@ jQuery(document).ready(function($){
     }
   
     // Hide user whitelist unless "Only specific students below" is checked
-    if (!$('#radio_auth_settings_access_restriction_approved_users').is(':checked')) {
+    if ( ! $('#radio_auth_settings_access_restriction_approved_users').is(':checked') ) {
       $('div.animated_wrapper', auth_settings_access_users_pending).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_users_approved).slideUp(animation_speed);
       $('div.animated_wrapper', auth_settings_access_users_blocked).slideUp(animation_speed);
@@ -450,7 +460,7 @@ jQuery(document).ready(function($){
 
   // Event handler: show/hide CAS/LDAP options based on selection.
   $('input[name="auth_settings[external_service]"]').change(function() {
-    if ($('#radio_auth_settings_external_service_cas').is(':checked')) {
+    if ( $('#radio_auth_settings_external_service_cas').is(':checked') ) {
       $('div.animated_wrapper', auth_settings_external_cas_host).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_cas_port).slideDown(animation_speed);
       $('div.animated_wrapper', auth_settings_external_cas_path).slideDown(animation_speed);
@@ -515,10 +525,10 @@ jQuery(document).ready(function($){
   // field adds the user to the list. Additionally, if the email field is
   // blank, it gets constructed from the username field (and vice versa).
   $('form input.auth-username, form input.auth-email, form select.auth-role').bind('keyup', function(e) {
-    if (e.which == 13) { // Enter key
+    if ( e.which == 13 ) { // Enter key
       $(this).parent().find('input[type="button"]').trigger('click');
       return false;
-    } else if ($(this).hasClass('auth-username')) {
+    } else if ( $(this).hasClass('auth-username') ) {
       var host = '';
       if ( $('#radio_auth_settings_external_service_cas').is(':checked') || $('#auth_settings_external_service').val() == 'cas' ) {
         host = $('#auth_settings_cas_host').val();
@@ -526,12 +536,12 @@ jQuery(document).ready(function($){
         host = $('#auth_settings_ldap_host').val();
       }
       $(this).siblings('.auth-email').val($(this).val() + '@' + getTLDFromFQDN(host));
-    } else if ($(this).hasClass('auth-email')) {
+    } else if ( $(this).hasClass('auth-email') ) {
       $(this).siblings('.auth-username').val(getUsernameFromEmail($(this).val()));
     }
   });
   $('form input.auth-username, form input.auth-email').bind('keydown', function(e) {
-    if (e.which == 13) { // Enter key
+    if ( e.which == 13 ) { // Enter key
       e.preventDefault();
       return false;
     }
@@ -545,7 +555,7 @@ jQuery(document).ready(function($){
   });
 
   // Switch to the first tab.
-  chooseTab('access_lists');
+  chooseTab( 'access_lists' );
 
   // Hide/show multisite settings based on override checkbox.
   $('input[name="auth_settings[multisite_override]"]').change(function() {
