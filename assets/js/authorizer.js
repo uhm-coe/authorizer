@@ -191,6 +191,74 @@ function save_auth_settings_access(caller, create_local_account) {
 }
 
 
+// Multisite functions
+function save_auth_multisite_settings(caller) {
+  jQuery(caller).attr('disabled', 'disabled');
+  jQuery(caller).last().after('<span class="spinner"></span>');
+  jQuery('form .spinner').show();
+
+  var access_restriction = jQuery('form input[name="auth_settings[access_restriction]"]:checked').val();
+
+
+
+
+  var access_users_approved = new Object();
+  jQuery('#list_auth_settings_access_users_approved li').each(function(index) {
+    var user = new Object();
+    user['username'] = jQuery('.auth-username', this).val();
+    user['email'] = jQuery('.auth-email', this).val();
+    user['role'] = jQuery('.auth-role', this).val();
+    user['date_added'] = jQuery('.auth-date-added', this).val();
+    user['local_user'] = jQuery('.auth-local-user', this).length !== 0;
+    access_users_approved[index] = user;
+  });
+
+  var nonce_save_auth_settings_access = jQuery('#nonce_save_auth_settings_access').val();
+
+  jQuery.post(ajaxurl, {
+    action: 'save_auth_multisite_settings',
+    'access_restriction': access_restriction,
+    'access_users_approved': access_users_approved,
+    'nonce_save_auth_settings_access': nonce_save_auth_settings_access,
+  }, function(response) {
+    jQuery('form .spinner').remove();
+    jQuery(caller).removeAttr('disabled');
+    if (response==0) { // failed
+      return false;
+    } else { // succeeded
+      return true;
+    }
+  });
+}
+
+// Hide or show (with overlay) the multisite settings based on the "multisite override" setting.
+function hide_multisite_settings_if_disabled() {
+  var $ = jQuery;
+
+  if ( $('#auth_settings_multisite_override').length == 0 )
+    return;
+
+  var settings = $('#auth_multisite_settings');
+  var overlay = $('#auth_multisite_settings_disabled_overlay')
+
+  if ( $('#auth_settings_multisite_override').is(':checked') ) {
+    overlay.hide(animation_speed);
+  } else {
+    overlay.css({
+      'background-color': '#f1f1f1',
+      'opacity': 0.8,
+      'position': 'absolute',
+      'top': settings.position().top,
+      'left': settings.position().left,
+      'width': settings.width(),
+      'height': settings.height(),
+    });
+    overlay.show(animation_speed);
+  }
+}
+
+
+
 // Helper function to grab a querystring param value by name
 function getParameterByName(needle, haystack) {
   needle = needle.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
@@ -476,33 +544,6 @@ jQuery(document).ready(function($){
   hide_multisite_settings_if_disabled();
 
 });
-
-
-// Hide or show (with overlay) the multisite settings based on the "multisite override" setting.
-function hide_multisite_settings_if_disabled() {
-  var $ = jQuery;
-
-  if ( $('#auth_settings_multisite_override').length == 0 )
-    return;
-
-  var settings = $('#auth_multisite_settings');
-  var overlay = $('#auth_multisite_settings_disabled_overlay')
-
-  if ( $('#auth_settings_multisite_override').is(':checked') ) {
-    overlay.hide(animation_speed);
-  } else {
-    overlay.css({
-      'background-color': '#f1f1f1',
-      'opacity': 0.8,
-      'position': 'absolute',
-      'top': settings.position().top,
-      'left': settings.position().left,
-      'width': settings.width(),
-      'height': settings.height(),
-    });
-    overlay.show(animation_speed);
-  }
-}
 
 
 /**

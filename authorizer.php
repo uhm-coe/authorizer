@@ -116,6 +116,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_save_auth_dashboard_widget', array( $this, 'ajax_save_auth_dashboard_widget' ) );
 
+			// ajax save options from multisite options page
+			add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
+
 			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
@@ -841,7 +844,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
-		 * Network Admin Options page
+		 * Multisite: Network Admin Options page
 		 ****************************
 		 */
 
@@ -973,7 +976,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						</tbody></table>
 
 						<br class="clear" />
-						<?php //submit_button() prob replace this with button with ajax event and disable events on approved list; ?>
+						<input type="button" name="submit" id="submit" class="button button-primary" value="Save Changes" onclick="save_auth_multisite_settings(this);" />
+						<br /><br /><br />
 					</div>
 				</form>
 			</div>
@@ -984,6 +988,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Save multisite settings (ajax call).
 		 */
 		function ajax_save_auth_multisite_settings() {
+error_log('sdhrgblaaaaaar'); die('');
 			if ( ! current_user_can ('manage_network_options' ) ) {
 				die('');
 			}
