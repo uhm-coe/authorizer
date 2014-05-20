@@ -4,17 +4,17 @@ var shake_speed = 600;
 
 
 // Switch between option tabs.
-function chooseTab(listName) {
+function chooseTab(list_name) {
   // default to the access list tab
-  listName = typeof listName !== 'undefined' ? listName : 'access_list';
+  list_name = typeof list_name !== 'undefined' ? list_name : 'access_list';
 
   // Hide all tab content, then show selected tab content
   jQuery('div.section_info, div.section_info + table').hide();
-  jQuery('#section_info_' + listName + ', #section_info_' + listName + ' + table').show();
+  jQuery('#section_info_' + list_name + ', #section_info_' + list_name + ' + table').show();
 
   // Set active tab
   jQuery('.nav-tab-wrapper a').removeClass('nav-tab-active');
-  jQuery('a.nav-tab-' + listName).addClass('nav-tab-active');
+  jQuery('a.nav-tab-' + list_name).addClass('nav-tab-active');
 }
 
 // Add user to list (list = blocked or approved).
@@ -107,20 +107,20 @@ function auth_add_user(caller, list, create_local_account) {
 }
 
 // Remove user from list (multisite options page).
-function auth_multisite_ignore_user(caller, listName) {
+function auth_multisite_ignore_user(caller, list_name) {
   var is_multisite = true;
-  auth_ignore_user( caller, listName, is_multisite );
+  auth_ignore_user( caller, list_name, is_multisite );
 }
 
 // Remove user from list.
-function auth_ignore_user(caller, listName, is_multisite) {
+function auth_ignore_user(caller, list_name, is_multisite) {
   is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
   // Show an 'empty list' message if we're deleting the last item
-  listName = typeof listName !== 'undefined' ? listName : '';
+  list_name = typeof list_name !== 'undefined' ? list_name : '';
   var list = jQuery(caller).parent().parent();
   if (jQuery('li', list).length <= 1) {
-    jQuery(list).append('<li class="auth-empty"><em>No ' + listName + ' users</em></li>');
+    jQuery(list).append('<li class="auth-empty"><em>No ' + list_name + ' users</em></li>');
   }
 
   jQuery(caller).parent().slideUp(250,function() {
