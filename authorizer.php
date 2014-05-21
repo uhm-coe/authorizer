@@ -601,8 +601,24 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
-			// @TODO multisite overrides (copy from authenticate() fcuntion)
-			// Override external_service (cas or ldap) and associated options
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override external_service (cas or ldap) and associated options
+					$auth_settings['external_service'] = $auth_multisite_settings['external_service'];
+					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
+					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
+					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
+					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
+					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
+					$auth_settings['ldap_uid'] = $auth_multisite_settings['ldap_uid'];
+					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
+					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
+					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
+				}
+			}
 
 			// Reset option containing old error messages.
 			update_option( 'auth_settings_advanced_login_error', $error_message );
