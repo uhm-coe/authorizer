@@ -662,8 +662,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$auth_settings = get_option( 'auth_settings' );
 
-			// @TODO: multisite overrides (copy from authenticate())
-			// Override access_restriction
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override access_restriction
+					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+				}
+			}
 
 			$has_access = (
 				// Always allow access if WordPress is installing
