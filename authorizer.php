@@ -2080,7 +2080,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><select id="<?= $id; ?>" name="<?= $name; ?>">
@@ -2101,7 +2101,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_<?= $id; ?>_cas" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_<?= $id; ?>_cas" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_<?= $id; ?>_cas" name="<?= $name; ?>" value="cas"<?php checked( 'cas' == $auth_settings[$option] ); ?> /> CAS<br />
@@ -2121,7 +2121,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="login.its.example.edu" /><?php
@@ -2140,7 +2140,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="443" style="width:50px;" /><?php
@@ -2159,7 +2159,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="/cas" /><?php
@@ -2178,7 +2178,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="ldap.example.edu" /><?php
@@ -2196,7 +2196,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="389" /><?php
@@ -2214,7 +2214,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
@@ -2232,7 +2232,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="uid" /><?php
@@ -2250,7 +2250,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
@@ -2268,7 +2268,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
@@ -2287,7 +2287,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
@@ -2310,7 +2310,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
@@ -2413,7 +2413,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-auth_settings_advanced_lockouts_attempts_1" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-auth_settings_advanced_lockouts_attempts_1" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?>After
@@ -2442,7 +2442,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-auth_settings_advanced_lostpassword_url" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-auth_settings_advanced_lostpassword_url" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
@@ -2457,7 +2457,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_advanced_branding_default" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_auth_settings_advanced_branding_default" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_advanced_branding_default" name="auth_settings[advanced_branding]" value="default"<?php checked( 'default' == $auth_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />

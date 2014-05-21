@@ -19,7 +19,7 @@ function chooseTab( list_name ) {
   $('a.nav-tab-' + list_name).addClass('nav-tab-active');
 
   // Hide site options if they are overridden by a multisite setting.
-  hide_multisite_overridden_options();
+  setTimeout( hide_multisite_overridden_options, animation_speed );
 }
 
 // Remove user from list (multisite options page).
@@ -419,6 +419,15 @@ function getUsernameFromEmail( email ) {
   return email.split( "@" )[0];
 }
 
+// Helper function to grab a querystring value
+function querystring( key ) {
+  var re = new RegExp( '(?:\\?|&)'+key+'=(.*?)(?=&|$)', 'gi' );
+  var r = [], m;
+  while ( ( m = re.exec( document.location.search ) ) != null )
+    r.push( m[1] );
+  return r;
+}
+
 
 jQuery(document).ready(function($){
   // Grab references to form elements that we will show/hide on page load
@@ -638,8 +647,13 @@ jQuery(document).ready(function($){
     selectionHeader: '<div class="custom-header">Public Pages</div>',
   });
 
-  // Switch to the first tab.
-  chooseTab( 'access_lists' );
+  // Switch to the first tab (or the tab indicated in the querystring).
+  var tab = querystring( 'tab' );
+  if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
+    chooseTab( tab );
+  } else {
+    chooseTab( 'access_lists' );
+  }
 
   // Hide/show multisite settings based on override checkbox.
   $('input[name="auth_settings[multisite_override]"]').change(function() {
@@ -647,8 +661,6 @@ jQuery(document).ready(function($){
   });
   hide_multisite_settings_if_disabled();
 
-  // Hide site options if they are overridden by a multisite setting.
-  hide_multisite_overridden_options();
 });
 
 
