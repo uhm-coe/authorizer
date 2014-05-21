@@ -17,6 +17,9 @@ function chooseTab( list_name ) {
   // Set active tab
   $('.nav-tab-wrapper a').removeClass('nav-tab-active');
   $('a.nav-tab-' + list_name).addClass('nav-tab-active');
+
+  // Hide site options if they are overridden by a multisite setting.
+  hide_multisite_overridden_options();
 }
 
 // Remove user from list (multisite options page).
@@ -337,6 +340,28 @@ function hide_multisite_settings_if_disabled() {
   }
 }
 
+// Hide (with overlay) site options if overridden by a multisite option.
+function hide_multisite_overridden_options() {
+  var $ = jQuery;
+
+  $('.auth_multisite_override_overlay').each( function() {
+    // Option to hide is stored in the overlay's id with 'overlay-hide-' prefix.
+    var option_id_to_hide = $(this).attr('id').replace('overlay-hide-','');
+    var option_container_to_hide = $('#' + option_id_to_hide).closest('tr');
+    $(this).css({
+      'background-color': '#f1f1f1',
+      'z-index': 1,
+      'opacity': 0.8,
+      'position': 'absolute',
+      'top': option_container_to_hide.position().top,
+      'left': option_container_to_hide.position().left,
+      'width': option_container_to_hide.width(),
+      'height': option_container_to_hide.height(),
+    });
+    $(this).show();
+  });
+}
+
 
 
 // Helper function to grab a querystring param value by name
@@ -622,6 +647,8 @@ jQuery(document).ready(function($){
   });
   hide_multisite_settings_if_disabled();
 
+  // Hide site options if they are overridden by a multisite setting.
+  hide_multisite_overridden_options();
 });
 
 

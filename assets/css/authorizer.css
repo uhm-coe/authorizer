@@ -85,6 +85,23 @@ body.toplevel_page_authorizer .spinner {
 	display: none;
 }
 
+/**
+ * Overlays
+ */
+.auth_multisite_override_overlay .overlay-note {
+  background: white;
+  padding: 8px;
+  opacity: 0;
+  border: 1px solid #aaa;
+  margin: 2%;
+  position: absolute;
+  -webkit-transition: opacity 0.1s ease-in-out;
+  -moz-transition: opacity 0.1s ease-in-out;
+  transition: opacity 0.1s ease-in-out;
+}
+.auth_multisite_override_overlay:hover .overlay-note {
+  opacity: 1;
+}
 
 /**
  * Portions below from Bootstrap
