@@ -776,8 +776,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
-			// @TODO: multisite overrides (copy from authenticate())
-			// Override lockouts
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override lockouts
+					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
+				}
+			}
 
 			// Get user trying to log in.
 			// If this isn't a real user, update the global failed attempt
