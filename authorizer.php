@@ -280,6 +280,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override lockouts
+					// Override access_restriction
+					// Override external_service (cas or ldap) and associated options
+					// Append network approved users to access_users_approved
+					// Override access_default_role
+				}
+			}
+
 			// Create semantic lockout variables.
 			$lockouts = $auth_settings['advanced_lockouts'];
 			$time_since_last_fail = time() - $last_attempt;
@@ -569,6 +581,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
+			// @TODO multisite overrides (copy from authenticate() fcuntion)
+			// Override external_service (cas or ldap) and associated options
+
 			// Reset option containing old error messages.
 			update_option( 'auth_settings_advanced_login_error', $error_message );
 
@@ -610,6 +625,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 );	// only need it the first time
 
 			$auth_settings = get_option( 'auth_settings' );
+
+			// @TODO: multisite overrides (copy from authenticate())
+			// Override access_restriction
 
 			$has_access = (
 				// Always allow access if WordPress is installing
@@ -716,6 +734,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
+			// @TODO: multisite overrides (copy from authenticate())
+			// Override lockouts
+
 			// Get user trying to log in.
 			// If this isn't a real user, update the global failed attempt
 			// variables. We'll use these global variables to institute the
@@ -761,7 +782,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * WordPress password resets won't work.
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
+			// Grab plugin settings
 			$auth_settings = get_option( 'auth_settings' );
+
+			// @TODO: multisite overrides
+			// Override advanced_lostpassword_url
+
 			if (
 				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
 				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
@@ -775,6 +801,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Overwrite the username and password labels on the login form.
+		 * @todo : @TODO this is currently unused; was used for changing to 'UH Username'
 		 */
 		function custom_login_form_labels( $translated_text, $text, $domain ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -1200,7 +1227,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: login_head
 		 */
 		function load_login_css_and_js() {
+			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
+
+			// @TODO multisite overrides
+			// Override advanced_branding
 
 			?>
 			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
@@ -1226,7 +1257,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *   }
 		 */
 		public function admin_notices() {
+			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
+
+			// @TODO: Multisite overrides
+			// Override external_service (cas or ldap) and cas options if selected
 
 			if ( $auth_settings['external_service'] === 'cas' ) {
 				// Check if provided CAS URL is accessible.
@@ -1918,6 +1953,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		function print_combo_auth_access_users_approved( $args = '' ) {
+			// @TODO: multisite override: add multisite approved users to list, greyed out
+
 			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
 				// We're showing the "globally" approved list on the network
 				// admin plugin options page, so we need to load the global
@@ -2417,11 +2454,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
 		 */
-		function is_username_in_list($username = '', $list = 'approved') {
+		function is_username_in_list($username = '', $list = 'approved', $is_multisite_list = false ) {
 			if ( empty( $username ) )
 				return false;
 
 			$auth_settings = get_option( 'auth_settings' );
+
+			// @TODO multisite overrides
+			// Override access_users_approved with network approved users; use is_multisite_list param
 
 			switch ( $list ) {
 				case 'pending':
