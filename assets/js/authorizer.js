@@ -325,6 +325,7 @@ function hide_multisite_settings_if_disabled() {
   } else {
     overlay.css({
       'background-color': '#f1f1f1',
+      'z-index': 1,
       'opacity': 0.8,
       'position': 'absolute',
       'top': settings.position().top,

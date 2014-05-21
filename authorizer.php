@@ -460,7 +460,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// environment, just remove them from the current blog.
 				if ( $user ) {
 					if ( is_multisite() ) {
-						remove_user_from_blog( $user->ID, get_current_blog_id() );
+						remove_user_from_blog( $user->ID, get_current_blog_id(), get_current_user_id() );
 					} else {
 						// Reset user's password (change it to something they don't know, just in case)
 						wp_set_password( wp_generate_password(), $user->ID );
@@ -899,7 +899,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Who can view the sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_restriction(); ?></td>
+								<td><?php $this->print_radio_auth_access_restriction( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Approved Users (All Sites)</th>
@@ -911,51 +911,51 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Default role for new users</th>
-								<td><?php $this->print_select_auth_access_default_role(); ?></td>
+								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Type of external service to authenticate against</th>
-								<td><?php $this->print_radio_auth_external_service(); ?></td>
+								<td><?php $this->print_radio_auth_external_service( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server hostname</th>
-								<td><?php $this->print_text_cas_host(); ?></td>
+								<td><?php $this->print_text_cas_host( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server port</th>
-								<td><?php $this->print_text_cas_port(); ?></td>
+								<td><?php $this->print_text_cas_port( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server path/context</th>
-								<td><?php $this->print_text_cas_path(); ?></td>
+								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Host</th>
-								<td><?php $this->print_text_ldap_host(); ?></td>
+								<td><?php $this->print_text_ldap_host( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Port</th>
-								<td><?php $this->print_text_ldap_port(); ?></td>
+								<td><?php $this->print_text_ldap_port( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Search Base</th>
-								<td><?php $this->print_text_ldap_search_base(); ?></td>
+								<td><?php $this->print_text_ldap_search_base( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute containing username</th>
-								<td><?php $this->print_text_ldap_uid(); ?></td>
+								<td><?php $this->print_text_ldap_uid( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Directory User</th>
-								<td><?php $this->print_text_ldap_user(); ?></td>
+								<td><?php $this->print_text_ldap_user( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Directory User Password</th>
-								<td><?php $this->print_password_ldap_password(); ?></td>
+								<td><?php $this->print_password_ldap_password( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Secure Connection (TLS)</th>
-								<td><?php $this->print_checkbox_ldap_tls(); ?></td>
+								<td><?php $this->print_checkbox_ldap_tls( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -963,22 +963,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Limit invalid login attempts</th>
-								<td><?php $this->print_text_auth_advanced_lockouts(); ?></td>
+								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Custom lost password URL</th>
-								<td><?php $this->print_text_auth_advanced_lostpassword_url(); ?></td>
+								<td><?php $this->print_text_auth_advanced_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Custom WordPress login branding</th>
-								<td><?php $this->print_radio_auth_advanced_branding(); ?></td>
+								<td><?php $this->print_radio_auth_advanced_branding( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
 						<br class="clear" />
-						<input type="button" name="submit" id="submit" class="button button-primary" value="Save Changes" onclick="save_auth_multisite_settings(this);" />
-						<br /><br /><br />
 					</div>
+					<input type="button" name="submit" id="submit" class="button button-primary" value="Save Changes" onclick="save_auth_multisite_settings(this);" />
 				</form>
 			</div>
 			<?php
@@ -988,13 +987,31 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Save multisite settings (ajax call).
 		 */
 		function ajax_save_auth_multisite_settings() {
-error_log('sdhrgblaaaaaar'); die('');
 			if ( ! current_user_can ('manage_network_options' ) ) {
 				die('');
 			}
 
-			// Make sure posted variables exist.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
+			// Make sure nonce exists and all POST variables exist.
+			if ( empty( $_POST['nonce_save_auth_settings'] )
+				|| ! array_key_exists( 'multisite_override', $_POST )
+				|| ! array_key_exists( 'access_restriction', $_POST )
+				|| ! array_key_exists( 'access_users_approved', $_POST )
+				|| ! array_key_exists( 'access_default_role', $_POST )
+				|| ! array_key_exists( 'external_service', $_POST )
+				|| ! array_key_exists( 'cas_host', $_POST )
+				|| ! array_key_exists( 'cas_port', $_POST )
+				|| ! array_key_exists( 'cas_path', $_POST )
+				|| ! array_key_exists( 'ldap_host', $_POST )
+				|| ! array_key_exists( 'ldap_port', $_POST )
+				|| ! array_key_exists( 'ldap_search_base', $_POST )
+				|| ! array_key_exists( 'ldap_uid', $_POST )
+				|| ! array_key_exists( 'ldap_user', $_POST )
+				|| ! array_key_exists( 'ldap_password', $_POST )
+				|| ! array_key_exists( 'ldap_tls', $_POST )
+				|| ! array_key_exists( 'advanced_lockouts', $_POST )
+				|| ! array_key_exists( 'advanced_lostpassword_url', $_POST )
+				|| ! array_key_exists( 'advanced_branding', $_POST )
+			) {
 				die('');
 			}
 
@@ -1003,9 +1020,10 @@ error_log('sdhrgblaaaaaar'); die('');
 				die('');
 			}
 
+
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
-			// Create default settings if they don't exist.
+			// Create default user array if it's empty (assert array exists).
 			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
 				$auth_multisite_settings['access_users_approved'] = array();
 			}
@@ -1017,7 +1035,12 @@ error_log('sdhrgblaaaaaar'); die('');
 				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
 					$ignored_user = get_user_by( 'email', $approved_user['email'] );
 					if ( $ignored_user !== false ) {
-						remove_user_from_blog( $ignored_user->ID, get_current_blog_id() );
+						// Remove this multisite-approved user from all blogs
+						$blogs = get_blogs_of_user( $ignored_user->ID );
+						foreach ( $blogs as $blog ) {
+							remove_user_from_blog( $ignored_user->ID, $blog->userblog_id, get_current_user_id() );
+						}
+						// @TODO: replace the above with update_user_meta(blogid, 'auth_inactive', true, false)?
 					}
 				}
 			}
@@ -1028,23 +1051,15 @@ error_log('sdhrgblaaaaaar'); die('');
 			foreach ( $_POST['access_users_approved'] as $approved_user ) {
 				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
 					$new_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $new_user !== false ) {
-						add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
-					} else if ( $approved_user['local_user'] === 'true' ) {
+					if ( $new_user !== true && $approved_user['local_user'] === 'true' ) {
 						// Create a WP account for this new *local* user and email the password.
 						$plaintext_password = wp_generate_password(); // random password
-						$result = wp_insert_user(
-							array(
-								'user_login' => strtolower( $approved_user['username'] ),
-								'user_pass' => $plaintext_password,
-								'first_name' => '',
-								'last_name' => '',
-								'user_email' => strtolower( $approved_user['email'] ),
-								'user_registered' => date( 'Y-m-d H:i:s' ),
-								'role' => $approved_user['role'],
-							)
+						$result = wpmu_create_user(
+							strtolower( $approved_user['username'] ),
+							$plaintext_password,
+							strtolower( $approved_user['email'] )
 						);
-						if ( ! is_wp_error( $result ) ) {
+						if ( $result !== false ) {
 							// Email password to new user
 							wp_new_user_notification( $result, $plaintext_password );
 						}
@@ -1052,10 +1067,33 @@ error_log('sdhrgblaaaaaar'); die('');
 				}
 			}
 
-			// Update the approved user list with the new copy
-			$auth_multisite_settings['access_users_pending'] = $_POST['access_users_pending'];
+			// Sanitize settings
+			$auth_multisite_settings = $this->sanitize_options( $_POST, true );
 
-			// Update options.
+			// Filter options to only the allowed values (multisite options are a subset of all options)
+			$allowed = array(
+				'multisite_override',
+				'access_restriction',
+				'access_users_approved',
+				'access_default_role',
+				'external_service',
+				'cas_host',
+				'cas_port',
+				'cas_path',
+				'ldap_host',
+				'ldap_port',
+				'ldap_search_base',
+				'ldap_uid',
+				'ldap_user',
+				'ldap_password',
+				'ldap_tls',
+				'advanced_lockouts',
+				'advanced_lostpassword_url',
+				'advanced_branding'
+			);
+			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
+
+			// Update multisite settings in database.
 			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 		}
 
@@ -1740,7 +1778,7 @@ error_log('sdhrgblaaaaaar'); die('');
 		/**
 		 * Settings sanitizer callback
 		 */
-		function sanitize_options( $auth_settings ) {
+		function sanitize_options( $auth_settings, $is_multisite_option = false ) {
 			// If the pending user list isn't a list, make it.
 			if ( ! is_array( $auth_settings['access_users_pending'] ) ) {
 				$auth_settings['access_users_pending'] = array();
@@ -1755,8 +1793,15 @@ error_log('sdhrgblaaaaaar'); die('');
 			// list have the same role as what's chosen in the approved list.
 			foreach( $auth_settings['access_users_approved'] as $user_info ) {
 				$wp_user = get_user_by( 'email', $user_info['email'] );
-				if ( $wp_user && ! array_key_exists( $user_info['role'], $wp_user->roles ) ) {
-					$wp_user->set_role( $user_info['role'] );
+				if ( $wp_user ) {
+					if ( $is_multisite_option ) {
+						$blogs = get_blogs_of_user( $wp_user->ID );
+						foreach ( $blogs as $blog ) {
+							add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
+						}
+					} else {
+						$wp_user->set_role( $user_info['role'] );
+					}
 				}
 			}
 
@@ -1986,60 +2031,60 @@ error_log('sdhrgblaaaaaar'); die('');
 		}
 
 		function print_select_auth_access_default_role( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><select id="auth_settings_access_default_role" name="auth_settings[access_default_role]">
 				<?php wp_dropdown_roles( $auth_settings['access_default_role'] ); ?>
 			</select><?php
 		}
 
 		function print_radio_auth_external_service( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_external_service_cas" name="auth_settings[external_service]" value="cas"<?php checked( 'cas' == $auth_settings['external_service'] ); ?> /> CAS<br />
 			<input type="radio" id="radio_auth_settings_external_service_ldap" name="auth_settings[external_service]" value="ldap"<?php checked( 'ldap' == $auth_settings['external_service'] ); ?> /> LDAP<br /><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?= $auth_settings['cas_host']; ?>" placeholder="login.its.example.edu" /><?php
 		}
 
 		function print_text_cas_port( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_cas_port" name="auth_settings[cas_port]" value="<?= $auth_settings['cas_port']; ?>" placeholder="443" style="width:50px;" /><?php
 		}
 
 		function print_text_cas_path( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_cas_path" name="auth_settings[cas_path]" value="<?= $auth_settings['cas_path']; ?>" placeholder="/cas" /><?php
 		}
 
 		function print_text_ldap_host( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?= $auth_settings['ldap_host']; ?>" placeholder="ldap.example.edu" /><?php
 		}
 		function print_text_ldap_port( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_ldap_port" name="auth_settings[ldap_port]" value="<?= $auth_settings['ldap_port']; ?>" placeholder="389" /><?php
 		}
 		function print_text_ldap_search_base( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_ldap_search_base" name="auth_settings[ldap_search_base]" value="<?= $auth_settings['ldap_search_base']; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
 		}
 		function print_text_ldap_uid( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_ldap_uid" name="auth_settings[ldap_uid]" value="<?= $auth_settings['ldap_uid']; ?>" placeholder="uid" /><?php
 		}
 		function print_text_ldap_user( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_ldap_user" name="auth_settings[ldap_user]" value="<?= $auth_settings['ldap_user']; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
 		}
 		function print_password_ldap_password( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_ldap_password" name="auth_settings[ldap_password]" value="<?= $this->decrypt(base64_decode($auth_settings['ldap_password'])); ?>" autocomplete="off" /><?php
+			<input type="password" id="auth_settings_ldap_password" name="auth_settings[ldap_password]" value="<?= $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ); ?>" autocomplete="off" /><?php
 		}
 		function print_checkbox_ldap_tls( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="checkbox" id="auth_settings_ldap_tls" name="auth_settings[ldap_tls]" value="1"<?php checked( 1 == $auth_settings['ldap_tls'] ); ?> /> Use TLS<?php
 		}
 
@@ -2052,7 +2097,7 @@ error_log('sdhrgblaaaaaar'); die('');
 		}
 
 		function print_radio_auth_access_restriction( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
@@ -2145,7 +2190,7 @@ error_log('sdhrgblaaaaaar'); die('');
 		}
 
 		function print_text_auth_advanced_lockouts( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?>After
 			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?= $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
 			invalid password attempts, delay further attempts on that username for
@@ -2164,12 +2209,12 @@ error_log('sdhrgblaaaaaar'); die('');
 		}
 
 		function print_text_auth_advanced_lostpassword_url( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_auth_advanced_branding( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
+			$auth_settings = is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ) : get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_advanced_branding_default" name="auth_settings[advanced_branding]" value="default"<?php checked( 'default' == $auth_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />
 				<input type="radio" id="radio_auth_settings_advanced_branding_custom_uh" name="auth_settings[advanced_branding]" value="custom_uh"<?php checked( 'custom_uh' == $auth_settings['advanced_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
 		}
@@ -2251,7 +2296,7 @@ error_log('sdhrgblaaaaaar'); die('');
 					$ignored_user = get_user_by( 'email', $approved_user['email'] );
 					if ( $ignored_user !== false ) {
 						if ( is_multisite() ) {
-							remove_user_from_blog( $ignored_user->ID, get_current_blog_id() );
+							remove_user_from_blog( $ignored_user->ID, get_current_blog_id(), get_current_user_id() );
 						} else {
 							// Mark this ignored user as inactive (enforce inactivity in this->authenticate()).
 							update_user_meta( $ignored_user->ID, 'auth_inactive', 'yes' );
@@ -2304,7 +2349,7 @@ error_log('sdhrgblaaaaaar'); die('');
 						$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
 						if ( $unblocked_user !== false ) {
 							if ( is_multisite() ) {
-								remove_user_from_blog( $unblocked_user->ID, get_current_blog_id() );
+								remove_user_from_blog( $unblocked_user->ID, get_current_blog_id(), get_current_user_id() );
 							} else {
 								// Mark this user as unblocked.
 								delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
