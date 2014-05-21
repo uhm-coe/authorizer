@@ -833,8 +833,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings
 			$auth_settings = get_option( 'auth_settings' );
 
-			// @TODO: multisite overrides
-			// Override advanced_lostpassword_url
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override access_restriction
+					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+
+					// Override advanced_lostpassword_url
+					$auth_settings['advanced_lostpassword_url'] = $auth_multisite_settings['advanced_lostpassword_url'];
+				}
+			}
 
 			if (
 				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
