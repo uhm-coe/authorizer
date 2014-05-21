@@ -858,7 +858,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Overwrite the username and password labels on the login form.
-		 * @todo : @TODO this is currently unused; was used for changing to 'UH Username'
+		 * @todo : remove. this is currently unused; was used for changing to 'UH Username'
 		 */
 		function custom_login_form_labels( $translated_text, $text, $domain ) {
 			$auth_settings = get_option( 'auth_settings' );
