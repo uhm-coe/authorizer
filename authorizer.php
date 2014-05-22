@@ -2180,6 +2180,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// We're on the multisite options page, so print the multisite options instead.
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// Make the access_restriction option match what's set in multisite so the correct options appear below it.
+				$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
 				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
 			}
