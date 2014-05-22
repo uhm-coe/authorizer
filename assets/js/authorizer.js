@@ -336,7 +336,7 @@ function hide_multisite_settings_if_disabled() {
       'width': settings.width(),
       'height': settings.height(),
     });
-    overlay.show(animation_speed);
+    overlay.show();
   }
 }
 
