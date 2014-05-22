@@ -2165,6 +2165,110 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		function print_section_info_access( $args = '' ) {
+			?><div id="section_info_access" class="section_info">
+				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
+				<p>Choose how you want to restrict access to this site below.</p>
+			</div><?php
+		}
+
+		function print_radio_auth_access_restriction( $args = '' ) {
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
+		}
+
+		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><select id="auth_settings_access_role_receive_pending_emails" name="auth_settings[access_role_receive_pending_emails]">
+				<option value="---" <?php selected( $auth_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
+				<?php wp_dropdown_roles( $auth_settings['access_role_receive_pending_emails'] ); ?>
+			</select><?php
+		}
+
+		function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			wp_editor(
+				$auth_settings['access_pending_redirect_to_message'],
+				'auth_settings_access_pending_redirect_to_message',
+				array(
+					'media_buttons' => false,
+					'textarea_name' => 'auth_settings[access_pending_redirect_to_message]',
+					'textarea_rows' => 5,
+					'tinymce' => true,
+					'teeny' => true,
+					'quicktags' => false,
+				)
+			);
+		}
+
+
+		function print_section_info_access_public( $args = '' ) {
+			?><div id="section_info_access_public" class="section_info">
+				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
+			</div><?php
+		}
+
+		function print_radio_auth_access_redirect( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="radio" id="radio_auth_settings_access_redirect_to_login" name="auth_settings[access_redirect]" value="login"<?php checked( 'login' == $auth_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
+			<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them the anonymous access message (below)<?php
+		}
+
+		function print_radio_auth_access_public_warning( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page (without the anonymous access message)<br />
+			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page with the anonymous access message above the content<?php
+		}
+
+		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			wp_editor(
+				$auth_settings['access_redirect_to_message'],
+				'auth_settings_access_redirect_to_message',
+				array(
+					'media_buttons' => false,
+					'textarea_name' => 'auth_settings[access_redirect_to_message]',
+					'textarea_rows' => 5,
+					'tinymce' => true,
+					'teeny' => true,
+					'quicktags' => false,
+				)
+			);
+		}
+
+		function print_multiselect_auth_access_public_pages( $args = '' ) {
+			$auth_settings = get_option( 'auth_settings' );
+			?><select id="auth_settings_access_public_pages" multiple="multiple" name="auth_settings[access_public_pages][]">
+				<optgroup label="Special">
+					<option value="home" <?php print in_array( 'home', $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+				</optgroup>
+				<?php $post_types = get_post_types( '', 'names' ); ?>
+				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
+				<?php foreach ( $post_types as $post_type ): ?>
+					<optgroup label="<?php print ucfirst( $post_type ); ?>">
+					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
+					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
+					<?php foreach ( $pages as $page ): ?>
+						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+					<?php endforeach; ?>
+					</optgroup>
+				<?php endforeach; ?>
+			</select><?php
+		}
+
+
 		function print_section_info_external( $args = '' ) {
 			?><div id="section_info_external" class="section_info">
 				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
@@ -2398,110 +2502,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
-		}
-
-
-		function print_section_info_access( $args = '' ) {
-			?><div id="section_info_access" class="section_info">
-				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
-				<p>Choose how you want to restrict access to this site below.</p>
-			</div><?php
-		}
-
-		function print_radio_auth_access_restriction( $args = '' ) {
-			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay" style="display: none;"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
-			}
-			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only the university community (All external service users and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
-		}
-
-		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			?><select id="auth_settings_access_role_receive_pending_emails" name="auth_settings[access_role_receive_pending_emails]">
-				<option value="---" <?php selected( $auth_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
-				<?php wp_dropdown_roles( $auth_settings['access_role_receive_pending_emails'] ); ?>
-			</select><?php
-		}
-
-		function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			wp_editor(
-				$auth_settings['access_pending_redirect_to_message'],
-				'auth_settings_access_pending_redirect_to_message',
-				array(
-					'media_buttons' => false,
-					'textarea_name' => 'auth_settings[access_pending_redirect_to_message]',
-					'textarea_rows' => 5,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
-				)
-			);
-		}
-
-
-		function print_section_info_access_public( $args = '' ) {
-			?><div id="section_info_access_public" class="section_info">
-				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
-			</div><?php
-		}
-
-		function print_radio_auth_access_redirect( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			?><input type="radio" id="radio_auth_settings_access_redirect_to_login" name="auth_settings[access_redirect]" value="login"<?php checked( 'login' == $auth_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
-			<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them the anonymous access message (below)<?php
-		}
-
-		function print_radio_auth_access_public_warning( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page (without the anonymous access message)<br />
-			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page with the anonymous access message above the content<?php
-		}
-
-		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			wp_editor(
-				$auth_settings['access_redirect_to_message'],
-				'auth_settings_access_redirect_to_message',
-				array(
-					'media_buttons' => false,
-					'textarea_name' => 'auth_settings[access_redirect_to_message]',
-					'textarea_rows' => 5,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
-				)
-			);
-		}
-
-		function print_multiselect_auth_access_public_pages( $args = '' ) {
-			$auth_settings = get_option( 'auth_settings' );
-			?><select id="auth_settings_access_public_pages" multiple="multiple" name="auth_settings[access_public_pages][]">
-				<optgroup label="Special">
-					<option value="home" <?php print in_array( 'home', $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
-				</optgroup>
-				<?php $post_types = get_post_types( '', 'names' ); ?>
-				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
-				<?php foreach ( $post_types as $post_type ): ?>
-					<optgroup label="<?php print ucfirst( $post_type ); ?>">
-					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
-					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
-					<?php foreach ( $pages as $page ): ?>
-						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
-					<?php endforeach; ?>
-					</optgroup>
-				<?php endforeach; ?>
-			</select><?php
 		}
 
 
