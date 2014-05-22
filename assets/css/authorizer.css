@@ -38,6 +38,13 @@ body.toplevel_page_authorizer .spinner {
 	width: 80px;
 }
 
+.auth-multisite-username,
+.auth-multisite-email,
+.auth-multisite-role,
+.auth-multisite-date-added {
+  opacity: 0.5;
+}
+
 #auth_dashboard_widget {
 	min-width: 460px;
 }
@@ -329,7 +336,9 @@ body.toplevel_page_authorizer .spinner {
 .glyphicon-user:before {
   content: "\e008";
 }
-
+.glyphicon-globe:before {
+  content: "\e135";
+}
 
 /**
  * Bootstrap customizations (typically because of conflicts with WordPress styles)

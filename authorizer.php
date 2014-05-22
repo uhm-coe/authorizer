@@ -2032,24 +2032,52 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		function print_combo_auth_access_users_approved( $args = '' ) {
-			// @TODO: multisite override: add multisite approved users to list, greyed out
+			// Grab multisite overrides
+			$auth_multisite_settings = array();
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			}
 
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+			$multisite_admin_page = false;
+			if ( is_multisite() && is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
 				// We're showing the "globally" approved list on the network
 				// admin plugin options page, so we need to load the global
 				// approved list instead of a site-specific approved list.
 				// Note: BLOG_ID_CURRENT_SITE (typically set to 1) points
 				// to the "Main Site" for the network (usually the first site).
-				$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				$auth_settings = $auth_multisite_settings;
 
 				// We also will need to change the AJAX destinations for
 				// actions (ignore user; add user; add local user).
 				$js_function_prefix = 'auth_multisite_';
+
+				// Flag indicating we're viewing the multisite options page.
+				$multisite_admin_page = true;
 			} else {
 				$auth_settings = get_option( 'auth_settings' );
 				$js_function_prefix = 'auth_';
 			}
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
+				<?php if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' && array_key_exists( 'access_users_approved', $auth_multisite_settings ) && is_array( $auth_multisite_settings['access_users_approved'] ) && ! $multisite_admin_page ) : ?>
+					<?php foreach ( $auth_multisite_settings['access_users_approved'] as $key => $approved_user ): ?>
+						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
+						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
+							<?php $approved_user['username'] = $approved_wp_user->user_login; ?>
+							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
+							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
+							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
+						<?php endif; ?>
+						<li>
+							<input type="text" name="auth_multisite_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="auth-username auth-multisite-username" />
+							<input type="text" id="auth_multisite_settings_access_users_approved_<?= $key; ?>" name="auth_multisite_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
+							<select name="auth_multisite_settings[access_users_approved][<?= $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
+								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
+							</select>
+							<input type="text" name="auth_multisite_settings[access_users_approved][<?= $key; ?>][date_added]" value="<?= date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
+							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
+						</li>
+					<?php endforeach; ?>
+				<?php endif; ?>
 				<?php if ( array_key_exists( 'access_users_approved', $auth_settings ) && is_array( $auth_settings['access_users_approved'] ) ) : ?>
 					<?php foreach ( $auth_settings['access_users_approved'] as $key => $approved_user ): ?>
 						<?php $is_current_user = false; ?>
