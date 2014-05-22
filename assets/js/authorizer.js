@@ -4,8 +4,11 @@ var shake_speed = 600;
 
 
 // Switch between option tabs.
-function chooseTab( list_name ) {
+function chooseTab( list_name, delay ) {
   var $ = jQuery;
+
+  // default delay is 0
+  delay = typeof delay !== 'undefined' ? delay : 0;
 
   // default to the access list tab
   list_name = typeof list_name !== 'undefined' ? list_name : 'access_list';
@@ -19,7 +22,7 @@ function chooseTab( list_name ) {
   $('a.nav-tab-' + list_name).addClass('nav-tab-active');
 
   // Hide site options if they are overridden by a multisite setting.
-  setTimeout( hide_multisite_overridden_options, animation_speed );
+  setTimeout( hide_multisite_overridden_options, delay );
 }
 
 // Remove user from list (multisite options page).
@@ -650,7 +653,7 @@ jQuery(document).ready(function($){
   // Switch to the first tab (or the tab indicated in the querystring).
   var tab = querystring( 'tab' );
   if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
-    chooseTab( tab );
+    chooseTab( tab, animation_speed );
   } else {
     chooseTab( 'access_lists' );
   }
