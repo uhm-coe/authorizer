@@ -273,11 +273,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.' ) );
 			}
 
-			// Make sure $last_attempt (time) and $num_attempts are positive integers.
-			// Note: this addresses resetting them if either is unset from above.
-			$last_attempt = abs( intval( $last_attempt ) );
-			$num_attempts = abs( intval( $num_attempts ) );
-
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
@@ -311,6 +306,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['access_default_role'] = $auth_multisite_settings['access_default_role'];
 				}
 			}
+
+			// Make sure $last_attempt (time) and $num_attempts are positive integers.
+			// Note: this addresses resetting them if either is unset from above.
+			$last_attempt = abs( intval( $last_attempt ) );
+			$num_attempts = abs( intval( $num_attempts ) );
 
 			// Create semantic lockout variables.
 			$lockouts = $auth_settings['advanced_lockouts'];
@@ -352,14 +352,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
 				return new WP_Error( 'using_wp_authentication', 'Bypassing external authentication in favor of WordPress authentication...' );
 			}
-			// Admin bypass: if we have populated username/password data, and
-			// the page we're coming from is the admin bypass, let WordPress
-			// handle the authentication (by passing on null).
-			if ( ! empty( $username ) && ! empty( $password ) && strpos( $_SERVER['HTTP_REFERER'], 'login=wordpress' ) !== false ) {
-				return null;
-			}
 
-			// If we're not restricting view access access at all, don't check
+			// If we're not restricting view access at all, don't check
 			// against an external service; instead, pass through to default
 			// WP authentication.
 			if ( $auth_settings['access_restriction'] === 'everyone' ) {
