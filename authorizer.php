@@ -999,6 +999,30 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_radio_auth_external_service( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row">Enable Google Logins</th>
+								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Enable CAS Logins</th>
+								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Enable LDAP Logins</th>
+								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Google Client ID</th>
+								<td><?php $this->print_text_google_clientid( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Google Client Secret</th>
+								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS Custom Label</th>
+								<td><?php $this->print_text_cas_customlabel( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row">CAS server hostname</th>
 								<td><?php $this->print_text_cas_host( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -1072,27 +1096,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die('');
 			}
 
-			// Make sure nonce exists and all POST variables exist.
-			if ( empty( $_POST['nonce_save_auth_settings'] )
-				|| ! array_key_exists( 'multisite_override', $_POST )
-				|| ! array_key_exists( 'access_restriction', $_POST )
-				|| ! array_key_exists( 'access_users_approved', $_POST )
-				|| ! array_key_exists( 'access_default_role', $_POST )
-				|| ! array_key_exists( 'external_service', $_POST )
-				|| ! array_key_exists( 'cas_host', $_POST )
-				|| ! array_key_exists( 'cas_port', $_POST )
-				|| ! array_key_exists( 'cas_path', $_POST )
-				|| ! array_key_exists( 'ldap_host', $_POST )
-				|| ! array_key_exists( 'ldap_port', $_POST )
-				|| ! array_key_exists( 'ldap_search_base', $_POST )
-				|| ! array_key_exists( 'ldap_uid', $_POST )
-				|| ! array_key_exists( 'ldap_user', $_POST )
-				|| ! array_key_exists( 'ldap_password', $_POST )
-				|| ! array_key_exists( 'ldap_tls', $_POST )
-				|| ! array_key_exists( 'advanced_lockouts', $_POST )
-				|| ! array_key_exists( 'advanced_lostpassword_url', $_POST )
-				|| ! array_key_exists( 'advanced_branding', $_POST )
-			) {
+			// Make sure nonce exists.
+			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
 				die('');
 			}
 
@@ -1101,7 +1106,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die('');
 			}
 
-
+			// Get multisite settings.
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
 			// Create default user array if it's empty (assert array exists).
@@ -1158,6 +1163,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'access_users_approved',
 				'access_default_role',
 				'external_service',
+				'external_google',
+				'external_cas',
+				'external_ldap',
+				'google_clientid',
+				'google_clientsecret',
+				'cas_customlabel',
 				'cas_host',
 				'cas_port',
 				'cas_path',
@@ -1367,13 +1378,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
-					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
-					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
-					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
-					$auth_settings['ldap_uid'] = $auth_multisite_settings['ldap_uid'];
-					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
-					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
-					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
 				}
 			}
 
@@ -1442,14 +1446,22 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add help tab for External Service (CAS, LDAP) Settings
 			$help_auth_settings_external_content = '
 				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You\'ll have to fill out different fields below depending on which service you choose.</p>
+				<p><strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.</p>
+				<p><strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.</p>
+				<p><strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.</p>
 				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
-				<p><strong><em>If you choose CAS:</em></strong></p>
+				<p><strong><em>If you enable Google logins:</em></strong></p>
+				<ul>
+					<li><strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com</li>
+					<li><strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT</li>
+				</ul>
+				<p><strong><em>If you enable CAS logins:</em></strong></p>
 				<ul>
 					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</li>
 					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
 					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
 				</ul>
-				<p><strong><em>If you choose LDAP:</em></strong></p>
+				<p><strong><em>If you enable LDAP logins:</em></strong></p>
 				<ul>
 					<li><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</li>
 					<li><strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.</li>
@@ -1623,6 +1635,48 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_external_google', // HTML element ID
+				'Enable Google Logins', // HTML element Title
+				array( $this, 'print_checkbox_auth_external_google' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_external_cas', // HTML element ID
+				'Enable CAS Logins', // HTML element Title
+				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_external_ldap', // HTML element ID
+				'Enable LDAP Logins', // HTML element Title
+				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_google_clientid', // HTML element ID
+				'Google Client ID', // HTML element Title
+				array( $this, 'print_text_google_clientid' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_google_clientsecret', // HTML element ID
+				'Google Client Secret', // HTML element Title
+				array( $this, 'print_text_google_clientsecret' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_cas_customlabel', // HTML element ID
+				'CAS custom label', // HTML element Title
+				array( $this, 'print_text_cas_customlabel' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_cas_host', // HTML element ID
 				'CAS server hostname', // HTML element Title
 				array( $this, 'print_text_cas_host' ), // Callback (echos form element)
@@ -1787,6 +1841,26 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['external_service'] = 'cas';
 			}
 
+			if ( ! array_key_exists( 'google', $auth_settings ) ) {
+				$auth_settings['google'] = '';
+			}
+			if ( ! array_key_exists( 'cas', $auth_settings ) ) {
+				$auth_settings['cas'] = '';
+			}
+			if ( ! array_key_exists( 'ldap', $auth_settings ) ) {
+				$auth_settings['ldap'] = '';
+			}
+
+			if ( ! array_key_exists( 'google_clientid', $auth_settings ) ) {
+				$auth_settings['google_clientid'] = '';
+			}
+			if ( ! array_key_exists( 'google_clientsecret', $auth_settings ) ) {
+				$auth_settings['google_clientsecret'] = '';
+			}
+
+			if ( ! array_key_exists( 'cas_customlabel', $auth_settings ) ) {
+				$auth_settings['cas_customlabel'] = 'CAS';
+			}
 			if ( !array_key_exists( 'cas_host', $auth_settings ) ) {
 				$auth_settings['cas_host'] = '';
 			}
@@ -1871,6 +1945,24 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( !array_key_exists( 'external_service', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['external_service'] = 'cas';
+				}
+				if ( ! array_key_exists( 'google', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['google'] = '';
+				}
+				if ( ! array_key_exists( 'cas', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas'] = '';
+				}
+				if ( ! array_key_exists( 'ldap', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap'] = '';
+				}
+				if ( ! array_key_exists( 'google_clientid', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['google_clientid'] = '';
+				}
+				if ( ! array_key_exists( 'google_clientsecret', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['google_clientsecret'] = '';
+				}
+				if ( ! array_key_exists( 'cas_customlabel', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_customlabel'] = 'CAS';
 				}
 				if ( !array_key_exists( 'cas_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_host'] = '';
@@ -1974,18 +2066,40 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_public_warning'] = 'warning';
 			}
 
+			// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ) {
+				$auth_settings['google'] = '1';
+			}
+
+			// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ) {
+				$auth_settings['cas'] = '1';
+			}
+
+			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ) {
+				$auth_settings['ldap'] = '1';
+			}
+
 			// Sanitize CAS Host setting
 			$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
 
-			// Sanitize LDAP and CAS Port (int)
-			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
+			// Sanitize CAS Port (int)
 			$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
 			// Sanitize LDAP Host setting
 			$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
 
+			// Sanitize LDAP Port (int)
+			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
+
 			// Sanitize LDAP attributes (basically make sure they don't have any parantheses)
 			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
+
+			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ) {
+				$auth_settings['ldap_tls'] = '1';
+			}
 
 			// Obfuscate LDAP directory user password
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
@@ -2354,6 +2468,132 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="radio" id="radio_<?= $id; ?>_cas" name="<?= $name; ?>" value="cas"<?php checked( 'cas' == $auth_settings[$option] ); ?> /> CAS<br />
 			<input type="radio" id="radio_<?= $id; ?>_ldap" name="<?= $name; ?>" value="ldap"<?php checked( 'ldap' == $auth_settings[$option] ); ?> /> LDAP<br /><?php
+		}
+
+		function print_checkbox_auth_external_google( $args = '' ) {
+			// Set option name.
+			$option = 'google';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable Google Logins<?php
+		}
+
+		function print_checkbox_auth_external_cas( $args = '' ) {
+			// Set option name.
+			$option = 'google';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
+		}
+
+		function print_checkbox_auth_external_ldap( $args = '' ) {
+			// Set option name.
+			$option = 'google';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
+		}
+
+		function print_text_google_clientid( $args = '' ) {
+			// Set option name.
+			$option = 'google_clientid';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?>If you don't have a Google Client ID and Secret, generate them by following these instructions:
+			<ol>
+				<li>Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.</li>
+				<li>Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:
+					<ul>
+						<li>Application Type: <strong>Web application</strong></li>
+						<li>Authorized Javascript Origins: <strong><?= get_site_url(); ?></strong></li>
+						<li>Authorized Redirect URI: <strong><?= get_site_url( 'wp-login.php' ); ?></strong></li>
+					</ul>
+				</li>
+				<li>Copy/paste your new Client ID/Secret pair into the fields below.</li>
+			</ol>
+			<input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
+		}
+
+		function print_text_google_clientsecret( $args = '' ) {
+			// Set option name.
+			$option = 'google_clientsecret';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:200px;" /><?php
+		}
+
+		function print_text_cas_customlabel( $args = '' ) {
+			// Set option name.
+			$option = 'cas_customlabel';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?>The button on the login page will read:<br /><strong>Login with </strong><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="CAS" style="width: 50px;" /><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
