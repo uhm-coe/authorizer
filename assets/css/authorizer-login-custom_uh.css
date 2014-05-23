@@ -1,8 +1,11 @@
 /* Restyle wp-login.php to reflect UH logins */
 
 /* Login Body */
-body.login {
+html, body.login {
 	background: #fbfbfb url('../images/texture-debut-light.jpg') repeat-y right top;
+}
+
+body.login {
 	height: auto;
 }
 
