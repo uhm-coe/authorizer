@@ -260,10 +260,16 @@ function save_auth_multisite_settings( caller ) {
 
   var external_service = $('form input[name="auth_settings[external_service]"]:checked').val();
 
+  var google = $('#auth_settings_google').is(':checked') ? '1' : '';
+  var google_clientid = $('#auth_settings_google_clientid').val();
+  var google_clientsecret = $('#auth_settings_google_clientsecret').val();
+
+  var cas = $('#auth_settings_cas').is(':checked') ? '1' : '';
   var cas_host = $('#auth_settings_cas_host').val();
   var cas_port = $('#auth_settings_cas_port').val();
   var cas_path = $('#auth_settings_cas_path').val();
 
+  var ldap = $('#auth_settings_ldap').is(':checked') ? '1' : '';
   var ldap_host = $('#auth_settings_ldap_host').val();
   var ldap_port = $('#auth_settings_ldap_port').val();
   var ldap_search_base = $('#auth_settings_ldap_search_base').val();
@@ -292,9 +298,14 @@ function save_auth_multisite_settings( caller ) {
     'access_users_approved': access_users_approved,
     'access_default_role': access_default_role,
     'external_service': external_service,
+    'google': google,
+    'google_clientid': google_clientid,
+    'google_clientsecret': google_clientsecret,
+    'cas': cas,
     'cas_host': cas_host,
     'cas_port': cas_port,
     'cas_path': cas_path,
+    'ldap': ldap,
     'ldap_host': ldap_host,
     'ldap_port': ldap_port,
     'ldap_search_base': ldap_search_base,
@@ -366,6 +377,19 @@ function hide_multisite_overridden_options() {
 }
 
 
+
+// Helper function to hide/show wordpress option
+function animate_option( action, option ) {
+  var $ = jQuery;
+  if ( action === 'show' ) {
+    $('div.animated_wrapper', option).slideDown(animation_speed);
+    $('th', option).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
+    $('td', option).animate({ padding: '15px 10px' }, { duration: animation_speed });
+  } else if ( action === 'hide' ) {
+    $('div.animated_wrapper', option).slideUp(animation_speed);
+    $('td, th', option).animate({ padding: '0px' }, { duration: animation_speed });
+  }
+}
 
 // Helper function to grab a querystring param value by name
 function getParameterByName( needle, haystack ) {
@@ -444,9 +468,15 @@ jQuery(document).ready(function($){
   var auth_settings_access_public_pages = $('#auth_settings_access_public_pages').closest('tr');
   var auth_settings_external_settings_table = $('#auth_settings_external_service_cas').closest('table');
   var auth_settings_external_service_cas = $('#radio_auth_settings_external_service_cas').closest('tr');
+  var auth_settings_external_google = $('#auth_settings_google').closest('tr');
+  var auth_settings_external_google_clientid = $('#auth_settings_google_clientid').closest('tr');
+  var auth_settings_external_google_clientsecret = $('#auth_settings_google_clientsecret').closest('tr');
+  var auth_settings_external_cas = $('#auth_settings_cas').closest('tr');
+  var auth_settings_external_cas_customlabel = $('#auth_settings_cas_customlabel').closest('tr');
   var auth_settings_external_cas_host = $('#auth_settings_cas_host').closest('tr');
   var auth_settings_external_cas_port = $('#auth_settings_cas_port').closest('tr');
   var auth_settings_external_cas_path = $('#auth_settings_cas_path').closest('tr');
+  var auth_settings_external_ldap = $('#auth_settings_ldap').closest('tr');
   var auth_settings_external_ldap_host = $('#auth_settings_ldap_host').closest('tr');
   var auth_settings_external_ldap_port = $('#auth_settings_ldap_port').closest('tr');
   var auth_settings_external_ldap_search_base = $('#auth_settings_ldap_search_base').closest('tr');
@@ -464,6 +494,9 @@ jQuery(document).ready(function($){
   $('th, td', auth_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_google_clientid).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_google_clientsecret).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_cas_customlabel).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_host).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_port).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_path).wrapInner('<div class="animated_wrapper" />');
@@ -498,8 +531,28 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).hide();
   }
 
-  // On load: Show/hide CAS/LDAP options based on which is selected
-  if ( $('#radio_auth_settings_external_service_cas').is(':checked') ) {
+  // Hide Google options if unchecked
+  if ( ! $('#auth_settings_google').is(':checked') ) {
+    $('div.animated_wrapper', auth_settings_external_google_clientid).hide();
+    $('div.animated_wrapper', auth_settings_external_google_clientsecret).hide();
+    $('td, th', auth_settings_external_google_clientid).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_google_clientsecret).animate({ padding: '0px' }, { duration: animation_speed });
+  }
+
+  // Hide CAS options if unchecked
+  if ( ! $('#auth_settings_cas').is(':checked') ) {
+    $('div.animated_wrapper', auth_settings_external_cas_customlabel).hide();
+    $('div.animated_wrapper', auth_settings_external_cas_host).hide();
+    $('div.animated_wrapper', auth_settings_external_cas_port).hide();
+    $('div.animated_wrapper', auth_settings_external_cas_path).hide();
+    $('td, th', auth_settings_external_cas_customlabel).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_cas_host).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_cas_port).animate({ padding: '0px' }, { duration: animation_speed });
+    $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
+  }
+
+  // Hide LDAP options if unchecked
+  if ( ! $('#auth_settings_ldap').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_external_ldap_host).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_port).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_search_base).hide();
@@ -507,7 +560,6 @@ jQuery(document).ready(function($){
     $('div.animated_wrapper', auth_settings_external_ldap_user).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_password).hide();
     $('div.animated_wrapper', auth_settings_external_ldap_tls).hide();
-
     $('td, th', auth_settings_external_ldap_host).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_port).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_search_base).animate({ padding: '0px' }, { duration: animation_speed });
@@ -515,14 +567,6 @@ jQuery(document).ready(function($){
     $('td, th', auth_settings_external_ldap_user).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_password).animate({ padding: '0px' }, { duration: animation_speed });
     $('td, th', auth_settings_external_ldap_tls).animate({ padding: '0px' }, { duration: animation_speed });
-  } else {
-    $('div.animated_wrapper', auth_settings_external_cas_host).hide();
-    $('div.animated_wrapper', auth_settings_external_cas_port).hide();
-    $('div.animated_wrapper', auth_settings_external_cas_path).hide();
-
-    $('td, th', auth_settings_external_cas_host).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_cas_port).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
   }
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -554,66 +598,50 @@ jQuery(document).ready(function($){
     }
   });
 
-  // Event handler: show/hide CAS/LDAP options based on selection.
-  $('input[name="auth_settings[external_service]"]').change(function() {
-    if ( $('#radio_auth_settings_external_service_cas').is(':checked') ) {
-      $('div.animated_wrapper', auth_settings_external_cas_host).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_cas_port).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_cas_path).slideDown(animation_speed);
-
-      $('div.animated_wrapper', auth_settings_external_ldap_host).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_port).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_search_base).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_uid).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_user).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_password).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_tls).slideUp(animation_speed);
-
-      $('th', auth_settings_external_cas_host).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_cas_port).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_cas_path).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('td', auth_settings_external_cas_host).animate({ padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_cas_port).animate({ padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_cas_path).animate({ padding: '15px 10px' }, { duration: animation_speed });
-
-      $('td, th', auth_settings_external_ldap_host).animate(       { padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_port).animate(       { padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_search_base).animate({ padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_uid).animate(        { padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_user).animate(       { padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_password).animate(   { padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_ldap_tls).animate(        { padding: '0px' }, { duration: animation_speed });
+  // Event handler: Show/hide Google options based on checkbox
+  $('input[name="auth_settings[google]"]').change(function() {
+    if ( $(this).is(':checked') ) {
+      animate_option( 'show', auth_settings_external_google_clientid );
+      animate_option( 'show', auth_settings_external_google_clientsecret );
     } else {
-      $('div.animated_wrapper', auth_settings_external_cas_host).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_cas_port).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_cas_path).slideUp(animation_speed);
+      animate_option( 'hide', auth_settings_external_google_clientid );
+      animate_option( 'hide', auth_settings_external_google_clientsecret );
+    }
+  });
 
-      $('div.animated_wrapper', auth_settings_external_ldap_host).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_port).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_search_base).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_uid).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_user).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_password).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_external_ldap_tls).slideDown(animation_speed);
+  // Event handler: Show/hide CAS options based on checkbox
+  $('input[name="auth_settings[cas]"]').change(function() {
+    if ( $(this).is(':checked') ) {
+      animate_option( 'show', auth_settings_external_cas_customlabel );
+      animate_option( 'show', auth_settings_external_cas_host );
+      animate_option( 'show', auth_settings_external_cas_port );
+      animate_option( 'show', auth_settings_external_cas_path );
+    } else {
+      animate_option( 'hide', auth_settings_external_cas_customlabel );
+      animate_option( 'hide', auth_settings_external_cas_host );
+      animate_option( 'hide', auth_settings_external_cas_port );
+      animate_option( 'hide', auth_settings_external_cas_path );
+    }
+  });
 
-      $('td, th', auth_settings_external_cas_host).animate({ padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_cas_port).animate({ padding: '0px' }, { duration: animation_speed });
-      $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
-
-      $('th', auth_settings_external_ldap_host).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_port).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_search_base).animate({ padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_uid).animate(        { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_user).animate(       { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_password).animate(   { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('th', auth_settings_external_ldap_tls).animate(        { padding: '20px 10px 20px 0' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_host).animate(       { padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_port).animate(       { padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_search_base).animate({ padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_uid).animate(        { padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_user).animate(       { padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_password).animate(   { padding: '15px 10px' }, { duration: animation_speed });
-      $('td', auth_settings_external_ldap_tls).animate(        { padding: '15px 10px' }, { duration: animation_speed });
+  // Event handler: Show/hide LDAP options based on checkbox
+  $('input[name="auth_settings[ldap]"]').change(function() {
+    if ( $(this).is(':checked') ) {
+      animate_option( 'show', auth_settings_external_ldap_host );
+      animate_option( 'show', auth_settings_external_ldap_port );
+      animate_option( 'show', auth_settings_external_ldap_search_base );
+      animate_option( 'show', auth_settings_external_ldap_uid );
+      animate_option( 'show', auth_settings_external_ldap_user );
+      animate_option( 'show', auth_settings_external_ldap_password );
+      animate_option( 'show', auth_settings_external_ldap_tls );
+    } else {
+      animate_option( 'hide', auth_settings_external_ldap_host );
+      animate_option( 'hide', auth_settings_external_ldap_port );
+      animate_option( 'hide', auth_settings_external_ldap_search_base );
+      animate_option( 'hide', auth_settings_external_ldap_uid );
+      animate_option( 'hide', auth_settings_external_ldap_user );
+      animate_option( 'hide', auth_settings_external_ldap_password );
+      animate_option( 'hide', auth_settings_external_ldap_tls );
     }
   });
 

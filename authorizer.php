@@ -1163,15 +1163,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'access_users_approved',
 				'access_default_role',
 				'external_service',
-				'external_google',
-				'external_cas',
-				'external_ldap',
+				'google',
 				'google_clientid',
 				'google_clientsecret',
+				'cas',
 				'cas_customlabel',
 				'cas_host',
 				'cas_port',
 				'cas_path',
+				'ldap',
 				'ldap_host',
 				'ldap_port',
 				'ldap_search_base',
@@ -1642,20 +1642,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_external_cas', // HTML element ID
-				'Enable CAS Logins', // HTML element Title
-				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
-			);
-			add_settings_field(
-				'auth_settings_external_ldap', // HTML element ID
-				'Enable LDAP Logins', // HTML element Title
-				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
-			);
-			add_settings_field(
 				'auth_settings_google_clientid', // HTML element ID
 				'Google Client ID', // HTML element Title
 				array( $this, 'print_text_google_clientid' ), // Callback (echos form element)
@@ -1666,6 +1652,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_google_clientsecret', // HTML element ID
 				'Google Client Secret', // HTML element Title
 				array( $this, 'print_text_google_clientsecret' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_external_cas', // HTML element ID
+				'Enable CAS Logins', // HTML element Title
+				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -1694,6 +1687,13 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_cas_path', // HTML element ID
 				'CAS server path/context', // HTML element Title
 				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_external_ldap', // HTML element ID
+				'Enable LDAP Logins', // HTML element Title
+				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -2489,44 +2489,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable Google Logins<?php
 		}
 
-		function print_checkbox_auth_external_cas( $args = '' ) {
-			// Set option name.
-			$option = 'google';
-			$name = "auth_settings[$option]";
-			$id = "auth_settings_$option";
-			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
-			}
-			// Print option elements.
-			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
-		}
-
-		function print_checkbox_auth_external_ldap( $args = '' ) {
-			// Set option name.
-			$option = 'google';
-			$name = "auth_settings[$option]";
-			$id = "auth_settings_$option";
-			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
-			}
-			// Print option elements.
-			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
-		}
-
 		function print_text_google_clientid( $args = '' ) {
 			// Set option name.
 			$option = 'google_clientid';
@@ -2577,6 +2539,25 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:200px;" /><?php
 		}
 
+		function print_checkbox_auth_external_cas( $args = '' ) {
+			// Set option name.
+			$option = 'cas';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
+		}
+
 		function print_text_cas_customlabel( $args = '' ) {
 			// Set option name.
 			$option = 'cas_customlabel';
@@ -2593,7 +2574,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?>The button on the login page will read:<br /><strong>Login with </strong><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="CAS" style="width: 50px;" /><?php
+			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
@@ -2651,6 +2632,25 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="/cas" /><?php
+		}
+
+		function print_checkbox_auth_external_ldap( $args = '' ) {
+			// Set option name.
+			$option = 'ldap';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="checkbox" id="<?= $id; ?>" name="<?= $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
 		}
 
 		function print_text_ldap_host( $args = '' ) {
