@@ -110,6 +110,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add custom css and js to wp-login.php
 			add_action( 'login_head', array( $this, 'load_login_css_and_js' ) );
 
+			// Modify login page with external auth links (if enabled; e.g., google or cas)
+			add_action( 'login_form', array( $this, 'login_form_add_external_service_links' ) );
+
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
@@ -1293,6 +1296,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
 			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
+			<link rel="stylesheet" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
 			<?php
 
 			if ( $auth_settings['advanced_branding'] === 'custom_uh' ):
@@ -1303,6 +1307,43 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			endif;
 		}
 
+
+		/**
+		 * Create links for any external authentication services that are enabled.
+		 */
+		function login_form_add_external_service_links() {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override external_service (cas or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
+					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
+					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+				}
+			}
+
+			$auth_url_google = '';
+			$auth_url_cas = '';
+			$auth_label_cas = 'CAS';
+
+			?>
+			<div id="auth-external-service-login">
+				<?php if ( 1|| $auth_settings['google_enabled'] === '1' ): ?>
+					<p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p>
+				<?php endif; ?>
+				<?php if ( 1|| $auth_settings['cas_enabled'] === '1' ): ?>
+					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_label_cas; ?></span></a></p>
+				<?php endif; ?>
+				<h3> &mdash; or &mdash; </h3>
+			</div>
+			<?php
+
+		}
 
 
 		/**

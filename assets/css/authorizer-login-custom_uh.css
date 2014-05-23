@@ -66,7 +66,8 @@ body.login #loginform .submit {
 	clear: both;
 	width: 100%;
 }
-body.login #loginform #wp-submit {
+body.login #loginform #wp-submit,
+body.login #loginform .button.button-cas {
 	height: 44px;
 	font-size: 18px;
 	background-color: #B3995D;

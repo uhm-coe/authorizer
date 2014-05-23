@@ -1,5 +1,10 @@
 // Run function after page load (uses domready.js, so make sure that's included first)
 domReady(function() {
+	// Move any external service buttons into top of login form.
+	var loginform = document.getElementById( 'loginform' );
+	var externals = document.getElementById( 'auth-external-service-login' );
+	loginform.insertBefore( externals, loginform.firstChild );
+
 	// Decrement seconds counter if it exists
 	var seconds_element = document.getElementById( 'seconds_remaining' );
 	if ( seconds_element != null ) {

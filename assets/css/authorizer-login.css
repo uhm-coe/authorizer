@@ -1,0 +1,21 @@
+.button.button-external {
+	width: 100%;
+	margin: 0 0 20px 0;
+	height: 44px;
+	padding-top: 8px;
+	font-size: 18px;
+	text-align: center;
+}
+.button.button-external .dashicons {
+	font-size: 26px;
+}
+.button.button-external .label {
+	padding-left: 16px;
+}
+
+
+
+#auth-external-service-login h3 {
+	text-align: center;
+	margin-bottom: 16px;
+}
