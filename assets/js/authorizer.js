@@ -388,6 +388,9 @@ function animate_option( action, option ) {
   } else if ( action === 'hide' ) {
     $('div.animated_wrapper', option).slideUp(animation_speed);
     $('td, th', option).animate({ padding: '0px' }, { duration: animation_speed });
+  } else if ( action === 'hide_immediately') {
+    $('div.animated_wrapper', option).hide();
+    $('td, th', option).css({ padding: '0px' });
   }
 }
 
@@ -533,68 +536,55 @@ jQuery(document).ready(function($){
 
   // Hide Google options if unchecked
   if ( ! $('#auth_settings_google').is(':checked') ) {
-    $('div.animated_wrapper', auth_settings_external_google_clientid).hide();
-    $('div.animated_wrapper', auth_settings_external_google_clientsecret).hide();
-    $('td, th', auth_settings_external_google_clientid).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_google_clientsecret).animate({ padding: '0px' }, { duration: animation_speed });
+    animate_option( 'hide_immediately', auth_settings_external_google_clientid );
+    animate_option( 'hide_immediately', auth_settings_external_google_clientsecret );
   }
 
   // Hide CAS options if unchecked
   if ( ! $('#auth_settings_cas').is(':checked') ) {
-    $('div.animated_wrapper', auth_settings_external_cas_customlabel).hide();
-    $('div.animated_wrapper', auth_settings_external_cas_host).hide();
-    $('div.animated_wrapper', auth_settings_external_cas_port).hide();
-    $('div.animated_wrapper', auth_settings_external_cas_path).hide();
-    $('td, th', auth_settings_external_cas_customlabel).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_cas_host).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_cas_port).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_cas_path).animate({ padding: '0px' }, { duration: animation_speed });
+    animate_option( 'hide_immediately', auth_settings_external_cas_customlabel );
+    animate_option( 'hide_immediately', auth_settings_external_cas_host );
+    animate_option( 'hide_immediately', auth_settings_external_cas_port );
+    animate_option( 'hide_immediately', auth_settings_external_cas_path );
   }
 
   // Hide LDAP options if unchecked
   if ( ! $('#auth_settings_ldap').is(':checked') ) {
-    $('div.animated_wrapper', auth_settings_external_ldap_host).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_port).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_search_base).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_uid).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_user).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_password).hide();
-    $('div.animated_wrapper', auth_settings_external_ldap_tls).hide();
-    $('td, th', auth_settings_external_ldap_host).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_port).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_search_base).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_uid).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_user).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_password).animate({ padding: '0px' }, { duration: animation_speed });
-    $('td, th', auth_settings_external_ldap_tls).animate({ padding: '0px' }, { duration: animation_speed });
+    animate_option( 'hide_immediately', auth_settings_external_ldap_host );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_port );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_search_base );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_uid );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_user );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_password );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_tls );
   }
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="auth_settings[access_restriction]"]').change(function(){
     if ( $('#radio_auth_settings_access_restriction_everyone').is(':checked') ) {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_public_pages).slideUp(animation_speed);
+      animate_option( 'hide', auth_settings_access_redirect_to_login );
+      animate_option( 'hide', auth_settings_access_redirect_to_message );
+      animate_option( 'hide', auth_settings_access_public_pages );
     } else {
-      $('div.animated_wrapper', auth_settings_access_redirect_to_login).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_redirect_to_message).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_public_pages).slideDown(animation_speed);
+      animate_option( 'show', auth_settings_access_redirect_to_login );
+      animate_option( 'show', auth_settings_access_redirect_to_message );
+      animate_option( 'show', auth_settings_access_public_pages );
       $('input[name="auth_settings[access_redirect]"]').trigger('change');
     }
   
     // Hide user whitelist unless "Only specific students below" is checked
     if ( ! $('#radio_auth_settings_access_restriction_approved_users').is(':checked') ) {
-      $('div.animated_wrapper', auth_settings_access_users_pending).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_users_approved).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_users_blocked).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).slideUp(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).slideUp(animation_speed);
+      animate_option( 'hide', auth_settings_access_users_pending );
+      animate_option( 'hide', auth_settings_access_users_approved );
+      animate_option( 'hide', auth_settings_access_users_blocked );
+      animate_option( 'hide', auth_settings_access_role_receive_pending_emails );
+      animate_option( 'hide', auth_settings_access_pending_redirect_to_message );
     } else {
-      $('div.animated_wrapper', auth_settings_access_users_pending).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_users_approved).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_users_blocked).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).slideDown(animation_speed);
-      $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).slideDown(animation_speed);
+      animate_option( 'show', auth_settings_access_users_pending );
+      animate_option( 'show', auth_settings_access_users_approved );
+      animate_option( 'show', auth_settings_access_users_blocked );
+      animate_option( 'show', auth_settings_access_role_receive_pending_emails );
+      animate_option( 'show', auth_settings_access_pending_redirect_to_message );
     }
   });
 
