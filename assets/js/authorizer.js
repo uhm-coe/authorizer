@@ -616,6 +616,7 @@ jQuery(document).ready(function($){
     if ( e.which == 13 ) { // Enter key
       $(this).parent().find('input[type="button"]').trigger('click');
       return false;
+    }
   });
   $('form input.auth-email').bind('keydown', function(e) {
     if ( e.which == 13 ) { // Enter key

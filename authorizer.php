@@ -32,15 +32,20 @@ Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authe
 Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
 */
 
-
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	include_once dirname(__FILE__) . '/assets/inc/CAS-1.3.2/CAS.php';
+	require_once dirname(__FILE__) . '/assets/inc/CAS-1.3.2/CAS.php';
 }
 
+// Add Google API PHP Client if it's not included.
+// @see https://github.com/google/google-api-php-client
+if ( ! class_exists( 'Google_Client' ) ) {
+	set_include_path( get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/assets/inc/google-api-php-client/src' );
+	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Client.php';
+}
 
-if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
+if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	/**
 	 * Define class for plugin: Authorizer.
 	 *
@@ -139,6 +144,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If multisite, add network admin options page (global settings for all sites)
 			if ( is_multisite() ) {
 				add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
+			}
+
+			// Create login cookie (used by google login)
+			if ( ! isset( $_COOKIE['login_unique'] ) && $GLOBALS['pagenow'] == 'wp-login.php' ) {
+				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( COOKIE_DOMAIN ) ? COOKIE_DOMAIN : '' );
 			}
 
 		} // END __construct()
@@ -369,7 +379,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Start external authentication.
 			// @TODO external_service is deprecated; move cas to button instead of inline
-			if ( $auth_settings['external_service'] === 'cas' ) {
+			$externally_authenticated_email = '';
+			$tld = '';
+			if ( $auth_settings['external_service'] === 'cast' ) {
 				// Set the CAS client configuration
 				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
 
@@ -470,6 +482,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we've made it this far, we have an externally authenticated user.
 			// $externally_authenticated_email and $tld should both be set.
+			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 0 ) {
+				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
+				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+			}
 
 			// Check if the external user has a WordPress account (with the same email address)
 			if ( ! $user ) {
@@ -1353,23 +1369,50 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 					// Override external services (cas or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
+					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+					$auth_settings['cas'] = $auth_multisite_settings['cas'];
+					$auth_settings['cas_customlabel'] = $auth_multisite_settings['cas_customlabel'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
 				}
 			}
 
-			$auth_url_google = '';
-			$auth_url_cas = '';
-			$auth_label_cas = 'CAS';
+			// Prepare Google endpoint for incoming authentication
+			if ( $auth_settings['google'] === '1' ) {
+				$client = new Google_Client();
+				$client->setApplicationName( 'WordPress' );
+				$client->setClientId( $auth_settings['google_clientid'] );
+				$client->setClientSecret( $auth_settings['google_clientsecret'] );
+				$client->setRedirectUri( wp_login_url() );
+				$client->setScopes(
+					array(
+						'https://www.googleapis.com/auth/userinfo.email',
+						'https://www.googleapis.com/auth/userinfo.profile'
+					)
+				);
+				$client->setApprovalPrompt( 'auto' );
+
+				// Generate CSRF token
+				$client->setState( urlencode( wp_create_nonce( 'nonce_google_auth-' . $this->get_cookie_value() . '|' . wp_login_url() ) ) );
+
+				// Get Google URL
+				$auth_url_google = $client->createAuthUrl();
+			}
+
+			// Prepare CAS endpoint for incoming authentication
+			if ( $auth_settings['cas'] === '1' ) {
+				$auth_url_cas = '';
+			}
 
 			?>
 			<div id="auth-external-service-login">
-				<?php if ( 1|| $auth_settings['google_enabled'] === '1' ): ?>
+				<?php if ( $auth_settings['google'] === '1' ): ?>
 					<p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p>
 				<?php endif; ?>
-				<?php if ( 1|| $auth_settings['cas_enabled'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_label_cas; ?></span></a></p>
+				<?php if ( $auth_settings['cas'] === '1' ): ?>
+					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_settings['cas_customlabel']; ?></span></a></p>
 				<?php endif; ?>
 				<h3> &mdash; or &mdash; </h3>
 			</div>
@@ -2515,7 +2558,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:200px;" /><?php
+			?><input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
 		}
 
 		function print_checkbox_auth_external_cas( $args = '' ) {
@@ -2997,6 +3040,21 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 
 
+
+		/**
+		 * Generate a unique cookie to add to nonces to prevent CSRF.
+		 */
+		protected $cookie_value = null;
+		function get_cookie_value() {
+			if ( ! $this->cookie_value ) {
+				if ( isset( $_COOKIE['login_unique'] ) ) {
+					$this->cookie_value = $_COOKIE['login_unique'];
+				} else {
+					$this->cookie_value = md5( rand() );
+				}
+			}
+			return $this->cookie_value;
+		}
 
 		/**
 		 * Basic encryption using a public (not secret!) key. Used for general
