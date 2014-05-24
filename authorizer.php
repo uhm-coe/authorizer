@@ -289,11 +289,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Override access_restriction
 					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
 
-					// Override external_service (cas or ldap) and associated options
-					$auth_settings['external_service'] = $auth_multisite_settings['external_service'];
+					// Override external services (google, cas, or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
+					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+					$auth_settings['cas'] = $auth_multisite_settings['cas'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['ldap'] = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
 					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
@@ -364,6 +368,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Start external authentication.
+			// @TODO external_service is deprecated; move cas to button instead of inline
 			if ( $auth_settings['external_service'] === 'cas' ) {
 				// Set the CAS client configuration
 				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
@@ -607,11 +612,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external_service (cas or ldap) and associated options
-					$auth_settings['external_service'] = $auth_multisite_settings['external_service'];
+					// Override external services (cas or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
+					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+					$auth_settings['cas'] = $auth_multisite_settings['cas'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['ldap'] = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
 					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
@@ -625,8 +634,8 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Reset option containing old error messages.
 			update_option( 'auth_settings_advanced_login_error', $error_message );
 
-			// Log out of external service.
-			if ( $auth_settings['external_service'] === 'cas' ) {
+			// Log out of external service: CAS.
+			if ( $auth_settings['cas'] === '1' ) {
 				// Set the CAS client configuration if it hasn't been set already.
 				if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
 					phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
@@ -635,7 +644,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Log out of CAS.
 				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
 
-			} else if ( $auth_settings['external_service'] === 'ldap' ) {
+			}
+
+			// Log out of external service: LDAP.
+			if ( $auth_settings['ldap'] === '1' ) {
 				// Log out of LDAP.
 				// Nothing to do here, just pass on to wp logout.
 			}
@@ -1000,10 +1012,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Type of external service to authenticate against</th>
-								<td><?php $this->print_radio_auth_external_service( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
 								<th scope="row">Enable Google Logins</th>
 								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -1176,7 +1184,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'access_restriction',
 				'access_users_approved',
 				'access_default_role',
-				'external_service',
 				'google',
 				'google_clientid',
 				'google_clientsecret',
@@ -1344,7 +1351,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external_service (cas or ldap) and associated options
+					// Override external services (cas or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
@@ -1387,15 +1394,15 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external_service (cas or ldap) and associated options
-					$auth_settings['external_service'] = $auth_multisite_settings['external_service'];
+					// Override external services (cas or ldap) and associated options
+					$auth_settings['cas'] = $auth_multisite_settings['cas'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
 				}
 			}
 
-			if ( $auth_settings['external_service'] === 'cas' ) {
+			if ( $auth_settings['cas'] === '1' ) {
 				// Check if provided CAS URL is accessible.
 				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
 				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
@@ -1642,13 +1649,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_external_service', // HTML element ID
-				'Type of external service to authenticate against', // HTML element Title
-				array( $this, 'print_radio_auth_external_service' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
-			);
-			add_settings_field(
 				'auth_settings_external_google', // HTML element ID
 				'Enable Google Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_google' ), // Callback (echos form element)
@@ -1851,9 +1851,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['access_default_role'] = 'subscriber';
 				}
 			}
-			if ( !array_key_exists( 'external_service', $auth_settings ) ) {
-				$auth_settings['external_service'] = 'cas';
-			}
 
 			if ( ! array_key_exists( 'google', $auth_settings ) ) {
 				$auth_settings['google'] = '';
@@ -1956,9 +1953,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					} else {
 						$auth_multisite_settings['access_default_role'] = 'subscriber';
 					}
-				}
-				if ( !array_key_exists( 'external_service', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['external_service'] = 'cas';
 				}
 				if ( ! array_key_exists( 'google', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['google'] = '';
@@ -2455,26 +2449,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</select><?php
 		}
 
-		function print_radio_auth_external_service( $args = '' ) {
-			// Set option name.
-			$option = 'external_service';
-			$name = "auth_settings[$option]";
-			$id = "auth_settings_$option";
-			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_<?= $id; ?>_cas" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
-			}
-			// Print option elements.
-			?><input type="radio" id="radio_<?= $id; ?>_cas" name="<?= $name; ?>" value="cas"<?php checked( 'cas' == $auth_settings[$option] ); ?> /> CAS<br />
-			<input type="radio" id="radio_<?= $id; ?>_ldap" name="<?= $name; ?>" value="ldap"<?php checked( 'ldap' == $auth_settings[$option] ); ?> /> LDAP<br /><?php
-		}
-
 		function print_checkbox_auth_external_google( $args = '' ) {
 			// Set option name.
 			$option = 'google';
@@ -2873,9 +2847,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div class="inside">
 				<form method="post" id="auth_settings_access_form" action="">
-					<input type="hidden" id="auth_settings_external_service" name="auth_settings[external_service]" value="<?php print $auth_settings['external_service']; ?>" />
-					<input type="hidden" id="auth_settings_cas_host" name="auth_settings[cas_host]" value="<?php print $auth_settings['cas_host']; ?>" />
-					<input type="hidden" id="auth_settings_ldap_host" name="auth_settings[ldap_host]" value="<?php print $auth_settings['ldap_host']; ?>" />
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
 						<h2>Who can view the site?</h2>

@@ -251,8 +251,6 @@ function save_auth_multisite_settings( caller ) {
 
   var access_default_role = $('#auth_settings_access_default_role').val();
 
-  var external_service = $('form input[name="auth_settings[external_service]"]:checked').val();
-
   var google = $('#auth_settings_google').is(':checked') ? '1' : '';
   var google_clientid = $('#auth_settings_google_clientid').val();
   var google_clientsecret = $('#auth_settings_google_clientsecret').val();
@@ -290,7 +288,6 @@ function save_auth_multisite_settings( caller ) {
     'access_restriction': access_restriction,
     'access_users_approved': access_users_approved,
     'access_default_role': access_default_role,
-    'external_service': external_service,
     'google': google,
     'google_clientid': google_clientid,
     'google_clientsecret': google_clientsecret,
@@ -448,8 +445,7 @@ jQuery(document).ready(function($){
   var auth_settings_access_role_receive_pending_emails = $('#auth_settings_access_role_receive_pending_emails').closest('tr');
   var auth_settings_access_pending_redirect_to_message = $('#wp-auth_settings_access_pending_redirect_to_message-wrap').closest('tr');
   var auth_settings_access_public_pages = $('#auth_settings_access_public_pages').closest('tr');
-  var auth_settings_external_settings_table = $('#auth_settings_external_service_cas').closest('table');
-  var auth_settings_external_service_cas = $('#radio_auth_settings_external_service_cas').closest('tr');
+  var auth_settings_external_settings_table = $('#auth_settings_google').closest('table');
   var auth_settings_external_google = $('#auth_settings_google').closest('tr');
   var auth_settings_external_google_clientid = $('#auth_settings_google_clientid').closest('tr');
   var auth_settings_external_google_clientsecret = $('#auth_settings_google_clientsecret').closest('tr');
