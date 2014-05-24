@@ -42,7 +42,6 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
   list = typeof list !== 'undefined' ? list : 'approved';
   create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 
-  var username = $(caller).parent().find('.auth-username');
   var email = $(caller).parent().find('.auth-email');
   var role = $(caller).parent().find('.auth-role');
 
@@ -51,8 +50,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
   var buttons = caller;
 
   // Button (caller) might be nested in a div, so we need to walk up one more level
-  if ( username.length === 0 || email.length === 0 || role.length === 0 ) {
-    username = $(caller).parent().parent().find('.auth-username');
+  if ( email.length === 0 || role.length === 0 ) {
     email = $(caller).parent().parent().find('.auth-email');
     role = $(caller).parent().parent().find('.auth-role');
     buttons = $(caller).parent().children();
@@ -61,15 +59,16 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
   var next_id = $('#list_auth_settings_access_users_' + list + ' li').length;
   var validated = true;
 
-  if ( $.trim(username.val()) == '' )
+  if ( $.trim(email.val()) == '' ) {
     return false;
+  }
 
   $(buttons).attr('disabled', 'disabled');
 
   // Check if the course being added already exists in the list.
   if ( validated ) {
-    $('#list_auth_settings_access_users_' + list + ' input.auth-username').each(function() {
-      if ( this.value == username.val() ) {
+    $('#list_auth_settings_access_users_' + list + ' input.auth-email').each(function() {
+      if ( this.value == email.val() ) {
         validated = false;
         $(this).parent().effect('shake', shake_speed);
         $(buttons).removeAttr('disabled');
@@ -95,7 +94,6 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
     var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
     $(' \
       <li id="new_user_' + next_id + '" style="display: none;"> \
-        <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][username]" value="' + username.val() + '" readonly="true" class="auth-username" /> \
         <input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
         <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="save_auth_settings(this);"> \
         </select> \
@@ -114,7 +112,6 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
     $('#list_auth_settings_access_users_' + list + ' li.auth-empty').remove();
 
     // Reset the new user textboxes
-    username.val('');
     email.val('');
     $(buttons).removeAttr('disabled');
 
@@ -175,7 +172,6 @@ function save_auth_settings( caller, create_local_account ) {
   var access_users_pending = new Object();
   $('#list_auth_settings_access_users_pending li').each(function(index) {
     var user = new Object();
-    user['username'] = $('.auth-username', this).val();
     user['email'] = $('.auth-email', this).val();
     user['role'] = $('.auth-role', this).val();
     access_users_pending[index] = user;
@@ -184,7 +180,6 @@ function save_auth_settings( caller, create_local_account ) {
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function(index) {
     var user = new Object();
-    user['username'] = $('.auth-username', this).val();
     user['email'] = $('.auth-email', this).val();
     user['role'] = $('.auth-role', this).val();
     user['date_added'] = $('.auth-date-added', this).val();
@@ -201,7 +196,6 @@ function save_auth_settings( caller, create_local_account ) {
   var access_users_blocked = new Object();
   $('#list_auth_settings_access_users_blocked li').each(function( index ) {
     var user = new Object();
-    user['username'] = $('.auth-username', this).val();
     user['email'] = $('.auth-email', this).val();
     user['role'] = $('.auth-role', this).val();
     user['date_added'] = $('.auth-date-added', this).val();
@@ -248,7 +242,6 @@ function save_auth_multisite_settings( caller ) {
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function( index ) {
     var user = new Object();
-    user['username'] = $('.auth-username', this).val();
     user['email'] = $('.auth-email', this).val();
     user['role'] = $('.auth-role', this).val();
     user['date_added'] = $('.auth-date-added', this).val();
@@ -433,20 +426,6 @@ function getShortDate( date ) {
     case 11: month = 'Dec'; break;
   }
   return month + ' ' + date.getFullYear();
-}
-
-// Helper function to grab the TLD from a FQDN
-function getTLDFromFQDN( fqdn ) {
-  fqdn = typeof fqdn !== 'undefined' ? fqdn : '';
-  if ( fqdn == '' ) return 'example.com';
-  var matches = fqdn.match( /[^.]*\.[^.]*$/ );
-  return matches.length > 0 ? matches[0] : '';
-}
-
-// Helper function to get the username from an email address
-function getUsernameFromEmail( email ) {
-  email = typeof email !== 'undefined' ? email : '';
-  return email.split( "@" )[0];
 }
 
 // Helper function to grab a querystring value
@@ -635,26 +614,14 @@ jQuery(document).ready(function($){
     }
   });
 
-  // List management function: pressing enter in the username, email, or role
-  // field adds the user to the list. Additionally, if the email field is
-  // blank, it gets constructed from the username field (and vice versa).
-  $('form input.auth-username, form input.auth-email, form select.auth-role').bind('keyup', function(e) {
+  // List management function: pressing enter in the email, or role
+  // field adds the user to the list.
+  $('form input.auth-email, form select.auth-role').bind('keyup', function(e) {
     if ( e.which == 13 ) { // Enter key
       $(this).parent().find('input[type="button"]').trigger('click');
       return false;
-    } else if ( $(this).hasClass('auth-username') ) {
-      var host = '';
-      if ( $('#radio_auth_settings_external_service_cas').is(':checked') || $('#auth_settings_external_service').val() == 'cas' ) {
-        host = $('#auth_settings_cas_host').val();
-      } else if ( $('#radio_auth_settings_external_service_ldap').is(':checked') || $('#auth_settings_external_service').val() == 'ldap' ) {
-        host = $('#auth_settings_ldap_host').val();
-      }
-      $(this).siblings('.auth-email').val($(this).val() + '@' + getTLDFromFQDN(host));
-    } else if ( $(this).hasClass('auth-email') ) {
-      $(this).siblings('.auth-username').val(getUsernameFromEmail($(this).val()));
-    }
   });
-  $('form input.auth-username, form input.auth-email').bind('keydown', function(e) {
+  $('form input.auth-email').bind('keydown', function(e) {
     if ( e.which == 13 ) { // Enter key
       e.preventDefault();
       return false;

@@ -395,12 +395,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
 				// Get username that successfully authenticated against the external service (CAS).
-				$externally_authenticated_username = strtolower( phpCAS::getUser() );
+				$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
 
 			} else if ( $auth_settings['external_service'] === 'ldap' ) {
 
-				// Custom UH code: remove @hawaii.edu if it exists in the username
-				$username = str_replace( '@hawaii.edu', '', $username );
+				// Get the TLD from the LDAP host for use in matching email addresses
+				// For example: example.edu is the TLD for ldap.example.edu, so user
+				// 'bob' will have the following email address: bob@example.edu.
+				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+
+				// remove top level domain if it exists in the username (i.e., if user entered their email)
+				$username = str_replace( '@' . $tld, '', $username );
 
 				// Fail with error message if username or password is blank.
 				if ( empty( $username ) ) {
@@ -454,24 +459,16 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 				}
 
-				// Get the TLD from the LDAP host for use in matching email addresses
-				// For example: example.edu is the TLD for ldap.example.edu, so user
-				// 'bob' will have the following email address: bob@example.edu.
-				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
-
 				// User successfully authenticated against LDAP, so set the relevant variables.
-				$externally_authenticated_username = $username;
+				$externally_authenticated_email = $username . '@' . $tld;
 			}
 
 			// If we've made it this far, we have an externally authenticated user.
-			// $externally_authenticated_username and $tld should both be set.
+			// $externally_authenticated_email and $tld should both be set.
 
-			// Check if the external user has a WordPress account (with the same username or email address)
+			// Check if the external user has a WordPress account (with the same email address)
 			if ( ! $user ) {
-				$user = get_user_by( 'login', $externally_authenticated_username );
-			}
-			if ( ! $user ) {
-				$user = get_user_by( 'email', $externally_authenticated_username . '@' . $tld );
+				$user = get_user_by( 'email', $externally_authenticated_email );
 			}
 
 			// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
@@ -483,7 +480,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we've made it this far, we have an externally authenticated
 			// user. Deal with them differently based on which list they're in
 			// (pending, blocked, or approved).
-			if ( $this->is_username_in_list( $externally_authenticated_username, 'blocked' ) ) {
+			if ( $this->is_email_in_list( $externally_authenticated_email, 'blocked' ) ) {
 				// If the blocked external user has a WordPress account, change
 				// its password and mark it as blocked. In a multisite
 				// environment, just remove them from the current blog.
@@ -500,18 +497,27 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Notify user about blocked status
-				$error_message = 'Sorry ' . $externally_authenticated_username . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
+				$error_message = 'Sorry ' . $externally_authenticated_email . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
-			} else if ( $this->is_username_in_list( $externally_authenticated_username, 'approved' ) && ! $user_is_inactive ) {
-				$user_info = $this->get_user_info_from_list( $externally_authenticated_username, $auth_settings['access_users_approved'] );
+			} else if ( $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && ! $user_is_inactive ) {
+				$user_info = $this->get_user_info_from_list( $externally_authenticated_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
 				if ( ! $user ) {
-					$result = wp_insert_user(
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
+						$username = explode( "@", $user_info['email'] );
+						$username = $username[0];
+						if ( get_user_by( 'login', $username ) !== false ) {
+							$username = $approved_user['email'];
+						}
+						$result = wp_insert_user(
 						array(
-							'user_login' => strtolower( $user_info['username'] ),
+							'user_login' => strtolower( $username ),
 							'user_pass' => wp_generate_password(), // random password
 							'first_name' => '',
 							'last_name' => '',
@@ -554,10 +560,9 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
 				// (Note: this will include 'inactive' existing users.)
-				if ( ! $this->is_username_in_list( $externally_authenticated_username, 'pending' ) ) {
+				if ( ! $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
 					$pending_user = array();
-					$pending_user['username'] = $externally_authenticated_username;
-					$pending_user['email'] = $externally_authenticated_username . '@' . $tld;
+					$pending_user['email'] = $externally_authenticated_email;
 					$pending_user['role'] = $auth_settings['access_default_role'];
 					$pending_user['date_added'] = '';
 					if ( ! is_array ( $auth_settings['access_users_pending'] ) ) {
@@ -1140,8 +1145,17 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( $new_user !== true && $approved_user['local_user'] === 'true' ) {
 						// Create a WP account for this new *local* user and email the password.
 						$plaintext_password = wp_generate_password(); // random password
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
+						$username = explode( "@", $approved_user['email'] );
+						$username = $username[0];
+						if ( get_user_by( 'login', $username ) !== false ) {
+							$username = $approved_user['email'];
+						}
 						$result = wpmu_create_user(
-							strtolower( $approved_user['username'] ),
+							strtolower( $username ),
 							$plaintext_password,
 							strtolower( $approved_user['email'] )
 						);
@@ -2163,7 +2177,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" name="auth_settings[access_users_pending][<?= $key; ?>][username]" value="<?= $pending_user['username'] ?>" readonly="true" class="auth-username" />
 							<input type="text" id="auth_settings_access_users_pending_<?= $key; ?>" name="auth_settings[access_users_pending][<?= $key; ?>][email]" value="<?= $pending_user['email']; ?>" readonly="true" class="auth-email" />
 							<select name="auth_settings[access_users_pending][<?= $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
@@ -2211,13 +2224,11 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php foreach ( $auth_multisite_settings['access_users_approved'] as $key => $approved_user ): ?>
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
 						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
-							<?php $approved_user['username'] = $approved_wp_user->user_login; ?>
 							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
 							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" name="auth_multisite_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="auth-username auth-multisite-username" />
 							<input type="text" id="auth_multisite_settings_access_users_approved_<?= $key; ?>" name="auth_multisite_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
 							<select name="auth_multisite_settings[access_users_approved][<?= $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
@@ -2233,7 +2244,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $local_user_icon = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true' ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : ''; ?>
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
 						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
-							<?php $approved_user['username'] = $approved_wp_user->user_login; ?>
 							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
 							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
@@ -2243,7 +2253,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $approved_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" name="auth_settings[access_users_approved][<?= $key; ?>][username]" value="<?= $approved_user['username'] ?>" readonly="true" class="auth-username" />
 							<input type="text" id="auth_settings_access_users_approved_<?= $key; ?>" name="auth_settings[access_users_approved][<?= $key; ?>][email]" value="<?= $approved_user['email']; ?>" readonly="true" class="auth-email" />
 							<select name="auth_settings[access_users_approved][<?= $key; ?>][role]" class="auth-role" onchange="save_<?= $js_function_prefix; ?>settings_access(this);">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
@@ -2256,7 +2265,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 			</ul>
 			<div id="new_auth_settings_access_users_approved">
-				<input type="text" name="new_approved_user_name" id="new_approved_user_name" placeholder="username" class="auth-username" />
 				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="auth-email" />
 				<select name="new_approved_user_role" id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $auth_settings['access_default_role'] ); ?>
@@ -2282,7 +2290,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php foreach ( $auth_settings['access_users_blocked'] as $key => $blocked_user ): ?>
 						<?php if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) continue; ?>
 						<?php if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ): ?>
-							<?php $blocked_user['username'] = $blocked_wp_user->user_login; ?>
 							<?php $blocked_user['email'] = $blocked_wp_user->user_email; ?>
 							<?php $blocked_user['role'] = array_shift( $blocked_wp_user->roles ); ?>
 							<?php $blocked_user['date_added'] = $blocked_wp_user->user_registered; ?>
@@ -2291,7 +2298,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $blocked_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" name="auth_settings[access_users_blocked][<?= $key; ?>][username]" value="<?= $blocked_user['username'] ?>" readonly="true" class="auth-username" />
 							<input type="text" id="auth_settings_access_users_blocked_<?= $key; ?>" name="auth_settings[access_users_blocked][<?= $key; ?>][email]" value="<?= $blocked_user['email']; ?>" readonly="true" class="auth-email" />
 							<select name="auth_settings[access_users_blocked][<?= $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
@@ -2303,7 +2309,6 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 			</ul>
 			<div id="new_auth_settings_access_users_blocked">
-				<input type="text" name="new_blocked_user_name" id="new_blocked_user_name" placeholder="username" class="auth-username" />
 				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="auth-email" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
 					<option value="<?= $auth_settings['access_default_role']; ?>"><?= ucfirst( $auth_settings['access_default_role'] ); ?></option>
@@ -2802,7 +2807,7 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?>After
 			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?= $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
-			invalid password attempts, delay further attempts on that username for
+			invalid password attempts, delay further attempts on that user for
 			<input type="text" id="auth_settings_advanced_lockouts_duration_1" name="auth_settings[advanced_lockouts][duration_1]" value="<?= $auth_settings['advanced_lockouts']['duration_1']; ?>" placeholder="1" style="width:30px;" />
 			minute(s).
 			<br />
@@ -2950,9 +2955,18 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 					} else if ( $approved_user['local_user'] === 'true' ) {
 						// Create a WP account for this new *local* user and email the password.
 						$plaintext_password = wp_generate_password(); // random password
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
+						$username = explode( "@", $approved_user['email'] );
+						$username = $username[0];
+						if ( get_user_by( 'login', $username ) !== false ) {
+							$username = $approved_user['email'];
+						}
 						$result = wp_insert_user(
 							array(
-								'user_login' => strtolower( $approved_user['username'] ),
+								'user_login' => strtolower( $username ),
 								'user_pass' => $plaintext_password,
 								'first_name' => '',
 								'last_name' => '',
@@ -3042,12 +3056,12 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 		/**
-		 * Helper function to determine whether a given username is in one of
+		 * Helper function to determine whether a given email is in one of
 		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
 		 */
-		function is_username_in_list($username = '', $list = 'approved', $is_multisite_list = false ) {
-			if ( empty( $username ) )
+		function is_email_in_list($email = '', $list = 'approved', $is_multisite_list = false ) {
+			if ( empty( $email ) )
 				return false;
 
 			$auth_settings = get_option( 'auth_settings' );
@@ -3057,14 +3071,14 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			switch ( $list ) {
 				case 'pending':
-					return $this->in_multi_array( $username, $auth_settings['access_users_pending'] );
+					return $this->in_multi_array( $email, $auth_settings['access_users_pending'] );
 					break;
 				case 'blocked':
-					return $this->in_multi_array( $username, $auth_settings['access_users_blocked'] );
+					return $this->in_multi_array( $email, $auth_settings['access_users_blocked'] );
 					break;
 				case 'approved':
 				default:
-					return $this->in_multi_array( $username, $auth_settings['access_users_approved'] );
+					return $this->in_multi_array( $email, $auth_settings['access_users_approved'] );
 					break;
 			}
 		}
@@ -3142,10 +3156,10 @@ if ( !class_exists( 'WP_Plugin_Authorizer' ) ) {
 		// Helper function to get a single user info array from one of the
 		// access control lists (pending, approved, or blocked).
 		// Returns: false if not found; otherwise
-		// 	array( 'username' => '', 'email' => '', 'role' => '', 'date_added' => '');
-		function get_user_info_from_list( $username, $list ) {
+		// 	array( 'email' => '', 'role' => '', 'date_added' => '');
+		function get_user_info_from_list( $email, $list ) {
 			foreach ( $list as $user_info ) {
-				if ( $user_info['username'] === $username ) {
+				if ( $user_info['email'] === $email ) {
 					return $user_info;
 				}
 			}
