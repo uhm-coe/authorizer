@@ -168,9 +168,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( isset($_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
 					$old_blog = $wpdb->blogid;
 					// Get all blog ids
-					$blogids = $wpdb->get_col( $wpdb->prepare( "SELECT blog_id FROM $wpdb->blogs" ) );
-					foreach ( $blogids as $blog_id ) {
-						switch_to_blog( $blog_id );
+					$blogs = wp_get_sites( array(
+						'network_id' => $wpdb->siteid,
+						'limit' => 999999,
+					));
+					foreach ( $blogs as $blog ) {
+						switch_to_blog( $blog['blog_id'] );
 						// Set meaningful defaults for other sites in the network.
 						$this->set_default_options();
 					}
