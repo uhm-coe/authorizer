@@ -1035,20 +1035,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Enable CAS Logins</th>
-								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Enable LDAP Logins</th>
-								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
 								<th scope="row">Google Client ID</th>
 								<td><?php $this->print_text_google_clientid( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Google Client Secret</th>
 								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Enable CAS Logins</th>
+								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS Custom Label</th>
@@ -1065,6 +1061,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<tr>
 								<th scope="row">CAS server path/context</th>
 								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Enable LDAP Logins</th>
+								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Host</th>
@@ -1144,6 +1144,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Create default user array if it's empty (assert array exists).
 			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
 				$auth_multisite_settings['access_users_approved'] = array();
+			}
+
+			// Create posted user array if it's empty (assert array exists).
+			if ( ! array_key_exists( 'access_users_approved', $_POST ) || ! is_array( $_POST['access_users_approved'] ) ) {
+				$_POST['access_users_approved'] = array();
 			}
 
 			// Figure out if any of the users in the approved list were removed (ignored).
