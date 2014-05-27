@@ -23,7 +23,12 @@ body.toplevel_page_authorizer .spinner {
 	display: inline-block;
 	float: none;
 	vertical-align: text-bottom;
-	margin: 0 5px;
+	margin: 4px 5px 0 5px;
+}
+body.settings_page_authorizer .spinner .spinner-text,
+body.toplevel_page_authorizer .spinner .spinner-text {
+  color: green;
+  margin-left: 22px;
 }
 
 .auth-email {

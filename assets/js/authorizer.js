@@ -307,7 +307,9 @@ function save_auth_multisite_settings( caller ) {
     'advanced_lostpassword_url': advanced_lostpassword_url,
     'advanced_branding': advanced_branding,
   }, function( response ) {
-    $('form .spinner').remove();
+    $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
+      $(this).remove();
+    });
     $(caller).removeAttr('disabled');
     if ( response==0 ) { // failed
       return false;
