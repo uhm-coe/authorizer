@@ -4,7 +4,7 @@ var shake_speed = 600;
 
 
 // Switch between option tabs.
-function chooseTab( list_name, delay ) {
+function choose_tab( list_name, delay ) {
   var $ = jQuery;
 
   // default delay is 0
@@ -635,9 +635,9 @@ jQuery(document).ready(function($){
   // Switch to the first tab (or the tab indicated in the querystring).
   var tab = querystring( 'tab' );
   if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
-    chooseTab( tab, animation_speed );
+    choose_tab( tab, animation_speed );
   } else {
-    chooseTab( 'access_lists' );
+    choose_tab( 'access_lists' );
   }
 
   // Hide/show multisite settings based on override checkbox.

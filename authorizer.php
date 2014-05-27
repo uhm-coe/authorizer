@@ -1452,7 +1452,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Check if provided CAS URL is accessible.
 				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
 				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
-					print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:chooseTab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
+					print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:choose_tab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
 				}
 			}
 		}
@@ -2182,17 +2182,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_section_info_tabs( $args = '' ) {
 			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ): ?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
-					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists');">Access Lists</a>
+					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external');">External Service</a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced');">Advanced</a>
 				</h2>
 			<?php else: ?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists');">Access Lists</a>
-					<a class="nav-tab nav-tab-access" href="javascript:chooseTab('access');">Private Access</a>
-					<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public');">Public Access</a>
-					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external');">External Service</a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced');">Advanced</a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists');">Access Lists</a>
+					<a class="nav-tab nav-tab-access" href="javascript:choose_tab('access');">Private Access</a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public');">Public Access</a>
+					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external');">External Service</a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced');">Advanced</a>
 				</h2>
 			<?php endif;
 		}
@@ -2205,7 +2205,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
-				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
+				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:choose_tab('access');">Private Access</a> tab.</p>
 			</div><?php
 		}
 
@@ -2382,7 +2382,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only authenticated users (All external service users and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:chooseTab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
+			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:choose_tab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
 		}
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -2412,7 +2412,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
-				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:chooseTab('access');">Private Access</a> tab.</p>
+				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:choose_tab('access');">Private Access</a> tab.</p>
 			</div><?php
 		}
 
