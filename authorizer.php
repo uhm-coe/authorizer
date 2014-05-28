@@ -44,6 +44,9 @@ if ( ! class_exists( 'Google_Client' ) ) {
 	set_include_path( get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/assets/inc/google-api-php-client/src' );
 	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Client.php';
 }
+if ( ! class_exists( 'GoogleService_Oauth2' ) ) {
+	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Service/Oauth2.php';
+}
 
 if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	/**
@@ -147,7 +150,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Create login cookie (used by google login)
-			if ( ! isset( $_COOKIE['login_unique'] ) && $GLOBALS['pagenow'] == 'wp-login.php' ) {
+			if ( ! isset( $_COOKIE['login_unique'] ) ) {
 				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( COOKIE_DOMAIN ) ? COOKIE_DOMAIN : '' );
 			}
 
@@ -377,11 +380,57 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// against an external service; instead, pass through to default
 			// WP authentication.
 			if ( $auth_settings['access_restriction'] === 'everyone' ) {
-				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+				//return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+				return null;
 			}
 
 			// Start external authentication.
 			// @TODO external_service is deprecated; move cas to button instead of inline
+
+			// Coming back from a Google authentication ('code' and 'state' are in the querystring)
+			if ( array_key_exists( 'code', $_REQUEST ) && array_key_exists( 'state', $_REQUEST ) ) {
+				$code = $_REQUEST['code'];
+				$state = explode( '|', urldecode( $_REQUEST['state'] ) );
+
+				if ( count( $state ) !== 2 ) {
+					return new WP_Error( 'google_login_error', 'Invalid session state returned from Google. Please try again later.' );
+				}
+				$response_nonce = $state[0];
+				$response_redirect = $state[1];
+
+				if ( ! wp_verify_nonce( $response_nonce, 'nonce_google_auth-' . $this->get_cookie_value() ) ) {
+					return new WP_Error( 'google_login_error', 'Invalid or expired token returned from Google. Please try again later.' );
+				}
+
+				// Build the Google Client
+				$client = new Google_Client();
+				$client->setApplicationName( 'WordPress' );
+				$client->setClientId( $auth_settings['google_clientid'] );
+				$client->setClientSecret( $auth_settings['google_clientsecret'] );
+				$client->setRedirectUri( wp_login_url() );
+				$client->setScopes(
+					array(
+						//'https://www.googleapis.com/auth/userinfo.email',
+						//'https://www.googleapis.com/auth/userinfo.profile',
+						'profile',
+						'email',
+					)
+				);
+				$client->setApprovalPrompt( 'auto' );
+
+				// Build Oauth service
+				//$oauth_service = new Google_Service_Oauth2( $client );
+
+				try {
+					$client->authenticate( $code );
+					//$user_info = $oauth_service->userinfo->get();
+				} catch ( Google_Exception $e ) {
+					return new WP_Error( 'google_login_error', $e->getMessage() );
+				}
+
+				return new WP_Error('debug', 'debug google');
+			}
+
 			$externally_authenticated_email = '';
 			$tld = '';
 			if ( $auth_settings['external_service'] === 'cast' ) {
@@ -485,9 +534,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we've made it this far, we have an externally authenticated user.
 			// $externally_authenticated_email and $tld should both be set.
+
+			// If they're not, jump back to WP authentication.
 			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 0 ) {
 				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
-				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+				return new WP_Error( 'using_wp_authentication', 'Moving to WordPress authentication...' );
+			}
+
+			// If username or password is blank, just pass on to WordPress
+			if ( strlen( $username ) < 1 || strlen( $password ) < 1 ) {
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				return new WP_Error();
 			}
 
 			// Check if the external user has a WordPress account (with the same email address)
@@ -1389,6 +1446,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Prepare Google endpoint for incoming authentication
 			if ( $auth_settings['google'] === '1' ) {
+				// Build the Google Client
 				$client = new Google_Client();
 				$client->setApplicationName( 'WordPress' );
 				$client->setClientId( $auth_settings['google_clientid'] );
@@ -1396,14 +1454,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$client->setRedirectUri( wp_login_url() );
 				$client->setScopes(
 					array(
-						'https://www.googleapis.com/auth/userinfo.email',
-						'https://www.googleapis.com/auth/userinfo.profile',
+						//'https://www.googleapis.com/auth/userinfo.email',
+						//'https://www.googleapis.com/auth/userinfo.profile',
+						'profile',
+						'email',
 					)
 				);
 				$client->setApprovalPrompt( 'auto' );
 
+				// Build Oauth service
+				//$oauth_service = new Google_Service_Oauth2( $client );
+
 				// Generate CSRF token
-				$client->setState( urlencode( wp_create_nonce( 'nonce_google_auth-' . $this->get_cookie_value() . '|' . wp_login_url() ) ) );
+				$client->setState( urlencode( wp_create_nonce( 'nonce_google_auth-' . $this->get_cookie_value() ) . '|' . wp_login_url() ) );
 
 				// Get Google URL
 				$auth_url_google = $client->createAuthUrl();
@@ -2535,17 +2598,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><div id="overlay-hide-<?= $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
+			$site_url_parts = parse_url( get_site_url() );
+			$site_url_host = $site_url_parts['scheme'] . '://' . $site_url_parts['host'] . '/';
 			?>If you don't have a Google Client ID and Secret, generate them by following these instructions:
 			<ol>
 				<li>Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.</li>
 				<li>Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:
 					<ul>
 						<li>Application Type: <strong>Web application</strong></li>
-						<li>Authorized Javascript Origins: <strong><?= get_site_url(); ?></strong></li>
-						<li>Authorized Redirect URI: <strong><?= get_site_url( 'wp-login.php' ); ?></strong></li>
+						<li>Authorized Javascript Origins: <strong><?= $site_url_host; ?></strong></li>
+						<li>Authorized Redirect URI: <strong><?= get_site_url( get_current_blog_id(), 'wp-login.php' ); ?></strong></li>
 					</ul>
 				</li>
 				<li>Copy/paste your new Client ID/Secret pair into the fields below.</li>
+				<li><strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.</li>
 			</ol>
 			<input type="text" id="<?= $id; ?>" name="<?= $name; ?>" value="<?= $auth_settings[$option]; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
 		}
