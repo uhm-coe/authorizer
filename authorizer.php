@@ -44,9 +44,6 @@ if ( ! class_exists( 'Google_Client' ) ) {
 	set_include_path( get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/assets/inc/google-api-php-client/src' );
 	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Client.php';
 }
-if ( ! class_exists( 'Google_Service_Plus' ) ) {
-	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Service/Plus.php';
-}
 
 if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	/**
