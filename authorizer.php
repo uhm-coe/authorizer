@@ -430,6 +430,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
 			}
 
+			// If this externally authenticated user doesn't have an account
+			// and login access is set to "All authenticated users," add them
+			// to the approved list (they'll get an account created below).
+			if ( ! $user && $auth_settings['access_who_can_login'] === 'external_users' ) {
+				$approved_user = array(
+					'email' => $externally_authenticated_email,
+					'role' => $auth_settings['access_default_role'],
+					'date_added' => date( "Y-m-d H:i:s" ),
+				);
+				if ( ! is_array ( $auth_settings['access_users_approved'] ) ) {
+					$auth_settings['access_users_approved'] = array();
+				}
+				array_push( $auth_settings['access_users_approved'], $approved_user );
+				update_option( 'auth_settings', $auth_settings );
+			}
+
 			// Check our externally authenticated user against our access
 			// lists. Deal with them differently based on which list they're in
 			// (pending, blocked, or approved).
