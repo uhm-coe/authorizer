@@ -380,111 +380,32 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Start external authentication.
+			$externally_authenticated_email = '';
+			$authenticated_by = '';
+
 			// @TODO external_service is deprecated; move cas to button instead of inline
-
 			if ( $auth_settings['external_service'] === 'cast' ) {
-				// Set the CAS client configuration
-				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+				$result = $this->custom_authenticate_cas( $auth_settings );
 
-				// Update server certificate bundle if it doesn't exist or is older
-				// than 3 months, then use it to ensure CAS server is legitimate.
-				$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
-				$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
-				$time_90_days_ago = time() - $time_90_days;
-				if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
-					$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
-					if ( $cacert_contents !== false ) {
-						file_put_contents( $cacert_path, $cacert_contents );
-					} else {
-						return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
-					}
-				}
-				phpCAS::setCasServerCACert( $cacert_path );
-
-				// Authenticate against CAS
-				if ( ! phpCAS::isAuthenticated() ) {
-					phpCAS::forceAuthentication();
-					die();
+				if ( is_wp_error( $result ) ) {
+					return $result;
 				}
 
-				// Get the TLD from the CAS host for use in matching email addresses
-				// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
-				// 'bob' will have the following email address: bob@hawaii.edu.
-				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+				$externally_authenticated_email = $result['email'];
+				$authenticated_by = $result['authenticated_by'];
 
-				// Get username that successfully authenticated against the external service (CAS).
-				$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
+			}
 
-				// We'll track how this user was authenticated in user meta.
-				$authenticated_by = 'cas';
+			// Try LDAP authentication if we don't have an authenticated user yet.
+			if ( $auth_settings['ldap'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
+				$result = $this->custom_authenticate_ldap( $username, $password, $auth_settings );
 
-			} else if ( $auth_settings['external_service'] === 'ldapy' ) {
-
-				// Get the TLD from the LDAP host for use in matching email addresses
-				// For example: example.edu is the TLD for ldap.example.edu, so user
-				// 'bob' will have the following email address: bob@example.edu.
-				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
-
-				// remove top level domain if it exists in the username (i.e., if user entered their email)
-				$username = str_replace( '@' . $tld, '', $username );
-
-				// Fail with error message if username or password is blank.
-				if ( empty( $username ) ) {
-					return null;
-				}
-				if ( empty( $password ) ) {
-					return new WP_Error( 'empty_password', 'You must provide a password.' );
+				if ( is_wp_error( $result ) ) {
+					return $result;
 				}
 
-				// Authenticate against LDAP using options provided in plugin settings.
-				$result = false;
-				$ldap_user_dn = '';
-
-				$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
-				ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-				if ( $auth_settings['ldap_tls'] == 1 ) {
-					ldap_start_tls( $ldap );
-				}
-				$result = @ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
-				if ( !$result ) {
-					// Can't connect to LDAP, so fall back to WordPress authentication.
-					return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
-				}
-				// Look up the bind DN of the user trying to log in by
-				// performing an LDAP search for the login username in the
-				// field specified in the LDAP settings. This setup is common.
-				$ldap_search = ldap_search(
-					$ldap,
-					$auth_settings['ldap_search_base'],
-					"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
-					array('dn') // Just get the dn (no other attributes)
-				);
-				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
-
-				// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
-				if ( $ldap_entries['count'] < 1 ) {
-					return new WP_Error( 'no_ldap', 'No LDAP user found.' );
-				}
-
-				// Get the bind dn; if there are multiple results returned, just get the last one.
-				for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
-					$ldap_user_dn = $ldap_entries[$i]['dn'];
-				}
-
-				$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
-				if ( !$result ) {
-					// We have a real ldap user, but an invalid password. Pass
-					// through to wp authentication after failing LDAP (since
-					// this could be a local account that happens to be the
-					// same name as an LDAP user).
-					return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
-				}
-
-				// User successfully authenticated against LDAP, so set the relevant variables.
-				$externally_authenticated_email = $username . '@' . $tld;
-
-				// We'll track how this user was authenticated in user meta.
-				$authenticated_by = 'ldap';
+				$externally_authenticated_email = $result['email'];
+				$authenticated_by = $result['authenticated_by'];
 			}
 
 			// Skip to WordPress authentication if we don't have an externally
@@ -641,7 +562,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function ajax_process_google_login() {
 			$result = $this->custom_authenticate_google();
-			die( $result );
+			die( $result['message'] );
 		}
 
 
@@ -701,17 +622,130 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// @TODO: now that this google user is authenticated, run auth routines to determine what access they have in wp. probably refactor bunch of stuff in custom_authenticate() into separate functions so we can rely on them here, too.
 			//die($email);
 
-			return $response;
+			return array(
+				'email' => $email,
+				'message' => $response,
+				'authenticated_by' => 'google',
+			);
 		}
 
 
-		private function custom_authenticate_cas() {
+		private function custom_authenticate_cas( $auth_settings ) {
+			// Set the CAS client configuration
+			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
 
+			// Update server certificate bundle if it doesn't exist or is older
+			// than 3 months, then use it to ensure CAS server is legitimate.
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
+			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
+			$time_90_days_ago = time() - $time_90_days;
+			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
+				$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
+				if ( $cacert_contents !== false ) {
+					file_put_contents( $cacert_path, $cacert_contents );
+				} else {
+					return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
+				}
+			}
+			phpCAS::setCasServerCACert( $cacert_path );
+
+			// Authenticate against CAS
+			if ( ! phpCAS::isAuthenticated() ) {
+				phpCAS::forceAuthentication();
+				die();
+			}
+
+			// Get the TLD from the CAS host for use in matching email addresses
+			// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
+			// 'bob' will have the following email address: bob@hawaii.edu.
+			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+
+			// Get username that successfully authenticated against the external service (CAS).
+			$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
+
+			// We'll track how this user was authenticated in user meta.
+			$authenticated_by = 'cas';
+
+			return array(
+				'email' => $externally_authenticated_email,
+				'message' => '',
+				'authenticated_by' => $authenticated_by,
+			);
 		}
 
 
-		private function custom_authenticate_ldap( $username, $password ) {
+		private function custom_authenticate_ldap( $username, $password, $auth_settings ) {
+			// Get the TLD from the LDAP host for use in matching email addresses
+			// For example: example.edu is the TLD for ldap.example.edu, so user
+			// 'bob' will have the following email address: bob@example.edu.
+			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
 
+			// remove top level domain if it exists in the username (i.e., if user entered their email)
+			$username = str_replace( '@' . $tld, '', $username );
+
+			// Fail with error message if username or password is blank.
+			if ( empty( $username ) ) {
+				return null;
+			}
+			if ( empty( $password ) ) {
+				return new WP_Error( 'empty_password', 'You must provide a password.' );
+			}
+
+			// Authenticate against LDAP using options provided in plugin settings.
+			$result = false;
+			$ldap_user_dn = '';
+
+			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
+			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
+			if ( $auth_settings['ldap_tls'] == 1 ) {
+				ldap_start_tls( $ldap );
+			}
+			$result = @ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
+			if ( !$result ) {
+				// Can't connect to LDAP, so fall back to WordPress authentication.
+				return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
+			}
+			// Look up the bind DN of the user trying to log in by
+			// performing an LDAP search for the login username in the
+			// field specified in the LDAP settings. This setup is common.
+			$ldap_search = ldap_search(
+				$ldap,
+				$auth_settings['ldap_search_base'],
+				"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
+				array('dn') // Just get the dn (no other attributes)
+			);
+			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+
+			// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
+			if ( $ldap_entries['count'] < 1 ) {
+				return new WP_Error( 'no_ldap', 'No LDAP user found.' );
+			}
+
+			// Get the bind dn; if there are multiple results returned, just get the last one.
+			for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
+				$ldap_user_dn = $ldap_entries[$i]['dn'];
+			}
+
+			$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
+			if ( !$result ) {
+				// We have a real ldap user, but an invalid password. Pass
+				// through to wp authentication after failing LDAP (since
+				// this could be a local account that happens to be the
+				// same name as an LDAP user).
+				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+			}
+
+			// User successfully authenticated against LDAP, so set the relevant variables.
+			$externally_authenticated_email = $username . '@' . $tld;
+
+			// We'll track how this user was authenticated in user meta.
+			$authenticated_by = 'ldap';
+
+			return array(
+				'email' => $externally_authenticated_email,
+				'message' => '',
+				'authenticated_by' => 'ldap',
+			);
 		}
 
 
