@@ -167,7 +167,7 @@ function save_auth_settings( caller, create_local_account ) {
   $(caller).last().after('<span class="spinner"></span>');
   $('form .spinner').show();
 
-  var access_restriction = $('form input[name="auth_settings[access_restriction]"]:checked').val();
+  var access_who_can_login = $('form input[name="auth_settings[access_who_can_login]"]:checked').val();
 
   var access_users_pending = new Object();
   $('#list_auth_settings_access_users_pending li').each(function(index) {
@@ -206,7 +206,7 @@ function save_auth_settings( caller, create_local_account ) {
 
   $.post(ajaxurl, {
     action: 'save_auth_dashboard_widget',
-    'access_restriction': access_restriction,
+    'access_who_can_login': access_who_can_login,
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
     'access_users_blocked': access_users_blocked,
@@ -237,7 +237,7 @@ function save_auth_multisite_settings( caller ) {
 
   var multisite_override = $('#auth_settings_multisite_override').is(':checked') ? '1' : '';
 
-  var access_restriction = $('form input[name="auth_settings[access_restriction]"]:checked').val();
+  var access_who_can_login = $('form input[name="auth_settings[access_who_can_login]"]:checked').val();
 
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function( index ) {
@@ -286,7 +286,7 @@ function save_auth_multisite_settings( caller ) {
     action: 'save_auth_multisite_settings',
     'nonce_save_auth_settings': nonce_save_auth_settings,
     'multisite_override': multisite_override,
-    'access_restriction': access_restriction,
+    'access_who_can_login': access_who_can_login,
     'access_users_approved': access_users_approved,
     'access_default_role': access_default_role,
     'google': google,
@@ -505,7 +505,7 @@ jQuery(document).ready(function($){
   }
 
   // On load: Show/hide pending/approved/blocked list options
-  if ( !$('#radio_auth_settings_access_restriction_approved_users').is(':checked') ) {
+  if ( !$('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_access_users_pending).hide();
     $('div.animated_wrapper', auth_settings_access_users_approved).hide();
     $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
@@ -539,8 +539,8 @@ jQuery(document).ready(function($){
   }
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
-  $('input[name="auth_settings[access_restriction]"]').change(function(){
-    if ( $('#radio_auth_settings_access_restriction_everyone').is(':checked') ) {
+  $('input[name="auth_settings[access_who_can_login]"]').change(function(){
+    if ( $('#radio_auth_settings_access_who_can_login_everyone').is(':checked') ) {
       animate_option( 'hide', auth_settings_access_redirect_to_login );
       animate_option( 'hide', auth_settings_access_redirect_to_message );
       animate_option( 'hide', auth_settings_access_public_pages );
@@ -552,7 +552,7 @@ jQuery(document).ready(function($){
     }
   
     // Hide user whitelist unless "Only specific students below" is checked
-    if ( ! $('#radio_auth_settings_access_restriction_approved_users').is(':checked') ) {
+    if ( ! $('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
       animate_option( 'hide', auth_settings_access_users_pending );
       animate_option( 'hide', auth_settings_access_users_approved );
       animate_option( 'hide', auth_settings_access_users_blocked );
@@ -638,7 +638,7 @@ jQuery(document).ready(function($){
 
   // Switch to the first tab (or the tab indicated in the querystring).
   var tab = querystring( 'tab' );
-  if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
+  if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
     choose_tab( tab, animation_speed );
   } else {
     choose_tab( 'access_lists' );

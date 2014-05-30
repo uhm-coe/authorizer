@@ -306,8 +306,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Override lockouts
 					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
 
-					// Override access_restriction
-					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+					// Override access_who_can_login
+					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 
 					// Override external services (google, cas, or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
@@ -373,8 +373,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we're not restricting view access at all, don't check
 			// against an external service; instead, pass through to default
 			// WP authentication.
-			// @TODO: probably remove this? access_restriction now only applies to view access, not logging in (i.e., can enable ldap/cas/google and still have access=everyone)
-			if ( $auth_settings['access_restriction'] === 'everyone' ) {
+			// @TODO: probably remove this? access_who_can_login now only applies to view access, not logging in (i.e., can enable ldap/cas/google and still have access=everyone)
+			if ( $auth_settings['access_who_can_login'] === 'everyone' ) {
 				//return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
 				return null;
 			}
@@ -899,8 +899,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override access_restriction
-					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+					// Override access_who_can_login
+					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 				}
 			}
 
@@ -910,11 +910,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Always allow access to admins
 				( is_admin() ) ||
 				// Allow access if option is set to 'everyone'
-				( $auth_settings['access_restriction'] == 'everyone' ) ||
+				( $auth_settings['access_who_can_login'] == 'everyone' ) ||
 				// Allow access to logged in users if option is set to 'university' community
-				( $auth_settings['access_restriction'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
+				( $auth_settings['access_who_can_login'] == 'university' && $this->is_user_logged_in_and_blog_user() ) ||
 				// Allow access to approved external users and logged in users if option is set to 'approved_users'
-				( $auth_settings['access_restriction'] == 'approved_users' && $this->is_user_logged_in_and_blog_user() )
+				( $auth_settings['access_who_can_login'] == 'approved_users' && $this->is_user_logged_in_and_blog_user() )
 			);
 
 			// Fringe case: In a multisite, a user of a different blog can
@@ -1070,8 +1070,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override access_restriction
-					$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+					// Override access_who_can_login
+					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 
 					// Override advanced_lostpassword_url
 					$auth_settings['advanced_lostpassword_url'] = $auth_multisite_settings['advanced_lostpassword_url'];
@@ -1081,8 +1081,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if (
 				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
 				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL ) &&
-				array_key_exists( 'access_restriction', $auth_settings ) &&
-				$auth_settings['access_restriction'] !== 'everyone'
+				array_key_exists( 'access_who_can_login', $auth_settings ) &&
+				$auth_settings['access_who_can_login'] !== 'everyone'
 			) {
 				$lostpassword_url = $auth_settings['advanced_lostpassword_url'];
 			}
@@ -1215,8 +1215,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						</div>
 						<table class="form-table"><tbody>
 							<tr>
-								<th scope="row">Who can view the sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_restriction( array( 'multisite_admin' => true ) ); ?></td>
+								<th scope="row">Who can log in to sites in this network?</th>
+								<td><?php $this->print_radio_auth_access_who_can_login( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Approved Users (All Sites)</th>
@@ -1231,7 +1231,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Enable Google Logins</th>
+								<th scope="row">Google Logins</th>
 								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
@@ -1243,7 +1243,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Enable CAS Logins</th>
+								<th scope="row">CAS Logins</th>
 								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
@@ -1263,7 +1263,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Enable LDAP Logins</th>
+								<th scope="row">LDAP Logins</th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
@@ -1405,7 +1405,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Filter options to only the allowed values (multisite options are a subset of all options)
 			$allowed = array(
 				'multisite_override',
-				'access_restriction',
+				'access_who_can_login',
 				'access_users_approved',
 				'access_default_role',
 				'google',
@@ -1753,16 +1753,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for Private Access Settings
+			// Add help tab for Login Access Settings
+			// @TODO: rewrite
 			$help_auth_settings_access_content = '
-				<p><strong>Who can view the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or an account on an external service like CAS or LDAP (<strong>authenticated users</strong>), restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
+				<p><strong>Who can log in to the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to <strong>everyone</strong> (the default), restrict it to anyone with a WordPress account or an account on an external service like CAS or LDAP (<strong>authenticated users</strong>), restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em> (<strong>approved users</strong>), or restrict access to only users with WordPress accounts (<strong>users with prior access</strong>).</p>
 				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.</p>
 				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.</p>
 			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_access_content',
-					'title' => 'Private Access',
+					'title' => 'Login Access',
 					'content' => $help_auth_settings_access_content,
 				)
 			);
@@ -1886,33 +1887,33 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_lists' // Section this setting is shown on
 			);
 
-			// Create Private Access section
+			// Create Login Access section
 			add_settings_section(
-				'auth_settings_access', // HTML element ID
+				'auth_settings_access_login', // HTML element ID
 				'', // HTML element Title
-				array( $this, 'print_section_info_access' ), // Callback (echos section content)
+				array( $this, 'print_section_info_access_login' ), // Callback (echos section content)
 				'authorizer' // Page this section is shown on (slug)
 			);
 			add_settings_field(
-				'auth_settings_access_restriction', // HTML element ID
+				'auth_settings_access_who_can_login', // HTML element ID
 				'Who can view the site?', // HTML element Title
-				array( $this, 'print_radio_auth_access_restriction' ), // Callback (echos form element)
+				array( $this, 'print_radio_auth_access_who_can_login' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access' // Section this setting is shown on
+				'auth_settings_access_login' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_role_receive_pending_emails', // HTML element ID
 				'Which role should receive email notifications about pending users?', // HTML element Title
 				array( $this, 'print_select_auth_access_role_receive_pending_emails' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access' // Section this setting is shown on
+				'auth_settings_access_login' // Section this setting is shown on
 			);
 			add_settings_field(
 				'auth_settings_access_pending_redirect_to_message', // HTML element ID
 				'What message should pending users see after attempting to log in?', // HTML element Title
 				array( $this, 'print_wysiwyg_auth_access_pending_redirect_to_message' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access' // Section this setting is shown on
+				'auth_settings_access_login' // Section this setting is shown on
 			);
 
 
@@ -1968,7 +1969,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_external_google', // HTML element ID
-				'Enable Google Logins', // HTML element Title
+				'Google Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_google' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -1989,7 +1990,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_external_cas', // HTML element ID
-				'Enable CAS Logins', // HTML element Title
+				'CAS Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -2024,7 +2025,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_external_ldap', // HTML element ID
-				'Enable LDAP Logins', // HTML element Title
+				'LDAP Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -2132,9 +2133,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_users_blocked'] = array();
 			}
 
-			// Private Access Defaults.
-			if ( !array_key_exists( 'access_restriction', $auth_settings ) ) {
-				$auth_settings['access_restriction'] = 'everyone';
+			// Login Access Defaults.
+			if ( !array_key_exists( 'access_who_can_login', $auth_settings ) ) {
+				$auth_settings['access_who_can_login'] = 'everyone';
 			}
 			if ( !array_key_exists( 'access_role_receive_pending_emails', $auth_settings ) ) {
 				$auth_settings['access_role_receive_pending_emails'] = '---';
@@ -2257,9 +2258,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( !array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['access_users_approved'] = array();
 				}
-				// Private Access Defaults.
-				if ( !array_key_exists( 'access_restriction', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['access_restriction'] = 'everyone';
+				// Login Access Defaults.
+				if ( !array_key_exists( 'access_who_can_login', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['access_who_can_login'] = 'everyone';
 				}
 				// External Service Defaults.
 				if ( !array_key_exists( 'access_default_role', $auth_multisite_settings ) ) {
@@ -2378,8 +2379,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Default to "Everyone" view access restriction.
-			if ( ! in_array( $auth_settings['access_restriction'], array( 'everyone', 'university', 'approved_users' ) ) ) {
-				$auth_settings['access_restriction'] = 'everyone';
+			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'everyone', 'university', 'approved_users' ) ) ) {
+				$auth_settings['access_who_can_login'] = 'everyone';
 			}
 
 			// Default to WordPress login access redirect.
@@ -2461,8 +2462,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php else: ?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists');">Access Lists</a>
-					<a class="nav-tab nav-tab-access" href="javascript:choose_tab('access');">Private Access</a>
-					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public');">Public Access</a>
+					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login');">Login Access</a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public');">View Access</a>
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external');">External Service</a>
 					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced');">Advanced</a>
 				</h2>
@@ -2477,7 +2478,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
-				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:choose_tab('access');">Private Access</a> tab.</p>
+				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:choose_tab('access');">Login Access</a> tab.</p>
 			</div><?php
 		}
 
@@ -2631,14 +2632,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function print_section_info_access( $args = '' ) {
-			?><div id="section_info_access" class="section_info">
+		function print_section_info_access_login( $args = '' ) {
+			?><div id="section_info_access_login" class="section_info">
 				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 				<p>Choose how you want to restrict access to this site below.</p>
 			</div><?php
 		}
 
-		function print_radio_auth_access_restriction( $args = '' ) {
+		function print_radio_auth_access_who_can_login( $args = '' ) {
 			// Get plugin options.
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 			$auth_settings = get_option( 'auth_settings' );
@@ -2646,15 +2647,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// We're on the multisite options page, so print the multisite options instead.
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// Make the access_restriction option match what's set in multisite so the correct options appear below it.
-				$auth_settings['access_restriction'] = $auth_multisite_settings['access_restriction'];
+				// Make the access_who_can_login option match what's set in multisite so the correct options appear below it.
+				$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_access_restriction_everyone" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_auth_settings_access_who_can_login_everyone" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_access_restriction_everyone" name="auth_settings[access_restriction]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_restriction'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_university" name="auth_settings[access_restriction]" value="university"<?php checked( 'university' == $auth_settings['access_restriction'] ); ?> /> Only authenticated users (All external service users and all WordPress users)<br />
-			<input type="radio" id="radio_auth_settings_access_restriction_approved_users" name="auth_settings[access_restriction]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_restriction'] ); ?> /> Only <a href="javascript:choose_tab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
+			?><input type="radio" id="radio_auth_settings_access_who_can_login_everyone" name="auth_settings[access_who_can_login]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_who_can_login'] ); ?> /> Everyone (No access restriction: all anonymous and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_who_can_login_university" name="auth_settings[access_who_can_login]" value="university"<?php checked( 'university' == $auth_settings['access_who_can_login'] ); ?> /> Only authenticated users (All external service users and all WordPress users)<br />
+			<input type="radio" id="radio_auth_settings_access_who_can_login_approved_users" name="auth_settings[access_who_can_login]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_who_can_login'] ); ?> /> Only <a href="javascript:choose_tab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
 		}
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -2684,7 +2685,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
-				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:choose_tab('access');">Private Access</a> tab.</p>
+				<p>Choose your public access options here. If you don't see any options here, enable access restriction from the <a href="javascript:choose_tab('access');">Login Access</a> tab.</p>
 			</div><?php
 		}
 
@@ -3168,7 +3169,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<p><?php $this->print_section_info_access(); ?></p>
 					<div style="display: none;">
 						<h2>Who can view the site?</h2>
-						<?php $this->print_radio_auth_access_restriction(); ?>
+						<?php $this->print_radio_auth_access_who_can_login(); ?>
 					</div>
 					<div>
 						<h2>Pending Users</h2>
@@ -3195,7 +3196,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Make sure posted variables exist.
-			if ( empty( $_POST['access_restriction'] ) || empty( $_POST['nonce_save_auth_settings'] ) ) {
+			if ( empty( $_POST['access_who_can_login'] ) || empty( $_POST['nonce_save_auth_settings'] ) ) {
 				die('');
 			}
 
@@ -3205,8 +3206,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// If invalid input, set access restriction to only approved users.
-			if ( ! in_array( $_POST['access_restriction'], array( 'everyone', 'university', 'approved_users' ) ) ) {
-				$_POST['access_restriction'] = 'approved_users';
+			if ( ! in_array( $_POST['access_who_can_login'], array( 'everyone', 'university', 'approved_users' ) ) ) {
+				$_POST['access_who_can_login'] = 'approved_users';
 			}
 
 			$auth_settings = get_option( 'auth_settings' );
@@ -3292,7 +3293,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Update user lists
-			$auth_settings['access_restriction'] = stripslashes( $_POST['access_restriction'] );
+			$auth_settings['access_who_can_login'] = stripslashes( $_POST['access_who_can_login'] );
 			$auth_settings['access_users_pending'] = $_POST['access_users_pending'];
 			$auth_settings['access_users_approved'] = $_POST['access_users_approved'];
 			$auth_settings['access_users_blocked'] = $_POST['access_users_blocked'];
