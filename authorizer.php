@@ -913,7 +913,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// for this blog. Flag these users, and redirect them to their
 			// profile page with a message (so we don't get into a redirect
 			// loop on the wp-login.php page).
-			if ( is_multisite() && is_user_logged_in() && !$has_access ) {
+			if ( is_multisite() && is_user_logged_in() && ! $has_access ) {
 				wp_redirect( admin_url( 'profile.php' ), 302 );
 				exit;
 			}
@@ -948,17 +948,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
 			// Check to see if the requested page is public. If so, show it.
-			if ( in_array( $this->get_id_from_pagename( $wp->query_vars['pagename'] ), $auth_settings['access_public_pages'] ) ) {
-				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
-					update_option( 'auth_settings_advanced_public_notice', false);
-				} else {
-					update_option( 'auth_settings_advanced_public_notice', true);
-				}
-				return;
-			}
-
-			// Check to see if the requested page is the home page and if it is public. If so, show it.
-			if ( empty( $wp->request ) && in_array( 'home', $auth_settings['access_public_pages'] ) ) {
+			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $wp->query_vars['pagename'] );
+			if ( in_array( $current_page_id, $auth_settings['access_public_pages'] ) ) {
 				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 					update_option( 'auth_settings_advanced_public_notice', false);
 				} else {
@@ -968,15 +959,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
-			switch ( $auth_settings['access_redirect'] ) :
-			case 'message':
+			if ( $auth_settings['access_redirect'] === 'message' ) {
 				wp_die( $auth_settings['access_redirect_to_message'] . '<hr /><p style="text-align:center;margin-bottom:-15px;"><a class="button" href="' . wp_login_url( $current_path ) . '">Log In</a></p>', get_bloginfo( 'name' ) . ' - Access Restricted' );
-				break;
-			case 'login':
-			default:
+			} else { // if ( $auth_settings['access_redirect'] === 'login' ) {
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
-			endswitch;
+			}
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
