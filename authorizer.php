@@ -2366,7 +2366,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
-				<p>If you don't see any lists here, enable access restriction to "Only approved users" from the <a href="javascript:choose_tab('access');">Login Access</a> tab.</p>
 			</div><?php
 		}
 

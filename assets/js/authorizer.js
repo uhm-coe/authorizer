@@ -511,15 +511,6 @@ jQuery(document).ready(function($){
     $('#dashboard_link_approved_users').contents().unwrap();
   }
 
-  // On load: Show/hide pending/approved/blocked list options
-  if ( ! $('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
-    $('div.animated_wrapper', auth_settings_access_users_pending).hide();
-    $('div.animated_wrapper', auth_settings_access_users_approved).hide();
-    $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
-    $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).hide();
-    $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).hide();
-  }
-
   // On load: Show/hide public access options if everyone can see site
   if ( ! $('#radio_auth_settings_access_who_can_view_logged_in_users').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_access_public_pages).hide();
@@ -557,15 +548,9 @@ jQuery(document).ready(function($){
   $('input[name="auth_settings[access_who_can_login]"]').change(function(){
     // Hide user whitelist unless "Only specific students below" is checked
     if ( ! $('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
-      animate_option( 'hide', auth_settings_access_users_pending );
-      animate_option( 'hide', auth_settings_access_users_approved );
-      animate_option( 'hide', auth_settings_access_users_blocked );
       animate_option( 'hide', auth_settings_access_role_receive_pending_emails );
       animate_option( 'hide', auth_settings_access_pending_redirect_to_message );
     } else {
-      animate_option( 'show', auth_settings_access_users_pending );
-      animate_option( 'show', auth_settings_access_users_approved );
-      animate_option( 'show', auth_settings_access_users_blocked );
       animate_option( 'show', auth_settings_access_role_receive_pending_emails );
       animate_option( 'show', auth_settings_access_pending_redirect_to_message );
     }
