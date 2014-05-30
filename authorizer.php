@@ -2463,7 +2463,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists');">Access Lists</a>
 					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login');">Login Access</a>
-					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public');">View Access</a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public');">Public Access</a>
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external');">External Service</a>
 					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced');">Advanced</a>
 				</h2>
