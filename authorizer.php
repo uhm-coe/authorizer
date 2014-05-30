@@ -417,8 +417,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Skip to WordPress authentication if we don't have an externally
-			// authenticated user, or if the username or password are blank.
-			if ( strlen( $externally_authenticated_email ) < 1 || ! $is_login_attempt ) {
+			// authenticated user.
+			if ( strlen( $externally_authenticated_email ) < 1 ) {
 				return null;
 			}
 
@@ -426,9 +426,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// The following should be set:
 			//   $externally_authenticated_email
 			//   $authenticated_by
-
-
-
 
 			// Check if the external user has a WordPress account (with the same email address)
 			if ( ! $user ) {
@@ -441,8 +438,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
 			}
 
-			// If we've made it this far, we have an externally authenticated
-			// user. Deal with them differently based on which list they're in
+			// Check our externally authenticated user against our access
+			// lists. Deal with them differently based on which list they're in
 			// (pending, blocked, or approved).
 			if ( $this->is_email_in_list( $externally_authenticated_email, 'blocked' ) ) {
 				// If the blocked external user has a WordPress account, change
@@ -642,6 +639,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_null( $token ) ) {
 				return new WP_Error( 'no_google_login', 'No Google credentials provided.' );
 			}
+
+			// Build the Google Client.
+			$client = new Google_Client();
+			$client->setApplicationName( 'WordPress' );
+			$client->setClientId( $auth_settings['google_clientid'] );
+			$client->setClientSecret( $auth_settings['google_clientsecret'] );
+			$client->setRedirectUri( 'postmessage' );
 
 			// Verify this is a successful Google authentication
 			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
