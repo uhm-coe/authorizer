@@ -383,32 +383,37 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$externally_authenticated_email = '';
 			$authenticated_by = '';
 
+			// Try Google authentication if it's enabled and we don't have a
+			// successful login yet.
 			// @TODO
 			// Check if we're reloading from a successful Google login
-
-			// @TODO external_service is deprecated; move cas to button instead of inline
-			if ( $auth_settings['external_service'] === 'cast' ) {
-				$result = $this->custom_authenticate_cas( $auth_settings );
-
-				if ( is_wp_error( $result ) ) {
-					return $result;
+			if ( $auth_settings['google'] === '1' ) {
+				$result = $this->custom_authenticate_google( $auth_settings );
+				if ( ! is_wp_error( $result ) ) {
+					$externally_authenticated_email = $result['email'];
+					$authenticated_by = $result['authenticated_by'];
 				}
-
-				$externally_authenticated_email = $result['email'];
-				$authenticated_by = $result['authenticated_by'];
-
 			}
 
-			// Try LDAP authentication if we don't have an authenticated user yet.
-			if ( $auth_settings['ldap'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
-				$result = $this->custom_authenticate_ldap( $username, $password, $auth_settings );
-
-				if ( is_wp_error( $result ) ) {
-					return $result;
+			// Try CAS authentication if it's enabled and we don't have a
+			// successful login yet.
+			// @TODO external_service is deprecated; move cas to button instead of inline
+			if ( $auth_settings['cas'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
+				$result = $this->custom_authenticate_cas( $auth_settings );
+				if ( ! is_wp_error( $result ) ) {
+					$externally_authenticated_email = $result['email'];
+					$authenticated_by = $result['authenticated_by'];
 				}
+			}
 
-				$externally_authenticated_email = $result['email'];
-				$authenticated_by = $result['authenticated_by'];
+			// Try LDAP authentication if it's enabled and we don't have an
+			// authenticated user yet.
+			if ( $auth_settings['ldap'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
+				$result = $this->custom_authenticate_ldap( $auth_settings, $username, $password );
+				if ( ! is_wp_error( $result ) ) {
+					$externally_authenticated_email = $result['email'];
+					$authenticated_by = $result['authenticated_by'];
+				}
 			}
 
 			// Skip to WordPress authentication if we don't have an externally
@@ -559,17 +564,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Verify the Google login, initialize the Google API client library,
-		 * and start the Google+ service.
+		 * Verify the Google login and set a session token.
+		 *
+		 * Flow: "Sign in with Google" button clicked; JS Google library
+		 * called; JS function signInCallback() fired with results from Google;
+		 * signInCallback() posts code and nonce (via AJAX) to this function;
+		 * This function checks the token using the Google PHP library, and
+		 * saves it to a session variable if it's authentic; control passes
+		 * back to signInCallback(), which will reload the current page
+		 * (wp-login.php) on success; wp-login.php reloads; custom_authenticate
+		 * hooked into authenticate action fires again, and
+		 * custom_authenticate_google() runs to verify the token; once verified
+		 * custom_authenticate proceeds as normal with the google email address
+		 * as a successfully authenticated external user.
+		 *
 		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback()
 		 */
 		function ajax_process_google_login() {
-			$result = $this->custom_authenticate_google();
-			die( $result['message'] );
-		}
-
-
-		private function custom_authenticate_google() {
 			$nonce = array_key_exists( 'nonce', $_POST ) ? $_POST['nonce'] : '';
 			$code = array_key_exists( 'code', $_POST ) ? $_POST['code'] : null;
 
@@ -611,23 +622,41 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Store the token in the session for later use.
 				$_SESSION['token'] = json_encode( $token );
 
-				$response = "Successfully connected.";
+				$response = "Successfully authenticated.";
 			} else {
 				$client->setAccessToken( json_encode( $token ) );
 
-				$response = 'Already connected.';
+				$response = 'Already authenticated.';
+			}
+
+			die( $response );
+		}
+
+
+		private function custom_authenticate_google( $auth_settings ) {
+			// Get one time use token
+			session_start();
+			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
+
+			// No token, so this is not a succesful Google login.
+			if ( is_null( $token ) ) {
+				return new WP_Error( 'no_google_login', 'No Google credentials provided.' );
+			}
+
+			// Verify this is a successful Google authentication
+			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] )
+
+			// Invalid ticket, so this in not a successful Google login.
+			if ( ! $ticket ) {
+				return new WP_Error( 'invalid_google_login', 'Invalid Google credentials provided.' );
 			}
 
 			// Get email address
-			$attributes = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] )->getAttributes();
+			$attributes = $ticket->getAttributes();
 			$email = $attributes['payload']['email'];
-
-			// @TODO: now that this google user is authenticated, run auth routines to determine what access they have in wp. probably refactor bunch of stuff in custom_authenticate() into separate functions so we can rely on them here, too.
-			//die($email);
 
 			return array(
 				'email' => $email,
-				'message' => $response,
 				'authenticated_by' => 'google',
 			);
 		}
@@ -671,13 +700,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return array(
 				'email' => $externally_authenticated_email,
-				'message' => '',
 				'authenticated_by' => $authenticated_by,
 			);
 		}
 
 
-		private function custom_authenticate_ldap( $username, $password, $auth_settings ) {
+		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
 			// Get the TLD from the LDAP host for use in matching email addresses
 			// For example: example.edu is the TLD for ldap.example.edu, so user
 			// 'bob' will have the following email address: bob@example.edu.
@@ -746,7 +774,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return array(
 				'email' => $externally_authenticated_email,
-				'message' => '',
 				'authenticated_by' => 'ldap',
 			);
 		}
@@ -1398,6 +1425,170 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
+		 * Login page (wp-login.php)
+		 ****************************
+		 */
+
+
+
+		/**
+		 * Load external resources on the wp-login.php page.
+		 * Run on action hook: login_head
+		 */
+		function load_login_css_and_js() {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override advanced_branding
+					$auth_settings['advanced_branding'] = $auth_multisite_settings['advanced_branding'];
+
+					// Override external services (cas or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+				}
+			}
+
+			?>
+			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
+			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
+			<link rel="stylesheet" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
+
+			<?php if ( $auth_settings['advanced_branding'] === 'custom_uh' ): ?>
+				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login-custom_uh.css', __FILE__ ); ?>" />
+				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login-custom_uh.js', __FILE__ ); ?>"></script>
+			<?php endif; ?>
+
+			<?php if ( $auth_settings['google'] === '1' ): ?>
+				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+				<script type="text/javascript">
+					(function () {
+						var po = document.createElement('script');
+						po.type = 'text/javascript';
+						po.async = true;
+						po.src = 'https://plus.google.com/js/client:plusone.js?onload=start';
+						var s = document.getElementsByTagName('script')[0];
+						s.parentNode.insertBefore(po, s);
+					})();
+				</script>
+			<?php endif; ?>
+
+			<?php
+		}
+
+
+		/**
+		 * Load external resources in the footer of the wp-login.php page.
+		 * Run on action hook: login_footer
+		 */
+		function load_login_footer_js() {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override external services (cas or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+				}
+			}
+
+			?>
+			<?php if ( $auth_settings['google'] === '1' ): ?>
+				<script type="text/javascript">
+					function signInCallback( authResult ) {
+						if ( authResult['code'] ) {
+							// Hide the sign-in button now that the user is authorized, for example:
+							$( '#signinButton' ).attr( 'style', 'display: none' );
+
+							// Send the code to the server
+							var ajaxurl = '<?= admin_url("admin-ajax.php"); ?>';
+							$.post(ajaxurl, {
+								action: 'process_google_login',
+								'code': authResult['code'],
+								'nonce': $('#nonce_google_auth-<?= $this->get_cookie_value(); ?>').val(),
+							}, function( response ) {
+								// Handle or verify the server response if necessary.
+								//console.log( response );
+
+								// Reload wp-login.php to continue the authentication process.
+								location.reload();
+							});
+						} else if ( authResult['error'] ) {
+							// There was an error.
+							// Possible error codes:
+							//   "access_denied" - User denied access to your app
+							//   "immediate_failed" - Could not automatially log in the user
+							//console.log('There was an error: ' + authResult['error']);
+						}
+					}
+				</script>
+			<?php endif; ?>
+
+			<?php
+		}
+
+
+		/**
+		 * Create links for any external authentication services that are enabled.
+		 */
+		function login_form_add_external_service_links() {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override external services (cas or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
+					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+					$auth_settings['cas'] = $auth_multisite_settings['cas'];
+					$auth_settings['cas_customlabel'] = $auth_multisite_settings['cas_customlabel'];
+					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
+					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
+					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+				}
+			}
+
+			?>
+			<div id="auth-external-service-login">
+				<?php if ( $auth_settings['google'] === '1' ): ?>
+					<?php // @TODO: remove the old button once we're sure we like the google-provided one. ?>
+					<!-- <p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p> -->
+					<div id="signinButton">
+						<span class="g-signin"
+							data-scope="email"
+							data-clientid="<?= $auth_settings['google_clientid']; ?>"
+							data-redirecturi="postmessage"
+							data-accesstype="offline"
+							data-cookiepolicy="single_host_origin"
+							data-width="wide"
+							data-height="tall"
+							data-theme="dark"
+							data-callback="signInCallback">
+						</span>
+					</div>
+					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
+				<?php endif; ?>
+
+				<?php if ( $auth_settings['cas'] === '1' ): ?>
+					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_settings['cas_customlabel']; ?></span></a></p>
+				<?php endif; ?>
+				<h3> &mdash; or &mdash; </h3>
+			</div>
+			<?php
+
+		}
+
+
+
+		/**
+		 ****************************
 		 * Options page
 		 ****************************
 		 */
@@ -1490,164 +1681,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
 		}
 
-
-
-		/**
-		 * Load external resources on the wp-login.php page.
-		 * Run on action hook: login_head
-		 */
-		function load_login_css_and_js() {
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override advanced_branding
-					$auth_settings['advanced_branding'] = $auth_multisite_settings['advanced_branding'];
-
-					// Override external services (cas or ldap) and associated options
-					$auth_settings['google'] = $auth_multisite_settings['google'];
-				}
-			}
-
-			?>
-			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
-			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
-			<link rel="stylesheet" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
-
-			<?php if ( $auth_settings['advanced_branding'] === 'custom_uh' ): ?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login-custom_uh.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login-custom_uh.js', __FILE__ ); ?>"></script>
-			<?php endif; ?>
-
-			<?php if ( $auth_settings['google'] === '1' ): ?>
-				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-				<script type="text/javascript">
-					(function () {
-						var po = document.createElement('script');
-						po.type = 'text/javascript';
-						po.async = true;
-						po.src = 'https://plus.google.com/js/client:plusone.js?onload=start';
-						var s = document.getElementsByTagName('script')[0];
-						s.parentNode.insertBefore(po, s);
-					})();
-				</script>
-			<?php endif; ?>
-
-			<?php
-		}
-
-
-		/**
-		 * Load external resources in the footer of the wp-login.php page.
-		 * Run on action hook: login_footer
-		 */
-		function load_login_footer_js() {
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external services (cas or ldap) and associated options
-					$auth_settings['google'] = $auth_multisite_settings['google'];
-				}
-			}
-
-			?>
-			<?php if ( $auth_settings['google'] === '1' ): ?>
-				<script type="text/javascript">
-					function signInCallback( authResult ) {
-						if ( authResult['code'] ) {
-							// Hide the sign-in button now that the user is authorized, for example:
-							$( '#signinButton' ).attr( 'style', 'display: none' );
-
-							// Send the code to the server
-							var ajaxurl = '<?= admin_url("admin-ajax.php"); ?>';
-							$.post(ajaxurl, {
-								action: 'process_google_login',
-								'code': authResult['code'],
-								'nonce': $('#nonce_google_auth-<?= $this->get_cookie_value(); ?>').val(),
-							}, function( response ) {
-								// Handle or verify the server response if necessary.
-
-								// Prints the list of people that the user has allowed the app to know
-								// to the console.
-								console.log('response:');
-								console.log( response );
-
-								// @TODO: somehow flag that this was successful, and reload the wp-login page
-							});
-						} else if ( authResult['error'] ) {
-							// There was an error.
-							// Possible error codes:
-							//   "access_denied" - User denied access to your app
-							//   "immediate_failed" - Could not automatially log in the user
-							console.log('There was an error: ' + authResult['error']);
-						}
-					}
-				</script>
-			<?php endif; ?>
-
-			<?php
-		}
-
-
-		/**
-		 * Create links for any external authentication services that are enabled.
-		 */
-		function login_form_add_external_service_links() {
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external services (cas or ldap) and associated options
-					$auth_settings['google'] = $auth_multisite_settings['google'];
-					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
-					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
-					$auth_settings['cas'] = $auth_multisite_settings['cas'];
-					$auth_settings['cas_customlabel'] = $auth_multisite_settings['cas_customlabel'];
-					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
-					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
-					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
-				}
-			}
-
-			?>
-			<div id="auth-external-service-login">
-				<?php if ( $auth_settings['google'] === '1' ): ?>
-					<?php // @TODO: remove the old button once we're sure we like the google-provided one. ?>
-					<!-- <p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p> -->
-					<div id="signinButton">
-						<span class="g-signin"
-							data-scope="email"
-							data-clientid="<?= $auth_settings['google_clientid']; ?>"
-							data-redirecturi="postmessage"
-							data-accesstype="offline"
-							data-cookiepolicy="single_host_origin"
-							data-width="wide"
-							data-height="tall"
-							data-theme="dark"
-							data-callback="signInCallback">
-						</span>
-					</div>
-					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
-				<?php endif; ?>
-
-				<?php if ( $auth_settings['cas'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_settings['cas_customlabel']; ?></span></a></p>
-				<?php endif; ?>
-				<h3> &mdash; or &mdash; </h3>
-			</div>
-			<?php
-
-		}
 
 
 		/**
