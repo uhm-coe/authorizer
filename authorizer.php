@@ -383,6 +383,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$externally_authenticated_email = '';
 			$authenticated_by = '';
 
+			// @TODO
+			// Check if we're reloading from a successful Google login
+
 			// @TODO external_service is deprecated; move cas to button instead of inline
 			if ( $auth_settings['external_service'] === 'cast' ) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
@@ -1575,6 +1578,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								// to the console.
 								console.log('response:');
 								console.log( response );
+
+								// @TODO: somehow flag that this was successful, and reload the wp-login page
 							});
 						} else if ( authResult['error'] ) {
 							// There was an error.
