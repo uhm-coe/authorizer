@@ -269,13 +269,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user = null;
 			}
 
+			// If username and password are blank, this isn't a log in attempt
+			$is_login_attempt = strlen( $username ) > 0 && strlen( $password ) > 0;
+
 			// Check to make sure that $username is not locked out due to too
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
-			$unauthenticated_user = get_user_by( 'login', $username );
+			$unauthenticated_user = strlen( $username ) > 0 ? get_user_by( 'login', $username ) : false;
 			$unauthenticated_user_is_blocked = false;
 			$unauthenticated_user_is_inactive = false;
-			if ( $unauthenticated_user !== false ) {
+			if ( $is_login_attempt && $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 				// Also check the auth_blocked user_meta flag (users in blocked list will get this flag)
@@ -288,7 +291,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Inactive users should be treated like deleted users (we just
-			// do this to preserve any content they created).
+			// do this to preserve any content they created, but here we should
+			// pretend they don't exist).
 			if ( $unauthenticated_user_is_blocked ) {
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.' ) );
@@ -347,19 +351,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$seconds_remaining_short_lockout = $lockouts['duration_1'] * 60 - $time_since_last_fail;
 
 			// Check if we need to institute a lockout delay
-			if ( $time_since_last_fail > $reset_duration ) {
+			if ( $is_login_attempt && $time_since_last_fail > $reset_duration ) {
 				// Enough time has passed since the last invalid attempt and
 				// now that we can reset the failed attempt count, and let this
 				// login attempt go through.
 				$num_attempts = 0; // This does nothing, but include it for semantic meaning.
-			} else if ( $num_attempts > $num_attempts_long_lockout && $seconds_remaining_long_lockout > 0 ) {
+			} else if ( $is_login_attempt && $num_attempts > $num_attempts_long_lockout && $seconds_remaining_long_lockout > 0 ) {
 				// Stronger lockout (1st/2nd round of invalid attempts reached)
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_long_lockout, $this->seconds_as_sentence( $seconds_remaining_long_lockout ), wp_lostpassword_url() ) );
-			} else if ( $num_attempts > $num_attempts_short_lockout && $seconds_remaining_short_lockout > 0 ) {
+			} else if ( $is_login_attempt && $num_attempts > $num_attempts_short_lockout && $seconds_remaining_short_lockout > 0 ) {
 				// Normal lockout (1st round of invalid attempts reached)
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
