@@ -273,7 +273,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check to make sure that $username is not locked out due to too
 			// many invalid login attempts. If it is, tell the user how much
 			// time remains until they can try again.
-			$unauthenticated_user = strlen( $username ) > 0 ? get_user_by( 'login', $username ) : false;
+			$unauthenticated_user = $is_login_attempt ? get_user_by( 'login', $username ) : false;
 			$unauthenticated_user_is_blocked = false;
 			$unauthenticated_user_is_inactive = false;
 			if ( $is_login_attempt && $unauthenticated_user !== false ) {
@@ -492,14 +492,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If they're not, jump back to WP authentication.
 			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 1 ) {
-				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
-				return new WP_Error( 'using_wp_authentication', 'Moving to WordPress authentication...' );
+				return null;
 			}
 
 			// If username or password is blank, just pass on to WordPress
-			if ( strlen( $username ) < 1 || strlen( $password ) < 1 ) {
-				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error();
+			if ( ! $is_login_attempt ) {
+				return null;
 			}
 
 			// Check if the external user has a WordPress account (with the same email address)
