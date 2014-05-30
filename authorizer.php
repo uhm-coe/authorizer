@@ -644,7 +644,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Verify this is a successful Google authentication
-			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] )
+			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
 
 			// Invalid ticket, so this in not a successful Google login.
 			if ( ! $ticket ) {
@@ -662,7 +662,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		/**
+		 * @TODO
+		 * [custom_authenticate_cas description]
+		 * @param  [type] $auth_settings [description]
+		 * @return [type]                [description]
+		 */
 		private function custom_authenticate_cas( $auth_settings ) {
+			// @TODO: make this only respond if we have session data from a cas login/ajax call
+			return new WP_Error('no cas', 'not yet.');
+
 			// Set the CAS client configuration
 			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
 
