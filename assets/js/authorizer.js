@@ -256,6 +256,7 @@ function save_auth_multisite_settings( caller ) {
   var google_clientsecret = $('#auth_settings_google_clientsecret').val();
 
   var cas = $('#auth_settings_cas').is(':checked') ? '1' : '';
+  var cas_customlabel = $('#auth_settings_cas_customlabel').val();
   var cas_host = $('#auth_settings_cas_host').val();
   var cas_port = $('#auth_settings_cas_port').val();
   var cas_path = $('#auth_settings_cas_path').val();
@@ -292,6 +293,7 @@ function save_auth_multisite_settings( caller ) {
     'google_clientid': google_clientid,
     'google_clientsecret': google_clientsecret,
     'cas': cas,
+    'cas_customlabel': cas_customlabel,
     'cas_host': cas_host,
     'cas_port': cas_port,
     'cas_path': cas_path,
