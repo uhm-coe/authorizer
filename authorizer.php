@@ -88,10 +88,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// If we have a custom login error, add the filter to show it.
-			// Caveat: Don't show the error on the admin bypass login.
 			$error = get_option( 'auth_settings_advanced_login_error' );
-			$is_admin_bypass = ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress';
-			if ( $error && strlen( $error ) > 0 && ! $is_admin_bypass ) {
+			if ( $error && strlen( $error ) > 0 ) {
 				add_filter( 'login_errors', array( $this, 'show_advanced_login_error' ) );
 			}
 
@@ -370,17 +368,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_short_lockout, $this->seconds_as_sentence( $seconds_remaining_short_lockout ), wp_lostpassword_url() ) );
-			}
-
-
-			// Admin bypass: skip external login and proceed to WordPress login
-			// if querystring variable 'login' is set to 'wordpress'--for
-			// example: https://www.example.com/wp-login.php?login=wordpress
-			// Note: only allow this if the user is not marked as inactive.
-			// @TODO: probably remove this, since we're not hiding wp-login anymore with immediate redirect to cas;
-			if ( ! empty($_GET['login'] ) && $_GET['login'] === 'wordpress'  && ! $unauthenticated_user_is_inactive ) {
-				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
-				return new WP_Error( 'using_wp_authentication', 'Bypassing external authentication in favor of WordPress authentication...' );
 			}
 
 			// If we're not restricting view access at all, don't check
@@ -2724,9 +2711,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_section_info_external( $args = '' ) {
 			?><div id="section_info_external" class="section_info">
-				<p><span class="red">Important Note</span>: If you're configuring an external authentication system (like CAS or LDAP) for the first time, make sure you do <strong>not</strong> log out of your administrator account in WordPress until you are sure it works. You risk locking yourself out of your WordPress installation. Use a different browser (or incognito/safe-browsing mode) to test, and leave your adminstrator account logged in here.</p>
-				<p>As a safeguard, you can always access the default WordPress login panel (and bypass any external authentication system) by visiting wp-login.php?login=wordpress like so:<br />
-					<a href="<?php print wp_login_url() . '?login=wordpress'; ?>"><?php print wp_login_url() . '?login=wordpress'; ?></a></p>
 				<p>Enter your external server settings below.</p>
 			</div><?php
 		}
