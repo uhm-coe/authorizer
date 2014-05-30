@@ -487,18 +487,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$authenticated_by = 'ldap';
 			}
 
-			// If we've made it this far, we have an externally authenticated user.
-			// $externally_authenticated_email and $tld should both be set.
-
-			// If they're not, jump back to WP authentication.
-			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 1 ) {
+			// Skip to WordPress authentication if we don't have an externally
+			// authenticated user, or if the username or password are blank.
+			if ( strlen( $externally_authenticated_email ) < 1 || ! $is_login_attempt ) {
 				return null;
 			}
 
-			// If username or password is blank, just pass on to WordPress
-			if ( ! $is_login_attempt ) {
-				return null;
-			}
+			// If we've made it this far, we should have an externally authenticated user.
+			// The following should be set:
+			//   $externally_authenticated_email
+			//   $authenticated_by
+
+
+
 
 			// Check if the external user has a WordPress account (with the same email address)
 			if ( ! $user ) {
@@ -630,6 +631,87 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 			return $user;
+		}
+
+
+		/**
+		 * Verify the Google login, initialize the Google API client library,
+		 * and start the Google+ service.
+		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback()
+		 */
+		function ajax_process_google_login() {
+			$result = $this->custom_authenticate_google();
+			die( $result );
+		}
+
+
+		private function custom_authenticate_google() {
+			$nonce = array_key_exists( 'nonce', $_POST ) ? $_POST['nonce'] : '';
+			$code = array_key_exists( 'code', $_POST ) ? $_POST['code'] : null;
+
+			// Nonce check.
+			if ( ! wp_verify_nonce( $nonce, 'google_csrf_nonce' ) ) {
+				return '';
+			}
+
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override external services (google, cas, or ldap) and associated options
+					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
+					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+				}
+			}
+
+			// Build the Google Client.
+			$client = new Google_Client();
+			$client->setApplicationName( 'WordPress' );
+			$client->setClientId( $auth_settings['google_clientid'] );
+			$client->setClientSecret( $auth_settings['google_clientsecret'] );
+			$client->setRedirectUri( 'postmessage' );
+
+			// Get one time use token (if it doesn't exist, we'll create one below)
+			session_start();
+			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
+
+			if ( empty( $token ) ) {
+				// Exchange the OAuth 2.0 authorization code for user credentials.
+				$client->authenticate( $code );
+				$token = json_decode( $client->getAccessToken() );
+
+				// Store the token in the session for later use.
+				$_SESSION['token'] = json_encode( $token );
+
+				$response = "Successfully connected.";
+			} else {
+				$client->setAccessToken( json_encode( $token ) );
+
+				$response = 'Already connected.';
+			}
+
+			// Get email address
+			$attributes = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] )->getAttributes();
+			$email = $attributes['payload']['email'];
+
+			// @TODO: now that this google user is authenticated, run auth routines to determine what access they have in wp. probably refactor bunch of stuff in custom_authenticate() into separate functions so we can rely on them here, too.
+			//die($email);
+
+			return $response;
+		}
+
+
+		private function custom_authenticate_cas() {
+
+		}
+
+
+		private function custom_authenticate_ldap( $username, $password ) {
+
 		}
 
 
@@ -1498,39 +1580,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// // Prepare Google endpoint for incoming authentication
-			// if ( $auth_settings['google'] === '1' ) {
-			// 	// Build the Google Client
-			// 	$client = new Google_Client();
-			// 	$client->setApplicationName( 'WordPress' );
-			// 	$client->setClientId( $auth_settings['google_clientid'] );
-			// 	$client->setClientSecret( $auth_settings['google_clientsecret'] );
-			// 	$client->setRedirectUri( wp_login_url() );
-			// 	$client->setScopes(
-			// 		array(
-			// 			//'https://www.googleapis.com/auth/userinfo.email',
-			// 			//'https://www.googleapis.com/auth/userinfo.profile',
-			// 			'profile',
-			// 			'email',
-			// 		)
-			// 	);
-			// 	$client->setApprovalPrompt( 'auto' );
-
-			// 	// Generate CSRF token
-			// 	$client->setState( urlencode( wp_create_nonce( 'nonce_google_auth-' . $this->get_cookie_value() ) . '|' . wp_login_url() ) );
-
-			// 	// Get Google URL
-			// 	$auth_url_google = $client->createAuthUrl();
-			// }
-
-			// // Prepare CAS endpoint for incoming authentication
-			// if ( $auth_settings['cas'] === '1' ) {
-			// 	$auth_url_cas = '';
-			// }
-
 			?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
+					<?php // @TODO: remove the old button once we're sure we like the google-provided one. ?>
 					<!-- <p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p> -->
 					<div id="signinButton">
 						<span class="g-signin"
@@ -1555,71 +1608,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div>
 			<?php
 
-		}
-
-
-		/**
-		 * Verify the Google login, initialize the Google API client library,
-		 * and start the Google+ service.
-		 * @return void, but die with an int code to return to the success() function in AJAX call signInCallback()
-		 */
-		function ajax_process_google_login() {
-			$nonce = array_key_exists( 'nonce', $_POST ) ? $_POST['nonce'] : '';
-			$code = array_key_exists( 'code', $_POST ) ? $_POST['code'] : null;
-
-			// Nonce check.
-			if ( ! wp_verify_nonce( $nonce, 'google_csrf_nonce' ) ) {
-				die('');
-			}
-
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override external services (google, cas, or ldap) and associated options
-					$auth_settings['google'] = $auth_multisite_settings['google'];
-					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
-					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
-				}
-			}
-
-			// Build the Google Client.
-			$client = new Google_Client();
-			$client->setApplicationName( 'WordPress' );
-			$client->setClientId( $auth_settings['google_clientid'] );
-			$client->setClientSecret( $auth_settings['google_clientsecret'] );
-			$client->setRedirectUri( 'postmessage' );
-
-			// Get one time use token (if it doesn't exist, we'll create one below)
-			session_start();
-			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
-
-			if ( empty( $token ) ) {
-				// Exchange the OAuth 2.0 authorization code for user credentials.
-				$client->authenticate( $code );
-				$token = json_decode( $client->getAccessToken() );
-
-				// Store the token in the session for later use.
-				$_SESSION['token'] = json_encode( $token );
-
-				$response = "Successfully connected.";
-			} else {
-				$client->setAccessToken( json_encode( $token ) );
-
-				$response = 'Already connected.';
-			}
-
-			// Get email address
-			$attributes = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] )->getAttributes();
-			$email = $attributes['payload']['email'];
-
-			// @TODO: now that this google user is authenticated, run auth routines to determine what access they have in wp. probably refactor bunch of stuff in custom_authenticate() into separate functions so we can rely on them here, too.
-			//die($email);
-
-			die( $response );
 		}
 
 
