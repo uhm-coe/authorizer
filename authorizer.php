@@ -974,171 +974,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
-		 * Custom filters and actions
-		 ****************************
-		 */
-
-
-		/**
-		 * Implements hook: do_action( 'wp_login_failed', $username );
-		 * Update the user meta for the user that just failed logging in.
-		 * Keep track of time of last failed attempt and number of failed attempts.
-		 */
-		function update_login_failed_count( $username ) {
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override lockouts
-					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
-				}
-			}
-
-			// Get user trying to log in.
-			// If this isn't a real user, update the global failed attempt
-			// variables. We'll use these global variables to institute the
-			// lockouts on nonexistent accounts. We do this so an attacker
-			// won't be able to determine which accounts are real by which
-			// accounts get locked out on multiple invalid attempts.
-			$user = get_user_by( 'login', $username );
-
-			if ( $user !== FALSE ) {
-				$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
-				$num_attempts = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
-			} else {
-				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
-				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
-			}
-
-			// Make sure $last_attempt (time) and $num_attempts are positive integers.
-			// Note: this addresses resetting them if either is unset from above.
-			$last_attempt = abs( intval( $last_attempt ) );
-			$num_attempts = abs( intval( $num_attempts ) );
-
-			// Reset the failed attempt count if the time since the last
-			// failed attempt is greater than the reset duration.
-			$time_since_last_fail = time() - $last_attempt;
-			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
-			if ( $time_since_last_fail > $reset_duration ) {
-				$num_attempts = 0;
-			}
-
-			// Set last failed time to now and increment last failed count.
-			if ( $user !== FALSE ) {
-				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', time() );
-				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
-			} else {
-				update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
-				update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
-			}
-		}
-
-		/**
-		 * Overwrite the URL for the lost password link on the login form.
-		 * If we're authenticating against an external service, standard
-		 * WordPress password resets won't work.
-		 */
-		function custom_lostpassword_url( $lostpassword_url ) {
-			// Grab plugin settings
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override access_who_can_login and access_who_can_view
-					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
-					$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
-
-					// Override advanced_lostpassword_url
-					$auth_settings['advanced_lostpassword_url'] = $auth_multisite_settings['advanced_lostpassword_url'];
-				}
-			}
-
-			if (
-				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
-				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL )
-			) {
-				$lostpassword_url = $auth_settings['advanced_lostpassword_url'];
-			}
-			return $lostpassword_url;
-		}
-
-		/**
-		 * Overwrite the username and password labels on the login form.
-		 * @todo : remove. this is currently unused; was used for changing to 'UH Username'
-		 */
-		function custom_login_form_labels( $translated_text, $text, $domain ) {
-			$auth_settings = get_option( 'auth_settings' );
-
-			if ( $translated_text === 'Username' ) {
-				$translated_text = 'Username';
-			}
-
-			if ( $translated_text === 'Password' ) {
-				$translated_text = 'Password';
-			}
-
-			return $translated_text;
-		}
-
-		/**
-		 * Show custom admin notice.
-		 * Filter: admin_notice
-		 */
-		function show_advanced_admin_notice() {
-			$notice = get_option( 'auth_settings_advanced_admin_notice' );
-			delete_option( 'auth_settings_advanced_admin_notice' );
-
-			if ( $notice && strlen( $notice ) > 0 ) {
-				?>
-				<div class="error">
-					<p><?php _e( $notice ); ?></p>
-				</div>
-				<?php
-			}
-		}
-
-		/**
-		 * Add custom error message to login screen.
-		 * Filter: login_errors
-		 */
-		function show_advanced_login_error( $errors ) {
-			$error = get_option( 'auth_settings_advanced_login_error' );
-			delete_option( 'auth_settings_advanced_login_error' );
-
-			//$errors .= '    ' . $error . "<br />\n";
-			$errors = '    ' . $error . "<br />\n";
-			return $errors;
-		}
-
-
-
-		/**
-		 * Load external resources for the public-facing site.
-		 */
-		function auth_public_scripts() {
-			// Load (and localize) public scripts
-			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/assets/js/authorizer-public.js', __FILE__ ) );
-			$auth_localized = array(
-				'wp_login_url' => wp_login_url(),
-				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
-			);
-			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
-			//update_option( 'auth_settings_advanced_public_notice', false);
-
-			// Load public css
-			wp_register_style( 'authorizer-public-css', plugins_url( 'assets/css/authorizer-public.css', __FILE__ ) );
-			wp_enqueue_style( 'authorizer-public-css' );
-		}
-
-
-
-		/**
-		 ****************************
 		 * Multisite: Network Admin Options page
 		 ****************************
 		 */
@@ -1428,6 +1263,39 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Add custom error message to login screen.
+		 * Filter: login_errors
+		 */
+		function show_advanced_login_error( $errors ) {
+			$error = get_option( 'auth_settings_advanced_login_error' );
+			delete_option( 'auth_settings_advanced_login_error' );
+
+			//$errors .= '    ' . $error . "<br />\n";
+			$errors = '    ' . $error . "<br />\n";
+			return $errors;
+		}
+
+
+		/**
+		 * Load external resources for the public-facing site.
+		 */
+		function auth_public_scripts() {
+			// Load (and localize) public scripts
+			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/assets/js/authorizer-public.js', __FILE__ ) );
+			$auth_localized = array(
+				'wp_login_url' => wp_login_url(),
+				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
+			);
+			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
+			//update_option( 'auth_settings_advanced_public_notice', false);
+
+			// Load public css
+			wp_register_style( 'authorizer-public-css', plugins_url( 'assets/css/authorizer-public.css', __FILE__ ) );
+			wp_enqueue_style( 'authorizer-public-css' );
+		}
+
+
+		/**
 		 * Load external resources on the wp-login.php page.
 		 * Run on action hook: login_head
 		 */
@@ -1582,6 +1450,113 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		/**
+		 * Implements hook: do_action( 'wp_login_failed', $username );
+		 * Update the user meta for the user that just failed logging in.
+		 * Keep track of time of last failed attempt and number of failed attempts.
+		 */
+		function update_login_failed_count( $username ) {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override lockouts
+					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
+				}
+			}
+
+			// Get user trying to log in.
+			// If this isn't a real user, update the global failed attempt
+			// variables. We'll use these global variables to institute the
+			// lockouts on nonexistent accounts. We do this so an attacker
+			// won't be able to determine which accounts are real by which
+			// accounts get locked out on multiple invalid attempts.
+			$user = get_user_by( 'login', $username );
+
+			if ( $user !== FALSE ) {
+				$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
+				$num_attempts = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
+			} else {
+				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
+				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+			}
+
+			// Make sure $last_attempt (time) and $num_attempts are positive integers.
+			// Note: this addresses resetting them if either is unset from above.
+			$last_attempt = abs( intval( $last_attempt ) );
+			$num_attempts = abs( intval( $num_attempts ) );
+
+			// Reset the failed attempt count if the time since the last
+			// failed attempt is greater than the reset duration.
+			$time_since_last_fail = time() - $last_attempt;
+			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
+			if ( $time_since_last_fail > $reset_duration ) {
+				$num_attempts = 0;
+			}
+
+			// Set last failed time to now and increment last failed count.
+			if ( $user !== FALSE ) {
+				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', time() );
+				update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			} else {
+				update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
+				update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			}
+		}
+
+		/**
+		 * Overwrite the URL for the lost password link on the login form.
+		 * If we're authenticating against an external service, standard
+		 * WordPress password resets won't work.
+		 */
+		function custom_lostpassword_url( $lostpassword_url ) {
+			// Grab plugin settings
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override access_who_can_login and access_who_can_view
+					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
+					$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
+
+					// Override advanced_lostpassword_url
+					$auth_settings['advanced_lostpassword_url'] = $auth_multisite_settings['advanced_lostpassword_url'];
+				}
+			}
+
+			if (
+				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
+				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL )
+			) {
+				$lostpassword_url = $auth_settings['advanced_lostpassword_url'];
+			}
+			return $lostpassword_url;
+		}
+
+		/**
+		 * Overwrite the username and password labels on the login form.
+		 * @todo : remove. this is currently unused; was used for changing to 'UH Username'
+		 */
+		function custom_login_form_labels( $translated_text, $text, $domain ) {
+			$auth_settings = get_option( 'auth_settings' );
+
+			if ( $translated_text === 'Username' ) {
+				$translated_text = 'Username';
+			}
+
+			if ( $translated_text === 'Password' ) {
+				$translated_text = 'Password';
+			}
+
+			return $translated_text;
+		}
+
+
 
 		/**
 		 ****************************
@@ -1621,7 +1596,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( $this, 'create_admin_page' ) // function
 			);
 		}
-
 
 
 		/**
@@ -1680,6 +1654,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Show custom admin notice.
+		 * Filter: admin_notice
+		 */
+		function show_advanced_admin_notice() {
+			$notice = get_option( 'auth_settings_advanced_admin_notice' );
+			delete_option( 'auth_settings_advanced_admin_notice' );
+
+			if ( $notice && strlen( $notice ) > 0 ) {
+				?>
+				<div class="error">
+					<p><?php _e( $notice ); ?></p>
+				</div>
+				<?php
+			}
+		}
+
+
+		/**
 		 * Add notices to the top of the options page.
 		 * Run on action hook chain: load-settings_page_authorizer > admin_notices
 		 * Description: Check for invalid settings combinations and show a warning message, e.g.:
@@ -1711,112 +1703,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 		}
-
-
-
-		/**
-		 * Add help documentation to the options page.
-		 * Run on action hook chain: load-settings_page_authorizer > admin_head
-		 */
-		public function admin_head() {
-			$screen = get_current_screen();
-			
-			// Add help tab for Access Lists Settings
-			$help_auth_settings_access_lists_content = '
-				<p><strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven\'t yet been approved (or blocked) by you.</p>
-				<p><strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.</p>
-				<p><strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
-				<p>Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.</p>
-			';
-			$screen->add_help_tab(
-				array(
-					'id' => 'help_auth_settings_access_lists_content',
-					'title' => 'Access Lists',
-					'content' => $help_auth_settings_access_lists_content,
-				)
-			);
-
-			// Add help tab for Login Access Settings
-			$help_auth_settings_access_login_content = '
-				<p><strong>Who can log in to the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.</p>
-				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.</p>
-				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.</p>
-			';
-			$screen->add_help_tab(
-				array(
-					'id' => 'help_auth_settings_access_login_content',
-					'title' => 'Login Access',
-					'content' => $help_auth_settings_access_login_content,
-				)
-			);
-
-			// Add help tab for Public Access Settings
-			$help_auth_settings_access_public_content = '
-				<p><strong>Who can view the site?</strong>: You can restrict the site\'s visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site\'s privacy using the settings below.</p>
-				<p><strong>What pages (if any) should be available to everyone?</strong>: If you\'d like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
-				<p><strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
-				<p><strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between showing them the page without any message, or showing them a the page with a message above the content.</p>
-				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
-			';
-			$screen->add_help_tab(
-				array(
-					'id' => 'help_auth_settings_access_public_content',
-					'title' => 'Public Access',
-					'content' => $help_auth_settings_access_public_content,
-				)
-			);
-
-			// Add help tab for External Service (CAS, LDAP) Settings
-			$help_auth_settings_external_content = '
-				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You\'ll have to fill out different fields below depending on which service you choose.</p>
-				<p><strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.</p>
-				<p><strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.</p>
-				<p><strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.</p>
-				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
-				<p><strong><em>If you enable Google logins:</em></strong></p>
-				<ul>
-					<li><strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com</li>
-					<li><strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT</li>
-				</ul>
-				<p><strong><em>If you enable CAS logins:</em></strong></p>
-				<ul>
-					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</li>
-					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
-					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
-				</ul>
-				<p><strong><em>If you enable LDAP logins:</em></strong></p>
-				<ul>
-					<li><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</li>
-					<li><strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.</li>
-					<li><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</li>
-					<li><strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.</li>
-					<li><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</li>
-					<li><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</li>
-					<li><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</li>
-				</ul>';
-			$screen->add_help_tab(
-				array(
-					'id' => 'help_auth_settings_external_content',
-					'title' => 'External Service',
-					'content' => $help_auth_settings_external_content,
-				)
-			);
-
-			// Add help tab for Advanced Settings
-			$help_auth_settings_advanced_content = '
-				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
-				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
-				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
-			';
-			$screen->add_help_tab(
-				array(
-					'id' => 'help_auth_settings_advanced_content',
-					'title' => 'Advanced',
-					'content' => $help_auth_settings_advanced_content,
-				)
-			);
-		}
-
 
 
 		/**
@@ -3168,10 +3054,118 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Add help documentation to the options page.
+		 * Run on action hook chain: load-settings_page_authorizer > admin_head
+		 */
+		public function admin_head() {
+			$screen = get_current_screen();
+
+			// Add help tab for Access Lists Settings
+			$help_auth_settings_access_lists_content = '
+				<p><strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven\'t yet been approved (or blocked) by you.</p>
+				<p><strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.</p>
+				<p><strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
+				<p>Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_auth_settings_access_lists_content',
+					'title' => 'Access Lists',
+					'content' => $help_auth_settings_access_lists_content,
+				)
+			);
+
+			// Add help tab for Login Access Settings
+			$help_auth_settings_access_login_content = '
+				<p><strong>Who can log in to the site?</strong>: Choose the level of access restriction you\'d like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.</p>
+				<p><strong>Which role should receive email notifications about pending users?</strong>: If you\'ve restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.</p>
+				<p><strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_auth_settings_access_login_content',
+					'title' => 'Login Access',
+					'content' => $help_auth_settings_access_login_content,
+				)
+			);
+
+			// Add help tab for Public Access Settings
+			$help_auth_settings_access_public_content = '
+				<p><strong>Who can view the site?</strong>: You can restrict the site\'s visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site\'s privacy using the settings below.</p>
+				<p><strong>What pages (if any) should be available to everyone?</strong>: If you\'d like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
+				<p><strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
+				<p><strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between showing them the page without any message, or showing them a the page with a message above the content.</p>
+				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_auth_settings_access_public_content',
+					'title' => 'Public Access',
+					'content' => $help_auth_settings_access_public_content,
+				)
+			);
+
+			// Add help tab for External Service (CAS, LDAP) Settings
+			$help_auth_settings_external_content = '
+				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You\'ll have to fill out different fields below depending on which service you choose.</p>
+				<p><strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.</p>
+				<p><strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.</p>
+				<p><strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.</p>
+				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
+				<p><strong><em>If you enable Google logins:</em></strong></p>
+				<ul>
+					<li><strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com</li>
+					<li><strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href="https://cloud.google.com/console">Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT</li>
+				</ul>
+				<p><strong><em>If you enable CAS logins:</em></strong></p>
+				<ul>
+					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</li>
+					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
+					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
+				</ul>
+				<p><strong><em>If you enable LDAP logins:</em></strong></p>
+				<ul>
+					<li><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</li>
+					<li><strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.</li>
+					<li><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</li>
+					<li><strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.</li>
+					<li><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</li>
+					<li><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</li>
+					<li><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</li>
+				</ul>';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_auth_settings_external_content',
+					'title' => 'External Service',
+					'content' => $help_auth_settings_external_content,
+				)
+			);
+
+			// Add help tab for Advanced Settings
+			$help_auth_settings_advanced_content = '
+				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
+				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
+				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
+			';
+			$screen->add_help_tab(
+				array(
+					'id' => 'help_auth_settings_advanced_content',
+					'title' => 'Advanced',
+					'content' => $help_auth_settings_advanced_content,
+				)
+			);
+		}
+
+
+
+		/**
 		 ****************************
 		 * Dashboard widget
 		 ****************************
 		 */
+
+
+
 		function add_dashboard_widgets() {
 			// Only users who can edit can see the authorizer dashboard widget
 			if ( current_user_can( 'edit_posts' ) ) {
@@ -3438,14 +3432,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			return false;
 		}
 
-		// Helper function to get a WordPress page ID from the pagename.
+		/**
+		 * Helper function to get a WordPress page ID from the pagename.
+		 * @param  string $pagename Page Slug
+		 * @return int           	Page/Post ID
+		 */
 		function get_id_from_pagename( $pagename = '' ) {
 			global $wpdb;
 			$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = '" . sanitize_title_for_query( $pagename ) . "'");
 			return $page_id;
 		}
 
-		// Helper function to determine if a URL is accessible.
+		/**
+		 * Helper function to determine if an URL is accessible.
+		 * @param  string $url URL that should be publicly reachable
+		 * @return boolean     Whether the URL is publicly reachable
+		 */
 		function url_is_accessible( $url ) {
 			// Use curl to retrieve the URL.
 			$handle = curl_init( $url );
