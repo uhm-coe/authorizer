@@ -382,49 +382,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Start external authentication.
 			// @TODO external_service is deprecated; move cas to button instead of inline
 
-			// Coming back from a Google authentication ('code' and 'state' are in the querystring)
-			if ( array_key_exists( 'code', $_REQUEST ) && array_key_exists( 'state', $_REQUEST ) ) {
-				$code = $_REQUEST['code'];
-				$state = explode( '|', urldecode( $_REQUEST['state'] ) );
-
-				if ( count( $state ) !== 2 ) {
-					return new WP_Error( 'google_login_error', 'Invalid session state returned from Google. Please try again later.' );
-				}
-				$response_nonce = $state[0];
-				$response_redirect = $state[1];
-
-				if ( ! wp_verify_nonce( $response_nonce, 'google_csrf_nonce' ) ) {
-					return new WP_Error( 'google_login_error', 'Invalid or expired token returned from Google. Please try again later.' );
-				}
-
-				// Build the Google Client
-				$client = new Google_Client();
-				$client->setApplicationName( 'WordPress' );
-				$client->setClientId( $auth_settings['google_clientid'] );
-				$client->setClientSecret( $auth_settings['google_clientsecret'] );
-				$client->setRedirectUri( wp_login_url() );
-				$client->setScopes(
-					array(
-						//'https://www.googleapis.com/auth/userinfo.email',
-						//'https://www.googleapis.com/auth/userinfo.profile',
-						'email',
-					)
-				);
-				$client->setApprovalPrompt( 'auto' );
-
-				try {
-					$client->authenticate( $code );
-					//$user_info = $oauth_service->userinfo->get();
-				} catch ( Google_Exception $e ) {
-					return new WP_Error( 'google_login_error', $e->getMessage() );
-				}
-
-				return new WP_Error('debug', 'debug google');
-			}
-
-			$externally_authenticated_email = '';
-			$tld = '';
-			$authenticated_by = 'wordpress';
 			if ( $auth_settings['external_service'] === 'cast' ) {
 				// Set the CAS client configuration
 				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
@@ -461,7 +418,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// We'll track how this user was authenticated in user meta.
 				$authenticated_by = 'cas';
 
-			} else if ( $auth_settings['external_service'] === 'ldap' ) {
+			} else if ( $auth_settings['external_service'] === 'ldapy' ) {
 
 				// Get the TLD from the LDAP host for use in matching email addresses
 				// For example: example.edu is the TLD for ldap.example.edu, so user
@@ -534,7 +491,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// $externally_authenticated_email and $tld should both be set.
 
 			// If they're not, jump back to WP authentication.
-			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 0 ) {
+			if ( strlen( $externally_authenticated_email ) < 1 || strlen( $tld ) < 1 ) {
 				remove_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
 				return new WP_Error( 'using_wp_authentication', 'Moving to WordPress authentication...' );
 			}
