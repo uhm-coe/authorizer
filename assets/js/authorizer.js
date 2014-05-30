@@ -168,6 +168,7 @@ function save_auth_settings( caller, create_local_account ) {
   $('form .spinner').show();
 
   var access_who_can_login = $('form input[name="auth_settings[access_who_can_login]"]:checked').val();
+  var access_who_can_view = $('form input[name="auth_settings[access_who_can_view]"]:checked').val();
 
   var access_users_pending = new Object();
   $('#list_auth_settings_access_users_pending li').each(function(index) {
@@ -207,6 +208,7 @@ function save_auth_settings( caller, create_local_account ) {
   $.post(ajaxurl, {
     action: 'save_auth_dashboard_widget',
     'access_who_can_login': access_who_can_login,
+    'access_who_can_view': access_who_can_view,
     'access_users_pending': access_users_pending,
     'access_users_approved': access_users_approved,
     'access_users_blocked': access_users_blocked,
@@ -238,6 +240,8 @@ function save_auth_multisite_settings( caller ) {
   var multisite_override = $('#auth_settings_multisite_override').is(':checked') ? '1' : '';
 
   var access_who_can_login = $('form input[name="auth_settings[access_who_can_login]"]:checked').val();
+
+  var access_who_can_view = $('form input[name="auth_settings[access_who_can_view]"]:checked').val();
 
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function( index ) {
@@ -287,6 +291,7 @@ function save_auth_multisite_settings( caller ) {
     'nonce_save_auth_settings': nonce_save_auth_settings,
     'multisite_override': multisite_override,
     'access_who_can_login': access_who_can_login,
+    'access_who_can_view': access_who_can_view,
     'access_users_approved': access_users_approved,
     'access_default_role': access_default_role,
     'google': google,
@@ -441,14 +446,15 @@ function querystring( key ) {
 
 jQuery(document).ready(function($){
   // Grab references to form elements that we will show/hide on page load
-  var auth_settings_access_redirect_to_login = $('#radio_auth_settings_access_redirect_to_login').closest('tr');
-  var auth_settings_access_redirect_to_message = $('#wp-auth_settings_access_redirect_to_message-wrap').closest('tr');
   var auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('tr');
   var auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('tr');
   var auth_settings_access_users_blocked = $('#list_auth_settings_access_users_blocked').closest('tr');
   var auth_settings_access_role_receive_pending_emails = $('#auth_settings_access_role_receive_pending_emails').closest('tr');
   var auth_settings_access_pending_redirect_to_message = $('#wp-auth_settings_access_pending_redirect_to_message-wrap').closest('tr');
   var auth_settings_access_public_pages = $('#auth_settings_access_public_pages').closest('tr');
+  var auth_settings_access_redirect_to_login = $('#radio_auth_settings_access_redirect_to_login').closest('tr');
+  var auth_settings_access_public_warning = $('#radio_auth_settings_access_public_warning').closest('tr');
+  var auth_settings_access_redirect_to_message = $('#wp-auth_settings_access_redirect_to_message-wrap').closest('tr');
   var auth_settings_external_settings_table = $('#auth_settings_google').closest('table');
   var auth_settings_external_google = $('#auth_settings_google').closest('tr');
   var auth_settings_external_google_clientid = $('#auth_settings_google_clientid').closest('tr');
@@ -468,14 +474,15 @@ jQuery(document).ready(function($){
   var auth_settings_external_ldap_tls = $('#auth_settings_ldap_tls').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
-  $('th, td', auth_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', auth_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_users_approved).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_users_blocked).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_role_receive_pending_emails).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_pending_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_access_public_pages).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_redirect_to_login).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_public_warning).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_google_clientid).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_google_clientsecret).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_customlabel).wrapInner('<div class="animated_wrapper" />');
@@ -505,12 +512,20 @@ jQuery(document).ready(function($){
   }
 
   // On load: Show/hide pending/approved/blocked list options
-  if ( !$('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
+  if ( ! $('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
     $('div.animated_wrapper', auth_settings_access_users_pending).hide();
     $('div.animated_wrapper', auth_settings_access_users_approved).hide();
     $('div.animated_wrapper', auth_settings_access_users_blocked).hide();
     $('div.animated_wrapper', auth_settings_access_role_receive_pending_emails).hide();
     $('div.animated_wrapper', auth_settings_access_pending_redirect_to_message).hide();
+  }
+
+  // On load: Show/hide public access options if everyone can see site
+  if ( ! $('#radio_auth_settings_access_who_can_view_logged_in_users').is(':checked') ) {
+    $('div.animated_wrapper', auth_settings_access_public_pages).hide();
+    $('div.animated_wrapper', auth_settings_access_redirect_to_login).hide();
+    $('div.animated_wrapper', auth_settings_access_public_warning).hide();
+    $('div.animated_wrapper', auth_settings_access_redirect_to_message).hide();
   }
 
   // Hide Google options if unchecked
@@ -540,17 +555,6 @@ jQuery(document).ready(function($){
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
   $('input[name="auth_settings[access_who_can_login]"]').change(function(){
-    if ( $('#radio_auth_settings_access_who_can_login_everyone').is(':checked') ) {
-      animate_option( 'hide', auth_settings_access_redirect_to_login );
-      animate_option( 'hide', auth_settings_access_redirect_to_message );
-      animate_option( 'hide', auth_settings_access_public_pages );
-    } else {
-      animate_option( 'show', auth_settings_access_redirect_to_login );
-      animate_option( 'show', auth_settings_access_redirect_to_message );
-      animate_option( 'show', auth_settings_access_public_pages );
-      $('input[name="auth_settings[access_redirect]"]').trigger('change');
-    }
-  
     // Hide user whitelist unless "Only specific students below" is checked
     if ( ! $('#radio_auth_settings_access_who_can_login_approved_users').is(':checked') ) {
       animate_option( 'hide', auth_settings_access_users_pending );
@@ -564,6 +568,21 @@ jQuery(document).ready(function($){
       animate_option( 'show', auth_settings_access_users_blocked );
       animate_option( 'show', auth_settings_access_role_receive_pending_emails );
       animate_option( 'show', auth_settings_access_pending_redirect_to_message );
+    }
+  });
+
+  // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
+  $('input[name="auth_settings[access_who_can_view]"]').change(function(){
+    if ( $('#radio_auth_settings_access_who_can_view_everyone').is(':checked') ) {
+      animate_option( 'hide', auth_settings_access_redirect_to_login );
+      animate_option( 'hide', auth_settings_access_redirect_to_message );
+      animate_option( 'hide', auth_settings_access_public_pages );
+      animate_option( 'hide', auth_settings_access_public_warning );
+    } else {
+      animate_option( 'show', auth_settings_access_redirect_to_login );
+      animate_option( 'show', auth_settings_access_redirect_to_message );
+      animate_option( 'show', auth_settings_access_public_pages );
+      animate_option( 'show', auth_settings_access_public_warning );
     }
   });
 
