@@ -655,6 +655,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		/**
+		 * Validate this user's credentials against Google.
+		 * @param  array $auth_settings Plugin settings
+		 * @return [mixed] Array containing 'email' and 'authenticated_by'
+		 *                       strings for the successfully authenticated
+		 *                       user, or WP_Error() object on failure.
+		 */
 		private function custom_authenticate_google( $auth_settings ) {
 			// Get one time use token
 			session_start();
@@ -693,9 +700,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * @TODO
-		 * [custom_authenticate_cas description]
-		 * @param  [type] $auth_settings [description]
-		 * @return [type]                [description]
+		 * Validate this user's credentials against CAS.
+		 * @param  array $auth_settings Plugin settings
+		 * @return [mixed] Array containing 'email' and 'authenticated_by'
+		 *                       strings for the successfully authenticated
+		 *                       user, or WP_Error() object on failure.
 		 */
 		private function custom_authenticate_cas( $auth_settings ) {
 			// @TODO: make this only respond if we have session data from a cas login/ajax call
@@ -743,6 +752,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		/**
+		 * Validate this user's credentials against Google.
+		 * @param  array $auth_settings  Plugin settings
+		 * @param  string $username      Attempted username from authenticate action
+		 * @param  string $password      Attempted password from authenticate action
+		 * @return [mixed] Array containing 'email' and 'authenticated_by'
+		 *                       strings for the successfully authenticated
+		 *                       user, or WP_Error() object on failure.
+		 */
 		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
 			// Get the TLD from the LDAP host for use in matching email addresses
 			// For example: example.edu is the TLD for ldap.example.edu, so user
