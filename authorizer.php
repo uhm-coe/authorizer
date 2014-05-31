@@ -387,7 +387,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Try CAS authentication if it's enabled and we don't have a
 			// successful login yet.
-			// @TODO move cas to button instead of inline
 			if ( $auth_settings['cas'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
@@ -433,18 +432,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// them an error screen.
 			if ( $this->is_email_in_list( $externally_authenticated_email, 'blocked' ) ) {
 				// If the blocked external user has a WordPress account, change
-				// its password and mark it as blocked. In a multisite
-				// environment, just remove them from the current blog.
+				// its password and mark it as blocked.
 				if ( $user ) {
-					if ( is_multisite() ) {
-						remove_user_from_blog( $user->ID, get_current_blog_id(), get_current_user_id() );
-					} else {
-						// Reset user's password (change it to something they don't know, just in case)
-						wp_set_password( wp_generate_password(), $user->ID );
+					// Reset user's password (change it to something they don't know, just in case)
+					wp_set_password( wp_generate_password(), $user->ID );
 
-						// Mark user as inactive (enforce inactivity in this->authenticate()).
-						update_user_meta( $user->ID, 'auth_blocked', 'yes' );
-					}
+					// Mark user as inactive (enforce inactivity in this->authenticate()).
+					update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 				}
 
 				// Notify user about blocked status
@@ -538,6 +532,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
 					$user->set_role( $user_info['role'] );
 				}
+
+				// Make sure this approved user doesn't have an auth_inactive flag.
+				delete_user_meta( $user->ID, 'auth_inactive' );
 
 			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
@@ -1228,12 +1225,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
 					$ignored_user = get_user_by( 'email', $approved_user['email'] );
 					if ( $ignored_user !== false ) {
-						// Remove this multisite-approved user from all blogs
+						// Flag this multisite-approved user as inactive
 						$blogs = get_blogs_of_user( $ignored_user->ID );
 						foreach ( $blogs as $blog ) {
-							remove_user_from_blog( $ignored_user->ID, $blog->userblog_id, get_current_user_id() );
+							switch_to_blog( $blog->userblog_id );
+							update_user_meta( $user->ID, 'auth_inactive', 'yes' );
+							restore_current_blog();
 						}
-						// @TODO: replace the above with update_user_meta(blogid, 'auth_inactive', true, false)?
 					}
 				}
 			}
@@ -3298,12 +3296,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
 					$ignored_user = get_user_by( 'email', $approved_user['email'] );
 					if ( $ignored_user !== false ) {
-						if ( is_multisite() ) {
-							remove_user_from_blog( $ignored_user->ID, get_current_blog_id(), get_current_user_id() );
-						} else {
-							// Mark this ignored user as inactive (enforce inactivity in this->authenticate()).
-							update_user_meta( $ignored_user->ID, 'auth_inactive', 'yes' );
-						}
+						// Mark this ignored user as inactive (enforce inactivity in this->authenticate()).
+						update_user_meta( $ignored_user->ID, 'auth_inactive', 'yes' );
 					}
 				}
 			}
@@ -3360,12 +3354,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( ! in_array( $blocked_user['email'], $new_blocked_list ) ) {
 						$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
 						if ( $unblocked_user !== false ) {
-							if ( is_multisite() ) {
-								remove_user_from_blog( $unblocked_user->ID, get_current_blog_id(), get_current_user_id() );
-							} else {
-								// Mark this user as unblocked.
-								delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
-							}
+							// Mark this user as unblocked.
+							delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
 						}
 					}
 				}
