@@ -579,7 +579,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// We'll track how this user was authenticated in user meta.
 			if ( $user ) {
-				update_user_meta( get_current_user_id(), 'authenticated_by', $authenticated_by );
+				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
 			}
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
@@ -860,6 +860,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			switch ( $authenticated_by ) {
 				case 'google':
 					// Log out of Google.
+					session_start();
 					if ( isset( $_SESSION ) && array_key_exists( 'token', $_SESSION ) ) {
 						$token = json_decode( $_SESSION['token'] )->access_token;
 
@@ -3213,7 +3214,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div class="inside">
 				<form method="post" id="auth_settings_access_form" action="">
-					<p><?php $this->print_section_info_access(); ?></p>
+					<p><?php $this->print_section_info_access_login(); ?></p>
 					<div style="display: none;">
 						<h2>Who can log into the site?</h2>
 						<?php $this->print_radio_auth_access_who_can_login(); ?>
