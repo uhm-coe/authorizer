@@ -123,3 +123,15 @@ body.login #backtoblog a {
 	max-width: 138px;
 	font-size: 11px;
 }
+
+body.login #signinButton {
+	height: 43px;
+	margin-bottom: 16px;
+	width: 270px;
+	background-color: #dd4b39;
+	border-bottom: 1px solid #bb3f30;
+	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.10);
+	box-shadow: 0 1px 0 rgba(0,0,0,0.10);
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+}
