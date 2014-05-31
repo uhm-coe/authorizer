@@ -377,8 +377,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Try Google authentication if it's enabled and we don't have a
 			// successful login yet.
-			// @TODO
-			// Check if we're reloading from a successful Google login
 			if ( $auth_settings['google'] === '1' ) {
 				$result = $this->custom_authenticate_google( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
@@ -389,7 +387,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Try CAS authentication if it's enabled and we don't have a
 			// successful login yet.
-			// @TODO external_service is deprecated; move cas to button instead of inline
+			// @TODO move cas to button instead of inline
 			if ( $auth_settings['cas'] === '1' && strlen ( $externally_authenticated_email ) === 0 ) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
