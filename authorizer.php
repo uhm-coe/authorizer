@@ -1457,8 +1457,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
-					<?php // @TODO: remove the old button once we're sure we like the google-provided one. ?>
-					<!-- <p><a class="button button-primary button-external button-google" href="<?= $auth_url_google; ?>"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p> -->
 					<div id="signinButton">
 						<span class="g-signin"
 							data-scope="email"
