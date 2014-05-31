@@ -850,7 +850,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Reset option containing old error messages.
-			update_option( 'auth_settings_advanced_login_error', $error_message );
+			delete_option( 'auth_settings_advanced_login_error' );
 
 			// Get the service the current user was authenticated with so we
 			// can log them out of that service.
