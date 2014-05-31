@@ -2769,7 +2769,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<ul>
 						<li>Application Type: <strong>Web application</strong></li>
 						<li>Authorized Javascript Origins: <strong><?= $site_url_host; ?></strong></li>
-						<li>Authorized Redirect URI: <strong><?= get_site_url( get_current_blog_id(), 'wp-login.php' ); ?></strong></li>
+						<li>Authorized Redirect URI: <em>none</em></li>
 					</ul>
 				</li>
 				<li>Copy/paste your new Client ID/Secret pair into the fields below.</li>
