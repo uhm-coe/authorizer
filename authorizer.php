@@ -699,7 +699,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * @TODO
 		 * Validate this user's credentials against CAS.
 		 * @param  array $auth_settings Plugin settings
 		 * @return [mixed] Array containing 'email' and 'authenticated_by'
@@ -707,8 +706,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                       user, or WP_Error() object on failure.
 		 */
 		private function custom_authenticate_cas( $auth_settings ) {
-			// @TODO: make this only respond if we have session data from a cas login/ajax call
-			return new WP_Error('no cas', 'not yet.');
+			// Move on if CAS hasn't been requested here.
+			if ( empty( $_GET['external'] ) || $_GET['external'] !== 'cas' ) {
+				return new WP_Error('cas_not_available', 'CAS is not enabled.');
+			}
 
 			// Set the CAS client configuration
 			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
@@ -1470,6 +1471,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
 				}
+			}
+
+			$auth_url_cas = '';
+			if ( $auth_settings['cas'] === '1' ) {
+				$auth_url_cas = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+				$auth_url_cas .= strpos( $auth_url_cas, '?' ) !== false ? '&external=cas' : '?external=cas';
 			}
 
 			?>
