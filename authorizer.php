@@ -458,7 +458,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// and login access is set to "All authenticated users," add them
 			// to the approved list (they'll get an account created below if
 			// they don't have one yet).
-			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved', true ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
 				// If this user happens to be in the pending list (rare),
 				// remove them from pending before adding them to approved.
 				if ( $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
@@ -487,7 +487,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
-			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && ! $user_is_inactive ) {
+			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved', true ) && ! $user_is_inactive ) {
 				$user_info = $this->get_user_info_from_list( $externally_authenticated_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
@@ -3426,9 +3426,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$auth_settings = get_option( 'auth_settings' );
 
-			// @TODO multisite overrides
-			// Override access_users_approved with network approved users; use is_multisite_list param
-
 			switch ( $list ) {
 				case 'pending':
 					return $this->in_multi_array( $email, $auth_settings['access_users_pending'] );
@@ -3438,6 +3435,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					break;
 				case 'approved':
 				default:
+					// Add in the users from the multisite options
+					if ( $is_multisite_list ) {
+						$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+						$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
+					}
 					return $this->in_multi_array( $email, $auth_settings['access_users_approved'] );
 					break;
 			}
