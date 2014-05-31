@@ -494,16 +494,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// If the approved external user does not have a WordPress account, create it
 				if ( ! $user ) {
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
-						$username = explode( "@", $user_info['email'] );
-						$username = $username[0];
-						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = $approved_user['email'];
-						}
-						$result = wp_insert_user(
+					// If there's already a user with this username (e.g.,
+					// johndoe/johndoe@gmail.com exists, and we're trying to add
+					// johndoe/johndoe@example.com), use the full email address
+					// as the username.
+					$username = explode( "@", $user_info['email'] );
+					$username = $username[0];
+					if ( get_user_by( 'login', $username ) !== false ) {
+						$username = $approved_user['email'];
+					}
+					$result = wp_insert_user(
 						array(
 							'user_login' => strtolower( $username ),
 							'user_pass' => wp_generate_password(), // random password
