@@ -1317,9 +1317,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function auth_public_scripts() {
 			// Load (and localize) public scripts
+			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/assets/js/authorizer-public.js', __FILE__ ) );
 			$auth_localized = array(
-				'wp_login_url' => wp_login_url(),
+				'wp_login_url' => wp_login_url( $current_path ),
 				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
