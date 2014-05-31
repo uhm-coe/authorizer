@@ -1,17 +1,17 @@
 === Authorizer ===
 Contributors: figureone
-Tags: cas, authentication, authorization, access, education, ldap, limit login attempts
+Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
 Tested up to: 3.9.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., LDAP, CAS).
+Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
 
 == Description ==
 
-*Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as CAS or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
+*Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
 *Authorizer* requires the following:
 
@@ -20,8 +20,9 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* provides the following options:
 
-* **Authentication**: Local (no external service); Local first, then external; external-only (except for admins)
-* **Access**: Everyone (all have access); University members (all local and all external); Specific users (all local and approved external)
+* **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts
+* **Login Access**: All authenticated users (all local and all external can log in); Only specific users (all local and approved external users can log in)
+* **Control View Access**: Everyone (open access); Only logged in users
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
 
 == Installation ==
