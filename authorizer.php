@@ -430,25 +430,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
 			}
 
-			// If this externally authenticated user doesn't have an account
-			// and login access is set to "All authenticated users," add them
-			// to the approved list (they'll get an account created below).
-			if ( ! $user && $auth_settings['access_who_can_login'] === 'external_users' ) {
-				$approved_user = array(
-					'email' => $externally_authenticated_email,
-					'role' => $auth_settings['access_default_role'],
-					'date_added' => date( "Y-m-d H:i:s" ),
-				);
-				if ( ! is_array ( $auth_settings['access_users_approved'] ) ) {
-					$auth_settings['access_users_approved'] = array();
-				}
-				array_push( $auth_settings['access_users_approved'], $approved_user );
-				update_option( 'auth_settings', $auth_settings );
-			}
-
-			// Check our externally authenticated user against our access
-			// lists. Deal with them differently based on which list they're in
-			// (pending, blocked, or approved).
+			// Check our externally authenticated user against the block list.
+			// If they are blocked, set the relevant user meta field, and show
+			// them an error screen.
 			if ( $this->is_email_in_list( $externally_authenticated_email, 'blocked' ) ) {
 				// If the blocked external user has a WordPress account, change
 				// its password and mark it as blocked. In a multisite
@@ -470,7 +454,42 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
-			} else if ( $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && ! $user_is_inactive ) {
+			}
+
+			// If this externally authenticated user isn't in the approved list
+			// and login access is set to "All authenticated users," add them
+			// to the approved list (they'll get an account created below if
+			// they don't have one yet).
+			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+				// If this user happens to be in the pending list (rare),
+				// remove them from pending before adding them to approved.
+				if ( $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
+					foreach ( $auth_settings['access_users_pending'] as $key => $pending_user ) {
+						if ( $pending_user['email'] === $externally_authenticated_email ) {
+							unset( $auth_settings['access_users_pending'][$key] );
+							break;
+						}
+					}
+				}
+
+				// Add this user to the approved list.
+				$approved_role = $user && is_array( $user->roles ) && count( $user->roles) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
+				$approved_user = array(
+					'email' => $externally_authenticated_email,
+					'role' => $approved_role,
+					'date_added' => date( "Y-m-d H:i:s" ),
+				);
+				if ( ! is_array ( $auth_settings['access_users_approved'] ) ) {
+					$auth_settings['access_users_approved'] = array();
+				}
+				array_push( $auth_settings['access_users_approved'], $approved_user );
+				update_option( 'auth_settings', $auth_settings );
+			}
+
+			// Check our externally authenticated user against the approved
+			// list. If they are approved, log them in (and create their account
+			// if necessary)
+			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved' ) && ! $user_is_inactive ) {
 				$user_info = $this->get_user_info_from_list( $externally_authenticated_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
@@ -552,7 +571,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Notify user about pending status and return without authenticating them.
 				$error_message = $auth_settings['access_pending_redirect_to_message'];
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . home_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_login_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 				return;
