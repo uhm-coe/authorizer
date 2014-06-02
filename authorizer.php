@@ -111,7 +111,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'load-toplevel_page_authorizer', array( $this, 'load_options_page' ) );
 
 			// Add custom css and js to wp-login.php
-			add_action( 'login_head', array( $this, 'load_login_css_and_js' ) );
+			add_action( 'login_enqueue_scripts', array( $this, 'login_enqueue_scripts_and_styles' ) );
 			add_action( 'login_footer', array( $this, 'load_login_footer_js' ) );
 
 			// Modify login page with external auth links (if enabled; e.g., google or cas)
@@ -1348,10 +1348,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Load external resources on the wp-login.php page.
-		 * Run on action hook: login_head
+		 * Enqueue JS scripts and CSS styles appearing on wp-login.php.
+		 * @return void
 		 */
-		function load_login_css_and_js() {
+		function login_enqueue_scripts_and_styles() {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
@@ -1367,31 +1367,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			?>
-			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/domready.js', __FILE__ ); ?>"></script>
-			<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login.js', __FILE__ ); ?>"></script>
-			<link rel="stylesheet" href="<?php print plugins_url( 'assets/css/authorizer-login.css', __FILE__ ); ?>" />
+			// Enqueue scripts appearing on wp-login.php.
+			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/assets/js/authorizer-login.js', __FILE__ ), array( 'jquery' ) );
 
-			<?php if ( $auth_settings['advanced_branding'] === 'custom_uh' ): ?>
-				<link rel="stylesheet" type="text/css" href="<?php print plugins_url( 'assets/css/authorizer-login-custom_uh.css', __FILE__ ); ?>" />
-				<script type="text/javascript" src="<?php print plugins_url( 'assets/js/authorizer-login-custom_uh.js', __FILE__ ); ?>"></script>
-			<?php endif; ?>
+			// Enqueue styles appearing on wp-login.php.
+			wp_register_style( 'authorizer-login-css', plugins_url( '/assets/css/authorizer-login.css', __FILE__ ) );
+			wp_enqueue_style( 'authorizer-login-css' );
 
-			<?php if ( $auth_settings['google'] === '1' ): ?>
-				<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
-				<script type="text/javascript">
-					(function () {
-						var po = document.createElement('script');
-						po.type = 'text/javascript';
-						po.async = true;
-						po.src = 'https://plus.google.com/js/client:plusone.js?onload=start';
-						var s = document.getElementsByTagName('script')[0];
-						s.parentNode.insertBefore(po, s);
-					})();
-				</script>
-			<?php endif; ?>
+			// If we're showing custom branding, load those resources.
+			if ( $auth_settings['advanced_branding'] === 'custom_uh' ) {
+				wp_enqueue_script( 'auth_login_custom_scripts', plugins_url( '/assets/js/authorizer-login-custom_uh.js', __FILE__ ), array( 'jquery' ) );
+				wp_register_style( 'authorizer-login-custom-css', plugins_url( '/assets/css/authorizer-login-custom_uh.css', __FILE__ ) );
+				wp_enqueue_style( 'authorizer-login-custom-css' );
+			}
 
-			<?php
+			// If we're using Google logins, load those resources.
+			if ( $auth_settings['google'] === '1' ) {
+				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/assets/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ) );
+			}
 		}
 
 
