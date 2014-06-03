@@ -41,7 +41,18 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Screenshots ==
 
-1. Options screen.
+1. WordPress Login screen with Google Logins and CAS Logins enabled.
+2. Authorizer Dashboard Widget.
+3. Authorizer Options: Access Lists.
+4. Authorizer Options: Login Access.
+5. Authorizer Options: Public Access.
+6. Authorizer Options: External Service.
+7. Authorizer Options: Advanced.
+8. Authorizer Network Admin Options (disabled).
+9. Authorizer Network Admin Options: Access Lists.
+10. Authorizer Network Admin Options: External Service.
+11. Authorizer Network Admin Options: Advanced.
+12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
 
