@@ -1,0 +1,16 @@
+/*
+ Theme Name:   Twenty Thirteen Child
+ Theme URI:    http://example.com/twenty-thirteen-child/
+ Description:  Twenty Thirteen Child Theme
+ Author:       John Doe
+ Author URI:   http://example.com
+ Template:     twentythirteen
+ Version:      1.0.0
+ Tags:         light, dark, two-columns, right-sidebar, responsive-layout, accessibility-ready
+ Text Domain:  twenty-thirteen-child
+*/
+
+@import url("../twentythirteen/style.css");
+
+/* =Theme customization starts here
+-------------------------------------------------------------- */

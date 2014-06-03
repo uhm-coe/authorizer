@@ -1,4 +1,4 @@
-/* Reformat wp-login.php to reflect UH logins */
+/* Reformat wp-login.php to reflect custom branding */
 
 jQuery(document).ready(function($) {
 	if ( 'placeholder' in document.createElement('input') ) {

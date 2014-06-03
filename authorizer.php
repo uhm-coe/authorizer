@@ -84,7 +84,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Modify login page to with custom password url and labels.
 			if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) {
 				add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
-				add_filter( 'gettext', array( $this, 'custom_login_form_labels' ), 20, 3 );
 			}
 
 			// If we have a custom login error, add the filter to show it.
@@ -1374,11 +1373,35 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_register_style( 'authorizer-login-css', plugins_url( '/assets/css/authorizer-login.css', __FILE__ ) );
 			wp_enqueue_style( 'authorizer-login-css' );
 
-			// If we're showing custom branding, load those resources.
-			if ( $auth_settings['advanced_branding'] === 'custom_uh' ) {
-				wp_enqueue_script( 'auth_login_custom_scripts', plugins_url( '/assets/js/authorizer-login-custom_uh.js', __FILE__ ), array( 'jquery' ) );
-				wp_register_style( 'authorizer-login-custom-css', plugins_url( '/assets/css/authorizer-login-custom_uh.css', __FILE__ ) );
-				wp_enqueue_style( 'authorizer-login-custom-css' );
+			/**
+			 * Developers can use the `authorizer_add_branding_option` filter
+			 * to add a radio button for "Custom WordPress login branding"
+			 * under the "Advanced" tab in Authorizer options. Example:
+			 *
+			 * function my_authorizer_add_branding_option( $branding_options ) {
+			 *   $new_branding_option = array(
+			 *   	'value' => 'your_brand'
+			 *   	'description' => 'Custom Your Brand Login Screen',
+			 *   	'css_url' => 'http://url/to/your_brand.css',
+			 *   	'js_url' => 'http://url/to/your_brand.js',
+			 *   );
+			 *   array_push( $branding_options, $new_branding_option );
+			 *   return $branding_options;
+			 * }
+			 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
+			 */
+			$branding_options = array();
+			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
+			foreach ( $branding_options as $branding_option ) {
+				// Make sure the custom brands have the required values
+				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'css_url', $branding_option ) && array_key_exists( 'js_url', $branding_option ) ) ) {
+					continue;
+				}
+				if ( $auth_settings['advanced_branding'] === $branding_option['value'] ) {
+					wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ) );
+					wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'] );
+					wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
+				}
 			}
 
 			// If we're using Google logins, load those resources.
@@ -3078,7 +3101,34 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_advanced_branding_default" name="auth_settings[advanced_branding]" value="default"<?php checked( 'default' == $auth_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />
-			<input type="radio" id="radio_auth_settings_advanced_branding_custom_uh" name="auth_settings[advanced_branding]" value="custom_uh"<?php checked( 'custom_uh' == $auth_settings['advanced_branding'] ); ?> /> Custom University of Hawai'i login screen<?php
+			<?php
+
+			/**
+			 * Developers can use the `authorizer_add_branding_option` filter
+			 * to add a radio button for "Custom WordPress login branding"
+			 * under the "Advanced" tab in Authorizer options. Example:
+			 *
+			 * function my_authorizer_add_branding_option( $branding_options ) {
+			 *   $new_branding_option = array(
+			 *   	'value' => 'your_brand'
+			 *   	'description' => 'Custom Your Brand Login Screen',
+			 *   	'css_url' => 'http://url/to/your_brand.css',
+			 *   	'js_url' => 'http://url/to/your_brand.js',
+			 *   );
+			 *   array_push( $branding_options, $new_branding_option );
+			 *   return $branding_options;
+			 * }
+			 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
+			 */
+			$branding_options = array();
+			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
+			foreach ( $branding_options as $branding_option ) {
+				// Make sure the custom brands have the required values
+				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
+					continue;
+				}
+				?><input type="radio" id="radio_auth_settings_advanced_branding_<?php print sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[advanced_branding]" value="<?php print $branding_option['value']; ?>"<?php checked( $branding_option['value'] == $auth_settings['advanced_branding'] ); ?> /> <?php print $branding_option['description']; ?><br /><?php
+			}
 		}
 
 
@@ -3175,7 +3225,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$help_auth_settings_advanced_content = '
 				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
 				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
-				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use the custom University of Hawai&#8216;i and DCDC branding on the WordPress login page, select that here.</p>
+				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</p>
 			';
 			$screen->add_help_tab(
 				array(

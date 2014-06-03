@@ -1,0 +1,14 @@
+/* Restyle wp-login.php to reflect custom branding */
+
+html, body.login {
+	background: #fbfbfb url('../images/texture-debut-light.jpg') repeat-y right top;
+}
+
+body.login {
+	height: auto;
+}
+
+/* Logo */
+body.login h1 a {
+	background: url('../images/w-logo-blue.png') top center no-repeat;
+}
