@@ -3483,11 +3483,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$handle = curl_init( $url );
 			curl_setopt( $handle,  CURLOPT_RETURNTRANSFER, TRUE );
 			$response = curl_exec( $handle );
-			$httpCode = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
+			$http_code = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
 			curl_close( $handle );
 
 			// Return true if the document has loaded successfully without any redirection or error
-			return $httpCode >= 200 && $httpCode < 400;
+			return $http_code >= 200 && $http_code < 400;
 		}
 
 		// Helper function that builds option tags for a select element for all
