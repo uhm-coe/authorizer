@@ -733,8 +733,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Get the TLD from the CAS host for use in matching email addresses
-			// For example: hawaii.edu is the TLD for login.its.hawaii.edu, so user
-			// 'bob' will have the following email address: bob@hawaii.edu.
+			// For example: example.edu is the TLD for login.its.example.edu, so user
+			// 'bob' will have the following email address: bob@example.edu.
 			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
 			// Get username that successfully authenticated against the external service (CAS).
@@ -3062,7 +3062,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><div id="overlay-hide-auth_settings_advanced_lostpassword_url" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myuh.hawaii.edu:8888/am-forgot-password" style="width: 400px;" /><?php
+			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_auth_advanced_branding( $args = '' ) {
@@ -3149,7 +3149,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</ul>
 				<p><strong><em>If you enable CAS logins:</em></strong></p>
 				<ul>
-					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.hawaii.edu).</li>
+					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.example.edu).</li>
 					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
 					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
 				</ul>
