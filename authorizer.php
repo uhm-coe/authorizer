@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: http://hawaii.edu/coe/dcdc/
 Description: Authorizer restricts access to students enrolled in university courses, using CAS or LDAP for authentication and a whitelist of users with permission to access the site.
-Version: 1.1
+Version: 2.0
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2

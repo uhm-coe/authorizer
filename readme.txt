@@ -56,12 +56,26 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.0 =
+* First public release.
+* Tue Jun 3, 2014
+
+= 1.6 =
+* Allow multiple external services to be enabled at once.
+* Mon May 26, 2014
+
+= 1.5 =
+* Add Google Logins support
+* Thu May 22, 2014
+
 = 1.1 =
 * Rename to Authorizer
 * Add LDAP support
+* Wed Mar 12, 2014
 
 = 1.0 =
 * First stable release.
+* Wed Aug 14, 2013
 
 = 0.2 =
 * Switch to CAS instead of LDAP/Sakai.
