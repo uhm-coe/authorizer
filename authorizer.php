@@ -784,7 +784,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				ldap_start_tls( $ldap );
 			}
 			$result = @ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
-			if ( !$result ) {
+			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
 			}
@@ -810,7 +810,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
-			if ( !$result ) {
+			if ( ! $result ) {
 				// We have a real ldap user, but an invalid password. Pass
 				// through to wp authentication after failing LDAP (since
 				// this could be a local account that happens to be the
@@ -2029,47 +2029,47 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Access Lists Defaults.
-			if ( !array_key_exists( 'access_users_pending', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_users_pending', $auth_settings ) ) {
 				$auth_settings['access_users_pending'] = array();
 			}
-			if ( !array_key_exists( 'access_users_approved', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_users_approved', $auth_settings ) ) {
 				$auth_settings['access_users_approved'] = array();
 			}
-			if ( !array_key_exists( 'access_users_blocked', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_users_blocked', $auth_settings ) ) {
 				$auth_settings['access_users_blocked'] = array();
 			}
 
 			// Login Access Defaults.
-			if ( !array_key_exists( 'access_who_can_login', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_who_can_login', $auth_settings ) ) {
 				$auth_settings['access_who_can_login'] = 'approved_users';
 			}
-			if ( !array_key_exists( 'access_role_receive_pending_emails', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_role_receive_pending_emails', $auth_settings ) ) {
 				$auth_settings['access_role_receive_pending_emails'] = '---';
 			}
-			if ( !array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
 			}
 
 			// Public Access to Private Page Defaults.
-			if ( !array_key_exists( 'access_who_can_view', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_who_can_view', $auth_settings ) ) {
 				$auth_settings['access_who_can_view'] = 'everyone';
 			}
-			if ( !array_key_exists( 'access_public_pages', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) ) {
 				$auth_settings['access_public_pages'] = array('home');
 			}
-			if ( !array_key_exists( 'access_redirect', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_redirect', $auth_settings ) ) {
 				$auth_settings['access_redirect'] = 'login';
 			}
-			if ( !array_key_exists( 'access_public_warning', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_public_warning', $auth_settings ) ) {
 				$auth_settings['access_public_warning'] = 'warning';
 			}
-			if ( !array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_redirect_to_message'] = '<p><strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.</p>';
 			}
 
 
 			// External Service Defaults.
-			if ( !array_key_exists( 'access_default_role', $auth_settings ) ) {
+			if ( ! array_key_exists( 'access_default_role', $auth_settings ) ) {
 				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 				$all_roles = $wp_roles->roles;
 				$editable_roles = apply_filters( 'editable_roles', $all_roles );
@@ -2100,40 +2100,40 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'cas_customlabel', $auth_settings ) ) {
 				$auth_settings['cas_customlabel'] = 'CAS';
 			}
-			if ( !array_key_exists( 'cas_host', $auth_settings ) ) {
+			if ( ! array_key_exists( 'cas_host', $auth_settings ) ) {
 				$auth_settings['cas_host'] = '';
 			}
-			if ( !array_key_exists( 'cas_port', $auth_settings ) ) {
+			if ( ! array_key_exists( 'cas_port', $auth_settings ) ) {
 				$auth_settings['cas_port'] = '';
 			}
-			if ( !array_key_exists( 'cas_path', $auth_settings ) ) {
+			if ( ! array_key_exists( 'cas_path', $auth_settings ) ) {
 				$auth_settings['cas_path'] = '';
 			}
 
-			if ( !array_key_exists( 'ldap_host', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
 				$auth_settings['ldap_host'] = '';
 			}
-			if ( !array_key_exists( 'ldap_port', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_port', $auth_settings ) ) {
 				$auth_settings['ldap_port'] = '';
 			}
-			if ( !array_key_exists( 'ldap_search_base', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_search_base', $auth_settings ) ) {
 				$auth_settings['ldap_search_base'] = '';
 			}
-			if ( !array_key_exists( 'ldap_uid', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_uid', $auth_settings ) ) {
 				$auth_settings['ldap_uid'] = '';
 			}
-			if ( !array_key_exists( 'ldap_user', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_user', $auth_settings ) ) {
 				$auth_settings['ldap_user'] = '';
 			}
-			if ( !array_key_exists( 'ldap_password', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_password', $auth_settings ) ) {
 				$auth_settings['ldap_password'] = '';
 			}
-			if ( !array_key_exists( 'ldap_tls', $auth_settings ) ) {
+			if ( ! array_key_exists( 'ldap_tls', $auth_settings ) ) {
 				$auth_settings['ldap_tls'] = '1';
 			}
 
 			// Advanced defaults.
-			if ( !array_key_exists( 'advanced_lockouts', $auth_settings ) ) {
+			if ( ! array_key_exists( 'advanced_lockouts', $auth_settings ) ) {
 				$auth_settings['advanced_lockouts'] = array(
 					'attempts_1' => 10,
 					'duration_1' => 1,
@@ -2142,10 +2142,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'reset_duration' => 120,
 				);
 			}
-			if ( !array_key_exists( 'advanced_lostpassword_url', $auth_settings ) ) {
+			if ( ! array_key_exists( 'advanced_lostpassword_url', $auth_settings ) ) {
 				$auth_settings['advanced_lostpassword_url'] = '';
 			}
-			if ( !array_key_exists( 'advanced_branding', $auth_settings ) ) {
+			if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 				$auth_settings['advanced_branding'] = 'default';
 			}
 
@@ -2160,23 +2160,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings = array();
 				}
 				// Global switch for enabling multisite options.
-				if ( !array_key_exists( 'multisite_override', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'multisite_override', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['multisite_override'] = '';
 				}
 				// Access Lists Defaults.
-				if ( !array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['access_users_approved'] = array();
 				}
 				// Login Access Defaults.
-				if ( !array_key_exists( 'access_who_can_login', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'access_who_can_login', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['access_who_can_login'] = 'approved_users';
 				}
 				// View Access Defaults.
-				if ( !array_key_exists( 'access_who_can_view', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'access_who_can_view', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['access_who_can_view'] = 'everyone';
 				}
 				// External Service Defaults.
-				if ( !array_key_exists( 'access_default_role', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'access_default_role', $auth_multisite_settings ) ) {
 					// Set default role to 'student' if that role exists, 'subscriber' otherwise.
 					$all_roles = $wp_roles->roles;
 					$editable_roles = apply_filters( 'editable_roles', $all_roles );
@@ -2204,38 +2204,38 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'cas_customlabel', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_customlabel'] = 'CAS';
 				}
-				if ( !array_key_exists( 'cas_host', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'cas_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_host'] = '';
 				}
-				if ( !array_key_exists( 'cas_port', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'cas_port', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_port'] = '';
 				}
-				if ( !array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_path'] = '';
 				}
-				if ( !array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_host'] = '';
 				}
-				if ( !array_key_exists( 'ldap_port', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_port', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_port'] = '';
 				}
-				if ( !array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_search_base'] = '';
 				}
-				if ( !array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_uid'] = '';
 				}
-				if ( !array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_user'] = '';
 				}
-				if ( !array_key_exists( 'ldap_password', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_password', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_password'] = '';
 				}
-				if ( !array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_tls'] = '1';
 				}
 				// Advanced defaults.
-				if ( !array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
+				if ( ! array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_lockouts'] = array(
 						'attempts_1' => 10,
 						'duration_1' => 1,
