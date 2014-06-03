@@ -13,9 +13,12 @@
 	padding-left: 16px;
 }
 
-
-
 #auth-external-service-login h3 {
 	text-align: center;
 	margin-bottom: 16px;
+}
+
+#signinButton {
+	margin-bottom: 16px;
+	text-align: center;
 }
