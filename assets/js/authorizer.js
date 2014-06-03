@@ -361,17 +361,19 @@ function hide_multisite_overridden_options() {
     // Option to hide is stored in the overlay's id with 'overlay-hide-' prefix.
     var option_id_to_hide = $(this).attr('id').replace('overlay-hide-','');
     var option_container_to_hide = $('#' + option_id_to_hide).closest('tr');
-    $(this).css({
-      'background-color': '#f1f1f1',
-      'z-index': 1,
-      'opacity': 0.8,
-      'position': 'absolute',
-      'top': option_container_to_hide.position().top,
-      'left': option_container_to_hide.position().left,
-      'width': option_container_to_hide.width(),
-      'height': option_container_to_hide.height(),
-    });
-    $(this).show();
+    if ( option_container_to_hide.length > 0 ) {
+      $(this).css({
+        'background-color': '#f1f1f1',
+        'z-index': 1,
+        'opacity': 0.8,
+        'position': 'absolute',
+        'top': option_container_to_hide.position().top,
+        'left': option_container_to_hide.position().left,
+        'width': option_container_to_hide.width(),
+        'height': option_container_to_hide.height(),
+      });
+      $(this).show();
+    }
   });
 }
 
