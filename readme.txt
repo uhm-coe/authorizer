@@ -22,7 +22,7 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 * **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts
 * **Login Access**: All authenticated users (all local and all external can log in); Only specific users (all local and approved external users can log in)
-* **Control View Access**: Everyone (open access); Only logged in users
+* **View Access**: Everyone (open access); Only logged in users
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
 
 == Installation ==
