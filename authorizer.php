@@ -410,17 +410,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// If we've made it this far, we should have an externally authenticated user.
-			// The following should be set:
+			// If we've made it this far, we should have an externally
+			// authenticated user. The following should be set:
 			//   $externally_authenticated_email
 			//   $authenticated_by
 
-			// Check if the external user has a WordPress account (with the same email address)
-			if ( ! $user ) {
-				$user = get_user_by( 'email', $externally_authenticated_email );
-			}
+			// Get the external user's WordPress account by email address.
+			$user = get_user_by( 'email', $externally_authenticated_email );
 
-			// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+			// Also check the auth_inactive user_meta flag (users removed from
+			// approved list will get this flag).
 			$user_is_inactive = $unauthenticated_user_is_inactive;
 			if ( $user ) {
 				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
