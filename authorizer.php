@@ -1423,11 +1423,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$( '#signinButton' ).attr( 'style', 'display: none' );
 
 							// Send the code to the server
-							var ajaxurl = '<?php print admin_url("admin-ajax.php"); ?>';
+							var ajaxurl = '<?php echo admin_url("admin-ajax.php"); ?>';
 							$.post(ajaxurl, {
 								action: 'process_google_login',
 								'code': authResult['code'],
-								'nonce': $('#nonce_google_auth-<?php print $this->get_cookie_value(); ?>').val(),
+								'nonce': $('#nonce_google_auth-<?php echo $this->get_cookie_value(); ?>').val(),
 							}, function( response ) {
 								// Handle or verify the server response if necessary.
 								//console.log( response );
@@ -1485,7 +1485,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<div id="signinButton">
 						<span class="g-signin"
 							data-scope="email"
-							data-clientid="<?php print $auth_settings['google_clientid']; ?>"
+							data-clientid="<?php echo $auth_settings['google_clientid']; ?>"
 							data-redirecturi="postmessage"
 							data-accesstype="offline"
 							data-cookiepolicy="single_host_origin"
@@ -1499,7 +1499,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php print $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php print $auth_settings['cas_customlabel']; ?></span></a></p>
+					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_customlabel']; ?></span></a></p>
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
@@ -1706,7 +1706,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook chain: load-settings_page_authorizer > admin_notices
 		 * Description: Check for invalid settings combinations and show a warning message, e.g.:
 		 *   if (cas url inaccessible) {
-		 *     print "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
+		 *     echo "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
 		 *   }
 		 */
 		public function admin_notices() {
@@ -1729,7 +1729,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Check if provided CAS URL is accessible.
 				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
 				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
-					print "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:choose_tab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
+					echo "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:choose_tab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
 				}
 			}
 		}
@@ -2401,13 +2401,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" id="auth_settings_access_users_pending_<?php print $key; ?>" name="auth_settings[access_users_pending][<?php print $key; ?>][email]" value="<?php print $pending_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[access_users_pending][<?php print $key; ?>][role]" class="auth-role">
+							<input type="text" id="auth_settings_access_users_pending_<?php echo $key; ?>" name="auth_settings[access_users_pending][<?php echo $key; ?>][email]" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
+							<select name="auth_settings[access_users_pending][<?php echo $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<input type="button" class="button-primary" id="approve_user_<?php print $key; ?>" onclick="auth_add_user(this, 'approved'); auth_ignore_user(this, 'pending');" value="Approve" />
-							<input type="button" class="button-primary" id="block_user_<?php print $key; ?>" onclick="auth_add_user(this, 'blocked'); auth_ignore_user(this, 'pending');" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?php print $key; ?>" onclick="auth_ignore_user(this);" value="&times;" />
+							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'approved'); auth_ignore_user(this, 'pending');" value="Approve" />
+							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'blocked'); auth_ignore_user(this, 'pending');" value="Block" />
+							<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this);" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -2453,11 +2453,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" id="auth_multisite_settings_access_users_approved_<?php print $key; ?>" name="auth_multisite_settings[access_users_approved][<?php print $key; ?>][email]" value="<?php print $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
-							<select name="auth_multisite_settings[access_users_approved][<?php print $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
+							<input type="text" id="auth_multisite_settings_access_users_approved_<?php echo $key; ?>" name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
+							<select name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
 							</select>
-							<input type="text" name="auth_multisite_settings[access_users_approved][<?php print $key; ?>][date_added]" value="<?php print date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
+							<input type="text" name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 						</li>
 					<?php endforeach; ?>
@@ -2477,13 +2477,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $approved_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" id="auth_settings_access_users_approved_<?php print $key; ?>" name="auth_settings[access_users_approved][<?php print $key; ?>][email]" value="<?php print $approved_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[access_users_approved][<?php print $key; ?>][role]" class="auth-role" onchange="save_<?php print $js_function_prefix; ?>settings_access(this);">
+							<input type="text" id="auth_settings_access_users_approved_<?php echo $key; ?>" name="auth_settings[access_users_approved][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
+							<select name="auth_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings_access(this);">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
 							</select>
-							<input type="text" name="auth_settings[access_users_approved][<?php print $key; ?>][date_added]" value="<?php print date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-							<input type="button" class="button" id="ignore_user_<?php print $key; ?>" onclick="<?php print $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) print 'disabled="disabled" '; ?>/>
-							<?php print $local_user_icon; ?>
+							<input type="text" name="auth_settings[access_users_approved][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+							<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) echo 'disabled="disabled" '; ?>/>
+							<?php echo $local_user_icon; ?>
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -2494,13 +2494,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php $this->wp_dropdown_permitted_roles( $auth_settings['access_default_role'] ); ?>
 				</select>
 				<div class="btn-group">
-					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php print $js_function_prefix; ?>add_user(this, 'approved');" value="Approve" />
+					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'approved');" value="Approve" />
 					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="javascript:void(0);" onclick="<?php print $js_function_prefix; ?>add_user( document.getElementById('approve_user_new'), 'approved', true);">Create a local WordPress <br />account instead, and email <br />the user their password.</a></li>
+						<li><a href="javascript:void(0);" onclick="<?php echo $js_function_prefix; ?>add_user( document.getElementById('approve_user_new'), 'approved', true);">Create a local WordPress <br />account instead, and email <br />the user their password.</a></li>
 					</ul>
 				</div>
 			</div>
@@ -2522,12 +2522,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $blocked_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" id="auth_settings_access_users_blocked_<?php print $key; ?>" name="auth_settings[access_users_blocked][<?php print $key; ?>][email]" value="<?php print $blocked_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[access_users_blocked][<?php print $key; ?>][role]" class="auth-role">
+							<input type="text" id="auth_settings_access_users_blocked_<?php echo $key; ?>" name="auth_settings[access_users_blocked][<?php echo $key; ?>][email]" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
+							<select name="auth_settings[access_users_blocked][<?php echo $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 							</select>
-							<input type="text" name="auth_settings[access_users_blocked][<?php print $key; ?>][date_added]" value="<?php print date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-							<input type="button" class="button" id="ignore_user_<?php print $key; ?>" onclick="auth_ignore_user(this, 'blocked');" value="&times;" />
+							<input type="text" name="auth_settings[access_users_blocked][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+							<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked');" value="&times;" />
 						</li>
 					<?php endforeach; ?>
 				<?php endif; ?>
@@ -2535,7 +2535,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<div id="new_auth_settings_access_users_blocked">
 				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="auth-email" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
-					<option value="<?php print $auth_settings['access_default_role']; ?>"><?php print ucfirst( $auth_settings['access_default_role'] ); ?></option>
+					<option value="<?php echo $auth_settings['access_default_role']; ?>"><?php echo ucfirst( $auth_settings['access_default_role'] ); ?></option>
 				</select>
 				<input class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');" value="Block" /><br />
 			</div>
@@ -2561,7 +2561,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Make the access_who_can_login option match what's set in multisite so the correct options appear below it.
 				$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_access_who_can_login_external_users" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_auth_settings_access_who_can_login_external_users" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=access_lists' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_who_can_login_external_users" name="auth_settings[access_who_can_login]" value="external_users"<?php checked( 'external_users' == $auth_settings['access_who_can_login'] ); ?> /> All authenticated users (All external service users and all WordPress users)<br />
@@ -2610,7 +2610,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Make the access_who_can_view option match what's set in multisite so the correct options appear below it.
 				$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_access_who_can_view_everyone" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=access_public' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-radio_auth_settings_access_who_can_view_everyone" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=access_public' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_who_can_view_everyone" name="auth_settings[access_who_can_view]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_who_can_view'] ); ?> /> Everyone can see the site<br />
@@ -2649,16 +2649,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><select id="auth_settings_access_public_pages" multiple="multiple" name="auth_settings[access_public_pages][]">
 				<optgroup label="Special">
-					<option value="home" <?php print in_array( 'home', $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+					<option value="home" <?php echo in_array( 'home', $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
 				</optgroup>
 				<?php $post_types = get_post_types( '', 'names' ); ?>
 				<?php $post_types = is_array( $post_types ) ? $post_types : array(); ?>
 				<?php foreach ( $post_types as $post_type ): ?>
-					<optgroup label="<?php print ucfirst( $post_type ); ?>">
+					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
 					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
 					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
 					<?php foreach ( $pages as $page ): ?>
-						<option value="<?php print $page->ID; ?>" <?php print in_array( $page->ID, $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php print $page->post_title; ?></option>
+						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
@@ -2685,10 +2685,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><select id="<?php print $id; ?>" name="<?php print $name; ?>">
+			?><select id="<?php echo $id; ?>" name="<?php echo $name; ?>">
 				<?php wp_dropdown_roles( $auth_settings[$option] ); ?>
 			</select><?php
 		}
@@ -2706,10 +2706,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="checkbox" id="<?php print $id; ?>" name="<?php print $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable Google Logins<?php
+			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable Google Logins<?php
 		}
 
 		function print_text_google_clientid( $args = '' ) {
@@ -2725,7 +2725,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			$site_url_parts = parse_url( get_site_url() );
@@ -2736,14 +2736,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<li>Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:
 					<ul>
 						<li>Application Type: <strong>Web application</strong></li>
-						<li>Authorized Javascript Origins: <strong><?php print $site_url_host; ?></strong></li>
+						<li>Authorized Javascript Origins: <strong><?php echo $site_url_host; ?></strong></li>
 						<li>Authorized Redirect URI: <em>none</em></li>
 					</ul>
 				</li>
 				<li>Copy/paste your new Client ID/Secret pair into the fields below.</li>
 				<li><strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.</li>
 			</ol>
-			<input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
+			<input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
 		}
 
 		function print_text_google_clientsecret( $args = '' ) {
@@ -2759,10 +2759,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
 		}
 
 		function print_checkbox_auth_external_cas( $args = '' ) {
@@ -2778,10 +2778,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="checkbox" id="<?php print $id; ?>" name="<?php print $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
+			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
 		}
 
 		function print_text_cas_customlabel( $args = '' ) {
@@ -2797,10 +2797,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
+			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
 		}
 
 		function print_text_cas_host( $args = '' ) {
@@ -2816,10 +2816,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="login.its.example.edu" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="login.its.example.edu" /><?php
 		}
 
 		function print_text_cas_port( $args = '' ) {
@@ -2835,10 +2835,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="443" style="width:50px;" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="443" style="width:50px;" /><?php
 		}
 
 		function print_text_cas_path( $args = '' ) {
@@ -2854,10 +2854,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="/cas" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="/cas" /><?php
 		}
 
 		function print_checkbox_auth_external_ldap( $args = '' ) {
@@ -2873,10 +2873,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="checkbox" id="<?php print $id; ?>" name="<?php print $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
+			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
 		}
 
 		function print_text_ldap_host( $args = '' ) {
@@ -2892,10 +2892,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="ldap.example.edu" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="ldap.example.edu" /><?php
 		}
 		function print_text_ldap_port( $args = '' ) {
 			// Set option name.
@@ -2910,10 +2910,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="389" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="389" /><?php
 		}
 		function print_text_ldap_search_base( $args = '' ) {
 			// Set option name.
@@ -2928,10 +2928,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
 		}
 		function print_text_ldap_uid( $args = '' ) {
 			// Set option name.
@@ -2946,10 +2946,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="uid" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="uid" /><?php
 		}
 		function print_text_ldap_user( $args = '' ) {
 			// Set option name.
@@ -2964,10 +2964,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="text" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $auth_settings[$option]; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
 		}
 		function print_password_ldap_password( $args = '' ) {
 			// Set option name.
@@ -2982,11 +2982,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="<?php print $id; ?>" name="<?php print $name; ?>" value="<?php print $this->decrypt( base64_decode( $auth_settings[$option] ) ); ?>" autocomplete="off" /><?php
+			<input type="password" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $this->decrypt( base64_decode( $auth_settings[$option] ) ); ?>" autocomplete="off" /><?php
 		}
 		function print_checkbox_ldap_tls( $args = '' ) {
 			// Set option name.
@@ -3001,10 +3001,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-<?php print $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?><input type="checkbox" id="<?php print $id; ?>" name="<?php print $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
+			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
 		}
 
 
@@ -3023,23 +3023,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $auth_multisite_settings;
 			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-auth_settings_advanced_lockouts_attempts_1" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php print network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
+				?><div id="overlay-hide-auth_settings_advanced_lockouts_attempts_1" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
 			?>After
-			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?php print $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
+			<input type="text" id="auth_settings_advanced_lockouts_attempts_1" name="auth_settings[advanced_lockouts][attempts_1]" value="<?php echo $auth_settings['advanced_lockouts']['attempts_1']; ?>" placeholder="10" style="width:30px;" />
 			invalid password attempts, delay further attempts on that user for
-			<input type="text" id="auth_settings_advanced_lockouts_duration_1" name="auth_settings[advanced_lockouts][duration_1]" value="<?php print $auth_settings['advanced_lockouts']['duration_1']; ?>" placeholder="1" style="width:30px;" />
+			<input type="text" id="auth_settings_advanced_lockouts_duration_1" name="auth_settings[advanced_lockouts][duration_1]" value="<?php echo $auth_settings['advanced_lockouts']['duration_1']; ?>" placeholder="1" style="width:30px;" />
 			minute(s).
 			<br />
 			After
-			<input type="text" id="auth_settings_advanced_lockouts_attempts_2" name="auth_settings[advanced_lockouts][attempts_2]" value="<?php print $auth_settings['advanced_lockouts']['attempts_2']; ?>" placeholder="10" style="width:30px;" />
+			<input type="text" id="auth_settings_advanced_lockouts_attempts_2" name="auth_settings[advanced_lockouts][attempts_2]" value="<?php echo $auth_settings['advanced_lockouts']['attempts_2']; ?>" placeholder="10" style="width:30px;" />
 			more invalid attempts, increase the delay to
-			<input type="text" id="auth_settings_advanced_lockouts_duration_2" name="auth_settings[advanced_lockouts][duration_2]" value="<?php print $auth_settings['advanced_lockouts']['duration_2']; ?>" placeholder="10" style="width:30px;" />
+			<input type="text" id="auth_settings_advanced_lockouts_duration_2" name="auth_settings[advanced_lockouts][duration_2]" value="<?php echo $auth_settings['advanced_lockouts']['duration_2']; ?>" placeholder="10" style="width:30px;" />
 			minutes.
 			<br />
 			Reset the delays after
-			<input type="text" id="auth_settings_advanced_lockouts_reset_duration" name="auth_settings[advanced_lockouts][reset_duration]" value="<?php print $auth_settings['advanced_lockouts']['reset_duration']; ?>" placeholder="240" style="width:40px;" />
+			<input type="text" id="auth_settings_advanced_lockouts_reset_duration" name="auth_settings[advanced_lockouts][reset_duration]" value="<?php echo $auth_settings['advanced_lockouts']['reset_duration']; ?>" placeholder="240" style="width:40px;" />
 			minutes with no invalid attempts.<?php
 		}
 
@@ -3048,7 +3048,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = get_option( 'auth_settings' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?php print $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
+			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?php echo $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_auth_advanced_branding( $args = '' ) {
@@ -3083,7 +3083,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
 					continue;
 				}
-				?><input type="radio" id="radio_auth_settings_advanced_branding_<?php print sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[advanced_branding]" value="<?php print $branding_option['value']; ?>"<?php checked( $branding_option['value'] == $auth_settings['advanced_branding'] ); ?> /> <?php print $branding_option['description']; ?><br /><?php
+				?><input type="radio" id="radio_auth_settings_advanced_branding_<?php echo sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[advanced_branding]" value="<?php echo $branding_option['value']; ?>"<?php checked( $branding_option['value'] == $auth_settings['advanced_branding'] ); ?> /> <?php echo $branding_option['description']; ?><br /><?php
 			}
 		}
 
@@ -3507,7 +3507,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If the specified $selected_role is not permitted, the select
 			// element will be readonly/disabled.
 			if ( ! array_key_exists( $selected_role, $roles ) ) {
-				?><option value="<?php print $selected_role; ?>" disabled="disabled"><?php print ucfirst( $selected_role ); ?></option><?php
+				?><option value="<?php echo $selected_role; ?>" disabled="disabled"><?php echo ucfirst( $selected_role ); ?></option><?php
 				return;
 			}
 
@@ -3515,7 +3515,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ($roles as $name => $role) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
 				$disabled = $is_current_user ? ' disabled="disabled"' : ''; // Don't let a user change their own role
-				?><option value="<?php print $name; ?>"<?php print $selected . $disabled; ?>><?php print $role['name']; ?></option><?php
+				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
 		}
 
