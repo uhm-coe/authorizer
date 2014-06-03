@@ -1502,7 +1502,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( $auth_settings['cas'] === '1' ): ?>
 					<p><a class="button button-primary button-external button-cas" href="<?= $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?= $auth_settings['cas_customlabel']; ?></span></a></p>
 				<?php endif; ?>
-				<h3> &mdash; or &mdash; </h3>
+
+				<?php if ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
+					<h3> &mdash; or &mdash; </h3>
+				<?php endif; ?>
 			</div>
 			<?php
 
