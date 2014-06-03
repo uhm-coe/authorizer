@@ -1587,24 +1587,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			return $lostpassword_url;
 		}
 
-		/**
-		 * Overwrite the username and password labels on the login form.
-		 * @todo : remove. this is currently unused; was used for changing to 'UH Username'
-		 */
-		function custom_login_form_labels( $translated_text, $text, $domain ) {
-			$auth_settings = get_option( 'auth_settings' );
-
-			if ( $translated_text === 'Username' ) {
-				$translated_text = 'Username';
-			}
-
-			if ( $translated_text === 'Password' ) {
-				$translated_text = 'Password';
-			}
-
-			return $translated_text;
-		}
-
 
 
 		/**
