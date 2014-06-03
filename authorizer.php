@@ -1168,14 +1168,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<th scope="row">Limit invalid login attempts</th>
 								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
-							<tr>
-								<th scope="row">Custom lost password URL</th>
-								<td><?php $this->print_text_auth_advanced_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Custom WordPress login branding</th>
-								<td><?php $this->print_radio_auth_advanced_branding( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
 						</tbody></table>
 
 						<br class="clear" />
@@ -1293,8 +1285,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_password',
 				'ldap_tls',
 				'advanced_lockouts',
-				'advanced_lostpassword_url',
-				'advanced_branding'
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
@@ -1358,9 +1348,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() ) {
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override advanced_branding
-					$auth_settings['advanced_branding'] = $auth_multisite_settings['advanced_branding'];
-
 					// Override external services (cas or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
 				}
@@ -1587,19 +1574,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function custom_lostpassword_url( $lostpassword_url ) {
 			// Grab plugin settings
 			$auth_settings = get_option( 'auth_settings' );
-
-			// Grab multisite overrides
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-					// Override access_who_can_login and access_who_can_view
-					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
-					$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
-
-					// Override advanced_lostpassword_url
-					$auth_settings['advanced_lostpassword_url'] = $auth_multisite_settings['advanced_lostpassword_url'];
-				}
-			}
 
 			if (
 				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
@@ -2267,12 +2241,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'duration_2' => 10,
 						'reset_duration' => 120,
 					);
-				}
-				if ( !array_key_exists( 'advanced_lostpassword_url', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['advanced_lostpassword_url'] = '';
-				}
-				if ( !array_key_exists( 'advanced_branding', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['advanced_branding'] = 'default';
 				}
 				// Save default network options to database.
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
@@ -3075,30 +3043,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_text_auth_advanced_lostpassword_url( $args = '' ) {
 			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-auth_settings_advanced_lostpassword_url" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
-			}
+
 			// Print option elements.
 			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?= $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_auth_advanced_branding( $args = '' ) {
 			// Get plugin options.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 			$auth_settings = get_option( 'auth_settings' );
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're on the multisite options page, so print the multisite options instead.
-				$auth_settings = $auth_multisite_settings;
-			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
-				// We're on a site's option page, but there are multisite overrides, so show the overlay.
-				?><div id="overlay-hide-radio_auth_settings_advanced_branding_default" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?= network_admin_url( 'admin.php?page=authorizer&tab=advanced' ); ?>">multisite option</a>.</span></div><?php
-			}
+
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_advanced_branding_default" name="auth_settings[advanced_branding]" value="default"<?php checked( 'default' == $auth_settings['advanced_branding'] ); ?> /> Default WordPress login screen<br />
 			<?php

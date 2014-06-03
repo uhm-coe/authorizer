@@ -282,10 +282,6 @@ function save_auth_multisite_settings( caller ) {
     'reset_duration': $('#auth_settings_advanced_lockouts_reset_duration').val()
   }
 
-  var advanced_lostpassword_url = $('#auth_settings_advanced_lostpassword_url').val();
-
-  var advanced_branding = $('form input[name="auth_settings[advanced_branding]"]:checked').val();
-
   $.post(ajaxurl, {
     action: 'save_auth_multisite_settings',
     'nonce_save_auth_settings': nonce_save_auth_settings,
@@ -311,8 +307,6 @@ function save_auth_multisite_settings( caller ) {
     'ldap_password': ldap_password,
     'ldap_tls': ldap_tls,
     'advanced_lockouts': advanced_lockouts,
-    'advanced_lostpassword_url': advanced_lostpassword_url,
-    'advanced_branding': advanced_branding,
   }, function( response ) {
     $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
       $(this).remove();
