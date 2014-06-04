@@ -210,11 +210,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				delete_option( 'auth_settings_advanced_admin_notice' );
 			}
 
-			// For security, delete inactive users (since we can't enforce their
-			// inactivity without this plugin enabled, which means they would be
-			// able to reset their passwords and log in). If they have any
-			// content, reassign it to the current user (the user uninstalling
-			// the plugin).
+			// For security, delete inactive and blocked users (since we can't
+			// enforce their inactivity without this plugin enabled, which means
+			// they would be able to reset their passwords and log in). If they
+			// have any content, reassign it to the current user (the user
+			// uninstalling the plugin).
 			if ( ! is_multisite() ) {
 				$inactive_users = get_users( array(
 					'meta_key' => 'auth_inactive',
@@ -466,10 +466,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// If the blocked external user has a WordPress account, change
 				// its password and mark it as blocked.
 				if ( $user ) {
-					// Reset user's password (change it to something they don't know, just in case)
-					wp_set_password( wp_generate_password(), $user->ID );
-
-					// Mark user as inactive (enforce inactivity in this->authenticate()).
+					// Mark user as blocked (enforce block in this->authenticate()).
 					update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 				}
 
