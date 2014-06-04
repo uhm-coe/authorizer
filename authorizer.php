@@ -235,7 +235,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-		} // END deactivate()
+		} // END uninstall()
 
 
 
@@ -440,7 +440,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 			return $user;
-		}
+		} // END custom_authenticate()
 
 
 		/**
@@ -486,7 +486,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
 					foreach ( $auth_settings['access_users_pending'] as $key => $pending_user ) {
 						if ( $pending_user['email'] === $user_email ) {
-							unset( $auth_settings['access_users_pending'][$key] );
+							unset( $auth_settings['access_users_pending'][ $key ] );
 							break;
 						}
 					}
@@ -599,7 +599,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 			}
 
-		}
+		} // END check_user_access()
 
 
 		/**
@@ -669,7 +669,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			die( $response );
-		}
+		} // END ajax_process_google_login()
 
 
 		/**
@@ -712,7 +712,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $email,
 				'authenticated_by' => 'google',
 			);
-		}
+		} // END custom_authenticate_google()
 
 
 		/**
@@ -767,7 +767,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $externally_authenticated_email,
 				'authenticated_by' => $authenticated_by,
 			);
-		}
+		} // END custom_authenticate_cas()
 
 
 		/**
@@ -857,7 +857,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $externally_authenticated_email,
 				'authenticated_by' => 'ldap',
 			);
-		}
+		} // END custom_authenticate_ldap()
 
 
 		/**
@@ -924,7 +924,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Log out of external service: CAS.
 					// Set the CAS client configuration if it hasn't been set already.
 					if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
-						phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+						phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 					}
 					// Log out of CAS.
 					phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
@@ -940,7 +940,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					break;
 			}
 
-		}
+		} // END custom_logout()
 
 
 
