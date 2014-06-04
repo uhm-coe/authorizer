@@ -81,10 +81,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Create settings link on Plugins page
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
 
-			// Modify login page to with custom password url and labels.
-			if ( strpos( $_SERVER['REQUEST_URI'], 'wp-login.php' ) !== false ) {
-				add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
-			}
+			// Modify login page with a custom password url (if option is set).
+			add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
 
 			// If we have a custom login error, add the filter to show it.
 			$error = get_option( 'auth_settings_advanced_login_error' );
@@ -325,6 +323,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
 					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
+					$auth_settings['ldap_lostpassword_url'] = $auth_multisite_settings['ldap_lostpassword_url'];
 
 					// Append network approved users to access_users_approved
 					$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
@@ -886,6 +885,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
 					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
+					$auth_settings['ldap_lostpassword_url'] = $auth_multisite_settings['ldap_lostpassword_url'];
 				}
 			}
 
@@ -1193,6 +1193,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<th scope="row">Secure Connection (TLS)</th>
 								<td><?php $this->print_checkbox_ldap_tls( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
+							<tr>
+								<th scope="row">Custom lost password URL</th>
+								<td><?php $this->print_text_ldap_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
 						</tbody></table>
 
 						<?php $this->print_section_info_advanced(); ?>
@@ -1317,6 +1321,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_user',
 				'ldap_password',
 				'ldap_tls',
+				'ldap_lostpassword_url',
 				'advanced_lockouts',
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
@@ -1612,10 +1617,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = get_option( 'auth_settings' );
 
 			if (
-				array_key_exists( 'advanced_lostpassword_url', $auth_settings ) &&
-				filter_var( $auth_settings['advanced_lostpassword_url'], FILTER_VALIDATE_URL )
+				array_key_exists( 'ldap_lostpassword_url', $auth_settings ) &&
+				filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_VALIDATE_URL )
 			) {
-				$lostpassword_url = $auth_settings['advanced_lostpassword_url'];
+				$lostpassword_url = $auth_settings['ldap_lostpassword_url'];
 			}
 			return $lostpassword_url;
 		}
@@ -2019,6 +2024,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
+			add_settings_field(
+				'auth_settings_ldap_lostpassword_url', // HTML element ID
+				'Custom lost password URL', // HTML element Title
+				array( $this, 'print_text_ldap_lostpassword_url' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
 
 			// Create Advanced Settings section
 			add_settings_section(
@@ -2031,13 +2043,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_advanced_lockouts', // HTML element ID
 				'Limit invalid login attempts', // HTML element Title
 				array( $this, 'print_text_auth_advanced_lockouts' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
-			);
-			add_settings_field(
-				'auth_settings_advanced_lostpassword_url', // HTML element ID
-				'Custom lost password URL', // HTML element Title
-				array( $this, 'print_text_auth_advanced_lostpassword_url' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
@@ -2165,6 +2170,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'ldap_tls', $auth_settings ) ) {
 				$auth_settings['ldap_tls'] = '1';
 			}
+			if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_settings ) ) {
+				$auth_settings['ldap_lostpassword_url'] = '';
+			}
 
 			// Advanced defaults.
 			if ( ! array_key_exists( 'advanced_lockouts', $auth_settings ) ) {
@@ -2175,9 +2183,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'duration_2' => 10,
 					'reset_duration' => 120,
 				);
-			}
-			if ( ! array_key_exists( 'advanced_lostpassword_url', $auth_settings ) ) {
-				$auth_settings['advanced_lostpassword_url'] = '';
 			}
 			if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 				$auth_settings['advanced_branding'] = 'default';
@@ -2267,6 +2272,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_tls'] = '1';
+				}
+				if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_lostpassword_url'] = '';
 				}
 				// Advanced defaults.
 				if ( ! array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
@@ -2373,6 +2381,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ) {
 				$auth_settings['ldap_tls'] = '1';
 			}
+
+			// Sanitize LDAP Lost Password URL
+			$auth_settings['ldap_lostpassword_url'] = filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_SANITIZE_URL );
 
 			// Obfuscate LDAP directory user password
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
@@ -3044,6 +3055,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
 		}
+		function print_text_ldap_lostpassword_url( $args = '' ) {
+			// Set option name.
+			$option = 'ldap_lostpassword_url';
+			$name = "auth_settings[$option]";
+			$id = "auth_settings_$option";
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
+				$auth_settings = $auth_multisite_settings;
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// We're on a site's option page, but there are multisite overrides, so show the overlay.
+				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
+			}
+			// Print option elements.
+			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
+		}
 
 
 		function print_section_info_advanced( $args = '' ) {
@@ -3079,14 +3108,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			Reset the delays after
 			<input type="text" id="auth_settings_advanced_lockouts_reset_duration" name="auth_settings[advanced_lockouts][reset_duration]" value="<?php echo $auth_settings['advanced_lockouts']['reset_duration']; ?>" placeholder="240" style="width:40px;" />
 			minutes with no invalid attempts.<?php
-		}
-
-		function print_text_auth_advanced_lostpassword_url( $args = '' ) {
-			// Get plugin options.
-			$auth_settings = get_option( 'auth_settings' );
-
-			// Print option elements.
-			?><input type="text" id="auth_settings_advanced_lostpassword_url" name="auth_settings[advanced_lostpassword_url]" value="<?php echo $auth_settings['advanced_lostpassword_url']; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		}
 
 		function print_radio_auth_advanced_branding( $args = '' ) {

@@ -273,6 +273,7 @@ function save_auth_multisite_settings( caller ) {
   var ldap_user = $('#auth_settings_ldap_user').val();
   var ldap_password = $('#auth_settings_ldap_password').val();
   var ldap_tls = $('#auth_settings_ldap_tls').is(':checked') ? '1' : '';
+  var ldap_lostpassword_url = $('#auth_settings_ldap_lostpassword_url').val();
 
   var advanced_lockouts = {
     'attempts_1': $('#auth_settings_advanced_lockouts_attempts_1').val(),
@@ -306,6 +307,7 @@ function save_auth_multisite_settings( caller ) {
     'ldap_user': ldap_user,
     'ldap_password': ldap_password,
     'ldap_tls': ldap_tls,
+    'ldap_lostpassword_url': ldap_lostpassword_url,
     'advanced_lockouts': advanced_lockouts,
   }, function( response ) {
     $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
@@ -468,6 +470,7 @@ jQuery(document).ready(function($){
   var auth_settings_external_ldap_user = $('#auth_settings_ldap_user').closest('tr');
   var auth_settings_external_ldap_password = $('#auth_settings_ldap_password').closest('tr');
   var auth_settings_external_ldap_tls = $('#auth_settings_ldap_tls').closest('tr');
+  var auth_settings_external_ldap_lostpassword_url = $('#auth_settings_ldap_lostpassword_url').closest('tr');
 
   // Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
   $('th, td', auth_settings_access_users_pending).wrapInner('<div class="animated_wrapper" />');
@@ -492,6 +495,7 @@ jQuery(document).ready(function($){
   $('th, td', auth_settings_external_ldap_user).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_password).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_ldap_tls).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_ldap_lostpassword_url).wrapInner('<div class="animated_wrapper" />');
 
   // If we're viewing the dashboard widget, reset a couple of the relevant
   // option variables (since they're aren't nested in table rows).
@@ -538,6 +542,7 @@ jQuery(document).ready(function($){
     animate_option( 'hide_immediately', auth_settings_external_ldap_user );
     animate_option( 'hide_immediately', auth_settings_external_ldap_password );
     animate_option( 'hide_immediately', auth_settings_external_ldap_tls );
+    animate_option( 'hide_immediately', auth_settings_external_ldap_lostpassword_url );
   }
 
   // Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -603,6 +608,7 @@ jQuery(document).ready(function($){
       animate_option( 'show', auth_settings_external_ldap_user );
       animate_option( 'show', auth_settings_external_ldap_password );
       animate_option( 'show', auth_settings_external_ldap_tls );
+      animate_option( 'show', auth_settings_external_ldap_lostpassword_url );
     } else {
       animate_option( 'hide', auth_settings_external_ldap_host );
       animate_option( 'hide', auth_settings_external_ldap_port );
@@ -611,6 +617,7 @@ jQuery(document).ready(function($){
       animate_option( 'hide', auth_settings_external_ldap_user );
       animate_option( 'hide', auth_settings_external_ldap_password );
       animate_option( 'hide', auth_settings_external_ldap_tls );
+      animate_option( 'hide', auth_settings_external_ldap_lostpassword_url );
     }
   });
 
