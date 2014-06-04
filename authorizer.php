@@ -3123,6 +3123,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				?><input type="radio" id="radio_auth_settings_advanced_branding_<?php echo sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[advanced_branding]" value="<?php echo $branding_option['value']; ?>"<?php checked( $branding_option['value'] == $auth_settings['advanced_branding'] ); ?> /> <?php echo $branding_option['description']; ?><br /><?php
 			}
+
+			// Print message about adding custom brands if there are none.
+			if ( count( $branding_options ) === 0 ) {
+				?><p><em><strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</em></p><?php
+			}
 		}
 
 
