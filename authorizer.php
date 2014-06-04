@@ -3495,13 +3495,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $is_current_user = false ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
-			$next_level = 'level_' . ( $current_user->user_level + 1 );
 
-			// Remove unpermitted roles from the roles array.
-			foreach ($roles as $name => $role) {
-				if ( isset( $role['capabilities'][$next_level] ) ) {
-					unset( $roles[$name] );
-				}
+			// Make sure we have a selected role (default to subscriber).
+			if ( strlen( $selected_role ) < 1 ) {
+				$selected_role = 'subscriber';
 			}
 
 			// If the specified $selected_role is not permitted, the select
