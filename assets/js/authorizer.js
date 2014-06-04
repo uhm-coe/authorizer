@@ -25,7 +25,7 @@ function choose_tab( list_name, delay ) {
   setTimeout( hide_multisite_overridden_options, delay );
 }
 
-// Remove user from list (multisite options page).
+// Add user to list (multisite options page).
 function auth_multisite_add_user( caller, list, create_local_account ) {
   create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
   var is_multisite = true;
@@ -214,7 +214,9 @@ function save_auth_settings( caller, create_local_account ) {
     'access_users_blocked': access_users_blocked,
     'nonce_save_auth_settings': nonce_save_auth_settings,
   }, function( response ) {
-    $('form .spinner').remove();
+    $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
+      $(this).remove();
+    });
     $(caller).removeAttr('disabled');
     if (response==0) { // failed
       return false;
