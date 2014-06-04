@@ -450,7 +450,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// and login access is set to "All authenticated users," add them
 			// to the approved list (they'll get an account created below if
 			// they don't have one yet).
-			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved', true ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved', 'multisite' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
 				// If this user happens to be in the pending list (rare),
 				// remove them from pending before adding them to approved.
 				if ( $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
@@ -479,7 +479,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
-			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved', true ) && ! $user_is_inactive ) {
+			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved', 'multisite' ) && ! $user_is_inactive ) {
 				$user_info = $this->get_user_info_from_list( $externally_authenticated_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
@@ -1258,7 +1258,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sanitize settings
-			$auth_multisite_settings = $this->sanitize_options( $_POST, true );
+			$auth_multisite_settings = $this->sanitize_options( $_POST, 'multisite' );
 
 			// Filter options to only the allowed values (multisite options are a subset of all options)
 			$allowed = array(
@@ -2253,7 +2253,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Settings sanitizer callback
 		 */
-		function sanitize_options( $auth_settings, $is_multisite_option = false ) {
+		function sanitize_options( $auth_settings, $multisite_mode = 'single' ) {
 			// If the pending user list isn't a list, make it.
 			if ( ! is_array( $auth_settings['access_users_pending'] ) ) {
 				$auth_settings['access_users_pending'] = array();
@@ -2269,7 +2269,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach( $auth_settings['access_users_approved'] as $user_info ) {
 				$wp_user = get_user_by( 'email', $user_info['email'] );
 				if ( $wp_user ) {
-					if ( $is_multisite_option ) {
+					if ( $multisite_mode === 'multisite' ) {
 						$blogs = get_blogs_of_user( $wp_user->ID );
 						foreach ( $blogs as $blog ) {
 							add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
@@ -3416,7 +3416,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
 		 */
-		function is_email_in_list($email = '', $list = 'approved', $is_multisite_list = false ) {
+		function is_email_in_list($email = '', $list = 'approved', $multisite_mode = 'single' ) {
 			if ( empty( $email ) )
 				return false;
 
@@ -3432,7 +3432,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				case 'approved':
 				default:
 					// Add in the users from the multisite options
-					if ( $is_multisite_list ) {
+					if ( $multisite_mode === 'multisite' ) {
 						$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 						$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
 					}
@@ -3444,18 +3444,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Helper function to search a multidimensional array for a value.
 		 */
-		function in_multi_array( $needle = '', $haystack = array(), $strict = false, $case_sensitive = false ) {
+		function in_multi_array( $needle = '', $haystack = array(), $strict_mode = 'not strict', $case_sensitivity = 'case insensitive' ) {
 			if ( ! is_array( $haystack ) ) {
 				return false;
 			}
-			if ( ! $case_sensitive ) {
+			if ( $case_sensitivity === 'case sensitive' ) {
 				$needle = strtolower( $needle );
 			}
 			foreach ( $haystack as $item ) {
-				if ( ! $case_sensitive && ! is_array( $item ) ) {
+				if ( $case_sensitivity === 'case sensitive' && ! is_array( $item ) ) {
 					$item = strtolower( $item );
 				}
-				if ( ( $strict ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict, $case_sensitive ) ) ) {
+				if ( ( $strict_mode === 'strict' ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) {
 					return true;
 				}
 			}
