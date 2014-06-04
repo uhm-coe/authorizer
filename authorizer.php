@@ -165,7 +165,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
 			if ( is_multisite() ) {
-				if ( isset($_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
+				if ( isset( $_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
 					$old_blog = $wpdb->blogid;
 					// Get all blog ids
 					$blogs = wp_get_sites( array(
@@ -184,7 +184,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Set meaningful defaults for this site.
 			$this->set_default_options();
-		}
+		} // END activate()
 
 		/**
 		 * Plugin deactivation.
