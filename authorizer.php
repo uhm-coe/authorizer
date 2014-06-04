@@ -2671,8 +2671,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_radio_auth_access_public_warning( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
-			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page (without the anonymous access message)<br />
-			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page with the anonymous access message above the content<?php
+			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page <strong>without</strong> the anonymous access message<br />
+			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissable" target="_blank">Bootstrap Dismissable Alert</a>)<?php
 		}
 
 		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
