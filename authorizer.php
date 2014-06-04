@@ -2100,7 +2100,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_redirect'] = 'login';
 			}
 			if ( ! array_key_exists( 'access_public_warning', $auth_settings ) ) {
-				$auth_settings['access_public_warning'] = 'warning';
+				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 			if ( ! array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_redirect_to_message'] = '<p><strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.</p>';
@@ -2344,7 +2344,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Default to warning message for anonymous users on public pages.
 			if ( ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
-				$auth_settings['access_public_warning'] = 'warning';
+				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 
 			// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string)
