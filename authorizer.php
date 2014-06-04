@@ -2455,7 +2455,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<li>
 							<input type="text" id="auth_multisite_settings_access_users_approved_<?php echo $key; ?>" name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
 							<select name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
-								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
+								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="auth_multisite_settings[access_users_approved][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
@@ -2476,10 +2476,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php else: ?>
 							<?php $approved_user['is_wp_user'] = false; ?>
 						<?php endif; ?>
+						<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 						<li>
 							<input type="text" id="auth_settings_access_users_approved_<?php echo $key; ?>" name="auth_settings[access_users_approved][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
 							<select name="auth_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings_access(this);">
-								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $is_current_user ); ?>
+								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 							</select>
 							<input type="text" name="auth_settings[access_users_approved][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 							<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) echo 'disabled="disabled" '; ?>/>
@@ -3492,7 +3493,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		// Helper function that builds option tags for a select element for all
 		// roles the current user has permission to assign.
-		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $is_current_user = false ) {
+		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled' ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
 
@@ -3511,7 +3512,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print an option element for each permitted role.
 			foreach ($roles as $name => $role) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
-				$disabled = $is_current_user ? ' disabled="disabled"' : ''; // Don't let a user change their own role
+				$disabled = $disable_input === 'disabled' ? ' disabled="disabled"' : ''; // Don't let a user change their own role
 				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
 		}
