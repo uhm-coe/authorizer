@@ -3390,11 +3390,40 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private static $key = '8QxnrvjdtweisvCBKEY!+0';
 		function encrypt( $text ) {
-			return mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
+			$result = '';
+
+			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
+			if ( function_exists( 'mcrypt_encrypt') ) {
+				$result = mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
+			} else {
+				for ( $i = 0; $i < strlen( $text ); $i++ ) {
+					$char = substr( $text, $i, 1 );
+					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
+					$char = chr( ord( $char ) + ord( $keychar ) );
+					$result .= $char;
+				}
+				$result = base64_encode( $result );
+			}
+
+			return $result;
 		}
 		function decrypt( $secret ) {
-			$str = '';
-			return rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$str" );
+			$result = '';
+
+			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
+			if ( function_exists( 'mcrypt_decrypt') ) {
+				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
+			} else {
+				$secret = base64_decode( $secret );
+				for ( $i = 0; $i < strlen( $secret ); $i++ ) {
+					$char = substr( $secret, $i, 1 );
+					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
+					$char = chr( ord( $char ) - ord( $keychar ) );
+					$result .= $char;
+				}
+			}
+
+			return $result;
 		}
 
 		/**
