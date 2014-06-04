@@ -420,15 +420,50 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Also check the auth_inactive user_meta flag (users removed from
 			// approved list will get this flag).
-			$user_is_inactive = $unauthenticated_user_is_inactive;
+			$active_mode = $unauthenticated_user_is_inactive ? 'inactive' : 'active';
 			if ( $user ) {
-				$user_is_inactive = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes';
+				$active_mode = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes' ? 'inactive' : 'active';
+			}
+
+			// Check this external user's access against the access lists
+			// (pending, approved, blocked)
+			$result = $this->check_user_access( $user, $externally_authenticated_email, $active_mode, $auth_settings );
+
+			// Fail with message if error.
+			if ( is_wp_error( $result ) ) {
+				return $result;
+			}
+
+			// We'll track how this user was authenticated in user meta.
+			if ( $user ) {
+				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+			}
+
+			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
+			return $user;
+		}
+
+
+		/**
+		 * This function will fail with a wp_die() message to the user if they
+		 * don't have access.
+		 * @param  WP_User $user       User to check
+		 * @param  [type] $user_email  User's plaintext email (in case current user doesn't have a WP account)
+		 * @param  string $active_mode 'inactive' users don't have access, and route to pending list
+		 * @return  WP_Error if there was an error on user creation / adding user to blog
+		 * 			wp_die() if user does not have access
+		 * 			null if user has access (success)
+		 */
+		private function check_user_access( $user, $user_email, $active_mode = 'active', $auth_settings = null ) {
+			if ( ! $auth_settings ) {
+				// Grab plugin settings.
+				$auth_settings = get_option( 'auth_settings' );
 			}
 
 			// Check our externally authenticated user against the block list.
 			// If they are blocked, set the relevant user meta field, and show
 			// them an error screen.
-			if ( $this->is_email_in_list( $externally_authenticated_email, 'blocked' ) ) {
+			if ( $this->is_email_in_list( $user_email, 'blocked' ) ) {
 				// If the blocked external user has a WordPress account, change
 				// its password and mark it as blocked.
 				if ( $user ) {
@@ -440,22 +475,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Notify user about blocked status
-				$error_message = 'Sorry ' . $externally_authenticated_email . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
+				$error_message = 'Sorry ' . $user_email . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
-				return;
 			}
 
 			// If this externally authenticated user isn't in the approved list
 			// and login access is set to "All authenticated users," add them
 			// to the approved list (they'll get an account created below if
 			// they don't have one yet).
-			if ( ! $this->is_email_in_list( $externally_authenticated_email, 'approved', 'multisite' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+			if ( ! $this->is_email_in_list( $user_email, 'approved', 'multisite' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
 				// If this user happens to be in the pending list (rare),
 				// remove them from pending before adding them to approved.
-				if ( $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
+				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
 					foreach ( $auth_settings['access_users_pending'] as $key => $pending_user ) {
-						if ( $pending_user['email'] === $externally_authenticated_email ) {
+						if ( $pending_user['email'] === $user_email ) {
 							unset( $auth_settings['access_users_pending'][$key] );
 							break;
 						}
@@ -465,7 +499,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Add this user to the approved list.
 				$approved_role = $user && is_array( $user->roles ) && count( $user->roles) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
 				$approved_user = array(
-					'email' => $externally_authenticated_email,
+					'email' => $user_email,
 					'role' => $approved_role,
 					'date_added' => date( "Y-m-d H:i:s" ),
 				);
@@ -479,8 +513,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
-			if ( $this->is_email_in_list( $externally_authenticated_email, 'approved', 'multisite' ) && ! $user_is_inactive ) {
-				$user_info = $this->get_user_info_from_list( $externally_authenticated_email, $auth_settings['access_users_approved'] );
+			if ( $this->is_email_in_list( $user_email, 'approved', 'multisite' ) && $active_mode === 'active' ) {
+				$user_info = $this->get_user_info_from_list( $user_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
 				if ( ! $user ) {
@@ -541,9 +575,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
 				// (Note: this will include 'inactive' existing users.)
-				if ( ! $this->is_email_in_list( $externally_authenticated_email, 'pending' ) ) {
+				if ( ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 					$pending_user = array();
-					$pending_user['email'] = $externally_authenticated_email;
+					$pending_user['email'] = $user_email;
 					$pending_user['role'] = $auth_settings['access_default_role'];
 					$pending_user['date_added'] = '';
 					if ( ! is_array ( $auth_settings['access_users_pending'] ) ) {
@@ -564,19 +598,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Notify user about pending status and return without authenticating them.
 				$error_message = $auth_settings['access_pending_redirect_to_message'];
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_login_url() . '">Check Again</a> <a class="button" href="' . wp_logout_url() . '">Log Out</a></p>';
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_login_url( home_url() ) . '">Check Again</a> <a class="button" href="' . wp_logout_url( home_url() ) . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
-				return;
 			}
 
-			// We'll track how this user was authenticated in user meta.
-			if ( $user ) {
-				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
-			}
-
-			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
-			return $user;
 		}
 
 
@@ -956,16 +982,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( $auth_settings['access_who_can_view'] == 'logged_in_users' && $this->is_user_logged_in_and_blog_user() )
 			);
 
-			// Fringe case: In a multisite, a user of a different blog can
-			// successfully log in, but they aren't on the 'approved' whitelist
-			// for this blog. Flag these users, and redirect them to their
-			// profile page with a message (so we don't get into a redirect
-			// loop on the wp-login.php page).
-			if ( is_multisite() && is_user_logged_in() && ! $has_access ) {
-				wp_redirect( admin_url( 'profile.php' ), 302 );
-				exit;
-			}
-
 			/**
 			 * Developers can use the `authorizer_has_access` filter
 			 * to override restricted access on certain pages. Note that the
@@ -995,8 +1011,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
+			// Fringe case: In a multisite, a user of a different blog can
+			// successfully log in, but they aren't on the 'approved' whitelist
+			// for this blog. Flag these users, and redirect them to their
+			// profile page with a message (so we don't get into a redirect
+			// loop on the wp-login.php page).
+			if ( is_multisite() && is_user_logged_in() && ! $has_access ) {
+				$current_user = wp_get_current_user();
+
+				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
+				$active_mode = get_user_meta( $current_user->ID, 'auth_inactive', true ) === 'yes' ? 'inactive' : 'active';
+
+				// Check user access; block if not, add them to pending list if open, let them through otherwise.
+				$result = $this->check_user_access( $current_user, $current_user->user_email, $active_mode, $auth_settings );
+			}
+
 			// Check to see if the requested page is public. If so, show it.
 			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $wp->query_vars['pagename'] );
+			if ( ! is_array( $auth_settings['access_public_pages'] ) ) {
+				$auth_settings['access_public_pages'] = array();
+			}
 			if ( in_array( $current_page_id, $auth_settings['access_public_pages'] ) ) {
 				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 					update_option( 'auth_settings_advanced_public_notice', false);
@@ -2648,6 +2682,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function print_multiselect_auth_access_public_pages( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
+			if ( ! is_array( $auth_settings['access_public_pages'] ) ) {
+				$auth_settings['access_public_pages'] = array();
+			}
 			?><select id="auth_settings_access_public_pages" multiple="multiple" name="auth_settings[access_public_pages][]">
 				<optgroup label="Special">
 					<option value="home" <?php echo in_array( 'home', $auth_settings['access_public_pages'] ) ? 'selected="selected"' : ''; ?>>Home Page</option>
