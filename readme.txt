@@ -1,5 +1,5 @@
 === Authorizer ===
-Contributors: figureone
+Contributors: figureone, the_magician, pat_trick
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
 Tested up to: 3.9.1
