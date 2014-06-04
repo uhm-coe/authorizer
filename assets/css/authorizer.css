@@ -311,6 +311,15 @@ body.toplevel_page_authorizer .spinner .spinner-text {
 }
 
 
+/* Override a strange WordPress style that causes text to jump */
+.form-table td .button-primary.active,
+.form-table td .button-primary:active,
+.form-table td .button-primary:focus,
+.form-table td .button-primary:hover {
+  vertical-align: baseline;
+}
+
+
 @font-face {
   font-family: 'Glyphicons Halflings';
 
