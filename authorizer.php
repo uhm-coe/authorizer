@@ -2086,7 +2086,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_role_receive_pending_emails'] = '---';
 			}
 			if ( ! array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
-				$auth_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently on the roster for this course. Your instructor has been notified, and once he/she has approved your request, you will be able to access this site. If you need any other help, please contact your instructor.</p>';
+				$auth_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your administrator.</p>';
 			}
 
 			// Public Access to Private Page Defaults.
