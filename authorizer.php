@@ -799,6 +799,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'empty_password', 'You must provide a password.' );
 			}
 
+			// Make sure php5-ldap extension is installed on server.
+			if ( ! function_exists( 'ldap_connect' ) ) {
+				// Note: this error message won't get shown to the user because
+				// authenticate will fall back to WP auth when this fails.
+				return new WP_Error( 'ldap_not_installed', 'LDAP logins are disabled because this server does not support them.');
+			}
+
 			// Authenticate against LDAP using options provided in plugin settings.
 			$result = false;
 			$ldap_user_dn = '';
@@ -2924,8 +2931,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// We're on a site's option page, but there are multisite overrides, so show the overlay.
 				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
+			// Make sure php5-ldap extension is installed on server.
+			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(<a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
 			// Print option elements.
-			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins<?php
+			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins <?php echo $ldap_installed_message; ?><?php
 		}
 
 		function print_text_ldap_host( $args = '' ) {
