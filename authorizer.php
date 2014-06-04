@@ -2055,7 +2055,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_who_can_view'] = 'everyone';
 			}
 			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) ) {
-				$auth_settings['access_public_pages'] = array('home');
+				$auth_settings['access_public_pages'] = array();
 			}
 			if ( ! array_key_exists( 'access_redirect', $auth_settings ) ) {
 				$auth_settings['access_redirect'] = 'login';
