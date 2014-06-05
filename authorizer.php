@@ -1463,6 +1463,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php if ( $auth_settings['google'] === '1' ): ?>
 				<script type="text/javascript">
 					function signInCallback( authResult ) {
+						var $ = jQuery;
 						if ( authResult['code'] ) {
 							// Hide the sign-in button now that the user is authorized, for example:
 							$( '#signinButton' ).attr( 'style', 'display: none' );
