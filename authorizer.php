@@ -426,7 +426,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check this external user's access against the access lists
 			// (pending, approved, blocked)
-			$result = $this->check_user_access( $user, $externally_authenticated_email, $active_mode, $auth_settings );
+			$result = $this->check_user_access( $user, $externally_authenticated_email, $active_mode );
 
 			// Fail with message if error.
 			if ( is_wp_error( $result ) ) {
@@ -453,10 +453,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * 			wp_die() if user does not have access
 		 * 			null if user has access (success)
 		 */
-		private function check_user_access( $user, $user_email, $active_mode = 'active', $auth_settings = null ) {
-			if ( ! $auth_settings ) {
-				// Grab plugin settings.
-				$auth_settings = get_option( 'auth_settings' );
+		private function check_user_access( $user, $user_email, $active_mode = 'active' ) {
+			// Grab plugin settings.
+			$auth_settings = get_option( 'auth_settings' );
+
+			// Grab multisite overrides
+			if ( is_multisite() ) {
+				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+					// Override access_who_can_login and access_who_can_view
+					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
+
+					// Override access_default_role
+					$auth_settings['access_default_role'] = $auth_multisite_settings['access_default_role'];
+				}
 			}
 
 			// Check our externally authenticated user against the block list.
@@ -1027,7 +1037,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$active_mode = get_user_meta( $current_user->ID, 'auth_inactive', true ) === 'yes' ? 'inactive' : 'active';
 
 				// Check user access; block if not, add them to pending list if open, let them through otherwise.
-				$result = $this->check_user_access( $current_user, $current_user->user_email, $active_mode, $auth_settings );
+				$result = $this->check_user_access( $current_user, $current_user->user_email, $active_mode );
 			}
 
 			// Check to see if the requested page is public. If so, show it.

@@ -180,6 +180,10 @@ function save_auth_settings( caller, create_local_account ) {
 
   var access_users_approved = new Object();
   $('#list_auth_settings_access_users_approved li').each(function(index) {
+    // Skip the greyed out multisite users, otherwise it will result in duplicates.
+    if ( $('.auth-multisite-user', this).length !== 0 ) {
+      return true;
+    }
     var user = new Object();
     user['email'] = $('.auth-email', this).val();
     user['role'] = $('.auth-role', this).val();
@@ -214,7 +218,7 @@ function save_auth_settings( caller, create_local_account ) {
     'access_users_blocked': access_users_blocked,
     'nonce_save_auth_settings': nonce_save_auth_settings,
   }, function( response ) {
-    $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
+    $('form .spinner:not(:has(.spinner-text))').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
       $(this).remove();
     });
     $(caller).removeAttr('disabled');
@@ -312,7 +316,7 @@ function save_auth_multisite_settings( caller ) {
     'ldap_lostpassword_url': ldap_lostpassword_url,
     'advanced_lockouts': advanced_lockouts,
   }, function( response ) {
-    $('form .spinner').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
+    $('form .spinner:not(:has(.spinner-text))').append('<span class="spinner-text">Saved.</span>').delay( 500 ).hide( animation_speed, function() {
       $(this).remove();
     });
     $(caller).removeAttr('disabled');
