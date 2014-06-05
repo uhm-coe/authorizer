@@ -236,7 +236,7 @@ function save_auth_multisite_settings( caller ) {
   var $ = jQuery;
 
   $(caller).attr('disabled', 'disabled');
-  $(caller).last().after('<span class="spinner"></span>');
+  $(caller).last().next().after('<span class="spinner"></span>');
   $('form .spinner').show();
 
   // Get form elements to save
