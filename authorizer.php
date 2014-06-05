@@ -2466,31 +2466,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		} // END print_combo_auth_access_users_pending()
 
 		function print_combo_auth_access_users_approved( $args = '' ) {
-			// Grab multisite overrides
-			$auth_multisite_settings = array();
-			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			}
-
+			// Get plugin options.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_settings = get_option( 'auth_settings' );
+			$js_function_prefix = 'auth_';
 			$multisite_admin_page = false;
-			if ( is_multisite() && is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
-				// We're showing the "globally" approved list on the network
-				// admin plugin options page, so we need to load the global
-				// approved list instead of a site-specific approved list.
-				// Note: BLOG_ID_CURRENT_SITE (typically set to 1) points
-				// to the "Main Site" for the network (usually the first site).
+			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) {
+				// We're on the multisite options page, so print the multisite options instead.
 				$auth_settings = $auth_multisite_settings;
 
 				// We also will need to change the AJAX destinations for
 				// actions (ignore user; add user; add local user).
-				$js_function_prefix = 'auth_multisite_';
+				$js_function_prefix .= 'multisite_';
 
 				// Flag indicating we're viewing the multisite options page.
 				$multisite_admin_page = true;
-			} else {
-				$auth_settings = get_option( 'auth_settings' );
-				$js_function_prefix = 'auth_';
+			} else if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
+				// Override access_default_role
+				$auth_settings['access_default_role'] = $auth_multisite_settings['access_default_role'];
 			}
+
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' && array_key_exists( 'access_users_approved', $auth_multisite_settings ) && is_array( $auth_multisite_settings['access_users_approved'] ) && ! $multisite_admin_page ) : ?>
 					<?php foreach ( $auth_multisite_settings['access_users_approved'] as $key => $approved_user ): ?>
