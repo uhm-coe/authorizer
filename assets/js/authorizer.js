@@ -92,10 +92,11 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
   if ( validated ) {
     // Add the new item.
     var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
+    var ajax_save_function = is_multisite ? 'save_auth_multisite_settings(this)' : 'save_auth_settings(this)';
     $(' \
       <li id="new_user_' + next_id + '" style="display: none;"> \
         <input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
-        <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="save_auth_settings(this);"> \
+        <select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + ajax_save_function + ';"> \
         </select> \
         <input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
         <input type="button" class="button" onclick="auth_ignore_user(this);" value="&times;" /> ' + local_icon + ' \
