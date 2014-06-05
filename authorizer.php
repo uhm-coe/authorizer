@@ -3312,13 +3312,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die('');
 			}
 
-			// Make sure nonce exists.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
-				die('');
-			}
-
 			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
 				die('');
 			}
 
