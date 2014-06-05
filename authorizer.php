@@ -3347,7 +3347,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Figure out if any of the users in the approved list were removed (ignored).
 			// Remove their access by setting the auth_inactive user_meta flag.
-			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
+			$new_approved_list = array_map(
+				function( $user ) {
+					return $user['email'];
+				},
+				$_POST['access_users_approved']
+			);
 			foreach ( $auth_settings['access_users_approved'] as $approved_user ) {
 				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
 					$ignored_user = get_user_by( 'email', $approved_user['email'] );
@@ -3360,7 +3365,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Figure out if any of the users in the approved list were added (new).
 			// Remove the auth_inactive flag from their WP account if either exists.
-			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_settings['access_users_approved'] );
+			$old_approved_list = array_map(
+				function( $user ) {
+					return $user['email'];
+				},
+				$auth_settings['access_users_approved']
+			);
 			foreach ( $_POST['access_users_approved'] as $approved_user ) {
 				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
 					$new_user = get_user_by( 'email', $approved_user['email'] );
