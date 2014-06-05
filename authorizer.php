@@ -781,7 +781,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Validate this user's credentials against Google.
+		 * Validate this user's credentials against LDAP.
 		 * @param  array $auth_settings  Plugin settings
 		 * @param  string $username      Attempted username from authenticate action
 		 * @param  string $password      Attempted password from authenticate action
