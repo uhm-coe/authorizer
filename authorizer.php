@@ -313,6 +313,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
 					$auth_settings['cas'] = $auth_multisite_settings['cas'];
+					$auth_settings['cas_custom_label'] = $auth_multisite_settings['cas_custom_label'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
@@ -881,6 +882,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
 					$auth_settings['cas'] = $auth_multisite_settings['cas'];
+					$auth_settings['cas_custom_label'] = $auth_multisite_settings['cas_custom_label'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
@@ -1778,6 +1780,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 					// Override external services (cas or ldap) and associated options
 					$auth_settings['cas'] = $auth_multisite_settings['cas'];
+					$auth_settings['cas_custom_label'] = $auth_multisite_settings['cas_custom_label'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
@@ -2865,7 +2868,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
-		} // END print_text_cas_customlabel()
+		} // END print_text_cas_custom_label()
 
 		function print_text_cas_host( $args = '' ) {
 			// Set option name.
