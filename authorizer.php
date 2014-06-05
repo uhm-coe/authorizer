@@ -2522,7 +2522,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 						<li>
 							<input type="text" id="auth_settings_access_users_approved_<?php echo $key; ?>" name="auth_settings[access_users_approved][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings_access(this);">
+							<select name="auth_settings[access_users_approved][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings(this);">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 							</select>
 							<input type="text" name="auth_settings[access_users_approved][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
