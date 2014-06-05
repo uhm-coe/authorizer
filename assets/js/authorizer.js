@@ -238,6 +238,8 @@ function save_auth_multisite_settings( caller ) {
   $(caller).attr('disabled', 'disabled');
   if ( $(caller).val() === 'Save Changes' ) {
     $(caller).last().after('<span class="spinner"></span>');
+  } else if ( $(caller).hasClass('auth-role') ) {
+    $(caller).last().next().next().after('<span class="spinner"></span>');
   } else {
     $(caller).last().next().after('<span class="spinner"></span>');
   }
