@@ -1233,7 +1233,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Save multisite settings (ajax call).
 		 */
 		function ajax_save_auth_multisite_settings() {
-			if ( ! current_user_can ( 'manage_network_options' ) ) {
+			if ( ! current_user_can( 'manage_network_options' ) ) {
 				die( '' );
 			}
 
