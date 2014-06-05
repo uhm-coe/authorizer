@@ -3295,7 +3295,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function add_dashboard_widgets() {
 			// Only users who can edit can see the authorizer dashboard widget
-			if ( current_user_can( 'edit_posts' ) ) {
+			if ( current_user_can( 'edit_users' ) ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'auth_dashboard_widget', 'Authorizer Settings', array( $this, 'add_auth_dashboard_widget' ) );
 			}
@@ -3335,7 +3335,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function ajax_save_auth_dashboard_widget() {
 			// Only users who can edit can update options.
-			if ( ! current_user_can( 'edit_posts' ) ) {
+			if ( ! current_user_can( 'edit_users' ) ) {
 				die('');
 			}
 
