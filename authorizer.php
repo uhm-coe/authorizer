@@ -417,16 +417,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get the external user's WordPress account by email address.
 			$user = get_user_by( 'email', $externally_authenticated_email );
 
-			// Also check the auth_inactive user_meta flag (users removed from
-			// approved list will get this flag).
-			$active_mode = $unauthenticated_user_is_inactive ? 'inactive' : 'active';
-			if ( $user ) {
-				$active_mode = get_user_meta( $user->ID, 'auth_inactive', true ) === 'yes' ? 'inactive' : 'active';
-			}
-
 			// Check this external user's access against the access lists
 			// (pending, approved, blocked)
-			$result = $this->check_user_access( $user, $externally_authenticated_email, $active_mode );
+			$result = $this->check_user_access( $user, $externally_authenticated_email );
 
 			// Fail with message if error.
 			if ( is_wp_error( $result ) ) {
@@ -448,12 +441,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * don't have access.
 		 * @param  WP_User $user       User to check
 		 * @param  [type] $user_email  User's plaintext email (in case current user doesn't have a WP account)
-		 * @param  string $active_mode 'inactive' users don't have access, and route to pending list
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 * 			wp_die() if user does not have access
 		 * 			null if user has access (success)
 		 */
-		private function check_user_access( $user, $user_email, $active_mode = 'active' ) {
+		private function check_user_access( $user, $user_email ) {
 			// Grab plugin settings.
 			$auth_settings = get_option( 'auth_settings' );
 
@@ -519,7 +511,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
-			if ( $this->is_email_in_list( $user_email, 'approved', 'multisite' ) && $active_mode === 'active' ) {
+			if ( $this->is_email_in_list( $user_email, 'approved', 'multisite' ) ) {
 				$user_info = $this->get_user_info_from_list( $user_email, $auth_settings['access_users_approved'] );
 
 				// If the approved external user does not have a WordPress account, create it
@@ -1033,11 +1025,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() && is_user_logged_in() && ! $has_access ) {
 				$current_user = wp_get_current_user();
 
-				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
-				$active_mode = get_user_meta( $current_user->ID, 'auth_inactive', true ) === 'yes' ? 'inactive' : 'active';
-
 				// Check user access; block if not, add them to pending list if open, let them through otherwise.
-				$result = $this->check_user_access( $current_user, $current_user->user_email, $active_mode );
+				$result = $this->check_user_access( $current_user, $current_user->user_email );
 			}
 
 			// Check to see if the requested page is public. If so, show it.
@@ -3346,6 +3335,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If invalid input, set view restriction to only approved users (most restrictive).
 			if ( ! in_array( $_POST['access_who_can_view'], array( 'everyone', 'logged_in_users' ) ) ) {
 				$_POST['access_who_can_view'] = 'logged_in_users';
+			}
+
+			// If empty lists (pending, approved, blocked), initialize them.
+			if ( ! ( array_key_exists( 'access_users_pending', $_POST ) && is_array( $_POST['access_users_pending'] ) ) ) {
+				$_POST['access_users_pending'] = array();
+			}
+			if ( ! ( array_key_exists( 'access_users_approved', $_POST ) && is_array( $_POST['access_users_approved'] ) ) ) {
+				$_POST['access_users_approved'] = array();
+			}
+			if ( ! ( array_key_exists( 'access_users_blocked', $_POST ) && is_array( $_POST['access_users_blocked'] ) ) ) {
+				$_POST['access_users_blocked'] = array();
 			}
 
 			$auth_settings = get_option( 'auth_settings' );
