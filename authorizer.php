@@ -80,6 +80,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Create settings link on Plugins page
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
+			add_filter( 'network_admin_plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'network_admin_plugin_settings_link' ) );
 
 			// Modify login page with a custom password url (if option is set).
 			add_filter( 'lostpassword_url', array( $this, 'custom_lostpassword_url' ) );
@@ -1651,6 +1652,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			array_unshift( $links, $settings_link );
 			return $links;
 		} // END plugin_settings_link()
+
+
+
+		/**
+		 * Add a link to this plugin's network settings page from the WordPress Plugins page.
+		 * Called from "network_admin_plugin_action_links" filter in __construct() above.
+		 *
+		 * @param array $links array of links in the network admin sidebar
+		 *
+		 * @return array of links to show in the network admin sidebar.
+		 */
+		public function network_admin_plugin_settings_link( $links ) {
+			$settings_link = '<a href="admin.php?page=authorizer">Network Settings</a>';
+			array_unshift( $links, $settings_link );
+			return $links;
+		} // END network_admin_plugin_settings_link()
 
 
 
