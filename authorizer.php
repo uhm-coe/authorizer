@@ -3576,7 +3576,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return false;
-		}
+		} // END in_multi_array()
 
 		/**
 		 * Helper function to get a WordPress page ID from the pagename.
@@ -3587,7 +3587,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			global $wpdb;
 			$page_id = $wpdb->get_var("SELECT ID FROM $wpdb->posts WHERE post_name = '" . sanitize_title_for_query( $pagename ) . "'");
 			return $page_id;
-		}
+		} // END get_id_from_pagename()
 
 		/**
 		 * Helper function to determine if an URL is accessible.
@@ -3604,7 +3604,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Return true if the document has loaded successfully without any redirection or error
 			return $http_code >= 200 && $http_code < 400;
-		}
+		} // END url_is_accessible()
 
 		// Helper function that builds option tags for a select element for all
 		// roles the current user has permission to assign.
@@ -3625,12 +3625,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print an option element for each permitted role.
-			foreach ($roles as $name => $role) {
+			foreach ( $roles as $name => $role ) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
 				$disabled = $disable_input === 'disabled' ? ' disabled="disabled"' : ''; // Don't let a user change their own role
 				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
-		}
+		} // END wp_dropdown_permitted_roles()
 
 		// Helper function to get a single user info array from one of the
 		// access control lists (pending, approved, or blocked).
@@ -3643,17 +3643,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return false;
-		}
+		} // END get_user_info_from_list()
 
 		// Helper function to convert seconds to human readable text.
 		// Source: http://csl.name/php-secs-to-human-text/
-		function seconds_as_sentence($secs) {
+		function seconds_as_sentence( $secs ) {
 			$units = array(
-				"week"   => 7*24*3600,
-				"day"    =>   24*3600,
-				"hour"   =>      3600,
-				"minute" =>        60,
-				"second" =>         1,
+				"week"   => 7 * 24 * 3600,
+				"day"    =>     24 * 3600,
+				"hour"   =>          3600,
+				"minute" =>            60,
+				"second" =>             1,
 			);
 
 			// specifically handle zero
@@ -3662,15 +3662,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$s = "";
 
 			foreach ( $units as $name => $divisor ) {
-				if ( $quot = intval($secs / $divisor) ) {
+				if ( $quot = intval( $secs / $divisor ) ) {
 					$s .= "$quot $name";
-					$s .= (abs($quot) > 1 ? "s" : "") . ", ";
+					$s .= ( abs( $quot ) > 1 ? "s" : "" ) . ", ";
 					$secs -= $quot * $divisor;
 				}
 			}
 
-			return substr($s, 0, -2);
-		}
+			return substr( $s, 0, -2 );
+		} // END seconds_as_sentence()
 
 	} // END class WP_Plugin_Authorizer
 }
