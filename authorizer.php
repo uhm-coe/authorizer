@@ -235,7 +235,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-		} // END deactivate()
+		} // END uninstall()
 
 
 
@@ -440,7 +440,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 			return $user;
-		}
+		} // END custom_authenticate()
 
 
 		/**
@@ -496,7 +496,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
 					foreach ( $auth_settings['access_users_pending'] as $key => $pending_user ) {
 						if ( $pending_user['email'] === $user_email ) {
-							unset( $auth_settings['access_users_pending'][$key] );
+							unset( $auth_settings['access_users_pending'][ $key ] );
 							break;
 						}
 					}
@@ -609,7 +609,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 			}
 
-		}
+		} // END check_user_access()
 
 
 		/**
@@ -679,7 +679,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			die( $response );
-		}
+		} // END ajax_process_google_login()
 
 
 		/**
@@ -722,7 +722,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $email,
 				'authenticated_by' => 'google',
 			);
-		}
+		} // END custom_authenticate_google()
 
 
 		/**
@@ -777,7 +777,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $externally_authenticated_email,
 				'authenticated_by' => $authenticated_by,
 			);
-		}
+		} // END custom_authenticate_cas()
 
 
 		/**
@@ -867,7 +867,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'email' => $externally_authenticated_email,
 				'authenticated_by' => 'ldap',
 			);
-		}
+		} // END custom_authenticate_ldap()
 
 
 		/**
@@ -934,7 +934,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Log out of external service: CAS.
 					// Set the CAS client configuration if it hasn't been set already.
 					if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
-						phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+						phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 					}
 					// Log out of CAS.
 					phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
@@ -950,7 +950,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					break;
 			}
 
-		}
+		} // END custom_logout()
 
 
 
@@ -1017,7 +1017,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 */
 			if ( apply_filters( 'authorizer_has_access', $has_access, $wp ) === true ) {
 				// Turn off the public notice about browsing anonymously
-				update_option( 'auth_settings_advanced_public_notice', false);
+				update_option( 'auth_settings_advanced_public_notice', false );
 
 				// We've determined that the current user has access, so simply return to grant access.
 				return;
@@ -1047,9 +1047,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( in_array( $current_page_id, $auth_settings['access_public_pages'] ) ) {
 				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
-					update_option( 'auth_settings_advanced_public_notice', false);
+					update_option( 'auth_settings_advanced_public_notice', false );
 				} else {
-					update_option( 'auth_settings_advanced_public_notice', true);
+					update_option( 'auth_settings_advanced_public_notice', true );
 				}
 				return;
 			}
@@ -1064,7 +1064,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
-		}
+		} // END restrict_access()
 
 
 
@@ -1093,7 +1093,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'dashicons-groups', // Icon URL
 				89 // Position
 			);
-		}
+		} // END network_admin_menu()
 
 		/**
 		 * Output the HTML for the options page
@@ -1227,24 +1227,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</form>
 			</div>
 			<?php
-		}
+		} // END create_network_admin_page()
 
 		/**
 		 * Save multisite settings (ajax call).
 		 */
 		function ajax_save_auth_multisite_settings() {
-			if ( ! current_user_can ('manage_network_options' ) ) {
-				die('');
+			if ( ! current_user_can ( 'manage_network_options' ) ) {
+				die( '' );
 			}
 
 			// Make sure nonce exists.
 			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
-				die('');
+				die( '' );
 			}
 
 			// Nonce check.
 			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
-				die('');
+				die( '' );
 			}
 
 			// Get multisite settings.
@@ -1342,7 +1342,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update multisite settings in database.
 			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
-		}
+		} // END ajax_save_auth_multisite_settings()
 
 
 
@@ -1365,7 +1365,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			//$errors .= '    ' . $error . "<br />\n";
 			$errors = '    ' . $error . "<br />\n";
 			return $errors;
-		}
+		} // END show_advance_login_error()
 
 
 		/**
@@ -1385,7 +1385,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Load public css
 			wp_register_style( 'authorizer-public-css', plugins_url( 'assets/css/authorizer-public.css', __FILE__ ) );
 			wp_enqueue_style( 'authorizer-public-css' );
-		}
+		} // END auth_public_scripts()
 
 
 		/**
@@ -1447,7 +1447,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $auth_settings['google'] === '1' ) {
 				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/assets/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ) );
 			}
-		}
+		} // END login_enqueue_scripts_and_styles()
 
 
 		/**
@@ -1500,7 +1500,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php endif; ?>
 
 			<?php
-		}
+		} // END load_login_footer_js()
 
 
 		/**
@@ -1561,7 +1561,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div>
 			<?php
 
-		}
+		} // END login_form_add_external_service_links()
 
 
 		/**
@@ -1619,7 +1619,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
 				update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
 			}
-		}
+		} // END update_login_failed_count()
 
 		/**
 		 * Overwrite the URL for the lost password link on the login form.
@@ -1637,7 +1637,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$lostpassword_url = $auth_settings['ldap_lostpassword_url'];
 			}
 			return $lostpassword_url;
-		}
+		} // END custom_lostpassword_url()
 
 
 
@@ -1678,7 +1678,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Menu slug
 				array( $this, 'create_admin_page' ) // function
 			);
-		}
+		} // END add_plugin_page()
 
 
 		/**
@@ -1701,7 +1701,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</form>
 			</div>
 			<?php
-		}
+		} // END create_admin_page()
 
 
 
@@ -1732,7 +1732,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
 			add_action( 'admin_head', array( $this, 'admin_head' ) ); // Add help documentation to the options page.
-		}
+		} // END load_options_page()
 
 
 
@@ -1751,7 +1751,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</div>
 				<?php
 			}
-		}
+		} // END show_advanced_admin_notice()
 
 
 		/**
@@ -1785,7 +1785,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					echo "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:choose_tab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
 				}
 			}
-		}
+		} // END admin_notices()
 
 
 		/**
@@ -2067,7 +2067,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
-		}
+		} // END page_init()
 
 
 		/**
@@ -2303,7 +2303,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Save default network options to database.
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 			}
-		}
+		} // END set_default_options()
 
 
 		/**
@@ -2417,7 +2417,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return $auth_settings;
-		}
+		} // END sanitize_options()
 
 
 		/**
@@ -2439,7 +2439,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced');">Advanced</a>
 				</h2>
 			<?php endif;
-		}
+		} // END print_section_info_tabs()
 
 		function print_section_info_access_lists( $args = '' ) {
 			?><div id="section_info_access_lists" class="section_info">
@@ -2450,7 +2450,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
 			</div><?php
-		}
+		} // END print_section_info_access_lists()
 
 		function print_combo_auth_access_users_pending( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2474,7 +2474,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 			</ul>
 			<?php
-		}
+		} // END print_combo_auth_access_users_pending()
 
 		function print_combo_auth_access_users_approved( $args = '' ) {
 			// Grab multisite overrides
@@ -2565,7 +2565,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</div>
 			</div>
 			<?php
-		}
+		} // END print_combo_auth_access_users_approved()
 
 		function print_combo_auth_access_users_blocked( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2600,7 +2600,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<input class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');" value="Block" /><br />
 			</div>
 			<?php
-		}
+		} // END print_combo_auth_access_users_blocked()
 
 
 		function print_section_info_access_login( $args = '' ) {
@@ -2608,7 +2608,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 				<p>Choose who is able to log into this site below.</p>
 			</div><?php
-		}
+		} // END print_section_info_access_login()
 
 		function print_radio_auth_access_who_can_login( $args = '' ) {
 			// Get plugin options.
@@ -2626,7 +2626,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_who_can_login_external_users" name="auth_settings[access_who_can_login]" value="external_users"<?php checked( 'external_users' == $auth_settings['access_who_can_login'] ); ?> /> All authenticated users (All external service users and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_access_who_can_login_approved_users" name="auth_settings[access_who_can_login]" value="approved_users"<?php checked( 'approved_users' == $auth_settings['access_who_can_login'] ); ?> /> Only <a href="javascript:choose_tab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
-		}
+		} // END print_radio_auth_access_who_can_login()
 
 		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2634,7 +2634,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<option value="---" <?php selected( $auth_settings['access_role_receive_pending_emails'], '---' ); ?>>None (Don't send notification emails)</option>
 				<?php wp_dropdown_roles( $auth_settings['access_role_receive_pending_emails'] ); ?>
 			</select><?php
-		}
+		} // END print_select_auth_access_role_receive_pending_emails()
 
 		function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2650,14 +2650,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'quicktags' => false,
 				)
 			);
-		}
+		} // END print_wysiwyg_auth_access_pending_redirect_to_message()
 
 
 		function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
 				<p>Choose your public access options here.</p>
 			</div><?php
-		}
+		} // END print_section_info_access_public()
 
 		function print_radio_auth_access_who_can_view( $args = '' ) {
 			// Get plugin options.
@@ -2675,19 +2675,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_access_who_can_view_everyone" name="auth_settings[access_who_can_view]" value="everyone"<?php checked( 'everyone' == $auth_settings['access_who_can_view'] ); ?> /> Everyone can see the site<br />
 			<input type="radio" id="radio_auth_settings_access_who_can_view_logged_in_users" name="auth_settings[access_who_can_view]" value="logged_in_users"<?php checked( 'logged_in_users' == $auth_settings['access_who_can_view'] ); ?> /> Only logged in users can see the site<br /><?php
-		}
+		} // END print_radio_auth_access_who_can_view()
 
 		function print_radio_auth_access_redirect( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_redirect_to_login" name="auth_settings[access_redirect]" value="login"<?php checked( 'login' == $auth_settings['access_redirect'] ); ?> /> Send them to the login screen<br />
 			<input type="radio" id="radio_auth_settings_access_redirect_to_message" name="auth_settings[access_redirect]" value="message"<?php checked( 'message' == $auth_settings['access_redirect'] ); ?> /> Show them the anonymous access message (below)<?php
-		}
+		} // END print_radio_auth_access_redirect()
 
 		function print_radio_auth_access_public_warning( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
 			?><input type="radio" id="radio_auth_settings_access_public_no_warning" name="auth_settings[access_public_warning]" value="no_warning"<?php checked( 'no_warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page <strong>without</strong> the anonymous access message<br />
 			<input type="radio" id="radio_auth_settings_access_public_warning" name="auth_settings[access_public_warning]" value="warning"<?php checked( 'warning' == $auth_settings['access_public_warning'] ); ?> /> Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissable" target="_blank">Bootstrap Dismissable Alert</a>)<?php
-		}
+		} // END print_radio_auth_access_public_warning()
 
 		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2703,7 +2703,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'quicktags' => false,
 				)
 			);
-		}
+		} // END print_wysiwyg_auth_access_redirect_to_message()
 
 		function print_multiselect_auth_access_public_pages( $args = '' ) {
 			$auth_settings = get_option( 'auth_settings' );
@@ -2726,14 +2726,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</optgroup>
 				<?php endforeach; ?>
 			</select><?php
-		}
+		} // END print_multiselect_auth_access_public_pages()
 
 
 		function print_section_info_external( $args = '' ) {
 			?><div id="section_info_external" class="section_info">
 				<p>Enter your external server settings below.</p>
 			</div><?php
-		}
+		} // END print_section_info_external()
 
 		function print_select_auth_access_default_role( $args = '' ) {
 			// Set option name.
@@ -2754,7 +2754,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><select id="<?php echo $id; ?>" name="<?php echo $name; ?>">
 				<?php wp_dropdown_roles( $auth_settings[$option] ); ?>
 			</select><?php
-		}
+		} // END print_select_auth_access_default_role()
 
 		function print_checkbox_auth_external_google( $args = '' ) {
 			// Set option name.
@@ -2773,7 +2773,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable Google Logins<?php
-		}
+		} // END print_checkbox_auth_external_google()
 
 		function print_text_google_clientid( $args = '' ) {
 			// Set option name.
@@ -2807,7 +2807,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<li><strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.</li>
 			</ol>
 			<input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
-		}
+		} // END print_text_google_clientid()
 
 		function print_text_google_clientsecret( $args = '' ) {
 			// Set option name.
@@ -2826,7 +2826,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
-		}
+		} // END print_text_google_clientsecret()
 
 		function print_checkbox_auth_external_cas( $args = '' ) {
 			// Set option name.
@@ -2845,7 +2845,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
-		}
+		} // END print_checkbox_auth_external_cas()
 
 		function print_text_cas_customlabel( $args = '' ) {
 			// Set option name.
