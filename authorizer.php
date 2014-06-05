@@ -1150,7 +1150,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							</tr>
 							<tr>
 								<th scope="row">CAS Custom Label</th>
-								<td><?php $this->print_text_cas_customlabel( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_custom_label( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server hostname</th>
@@ -1312,7 +1312,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'google_clientid',
 				'google_clientsecret',
 				'cas',
-				'cas_customlabel',
+				'cas_custom_label',
 				'cas_host',
 				'cas_port',
 				'cas_path',
@@ -1508,7 +1508,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
 					$auth_settings['cas'] = $auth_multisite_settings['cas'];
-					$auth_settings['cas_customlabel'] = $auth_multisite_settings['cas_customlabel'];
+					$auth_settings['cas_custom_label'] = $auth_multisite_settings['cas_custom_label'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
@@ -1541,7 +1541,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_customlabel']; ?></span></a></p>
+					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_custom_label']; ?></span></a></p>
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
@@ -1944,9 +1944,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
-				'auth_settings_cas_customlabel', // HTML element ID
+				'auth_settings_cas_custom_label', // HTML element ID
 				'CAS custom label', // HTML element Title
-				array( $this, 'print_text_cas_customlabel' ), // Callback (echos form element)
+				array( $this, 'print_text_cas_custom_label' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -2139,8 +2139,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['google_clientsecret'] = '';
 			}
 
-			if ( ! array_key_exists( 'cas_customlabel', $auth_settings ) ) {
-				$auth_settings['cas_customlabel'] = 'CAS';
+			if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
+				$auth_settings['cas_custom_label'] = 'CAS';
 			}
 			if ( ! array_key_exists( 'cas_host', $auth_settings ) ) {
 				$auth_settings['cas_host'] = '';
@@ -2243,8 +2243,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'google_clientsecret', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['google_clientsecret'] = '';
 				}
-				if ( ! array_key_exists( 'cas_customlabel', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['cas_customlabel'] = 'CAS';
+				if ( ! array_key_exists( 'cas_custom_label', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_custom_label'] = 'CAS';
 				}
 				if ( ! array_key_exists( 'cas_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_host'] = '';
@@ -2831,9 +2831,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable CAS Logins<?php
 		} // END print_checkbox_auth_external_cas()
 
-		function print_text_cas_customlabel( $args = '' ) {
+		function print_text_cas_custom_label( $args = '' ) {
 			// Set option name.
-			$option = 'cas_customlabel';
+			$option = 'cas_custom_label';
 			$name = "auth_settings[$option]";
 			$id = "auth_settings_$option";
 			// Get plugin options.

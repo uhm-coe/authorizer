@@ -279,7 +279,7 @@ function save_auth_multisite_settings( caller ) {
   var google_clientsecret = $('#auth_settings_google_clientsecret').val();
 
   var cas = $('#auth_settings_cas').is(':checked') ? '1' : '';
-  var cas_customlabel = $('#auth_settings_cas_customlabel').val();
+  var cas_custom_label = $('#auth_settings_cas_custom_label').val();
   var cas_host = $('#auth_settings_cas_host').val();
   var cas_port = $('#auth_settings_cas_port').val();
   var cas_path = $('#auth_settings_cas_path').val();
@@ -314,7 +314,7 @@ function save_auth_multisite_settings( caller ) {
     'google_clientid': google_clientid,
     'google_clientsecret': google_clientsecret,
     'cas': cas,
-    'cas_customlabel': cas_customlabel,
+    'cas_custom_label': cas_custom_label,
     'cas_host': cas_host,
     'cas_port': cas_port,
     'cas_path': cas_path,
@@ -477,7 +477,7 @@ jQuery(document).ready(function($){
   var auth_settings_external_google_clientid = $('#auth_settings_google_clientid').closest('tr');
   var auth_settings_external_google_clientsecret = $('#auth_settings_google_clientsecret').closest('tr');
   var auth_settings_external_cas = $('#auth_settings_cas').closest('tr');
-  var auth_settings_external_cas_customlabel = $('#auth_settings_cas_customlabel').closest('tr');
+  var auth_settings_external_cas_custom_label = $('#auth_settings_cas_custom_label').closest('tr');
   var auth_settings_external_cas_host = $('#auth_settings_cas_host').closest('tr');
   var auth_settings_external_cas_port = $('#auth_settings_cas_port').closest('tr');
   var auth_settings_external_cas_path = $('#auth_settings_cas_path').closest('tr');
@@ -503,7 +503,7 @@ jQuery(document).ready(function($){
   $('th, td', auth_settings_access_redirect_to_message).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_google_clientid).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_google_clientsecret).wrapInner('<div class="animated_wrapper" />');
-  $('th, td', auth_settings_external_cas_customlabel).wrapInner('<div class="animated_wrapper" />');
+  $('th, td', auth_settings_external_cas_custom_label).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_host).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_port).wrapInner('<div class="animated_wrapper" />');
   $('th, td', auth_settings_external_cas_path).wrapInner('<div class="animated_wrapper" />');
@@ -546,7 +546,7 @@ jQuery(document).ready(function($){
 
   // Hide CAS options if unchecked
   if ( ! $('#auth_settings_cas').is(':checked') ) {
-    animate_option( 'hide_immediately', auth_settings_external_cas_customlabel );
+    animate_option( 'hide_immediately', auth_settings_external_cas_custom_label );
     animate_option( 'hide_immediately', auth_settings_external_cas_host );
     animate_option( 'hide_immediately', auth_settings_external_cas_port );
     animate_option( 'hide_immediately', auth_settings_external_cas_path );
@@ -605,12 +605,12 @@ jQuery(document).ready(function($){
   // Event handler: Show/hide CAS options based on checkbox
   $('input[name="auth_settings[cas]"]').change(function() {
     if ( $(this).is(':checked') ) {
-      animate_option( 'show', auth_settings_external_cas_customlabel );
+      animate_option( 'show', auth_settings_external_cas_custom_label );
       animate_option( 'show', auth_settings_external_cas_host );
       animate_option( 'show', auth_settings_external_cas_port );
       animate_option( 'show', auth_settings_external_cas_path );
     } else {
-      animate_option( 'hide', auth_settings_external_cas_customlabel );
+      animate_option( 'hide', auth_settings_external_cas_custom_label );
       animate_option( 'hide', auth_settings_external_cas_host );
       animate_option( 'hide', auth_settings_external_cas_port );
       animate_option( 'hide', auth_settings_external_cas_path );
