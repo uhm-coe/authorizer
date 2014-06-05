@@ -2848,7 +2848,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
-		}
+		} // END print_text_cas_customlabel()
 
 		function print_text_cas_host( $args = '' ) {
 			// Set option name.
@@ -2867,7 +2867,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="login.its.example.edu" /><?php
-		}
+		} // END print_text_cas_host()
 
 		function print_text_cas_port( $args = '' ) {
 			// Set option name.
@@ -2886,7 +2886,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="443" style="width:50px;" /><?php
-		}
+		} // END print_text_cas_port()
 
 		function print_text_cas_path( $args = '' ) {
 			// Set option name.
@@ -2905,7 +2905,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="/cas" /><?php
-		}
+		} // END print_text_cas_path()
 
 		function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Set option name.
@@ -2926,7 +2926,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(<a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
 			// Print option elements.
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Enable LDAP Logins <?php echo $ldap_installed_message; ?><?php
-		}
+		} // END print_checkbox_auth_external_ldap()
 
 		function print_text_ldap_host( $args = '' ) {
 			// Set option name.
@@ -2945,7 +2945,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="ldap.example.edu" /><?php
-		}
+		} // END print_text_ldap_host()
+
 		function print_text_ldap_port( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_port';
@@ -2963,7 +2964,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="389" /><?php
-		}
+		} // END print_text_ldap_port()
+
 		function print_text_ldap_search_base( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_search_base';
@@ -2981,7 +2983,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
-		}
+		} // END print_text_ldap_search_base()
+
 		function print_text_ldap_uid( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_uid';
@@ -2999,7 +3002,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="uid" /><?php
-		}
+		} // END print_text_ldap_uid()
+
 		function print_text_ldap_user( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_user';
@@ -3017,7 +3021,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
-		}
+		} // END print_text_ldap_user()
+
 		function print_password_ldap_password( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_password';
@@ -3036,7 +3041,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
 			<input type="password" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $this->decrypt( base64_decode( $auth_settings[$option] ) ); ?>" autocomplete="off" /><?php
-		}
+		} // END print_password_ldap_password()
+
 		function print_checkbox_ldap_tls( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_tls';
@@ -3054,7 +3060,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="checkbox" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="1"<?php checked( 1 == $auth_settings[$option] ); ?> /> Use TLS<?php
-		}
+		} // END print_checkbox_ldap_tls
+
 		function print_text_ldap_lostpassword_url( $args = '' ) {
 			// Set option name.
 			$option = 'ldap_lostpassword_url';
@@ -3072,14 +3079,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Print option elements.
 			?><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
-		}
-
+		} // END print_text_ldap_lostpassword_url()
 
 		function print_section_info_advanced( $args = '' ) {
 			?><div id="section_info_advanced" class="section_info">
 				<p>You may optionally specify some advanced settings below.</p>
 			</div><?php
-		}
+		} // END print_section_info_advanced()
 
 		function print_text_auth_advanced_lockouts( $args = '' ) {
 			// Get plugin options.
@@ -3108,7 +3114,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			Reset the delays after
 			<input type="text" id="auth_settings_advanced_lockouts_reset_duration" name="auth_settings[advanced_lockouts][reset_duration]" value="<?php echo $auth_settings['advanced_lockouts']['reset_duration']; ?>" placeholder="240" style="width:40px;" />
 			minutes with no invalid attempts.<?php
-		}
+		} // END print_text_auth_advanced_lockouts()
 
 		function print_radio_auth_advanced_branding( $args = '' ) {
 			// Get plugin options.
@@ -3149,7 +3155,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( count( $branding_options ) === 0 ) {
 				?><p><em><strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</em></p><?php
 			}
-		}
+		} // END print_radio_auth_advanced_branding()
 
 
 
@@ -3254,7 +3260,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'content' => $help_auth_settings_advanced_content,
 				)
 			);
-		}
+		} // END admin_head()
 
 
 
@@ -3272,7 +3278,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'auth_dashboard_widget', 'Authorizer Settings', array( $this, 'add_auth_dashboard_widget' ) );
 			}
-		}
+		} // END add_dashboard_widgets()
 
 		function add_auth_dashboard_widget() {
 			$auth_settings = get_option( 'auth_settings' );
@@ -3304,7 +3310,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</form>
 			</div>
 			<?php
-		}
+		} // END add_auth_dashboard_widget()
 
 		function ajax_save_auth_dashboard_widget() {
 			// Only users who can edit can update options.
@@ -3431,7 +3437,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update options.
 			update_option( 'auth_settings', $auth_settings );
-		}
+		} // END ajax_save_auth_dashboard_widget()
 
 
 
@@ -3456,7 +3462,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return $this->cookie_value;
-		}
+		} // END get_cookie_value()
 
 		/**
 		 * Basic encryption using a public (not secret!) key. Used for general
@@ -3480,7 +3486,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return $result;
-		}
+		} // END encrypt()
+
 		function decrypt( $secret ) {
 			$result = '';
 
@@ -3498,7 +3505,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return $result;
-		}
+		} // END decrypt()
 
 		/**
 		 * In a multisite environment, returns true if the current user is logged
@@ -3513,14 +3520,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$is_user_logged_in_and_blog_user = is_user_logged_in();
 			}
 			return $is_user_logged_in_and_blog_user;
-		}
+		} // END is_user_logged_in_and_blog_user()
 
 		/**
 		 * Helper function to determine whether a given email is in one of
 		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
 		 */
-		function is_email_in_list($email = '', $list = 'approved', $multisite_mode = 'single' ) {
+		function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
 			if ( empty( $email ) )
 				return false;
 
@@ -3543,7 +3550,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					return $this->in_multi_array( $email, $auth_settings['access_users_approved'] );
 					break;
 			}
-		}
+		} // END is_email_in_list
 
 		/**
 		 * Helper function to search a multidimensional array for a value.
