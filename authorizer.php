@@ -2492,7 +2492,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
 						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
 							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
-							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
+							<?php $approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles ); ?>
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 						<?php endif; ?>
 						<li>
@@ -2512,7 +2512,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
 						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
 							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
-							<?php $approved_user['role'] = array_shift( $approved_wp_user->roles ); ?>
+							<?php $approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles ); ?>
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 							<?php $approved_user['is_wp_user'] = true; ?>
 							<?php $is_current_user = $approved_wp_user->ID === get_current_user_id(); ?>
