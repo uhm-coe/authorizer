@@ -46,20 +46,36 @@ body.toplevel_page_authorizer .spinner .spinner-text {
   opacity: 0.5;
 }
 
-#auth_dashboard_widget {
-	min-width: 460px;
-}
-
 #auth_dashboard_widget input, #auth_dashboard_widget select {
-	font-size: 90%;
+  font-size: 90%;
 }
 
 #auth_dashboard_widget input[type="radio"] {
 	margin: 0 0 6px;
 }
 
-#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email {
-	width: 90px;
+#auth_dashboard_widget #list_auth_settings_access_users_approved .auth-email,
+#auth_dashboard_widget #new_approved_user_email,
+#auth_dashboard_widget #list_auth_settings_access_users_blocked .auth-email,
+#auth_dashboard_widget #new_blocked_user_email {
+  width: 135px;
+}
+
+#auth_dashboard_widget .auth-date-added {
+  width: 70px;
+}
+
+/* Shrink dashboard widget elements on small sizes */
+@media only screen and (max-width: 1090px) {
+  #auth_dashboard_widget #list_auth_settings_access_users_approved .auth-email,
+  #auth_dashboard_widget #new_approved_user_email,
+  #auth_dashboard_widget #list_auth_settings_access_users_blocked .auth-email,
+  #auth_dashboard_widget #new_blocked_user_email {
+    width: 80px;
+  }
+  #auth_dashboard_widget select {
+    width: 80px;
+  }
 }
 
 #list_auth_settings_access_users_pending .auth-email,
