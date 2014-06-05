@@ -164,7 +164,13 @@ function save_auth_settings( caller, create_local_account ) {
   var $ = jQuery;
 
   $(caller).attr('disabled', 'disabled');
-  $(caller).last().after('<span class="spinner"></span>');
+  if ( $(caller).val() === 'Save Changes' ) {
+    $(caller).last().after('<span class="spinner"></span>');
+  } else if ( $(caller).hasClass('auth-role') ) {
+    $(caller).last().next().next().after('<span class="spinner"></span>');
+  } else {
+    $(caller).last().next().after('<span class="spinner"></span>');
+  }
   $('form .spinner').show();
 
   var access_who_can_login = $('form input[name="auth_settings[access_who_can_login]"]:checked').val();
