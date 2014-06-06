@@ -2863,7 +2863,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><div id="overlay-hide-<?php echo $id; ?>" class="auth_multisite_override_overlay"><span class="overlay-note">This setting is overridden by a <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>">multisite option</a>.</span></div><?php
 			}
 			// Print option elements.
-			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><strong>Sign in with </strong><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
+			?>The button on the login page will read: <a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><span class="dashicons dashicons-lock" style="margin: 4px 4px 0 0;"></span> <strong>Sign in with </strong><input type="text" id="<?php echo $id; ?>" name="<?php echo $name; ?>" value="<?php echo $auth_settings[$option]; ?>" placeholder="CAS" style="width: 100px;" /></a><?php
 		} // END print_text_cas_custom_label()
 
 		function print_text_cas_host( $args = '' ) {
