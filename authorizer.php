@@ -1394,6 +1394,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( array_key_exists( 'multisite_override', $auth_multisite_settings ) && $auth_multisite_settings['multisite_override'] === '1' ) {
 					// Override external services (cas or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
+					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 				}
 			}
 
@@ -1438,6 +1439,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we're using Google logins, load those resources.
 			if ( $auth_settings['google'] === '1' ) {
 				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/assets/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ) );
+				?>
+				<meta name="google-signin-clientid" content="<?php echo $auth_settings['google_clientid']; ?>" />
+				<meta name="google-signin-scope" content="email" />
+				<meta name="google-signin-cookiepolicy" content="single_host_origin" />
+				<?php
 			}
 		} // END login_enqueue_scripts_and_styles()
 
@@ -1464,9 +1470,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<script type="text/javascript">
 					function signInCallback( authResult ) {
 						var $ = jQuery;
-						if ( authResult['code'] ) {
+						if ( authResult['status'] && authResult['status']['signed_in'] ) {
 							// Hide the sign-in button now that the user is authorized, for example:
-							$( '#signinButton' ).attr( 'style', 'display: none' );
+							$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
 							// Send the code to the server
 							var ajaxurl = '<?php echo admin_url("admin-ajax.php"); ?>';
@@ -1481,12 +1487,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								// Reload wp-login.php to continue the authentication process.
 								location.reload();
 							});
-						} else if ( authResult['error'] ) {
-							// There was an error.
-							// Possible error codes:
+						} else {
+							// Update the app to reflect a signed out user
+							// Possible error values:
+							//   "user_signed_out" - User is signed-out
 							//   "access_denied" - User denied access to your app
-							//   "immediate_failed" - Could not automatially log in the user
-							//console.log('There was an error: ' + authResult['error']);
+							//   "immediate_failed" - Could not automatically log in the user
+							//console.log('Sign-in state: ' + authResult['error']);
 						}
 					}
 				</script>
@@ -1528,19 +1535,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
-					<div id="signinButton">
-						<span class="g-signin"
-							data-scope="email"
-							data-clientid="<?php echo $auth_settings['google_clientid']; ?>"
-							data-redirecturi="postmessage"
-							data-accesstype="offline"
-							data-cookiepolicy="single_host_origin"
-							data-width="wide"
-							data-height="tall"
-							data-theme="dark"
-							data-callback="signInCallback">
-						</span>
-					</div>
+					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p>
 					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
 				<?php endif; ?>
 

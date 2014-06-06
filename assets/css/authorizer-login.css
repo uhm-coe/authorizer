@@ -7,10 +7,35 @@
 	text-align: center;
 }
 .button.button-external .dashicons {
-	font-size: 26px;
+	font-size: 32px;
+	margin-top: -2px;
 }
 .button.button-external .label {
-	padding-left: 16px;
+	padding-left: 20px;
+}
+
+.button.button-google {
+	height: 43px;
+	margin-bottom: 16px;
+	width: 270px;
+	background-color: #dd4b39;
+	border-bottom: 1px solid #bb3f30;
+	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.10);
+	box-shadow: 0 1px 0 rgba(0,0,0,0.10);
+	-webkit-border-radius: 3px;
+	border-radius: 3px;
+	border-color: transparent;
+}
+.button.button-google:hover {
+	background-color: #e74b37;
+	-webkit-box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
+	box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
+	border-color: transparent;
+}
+.button.button-google:active {
+	background-color: #be3e2e;
+	-webkit-box-shadow: inset 0 2px 0 rgba(0,0,0,.20);
+	box-shadow: inset 0 2px 0 rgba(0,0,0,.20);
 }
 
 #auth-external-service-login h3 {
