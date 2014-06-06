@@ -428,6 +428,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return $result;
 			}
 
+			// If we created a new user in check_user_access(), log that user in.
+			if ( get_class( $result ) === 'WP_User' ) {
+				$user = $result;
+			}
+
 			// We'll track how this user was authenticated in user meta.
 			if ( $user ) {
 				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
@@ -567,6 +572,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Make sure this approved user doesn't have an auth_inactive flag.
 				delete_user_meta( $user->ID, 'auth_inactive' );
+
+				return $user;
 
 			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
@@ -729,11 +736,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function custom_authenticate_cas( $auth_settings ) {
 			// Move on if CAS hasn't been requested here.
 			if ( empty( $_GET['external'] ) || $_GET['external'] !== 'cas' ) {
-				return new WP_Error('cas_not_available', 'CAS is not enabled.');
+				return new WP_Error( 'cas_not_available', 'CAS is not enabled.' );
 			}
 
 			// Set the CAS client configuration
-			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval($auth_settings['cas_port']), $auth_settings['cas_path'] );
+			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 3 months, then use it to ensure CAS server is legitimate.
