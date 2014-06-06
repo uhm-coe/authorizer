@@ -1,4 +1,4 @@
-jQuery(document).ready(function($) {
+jQuery( document ).ready( function( $ ) {
 	// Move any external service buttons into top of login form.
 	var loginform = document.getElementById( 'loginform' );
 	var externals = document.getElementById( 'auth-external-service-login' );
@@ -6,7 +6,7 @@ jQuery(document).ready(function($) {
 
 	// Decrement seconds counter if it exists
 	var seconds_element = document.getElementById( 'seconds_remaining' );
-	if ( seconds_element != null ) {
+	if ( seconds_element !== null ) {
 		var seconds_interval = setInterval( function() {
 			var seconds = seconds_element.getAttribute( 'data-seconds' );
 			if ( seconds < 1 ) {
@@ -16,21 +16,21 @@ jQuery(document).ready(function($) {
 			seconds = parseInt( seconds ) - 1;
 			seconds_element.innerHTML = seconds_as_sentence( seconds );
 			seconds_element.setAttribute( 'data-seconds', seconds );
-		}, 1000);
+		}, 1000 );
 	}
 });
 
 function seconds_as_sentence( seconds ) {
-	units = {
-		week   : 7*24*3600,
-		day    :   24*3600,
-		hour   :      3600,
-		minute :        60,
-		second :         1
+	var units = {
+		week   : 7 * 24 * 3600,
+		day    :     24 * 3600,
+		hour   :          3600,
+		minute :            60,
+		second :             1
 	};
 
 	// specifically handle zero
-	if ( seconds == 0 ) {
+	if ( seconds === 0 ) {
 		return '0 seconds';
 	}
 
