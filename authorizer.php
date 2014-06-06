@@ -204,11 +204,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function uninstall() {
 			// Delete options in database.
-			if ( get_option( 'auth_settings' ) ) {
-				delete_option( 'auth_settings' );
-			}
-			if ( get_option( 'auth_settings_advanced_admin_notice' ) ) {
-				delete_option( 'auth_settings_advanced_admin_notice' );
+			delete_option( 'auth_settings' );
+			delete_option( 'auth_settings_advanced_admin_notice' );
+			delete_option( 'auth_settings_advanced_login_error' );
+			delete_option( 'auth_settings_advanced_lockouts_time_last_failed' );
+			delete_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+
+			// Delete multisite options
+			if ( is_multisite() ) {
+				delete_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings' );
 			}
 
 			// For security, delete inactive and blocked users (since we can't
