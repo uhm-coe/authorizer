@@ -335,6 +335,10 @@ body.toplevel_page_authorizer .spinner .spinner-text {
 	vertical-align: baseline;
 }
 
+/* Busy cursor for ajax calls */
+html.busy, html.busy * {
+	cursor: wait !important;
+}
 
 @font-face {
 	font-family: 'Glyphicons Halflings';

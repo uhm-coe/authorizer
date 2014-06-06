@@ -461,7 +461,16 @@ function querystring( key ) {
 }
 
 
-jQuery(document).ready(function($){
+jQuery( document ).ready( function( $ ) {
+  // Enable wait cursor when processing ajax calls.
+  $( function() {
+    $( 'html' ).bind( 'ajaxStart', function() {
+       $( this ).addClass( 'busy' );
+     }).bind( 'ajaxStop', function() {
+       $( this ).removeClass( 'busy' );
+     });
+  });
+
   // Grab references to form elements that we will show/hide on page load
   var auth_settings_access_users_pending = $('#list_auth_settings_access_users_pending').closest('tr');
   var auth_settings_access_users_approved = $('#list_auth_settings_access_users_approved').closest('tr');
