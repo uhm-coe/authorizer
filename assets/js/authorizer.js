@@ -374,8 +374,7 @@ function hide_multisite_overridden_options() {
 
 	$( '.auth_multisite_override_overlay' ).each( function() {
 		// Option to hide is stored in the overlay's id with 'overlay-hide-' prefix.
-		var option_id_to_hide = $( this ).attr( 'id' ).replace( 'overlay-hide-','' );
-		var option_container_to_hide = $( '#' + option_id_to_hide ).closest( 'tr' );
+		var option_container_to_hide = $( this ).closest( 'tr' );
 		if ( option_container_to_hide.length > 0 ) {
 			$( this ).css({
 				'background-color': '#f1f1f1',
