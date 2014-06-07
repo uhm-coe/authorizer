@@ -2355,9 +2355,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get multisite approved users (add them to top of list, greyed out).
+			$auth_multisite_settings = $this->get_plugin_options( 'multisite admin' );
 			$option_multisite = 'access_users_approved';
-			$auth_settings_option_multisite = $this->get_plugin_option( $option, 'multisite admin' );
-			$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
+			$auth_settings_option_multisite = array();
+			if (
+				is_multisite() &&
+				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
+				$auth_multisite_settings['multisite_override'] === '1'
+			) {
+				$auth_settings_option_multisite = $this->get_plugin_option( $option, 'multisite admin', 'allow override' );
+				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
+			}
 
 			// Get default role for new blocked user dropdown.
 			$access_default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
@@ -3182,13 +3190,37 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 
 
+		/**
+		 * Retrieves a specific plugin option from db. Multisite enabled.
+		 * @param  string $option        Option name
+		 * @param  string $admin_mode    'multisite admin' will retrieve the multisite value
+		 * @param  string $override_mode 'allow override' will retrieve the multisite value if it exists
+		 * @param  string $print_mode    'print overlay' will output overlay that hides this option on the settings page
+		 * @return mixed                 Option value, or null on failure
+		 */
 		private function get_plugin_option( $option, $admin_mode = 'single admin', $override_mode = 'no override', $print_mode = 'no overlay' ) {
 
+			// Get all plugin options.
 			$auth_settings = $this->get_plugin_options( $admin_mode, $override_mode );
 
-			// If the flag is set, print the overlay hiding the single site
-			// option that is overridden by a multisite option
-			if ( $admin_mode !== 'multisite admin' && $print_mode === 'print overlay' ) {
+			// Set option to null if it wasn't found.
+			if ( ! array_key_exists( $option, $auth_settings ) ) {
+				return null;
+			}
+
+			// If the requested and appropriate, print the overlay hiding the
+			// single site option that is overridden by a multisite option.
+			if (
+				$admin_mode !== 'multisite admin' &&
+				$override_mode === 'allow override' &&
+				$print_mode === 'print overlay' &&
+				array_key_exists( 'multisite_override', $auth_settings ) &&
+				$auth_settings['multisite_override'] === '1'
+			) {
+				// Get original plugin options (not overridden value). We'll
+				// show this old value behind the disabled overlay.
+				$auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
+
 				$name = "auth_settings[$option]";
 				$id = "auth_settings_$option";
 				?>
@@ -3203,9 +3235,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			return $auth_settings[$option];
 		}
 
+		/**
+		 * Retrieves all plugin options from db. Multisite enabled.
+		 * @param  string $admin_mode    'multisite admin' will retrieve the multisite value
+		 * @param  string $override_mode 'allow override' will retrieve the multisite value if it exists
+		 * @return mixed                 Option value, or null on failure
+		 */
 		private function get_plugin_options( $admin_mode = 'single admin', $override_mode = 'no override' ) {
-			// Grab plugin settings.
-			$auth_settings = get_option( 'auth_settings' );
+			// Grab plugin settings (skip if in multisite admin mode).
+			$auth_settings =  $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings' );
 
 			// Initialize to empty array if the plugin option doesn't exist.
 			if ( $auth_settings === FALSE ) {
