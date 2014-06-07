@@ -2195,7 +2195,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach( $auth_settings['access_users_approved'] as $user_info ) {
 				$wp_user = get_user_by( 'email', $user_info['email'] );
 				if ( $wp_user ) {
-					if ( $multisite_mode === 'multisite' ) {
+					if ( $multisite_mode === 'multisite' && is_multisite() ) {
 						$blogs = get_blogs_of_user( $wp_user->ID );
 						foreach ( $blogs as $blog ) {
 							add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
