@@ -3496,7 +3496,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $roles as $name => $role ) {
 				$selected = $selected_role == $name ? ' selected="selected"' : '';
 				$disabled = $disable_input === 'disabled' ? ' disabled="disabled"' : ''; // Don't let a user change their own role
-				?><option value="auth_settings[<?php echo $option; ?>]"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
+				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
 		} // END wp_dropdown_permitted_roles()
 
