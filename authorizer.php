@@ -1197,7 +1197,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $_POST['access_users_approved'] as $approved_user ) {
 				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
 					$new_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $new_user !== true && $approved_user['local_user'] === 'true' ) {
+					if ( $new_user === false && $approved_user['local_user'] === 'true' ) {
 						// Create a WP account for this new *local* user and email the password.
 						$plaintext_password = wp_generate_password(); // random password
 						// If there's already a user with this username (e.g.,
