@@ -1040,7 +1040,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_radio_auth_access_who_can_view( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row">Approved Users (All Sites)</th>
+								<th scope="row">Approved Users (All Sites)<br /><small><em>Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.</em></small></th>
 								<td><?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 						</tbody></table>
@@ -1733,6 +1733,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_access_pending_redirect_to_message', // HTML element ID
 				'What message should pending users see after attempting to log in?', // HTML element Title
 				array( $this, 'print_wysiwyg_auth_access_pending_redirect_to_message' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_access_login' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_access_should_email_approved_users', // HTML element ID
+				'Send welcome email to new approved users?', // HTML element Title
+				array( $this, 'print_checkbox_auth_access_should_email_approved_users' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_access_login' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_access_email_approved_users_subject', // HTML element ID
+				'Welcome email subject', // HTML element Title
+				array( $this, 'print_text_auth_access_should_email_approved_users' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_access_login' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_access_email_approved_users_body', // HTML element ID
+				'Welcome email body', // HTML element Title
+				array( $this, 'print_wysiwyg_auth_access_email_approved_users_body' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_access_login' // Section this setting is shown on
 			);
@@ -2534,6 +2555,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 		} // END print_wysiwyg_auth_access_pending_redirect_to_message()
 
+		function print_checkbox_auth_access_should_email_approved_users( $args = '' ) {
+			// Get plugin option.
+			$option = 'access_should_email_approved_users';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Send a welcome email when approving a new user<?php
+		} // END print_checkbox_auth_external_ldap()
+
+		function print_text_auth_access_should_email_approved_users( $args = '' ) {
+			// @TODO
+		}
+
+		function print_wysiwyg_auth_access_email_approved_users_body( $args = '' ) {
+			// @TODO
+		}
+
 
 		function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
@@ -3152,6 +3190,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							wp_new_user_notification( $result, $plaintext_password );
 						}
 					}
+
+					// Email new user welcome message if plugin option is set.
+					$this->maybe_email_welcome_message( $approved_user['email'] );
 				}
 			}
 
@@ -3325,6 +3366,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return $auth_settings;
+		}
+
+
+		private function maybe_email_welcome_message( $email ) {
+			// Get option for whether to email welcome messages.
+			$should_email_new_approved_users = $this->get_plugin_option( 'access_should_email_approved_users' );
+
+			if ( $should_email_new_approved_users === '1' ) {
+				// Get welcome email subject and body text
+				$subject = $this->get_plugin_option( 'access_email_approved_users_subject' );
+				$body = $this->get_plugin_option( 'access_email_approved_users_body' );
+
+				// Send email (make sure we actually have a subject and body).
+				if ( strlen( $subject) > 0 && strlen( $body) > 0 ) {
+					wp_mail( $email, $subject, $body );
+				}
+			}
 		}
 
 		/**
