@@ -65,7 +65,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	$( buttons ).attr( 'disabled', 'disabled' );
 
-	// Check if the course being added already exists in the list.
+	// Check if the name being added already exists in the list.
 	if ( validated ) {
 		$( '#list_auth_settings_access_users_' + list + ' input.auth-email' ).each( function() {
 			if ( this.value == email.val() ) {
@@ -77,16 +77,13 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		});
 	}
 
-	// Check if the name being added already exists in the list.
+	// Check if the user being added has a valid email address.
 	if ( validated ) {
-		$( '#list_auth_settings_access_users_' + list + ' input.auth-email' ).each( function() {
-			if ( this.value == email.val() ) {
-				validated = false;
-				$( this ).parent().effect( 'shake', shake_speed );
-				$( buttons ).removeAttr( 'disabled' );
-				return false;
-			}
-		});
+		if ( ! valid_email( $( '#new_' + list + '_user_email' ).val() ) ) {
+			validated = false;
+			$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
+			$( buttons ).removeAttr( 'disabled' );
+		}
 	}
 
 	if ( validated ) {
@@ -458,6 +455,12 @@ function querystring( key ) {
 	while ( ( m = re.exec( document.location.search ) ) !== null )
 		r.push( m[1] );
 	return r;
+}
+
+// Helper function to check if an email address is valid.
+function valid_email( email ) {
+    var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test( email );
 }
 
 
