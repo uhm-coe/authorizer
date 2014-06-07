@@ -1155,6 +1155,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die( '' );
 			}
 
+			// Assert multisite.
+			if ( ! is_multisite() ) {
+				die( '' );
+			}
+
 			// Get multisite settings.
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
@@ -3416,7 +3421,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				case 'approved':
 				default:
 					// Add in the users from the multisite options
-					if ( $multisite_mode === 'multisite' ) {
+					if ( is_multisite() && $multisite_mode === 'multisite' ) {
 						$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 						$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
 					}
