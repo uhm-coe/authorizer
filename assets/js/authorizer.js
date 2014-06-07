@@ -35,6 +35,9 @@ function auth_multisite_add_user( caller, list, create_local_account ) {
 function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	var $ = jQuery;
 
+	// Skip email address validation if adding from pending list (not user-editable).
+	var skip_validation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
+
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
@@ -66,7 +69,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	$( buttons ).attr( 'disabled', 'disabled' );
 
 	// Check if the name being added already exists in the list.
-	if ( validated ) {
+	if ( ! skip_validation && validated ) {
 		$( '#list_auth_settings_access_users_' + list + ' input.auth-email' ).each( function() {
 			if ( this.value == email.val() ) {
 				validated = false;
@@ -78,7 +81,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	}
 
 	// Check if the user being added has a valid email address.
-	if ( validated ) {
+	if ( ! skip_validation && validated ) {
 		if ( ! valid_email( $( '#new_' + list + '_user_email' ).val() ) ) {
 			validated = false;
 			$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
