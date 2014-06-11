@@ -3616,7 +3616,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print an option element for each permitted role.
 			foreach ( $roles as $name => $role ) {
 				$selected = $selected_role === $name ? ' selected="selected"' : '';
-				$disabled = $selected_role !== $name && $disable_input === 'disabled' ? ' disabled="disabled"' : ''; // Don't let a user change their own role
+
+				// Don't let a user change their own role
+				$disabled = $selected_role !== $name && $disable_input === 'disabled' ? ' disabled="disabled"' : '';
+
+				// But network admins can always change their role.
+				if ( is_multisite() && is_network_admin() ) {
+					$disabled = '';
+				}
+
 				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
 		} // END wp_dropdown_permitted_roles()
