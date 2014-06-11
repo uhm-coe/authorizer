@@ -3599,11 +3599,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$selected_role = 'subscriber';
 			}
 
-			// If the specified $selected_role is not permitted, the select
-			// element will be readonly/disabled.
+			// If the currently selected role is not in the list of roles, it
+			// either doesn't exist or the current user is not permitted to
+			// assign it.
 			if ( ! array_key_exists( $selected_role, $roles ) ) {
-				?><option value="<?php echo $selected_role; ?>" disabled="disabled"><?php echo ucfirst( $selected_role ); ?></option><?php
-				return;
+				?><option value="<?php echo $selected_role; ?>"><?php echo ucfirst( $selected_role ); ?></option><?php
+
+				// If the role exists, that means the user isn't permitted to
+				// assign it, so assume they can't edit that user's role at
+				// all. Return only the one role for the dropdown list.
+				if ( ! is_null( get_role( $selected_role ) ) ) {
+					return;
+				}
 			}
 
 			// Print an option element for each permitted role.
