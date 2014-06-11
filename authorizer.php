@@ -13,7 +13,7 @@ License: GPL2
 Copyright 2014  Paul Ryan  (email: prar@hawaii.edu)
 
 This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License, version 2, as 
+it under the terms of the GNU General Public License, version 2, as
 published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
@@ -56,7 +56,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	 * @link     http://hawaii.edu/coe/dcdc/wordpress/authorizer/doc/
 	 */
 	class WP_Plugin_Authorizer {
-		
+
 		/**
 		 * Constructor.
 		 */
