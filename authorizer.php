@@ -2444,10 +2444,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php else: ?>
 						<?php $approved_user['is_wp_user'] = false; ?>
 					<?php endif; ?>
-					<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 					<li>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
 						<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings(this);">
+							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
 						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
@@ -3621,7 +3621,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$disabled = $selected_role !== $name && $disable_input === 'disabled' ? ' disabled="disabled"' : '';
 
 				// But network admins can always change their role.
-				if ( is_multisite() && is_network_admin() ) {
+				if ( is_multisite() && current_user_can( 'manage_network' ) ) {
 					$disabled = '';
 				}
 
