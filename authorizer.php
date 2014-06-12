@@ -1141,6 +1141,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Save multisite settings (ajax call).
 		 */
 		function ajax_save_auth_multisite_settings() {
+			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'manage_network_options' ) ) {
 				die( '' );
 			}
@@ -1255,6 +1256,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update multisite settings in database.
 			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+
+			// Return 'success' value to AJAX call.
+			die( 'success' );
 		} // END ajax_save_auth_multisite_settings()
 
 
@@ -3146,14 +3150,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		} // END add_auth_dashboard_widget()
 
 		function ajax_save_auth_dashboard_widget() {
-			// Only users who can edit can update options.
+			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'edit_users' ) ) {
-				die('');
+				die( '' );
 			}
 
 			// Nonce check.
 			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
-				die('');
+				die( '' );
 			}
 
 			// If invalid input, set login restriction to only approved users (most restrictive).
@@ -3277,6 +3281,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update options.
 			update_option( 'auth_settings', $auth_settings );
+
+			// Return 'success' value to AJAX call.
+			die( 'success' );
 		} // END ajax_save_auth_dashboard_widget()
 
 

@@ -225,15 +225,23 @@ function save_auth_settings( caller, create_local_account ) {
 		'access_users_blocked': access_users_blocked,
 		'nonce_save_auth_settings': nonce_save_auth_settings,
 	}, function( response ) {
-		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">Saved.</span>' ).delay( 500 ).hide( animation_speed, function() {
+		// Server responded, but if response isn't 'success' it failed to save.
+		var succeeded = response === 'success';
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
-		if ( response === 0 ) { // failed
-			return false;
-		} else { // succeeded
-			return true;
-		}
+	}).fail( function() {
+		// Fail fires if the server doesn't respond
+		var succeeded = false;
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
+			$( this ).remove();
+		});
+		$( caller ).removeAttr( 'disabled' );
 	});
 }
 
@@ -329,15 +337,22 @@ function save_auth_multisite_settings( caller ) {
 		'ldap_lostpassword_url': ldap_lostpassword_url,
 		'advanced_lockouts': advanced_lockouts,
 	}, function( response ) {
-		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">Saved.</span>' ).delay( 500 ).hide( animation_speed, function() {
+		var succeeded = response === 'success';
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
-		if ( response === 0 ) { // failed
-			return false;
-		} else { // succeeded
-			return true;
-		}
+	}).fail( function() {
+		// Fail fires if the server doesn't respond
+		var succeeded = false;
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
+			$( this ).remove();
+		});
+		$( caller ).removeAttr( 'disabled' );
 	});
 }
 
