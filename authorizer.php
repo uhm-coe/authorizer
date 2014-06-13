@@ -2739,8 +2739,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
+			// Make sure php5-curl extension is installed on server.
+			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed)</span>' : '';
+
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Enable Google Logins<?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Enable Google Logins <?php echo $curl_installed_message; ?><?php
 		} // END print_checkbox_auth_external_google()
 
 		function print_text_google_clientid( $args = '' ) {
@@ -2784,8 +2787,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
+			// Make sure php5-curl extension is installed on server.
+			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed)</span>' : '';
+
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Enable CAS Logins<?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Enable CAS Logins <?php echo $curl_installed_message; ?><?php
 		} // END print_checkbox_auth_external_cas()
 
 		function print_text_cas_custom_label( $args = '' ) {
@@ -2835,7 +2841,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// Make sure php5-ldap extension is installed on server.
-			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(<a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
+			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Enable LDAP Logins <?php echo $ldap_installed_message; ?><?php
@@ -3602,6 +3608,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return boolean     Whether the URL is publicly reachable
 		 */
 		function url_is_accessible( $url ) {
+			// Make sure php5-curl extension is installed on server.
+			if ( ! function_exists( 'curl_init' ) ) {
+				// Note: This will silently fail, saying url is not accessible.
+				// Warn user elsewhere that they should install curl.
+				return false;
+			}
+
 			// Use curl to retrieve the URL.
 			$handle = curl_init( $url );
 			curl_setopt( $handle,  CURLOPT_RETURNTRANSFER, TRUE );
