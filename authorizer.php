@@ -931,293 +931,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 ****************************
-		 * Multisite: Network Admin Options page
-		 ****************************
-		 */
-
-
-		/**
-		 * Network Admin menu item
-		 * Hook: network_admin_menu
-		 *
-		 * @param  none
-		 * @return void
-		 */
-		public function network_admin_menu() {
-			// @see http://codex.wordpress.org/Function_Reference/add_menu_page
-			add_menu_page(
-				'Authorizer', // Page title
-				'Authorizer', // Menu title
-				'manage_network_options', // Capability
-				'authorizer', // Menu slug
-				array( $this, 'create_network_admin_page' ),
-				'dashicons-groups', // Icon URL
-				89 // Position
-			);
-		} // END network_admin_menu()
-
-		/**
-		 * Output the HTML for the options page
-		 */
-		public function create_network_admin_page() {
-			if ( ! current_user_can('manage_network_options') ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
-			}
-			$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-			?>
-			<div class="wrap">
-				<form method="post" action="" autocomplete="off">
-					<h2>Authorizer Settings</h2>
-					<p>Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.</p>
-
-					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 == $auth_settings['multisite_override'] ); ?> /> Override individual site settings with the settings below
-
-					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
-
-					<div class="wrap" id="auth_multisite_settings">
-						<?php $this->print_section_info_tabs( array( 'multisite_admin' => true ) ); ?>
-
-						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
-
-						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked) ?>
-						<div id="section_info_access_lists" class="section_info">
-							<p>Manage who has access to all sites in the network.</p>
-						</div>
-						<table class="form-table"><tbody>
-							<tr>
-								<th scope="row">Who can log in to sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_who_can_login( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Who can view sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_who_can_view( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Approved Users (All Sites)<br /><small><em>Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.</em></small></th>
-								<td><?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-						</tbody></table>
-
-						<?php $this->print_section_info_external(); ?>
-						<table class="form-table"><tbody>
-							<tr>
-								<th scope="row">Default role for new users</th>
-								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Google Logins</th>
-								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Google Client ID</th>
-								<td><?php $this->print_text_google_clientid( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Google Client Secret</th>
-								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">CAS Logins</th>
-								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">CAS Custom Label</th>
-								<td><?php $this->print_text_cas_custom_label( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">CAS server hostname</th>
-								<td><?php $this->print_text_cas_host( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">CAS server port</th>
-								<td><?php $this->print_text_cas_port( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">CAS server path/context</th>
-								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Logins</th>
-								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Host</th>
-								<td><?php $this->print_text_ldap_host( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Port</th>
-								<td><?php $this->print_text_ldap_port( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Search Base</th>
-								<td><?php $this->print_text_ldap_search_base( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP attribute containing username</th>
-								<td><?php $this->print_text_ldap_uid( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Directory User</th>
-								<td><?php $this->print_text_ldap_user( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">LDAP Directory User Password</th>
-								<td><?php $this->print_password_ldap_password( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Secure Connection (TLS)</th>
-								<td><?php $this->print_checkbox_ldap_tls( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row">Custom lost password URL</th>
-								<td><?php $this->print_text_ldap_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-						</tbody></table>
-
-						<?php $this->print_section_info_advanced(); ?>
-						<table class="form-table"><tbody>
-							<tr>
-								<th scope="row">Limit invalid login attempts</th>
-								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
-							</tr>
-						</tbody></table>
-
-						<br class="clear" />
-					</div>
-					<input type="button" name="submit" id="submit" class="button button-primary" value="Save Changes" onclick="save_auth_multisite_settings(this);" />
-				</form>
-			</div>
-			<?php
-		} // END create_network_admin_page()
-
-		/**
-		 * Save multisite settings (ajax call).
-		 */
-		function ajax_save_auth_multisite_settings() {
-			// Fail silently if current user doesn't have permissions.
-			if ( ! current_user_can( 'manage_network_options' ) ) {
-				die( '' );
-			}
-
-			// Make sure nonce exists.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
-				die( '' );
-			}
-
-			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
-				die( '' );
-			}
-
-			// Assert multisite.
-			if ( ! is_multisite() ) {
-				die( '' );
-			}
-
-			// Get multisite settings.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-
-			// Create default user array if it's empty (assert array exists).
-			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
-				$auth_multisite_settings['access_users_approved'] = array();
-			}
-
-			// Create posted user array if it's empty (assert array exists).
-			if ( ! array_key_exists( 'access_users_approved', $_POST ) || ! is_array( $_POST['access_users_approved'] ) ) {
-				$_POST['access_users_approved'] = array();
-			}
-
-			// Figure out if any of the users in the approved list were removed (ignored).
-			// Remove their access by setting the auth_inactive user_meta flag.
-			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
-			foreach ( $auth_multisite_settings['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
-					$ignored_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $ignored_user !== false ) {
-						// Flag this multisite-approved user as inactive
-						$blogs = get_blogs_of_user( $ignored_user->ID );
-						foreach ( $blogs as $blog ) {
-							switch_to_blog( $blog->userblog_id );
-							update_user_meta( $user->ID, 'auth_inactive', 'yes' );
-							restore_current_blog();
-						}
-					}
-				}
-			}
-
-			// Figure out if any of the users in the approved list were added (new).
-			// Remove the auth_inactive flag from their WP account if either exists.
-			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_multisite_settings['access_users_approved'] );
-			foreach ( $_POST['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
-					$new_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $new_user === false && $approved_user['local_user'] === 'true' ) {
-						// Create a WP account for this new *local* user and email the password.
-						$plaintext_password = wp_generate_password(); // random password
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
-						$username = explode( "@", $approved_user['email'] );
-						$username = $username[0];
-						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = $approved_user['email'];
-						}
-						$result = wpmu_create_user(
-							strtolower( $username ),
-							$plaintext_password,
-							strtolower( $approved_user['email'] )
-						);
-						if ( $result !== false ) {
-							// Email password to new user
-							wp_new_user_notification( $result, $plaintext_password );
-						}
-					}
-				}
-			}
-
-			// Sanitize settings
-			$auth_multisite_settings = $this->sanitize_options( $_POST, 'multisite' );
-
-			// Filter options to only the allowed values (multisite options are a subset of all options)
-			$allowed = array(
-				'multisite_override',
-				'access_who_can_login',
-				'access_who_can_view',
-				'access_users_approved',
-				'access_default_role',
-				'google',
-				'google_clientid',
-				'google_clientsecret',
-				'cas',
-				'cas_custom_label',
-				'cas_host',
-				'cas_port',
-				'cas_path',
-				'ldap',
-				'ldap_host',
-				'ldap_port',
-				'ldap_search_base',
-				'ldap_uid',
-				'ldap_user',
-				'ldap_password',
-				'ldap_tls',
-				'ldap_lostpassword_url',
-				'advanced_lockouts',
-			);
-			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
-
-			// Update multisite settings in database.
-			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
-
-			// Return 'success' value to AJAX call.
-			die( 'success' );
-		} // END ajax_save_auth_multisite_settings()
-
-
-
-		/**
-		 ****************************
 		 * Login page (wp-login.php)
 		 ****************************
 		 */
@@ -3058,6 +2771,293 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 		} // END admin_head()
+
+
+
+		/**
+		 ****************************
+		 * Multisite: Network Admin Options page
+		 ****************************
+		 */
+
+
+		/**
+		 * Network Admin menu item
+		 * Hook: network_admin_menu
+		 *
+		 * @param  none
+		 * @return void
+		 */
+		public function network_admin_menu() {
+			// @see http://codex.wordpress.org/Function_Reference/add_menu_page
+			add_menu_page(
+				'Authorizer', // Page title
+				'Authorizer', // Menu title
+				'manage_network_options', // Capability
+				'authorizer', // Menu slug
+				array( $this, 'create_network_admin_page' ),
+				'dashicons-groups', // Icon URL
+				89 // Position
+			);
+		} // END network_admin_menu()
+
+		/**
+		 * Output the HTML for the options page
+		 */
+		public function create_network_admin_page() {
+			if ( ! current_user_can('manage_network_options') ) {
+				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+			}
+			$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			?>
+			<div class="wrap">
+				<form method="post" action="" autocomplete="off">
+					<h2>Authorizer Settings</h2>
+					<p>Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.</p>
+
+					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 == $auth_settings['multisite_override'] ); ?> /> Override individual site settings with the settings below
+
+					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
+
+					<div class="wrap" id="auth_multisite_settings">
+						<?php $this->print_section_info_tabs( array( 'multisite_admin' => true ) ); ?>
+
+						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
+
+						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked) ?>
+						<div id="section_info_access_lists" class="section_info">
+							<p>Manage who has access to all sites in the network.</p>
+						</div>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Who can log in to sites in this network?</th>
+								<td><?php $this->print_radio_auth_access_who_can_login( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Who can view sites in this network?</th>
+								<td><?php $this->print_radio_auth_access_who_can_view( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Approved Users (All Sites)<br /><small><em>Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.</em></small></th>
+								<td><?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+						</tbody></table>
+
+						<?php $this->print_section_info_external(); ?>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Default role for new users</th>
+								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Google Logins</th>
+								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Google Client ID</th>
+								<td><?php $this->print_text_google_clientid( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Google Client Secret</th>
+								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS Logins</th>
+								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS Custom Label</th>
+								<td><?php $this->print_text_cas_custom_label( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server hostname</th>
+								<td><?php $this->print_text_cas_host( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server port</th>
+								<td><?php $this->print_text_cas_port( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS server path/context</th>
+								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Logins</th>
+								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Host</th>
+								<td><?php $this->print_text_ldap_host( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Port</th>
+								<td><?php $this->print_text_ldap_port( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Search Base</th>
+								<td><?php $this->print_text_ldap_search_base( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute containing username</th>
+								<td><?php $this->print_text_ldap_uid( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Directory User</th>
+								<td><?php $this->print_text_ldap_user( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP Directory User Password</th>
+								<td><?php $this->print_password_ldap_password( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Secure Connection (TLS)</th>
+								<td><?php $this->print_checkbox_ldap_tls( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">Custom lost password URL</th>
+								<td><?php $this->print_text_ldap_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+						</tbody></table>
+
+						<?php $this->print_section_info_advanced(); ?>
+						<table class="form-table"><tbody>
+							<tr>
+								<th scope="row">Limit invalid login attempts</th>
+								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+						</tbody></table>
+
+						<br class="clear" />
+					</div>
+					<input type="button" name="submit" id="submit" class="button button-primary" value="Save Changes" onclick="save_auth_multisite_settings(this);" />
+				</form>
+			</div>
+			<?php
+		} // END create_network_admin_page()
+
+		/**
+		 * Save multisite settings (ajax call).
+		 */
+		function ajax_save_auth_multisite_settings() {
+			// Fail silently if current user doesn't have permissions.
+			if ( ! current_user_can( 'manage_network_options' ) ) {
+				die( '' );
+			}
+
+			// Make sure nonce exists.
+			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
+				die( '' );
+			}
+
+			// Nonce check.
+			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+				die( '' );
+			}
+
+			// Assert multisite.
+			if ( ! is_multisite() ) {
+				die( '' );
+			}
+
+			// Get multisite settings.
+			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+
+			// Create default user array if it's empty (assert array exists).
+			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
+				$auth_multisite_settings['access_users_approved'] = array();
+			}
+
+			// Create posted user array if it's empty (assert array exists).
+			if ( ! array_key_exists( 'access_users_approved', $_POST ) || ! is_array( $_POST['access_users_approved'] ) ) {
+				$_POST['access_users_approved'] = array();
+			}
+
+			// Figure out if any of the users in the approved list were removed (ignored).
+			// Remove their access by setting the auth_inactive user_meta flag.
+			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
+			foreach ( $auth_multisite_settings['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
+					$ignored_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $ignored_user !== false ) {
+						// Flag this multisite-approved user as inactive
+						$blogs = get_blogs_of_user( $ignored_user->ID );
+						foreach ( $blogs as $blog ) {
+							switch_to_blog( $blog->userblog_id );
+							update_user_meta( $user->ID, 'auth_inactive', 'yes' );
+							restore_current_blog();
+						}
+					}
+				}
+			}
+
+			// Figure out if any of the users in the approved list were added (new).
+			// Remove the auth_inactive flag from their WP account if either exists.
+			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_multisite_settings['access_users_approved'] );
+			foreach ( $_POST['access_users_approved'] as $approved_user ) {
+				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
+					$new_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $new_user === false && $approved_user['local_user'] === 'true' ) {
+						// Create a WP account for this new *local* user and email the password.
+						$plaintext_password = wp_generate_password(); // random password
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
+						$username = explode( "@", $approved_user['email'] );
+						$username = $username[0];
+						if ( get_user_by( 'login', $username ) !== false ) {
+							$username = $approved_user['email'];
+						}
+						$result = wpmu_create_user(
+							strtolower( $username ),
+							$plaintext_password,
+							strtolower( $approved_user['email'] )
+						);
+						if ( $result !== false ) {
+							// Email password to new user
+							wp_new_user_notification( $result, $plaintext_password );
+						}
+					}
+				}
+			}
+
+			// Sanitize settings
+			$auth_multisite_settings = $this->sanitize_options( $_POST, 'multisite' );
+
+			// Filter options to only the allowed values (multisite options are a subset of all options)
+			$allowed = array(
+				'multisite_override',
+				'access_who_can_login',
+				'access_who_can_view',
+				'access_users_approved',
+				'access_default_role',
+				'google',
+				'google_clientid',
+				'google_clientsecret',
+				'cas',
+				'cas_custom_label',
+				'cas_host',
+				'cas_port',
+				'cas_path',
+				'ldap',
+				'ldap_host',
+				'ldap_port',
+				'ldap_search_base',
+				'ldap_uid',
+				'ldap_user',
+				'ldap_password',
+				'ldap_tls',
+				'ldap_lostpassword_url',
+				'advanced_lockouts',
+			);
+			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
+
+			// Update multisite settings in database.
+			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+
+			// Return 'success' value to AJAX call.
+			die( 'success' );
+		} // END ajax_save_auth_multisite_settings()
 
 
 
