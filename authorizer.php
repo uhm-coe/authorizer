@@ -1117,7 +1117,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_custom_label']; ?></span></a></p>
 				<?php endif; ?>
 
-				<?php if ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
+				<?php if ( $auth_settings['advanced_hide_wp_login'] === '1' ): ?>
+					<style type="text/css">
+						#loginform {
+							padding-bottom: 8px;
+						}
+						#loginform p>label, #loginform p.forgetmenot, #loginform p.submit, p#nav {
+							display: none;
+						}
+					</style>
+				<?php elseif ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
 					<h3> &mdash; or &mdash; </h3>
 				<?php endif; ?>
 			</div>
@@ -1639,6 +1648,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_advanced_hide_wp_login', // HTML element ID
+				'Hide WordPress Login', // HTML element Title
+				array( $this, 'print_checkbox_auth_advanced_hide_wp_login' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_advanced_branding', // HTML element ID
 				'Custom WordPress login branding', // HTML element Title
 				array( $this, 'print_radio_auth_advanced_branding' ), // Callback (echos form element)
@@ -1789,6 +1805,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'reset_duration' => 120,
 				);
 			}
+			if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_settings ) ) {
+				$auth_settings['advanced_hide_wp_login'] = '';
+			}
 			if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 				$auth_settings['advanced_branding'] = 'default';
 			}
@@ -1890,6 +1909,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'duration_2' => 10,
 						'reset_duration' => 120,
 					);
+				}
+				if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_hide_wp_login'] = '';
 				}
 				// Save default network options to database.
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
@@ -2005,6 +2027,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// duration_1, attempts_2, duration_2, reset_duration).
 			foreach ( $auth_settings['advanced_lockouts'] as $key => $value ) {
 				$auth_settings['advanced_lockouts'][$key] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
+			}
+
+			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ) {
+				$auth_settings['advanced_hide_wp_login'] = '1';
 			}
 
 			return $auth_settings;
@@ -2625,6 +2652,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			minutes with no invalid attempts.<?php
 		} // END print_text_auth_advanced_lockouts()
 
+		function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_hide_wp_login';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /> Hide WordPress Logins
+			<p><small>Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:<br /><a href="<?php echo wp_login_url(); ?>?external=wordpress" target="_blank"><?php echo wp_login_url(); ?>?external=wordpress</a>.</p><?php
+		} // END print_checkbox_auth_advanced_hide_wp_login()
+
 		function print_radio_auth_advanced_branding( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_branding';
@@ -2761,6 +2799,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$help_auth_settings_advanced_content = '
 				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
 				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
+				<p><strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so: <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
 				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</p>
 			';
 			$screen->add_help_tab(
@@ -2925,6 +2964,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<th scope="row">Limit invalid login attempts</th>
 								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
+							<tr>
+								<th scope="row">Hide WordPress Logins</th>
+								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
 						</tbody></table>
 
 						<br class="clear" />
@@ -3049,6 +3092,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_tls',
 				'ldap_lostpassword_url',
 				'advanced_lockouts',
+				'advanced_hide_wp_login',
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
@@ -3378,6 +3422,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Override lockouts
 					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
+
+					// Override Hide WordPress login
+					$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
 
 				}
 

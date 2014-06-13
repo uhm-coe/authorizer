@@ -309,6 +309,7 @@ function save_auth_multisite_settings( caller ) {
 		'duration_2': $( '#auth_settings_advanced_lockouts_duration_2' ).val(),
 		'reset_duration': $( '#auth_settings_advanced_lockouts_reset_duration' ).val()
 	};
+	var advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
 
 	$.post( ajaxurl, {
 		action: 'save_auth_multisite_settings',
@@ -336,6 +337,7 @@ function save_auth_multisite_settings( caller ) {
 		'ldap_tls': ldap_tls,
 		'ldap_lostpassword_url': ldap_lostpassword_url,
 		'advanced_lockouts': advanced_lockouts,
+		'advanced_hide_wp_login': advanced_hide_wp_login,
 	}, function( response ) {
 		var succeeded = response === 'success';
 		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
