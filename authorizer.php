@@ -1117,7 +1117,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_custom_label']; ?></span></a></p>
 				<?php endif; ?>
 
-				<?php if ( $auth_settings['advanced_hide_wp_login'] === '1' ): ?>
+				<?php if ( $auth_settings['advanced_hide_wp_login'] === '1' && strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false ): ?>
 					<style type="text/css">
 						#loginform {
 							padding-bottom: 8px;
