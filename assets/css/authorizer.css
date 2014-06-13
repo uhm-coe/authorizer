@@ -1,3 +1,29 @@
+body.settings_page_authorizer #wpbody-content > .wrap {
+	background: url("../banner-772x250.jpg") repeat-x 5px -35px;
+	margin-left: -20px;
+	margin-right: 0;
+	padding-left: 20px;
+	padding-right: 0;
+}
+body.settings_page_authorizer #wpbody-content > .wrap > h2 {
+	margin: -10px 0 58px 15px;
+	padding-top: 80px;
+	font-size: 290%;
+	text-shadow: 1px 1px 3px #8d8d8d;
+}
+
+body.settings_page_authorizer .nav-tab-wrapper {
+	margin-left: -20px;
+	padding-left: 30px;
+}
+
+body.settings_page_authorizer .nav-tab {
+	opacity: 0.7;
+}
+body.settings_page_authorizer .nav-tab-active {
+	opacity: 1.0;
+}
+
 body.settings_page_authorizer .ms-selectable,
 body.settings_page_authorizer .ms-selection {
 	background-color: transparent;
