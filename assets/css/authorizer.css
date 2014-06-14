@@ -111,8 +111,8 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 
 #list_auth_settings_access_users_pending .auth-email,
 #list_auth_settings_access_users_pending .auth-role {
-	border-color: #CBCF76;
-	background-color: #F5F4D4;
+	border-color: #ECF195;
+	background-color: #F5F8C4;
 }
 
 #list_auth_settings_access_users_approved .auth-email,
@@ -120,15 +120,15 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 #list_auth_settings_access_users_approved .auth-date-added,
 #new_auth_settings_access_users_approved .auth-email,
 #new_auth_settings_access_users_approved .auth-role {
-	border-color: #87C495;
-	background-color: #CDECD3;
+	border-color: #8DC33C;
+	background-color: #DCF0BE;
 }
 
 #list_auth_settings_access_users_blocked .auth-email,
 #list_auth_settings_access_users_blocked .auth-date-added,
 #new_auth_settings_access_users_blocked .auth-email {
-	border-color: #AA7966;
-	background-color: #ECC8C1;
+	border-color: #EA7E70;
+	background-color: #FACBC5;
 }
 #list_auth_settings_access_users_blocked .auth-role,
 #new_auth_settings_access_users_blocked .auth-role {
