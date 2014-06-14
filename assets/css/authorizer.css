@@ -395,6 +395,15 @@ html.busy, html.busy * {
 .glyphicon-globe:before {
 	content: "\e135";
 }
+.glyphicon-ban-circle:before {
+	content: "\e090";
+}
+.glyphicon-remove-circle:before {
+	content: "\e088";
+}
+.glyphicon-remove:before {
+	content: "\e014";
+}
 
 /**
  * Bootstrap customizations (typically because of conflicts with WordPress styles)
