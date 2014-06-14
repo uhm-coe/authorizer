@@ -384,7 +384,7 @@ function hide_multisite_settings_if_disabled() {
 			'position': 'absolute',
 			'top': settings.position().top,
 			'left': settings.position().left,
-			'width': settings.width(),
+			'width': '100%',
 			'height': settings.height(),
 		});
 		overlay.show();
@@ -406,7 +406,7 @@ function hide_multisite_overridden_options() {
 				'position': 'absolute',
 				'top': option_container_to_hide.position().top,
 				'left': option_container_to_hide.position().left,
-				'width': option_container_to_hide.width(),
+				'width': '100%',
 				'height': option_container_to_hide.height(),
 			});
 			$( this ).show();
