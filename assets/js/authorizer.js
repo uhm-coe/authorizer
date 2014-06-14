@@ -27,8 +27,13 @@ function choose_tab( list_name, delay ) {
 
 // Add user to list (multisite options page).
 function auth_multisite_add_user( caller, list, create_local_account ) {
-	create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 	var is_multisite = true;
+
+	// Default to the approved list.
+	list = typeof list !== 'undefined' ? list : 'approved';
+
+	// Default to not creating a local account.
+	create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 
 	// There currently is no multisite blocked list, so do nothing.
 	if ( list === 'blocked' ) {
@@ -47,8 +52,10 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
-	// default to the approved list
+	// Default to the approved list.
 	list = typeof list !== 'undefined' ? list : 'approved';
+
+	// Default to not creating a local account.
 	create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 
 	var email = $( caller ).parent().find( '.auth-email' );
@@ -97,15 +104,19 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	if ( validated ) {
 		// Add the new item.
-		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
 		var ajax_save_function = is_multisite ? 'save_auth_multisite_settings( this )' : 'save_auth_settings( this )';
+		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
+		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
+		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\'); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
 				<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + ajax_save_function + ';"> \
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
-				<input type="button" class="button" onclick="auth_ignore_user( this );" value="&times;" /> ' + local_icon + ' \
+				' + ban_button + ' \
+				<a class="button" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a> \
+				' + local_icon + ' \
 				<span class="spinner"></span> \
 			</li> \
 		' ).appendTo( '#list_auth_settings_access_users_' + list + '' ).slideDown( 250 );
@@ -136,6 +147,10 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 // Remove user from list (multisite options page).
 function auth_multisite_ignore_user( caller, list_name ) {
 	var is_multisite = true;
+
+	// Set default list if not provided.
+	list_name = typeof list_name !== 'undefined' ? list_name : '';
+
 	auth_ignore_user( caller, list_name, is_multisite );
 }
 // Remove user from list.
@@ -145,8 +160,10 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
-	// Show an 'empty list' message if we're deleting the last item
+	// Set default list if not provided.
 	list_name = typeof list_name !== 'undefined' ? list_name : '';
+
+	// Show an 'empty list' message if we're deleting the last item
 	var list = $( caller ).parent().parent();
 	if ( $( 'li', list ).length <= 1 ) {
 		$( list ).append( '<li class="auth-empty"><em>No ' + list_name + ' users</em></li>' );
@@ -240,7 +257,7 @@ function save_auth_settings( caller, create_local_account ) {
 		});
 		$( caller ).removeAttr( 'disabled' );
 	}).fail( function() {
-		// Fail fires if the server doesn't respond
+		// Fail fires if the server doesn't respond or responds with 500 codes
 		var succeeded = false;
 		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
