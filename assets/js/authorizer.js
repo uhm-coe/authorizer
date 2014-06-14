@@ -29,6 +29,12 @@ function choose_tab( list_name, delay ) {
 function auth_multisite_add_user( caller, list, create_local_account ) {
 	create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
 	var is_multisite = true;
+
+	// There currently is no multisite blocked list, so do nothing.
+	if ( list === 'blocked' ) {
+		return;
+	}
+
 	auth_add_user( caller, list, create_local_account, is_multisite );
 }
 // Add user to list (list = blocked or approved).
@@ -82,7 +88,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	// Check if the user being added has a valid email address.
 	if ( ! skip_validation && validated ) {
-		if ( ! valid_email( $( '#new_' + list + '_user_email' ).val() ) ) {
+		if ( ! valid_email( email.val() ) ) {
 			validated = false;
 			$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
 			$( buttons ).removeAttr( 'disabled' );
