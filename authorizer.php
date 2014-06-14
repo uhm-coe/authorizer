@@ -386,8 +386,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 				}
 
-				// Notify user about blocked status
-				$error_message = 'Sorry ' . $user_email . ', it seems you don\'t have access to ' . get_bloginfo( 'name' ) . '.';
+				// Notify user about blocked status and return without authenticating them.
+				$error_message = $auth_settings['access_blocked_redirect_to_message'];
+				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_login_url( home_url() ) . '">Check Again</a> <a class="button" href="' . wp_logout_url( home_url() ) . '">Log Out</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, get_bloginfo( 'name' ) . ' - Access Restricted' );
 			}
@@ -1434,6 +1435,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_access_login' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_access_blocked_redirect_to_message', // HTML element ID
+				'What message should blocked users see after attempting to log in?', // HTML element Title
+				array( $this, 'print_wysiwyg_auth_access_blocked_redirect_to_message' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_access_login' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_access_should_email_approved_users', // HTML element ID
 				'Send welcome email to new approved users?', // HTML element Title
 				array( $this, 'print_checkbox_auth_access_should_email_approved_users' ), // Callback (echos form element)
@@ -1696,6 +1704,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_pending_redirect_to_message'] = '<p>You\'re not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your administrator.</p>';
+			}
+			if ( ! array_key_exists( 'access_blocked_redirect_to_message', $auth_settings ) ) {
+				$auth_settings['access_blocked_redirect_to_message'] = '<p>You\'re not currently allowed to log into this site. If you think this is a mistake, please contact your administrator.</p>';
 			}
 			if ( ! array_key_exists( 'access_should_email_approved_users', $auth_settings ) ) {
 				$auth_settings['access_should_email_approved_users'] = '';
@@ -2090,7 +2101,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							</select>
 							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'approved'); auth_ignore_user(this, 'pending');" value="Approve" />
 							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'blocked'); auth_ignore_user(this, 'pending');" value="Block" />
-							<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this);" value="&times;" />
+							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this);" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -2166,7 +2177,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
 						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-						<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'blocked'); <?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) echo 'disabled="disabled" '; ?>/>
+						<?php if ( ! $is_current_user ): ?>
+							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'blocked'); <?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
+							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
+						<?php endif; ?>
 						<?php echo $local_user_icon; ?>
 					</li>
 				<?php endforeach; ?>
@@ -2217,7 +2231,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
 						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-						<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked');" value="&times;" />
+						<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
@@ -2281,6 +2295,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 		} // END print_wysiwyg_auth_access_pending_redirect_to_message()
+
+		function print_wysiwyg_auth_access_blocked_redirect_to_message( $args = '' ) {
+			// Get plugin option.
+			$option = 'access_blocked_redirect_to_message';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			wp_editor(
+				wpautop( $auth_settings_option ),
+				"auth_settings_$option",
+				array(
+					'media_buttons' => false,
+					'textarea_name' => "auth_settings[$option]",
+					'textarea_rows' => 5,
+					'tinymce' => true,
+					'teeny' => true,
+					'quicktags' => false,
+				)
+			);
+		} // END print_wysiwyg_auth_access_blocked_redirect_to_message()
 
 		function print_checkbox_auth_access_should_email_approved_users( $args = '' ) {
 			// Get plugin option.
