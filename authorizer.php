@@ -2120,7 +2120,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
 			}
 
-			// Get default role for new blocked user dropdown.
+			// Get default role for new user dropdown.
 			$access_default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
 
 			// Adjust javascript function prefixes if multisite.
@@ -2166,7 +2166,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
 						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-						<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) echo 'disabled="disabled" '; ?>/>
+						<input type="button" class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'blocked'); <?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" value="&times;" <?php if ( $is_current_user ) echo 'disabled="disabled" '; ?>/>
 						<?php echo $local_user_icon; ?>
 					</li>
 				<?php endforeach; ?>
