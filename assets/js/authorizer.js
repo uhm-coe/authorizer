@@ -505,6 +505,9 @@ jQuery( document ).ready( function( $ ) {
 	var auth_settings_access_users_blocked = $( '#list_auth_settings_access_users_blocked' ).closest( 'tr' );
 	var auth_settings_access_role_receive_pending_emails = $( '#auth_settings_access_role_receive_pending_emails' ).closest( 'tr' );
 	var auth_settings_access_pending_redirect_to_message = $( '#wp-auth_settings_access_pending_redirect_to_message-wrap' ).closest( 'tr' );
+	var auth_settings_access_should_email_approved_users = $( '#auth_settings_access_should_email_approved_users' ).closest( 'tr' );
+	var auth_settings_access_email_approved_users_subject = $( '#auth_settings_access_email_approved_users_subject' ).closest( 'tr' );
+	var auth_settings_access_email_approved_users_body = $( '#wp-auth_settings_access_email_approved_users_body-wrap' ).closest( 'tr' );
 	var auth_settings_access_public_pages = $( '#auth_settings_access_public_pages' ).closest( 'tr' );
 	var auth_settings_access_redirect_to_login = $( '#radio_auth_settings_access_redirect_to_login' ).closest( 'tr' );
 	var auth_settings_access_public_warning = $( '#radio_auth_settings_access_public_warning' ).closest( 'tr' );
@@ -534,6 +537,9 @@ jQuery( document ).ready( function( $ ) {
 	$( 'th, td', auth_settings_access_users_blocked ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_role_receive_pending_emails ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_pending_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_access_should_email_approved_users ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_access_email_approved_users_subject ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_access_email_approved_users_body ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_public_pages ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_redirect_to_login ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_public_warning ).wrapInner( '<div class="animated_wrapper" />' );
@@ -565,6 +571,12 @@ jQuery( document ).ready( function( $ ) {
 
 		// Remove the helper link, since there are no tabs on the dashboard widget
 		$( '#dashboard_link_approved_users' ).contents().unwrap();
+	}
+
+	// Hide Welcome email body/subject options if "Send welcome email" is off.
+	if ( ! $( '#auth_settings_access_should_email_approved_users' ).is( ':checked' ) ) {
+		animate_option( 'hide_immediately', auth_settings_access_email_approved_users_subject );
+		animate_option( 'hide_immediately', auth_settings_access_email_approved_users_body );
 	}
 
 	// On load: Show/hide public access options if everyone can see site
@@ -607,9 +619,26 @@ jQuery( document ).ready( function( $ ) {
 		if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {
 			animate_option( 'hide', auth_settings_access_role_receive_pending_emails );
 			animate_option( 'hide', auth_settings_access_pending_redirect_to_message );
+			animate_option( 'hide', auth_settings_access_should_email_approved_users );
+			animate_option( 'hide', auth_settings_access_email_approved_users_subject );
+			animate_option( 'hide', auth_settings_access_email_approved_users_body );
 		} else {
 			animate_option( 'show', auth_settings_access_role_receive_pending_emails );
 			animate_option( 'show', auth_settings_access_pending_redirect_to_message );
+			animate_option( 'show', auth_settings_access_should_email_approved_users );
+			animate_option( 'show', auth_settings_access_email_approved_users_subject );
+			animate_option( 'show', auth_settings_access_email_approved_users_body );
+		}
+	});
+
+	// Event handler: Hide Welcome email body/subject options if "Send welcome email" is off.
+	$( 'input[name="auth_settings[access_should_email_approved_users]"]' ).change( function() {
+		if ( $( this ).is( ':checked' ) ) {
+			animate_option( 'show', auth_settings_access_email_approved_users_subject );
+			animate_option( 'show', auth_settings_access_email_approved_users_body );
+		} else {
+			animate_option( 'hide', auth_settings_access_email_approved_users_subject );
+			animate_option( 'hide', auth_settings_access_email_approved_users_body );
 		}
 	});
 
