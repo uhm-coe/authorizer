@@ -3187,6 +3187,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		} // END add_auth_dashboard_widget()
 
 		function ajax_save_auth_dashboard_widget() {
+
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'edit_users' ) ) {
 				die( '' );
@@ -3312,6 +3313,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings['access_users_pending'] = $_POST['access_users_pending'];
 			$auth_settings['access_users_approved'] = $_POST['access_users_approved'];
 			$auth_settings['access_users_blocked'] = $_POST['access_users_blocked'];
+
+			// Prepare for sanitizing: sanitize encrypts LDAP password, so make
+			// sure it gets the unencrypted version. Otherwise it will
+			// re-encrypt, eventually running out of memory.
+			if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
+				$auth_settings['ldap_password'] = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) )
+			}
 
 			// Sanitize settings (also update user roles in approved list).
 			$auth_settings = $this->sanitize_options( $auth_settings );
