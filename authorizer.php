@@ -2266,6 +2266,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
+			// Workaround: javascript code hides/shows other settings based
+			// on the selection in this option. If this option is overridden
+			// by a multisite option, it should show that value in order to
+			// correctly display the other appropriate options.
+			// Side effect: this site option will be overwritten by the
+			// multisite option on save. Since this is a 2-item radio, we
+			// determined this was acceptable.
+			if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
+			}
+
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_external_users" name="auth_settings[<?php echo $option; ?>]" value="external_users"<?php checked( 'external_users' == $auth_settings_option ); ?> /> All authenticated users (All external service users and all WordPress users)<br />
 			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_approved_users" name="auth_settings[<?php echo $option; ?>]" value="approved_users"<?php checked( 'approved_users' == $auth_settings_option ); ?> /> Only <a href="javascript:choose_tab('access_lists');" id="dashboard_link_approved_users">approved users</a> (Approved external users and all WordPress users)<br /><?php
@@ -2376,6 +2387,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$option = 'access_who_can_view';
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Workaround: javascript code hides/shows other settings based
+			// on the selection in this option. If this option is overridden
+			// by a multisite option, it should show that value in order to
+			// correctly display the other appropriate options.
+			// Side effect: this site option will be overwritten by the
+			// multisite option on save. Since this is a 2-item radio, we
+			// determined this was acceptable.
+			if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
+			}
 
 			// Print option elements.
 			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_everyone" name="auth_settings[<?php echo $option; ?>]" value="everyone"<?php checked( 'everyone' == $auth_settings_option ); ?> /> Everyone can see the site<br />
@@ -3436,10 +3458,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// $approved_users    = $this->get_plugin_option( 'access_users_approved', 'single admin' );
 					// $ms_approved_users = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
 
-					// Override access_who_can_login and access_who_can_view
-					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
-					$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
-
 					// Override external services (google, cas, or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
@@ -3474,11 +3492,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Override Hide WordPress login
 					$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
-
 				}
-
 			}
-
 			return $auth_settings;
 		}
 
