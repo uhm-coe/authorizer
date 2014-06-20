@@ -3523,9 +3523,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$body = str_replace( '[site_name]', $site_name, $body );
 			$body = str_replace( '[site_url]', $site_url, $body );
 			$body = str_replace( '[user_email]', $email, $body );
+			$headers = 'Content-type: text/html' . "\r\n";
 
 			// Send email.
-			wp_mail( $email, $subject, $body );
+			wp_mail( $email, $subject, $body, $headers );
 
 			// Indicate mail was sent.
 			return true;
