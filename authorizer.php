@@ -922,7 +922,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			if ( $auth_settings['access_redirect'] === 'message' ) {
-				wp_die( $auth_settings['access_redirect_to_message'] . '<hr /><p style="text-align:center;margin-bottom:-15px;"><a class="button" href="' . wp_login_url( $current_path ) . '">Log In</a></p>', get_bloginfo( 'name' ) . ' - Access Restricted' );
+				$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
+				$error_message = apply_filters( 'the_content', $auth_settings['access_redirect_to_message'] );
+				$error_message .= '<hr /><p style="text-align:center;margin-bottom:-15px;"><a class="button" href="' . wp_login_url( $current_path ) . '">Log In</a></p>';
+				wp_die( $error_message, $page_title );
 			} else { // if ( $auth_settings['access_redirect'] === 'login' ) {
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
@@ -3491,7 +3494,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get welcome email subject and body text
 			$subject = $this->get_plugin_option( 'access_email_approved_users_subject' );
-			$body = $this->get_plugin_option( 'access_email_approved_users_body' );
+			$body = apply_filters( 'the_content', $this->get_plugin_option( 'access_email_approved_users_body' ) );
 
 			// Fail if the subject/body options don't exist or are empty.
 			if ( is_null( $subject ) || is_null( $body ) || strlen( $subject) === 0 || strlen( $body) === 0 ) {
