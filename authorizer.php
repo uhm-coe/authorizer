@@ -389,7 +389,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Notify user about blocked status and return without authenticating them.
 				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
 				$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
-				$error_message = $auth_settings['access_blocked_redirect_to_message'];
+				$error_message = apply_filters( 'the_content', $auth_settings['access_blocked_redirect_to_message'] );
 				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, $page_title );
@@ -516,7 +516,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Notify user about pending status and return without authenticating them.
 				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
 				$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
-				$error_message = $auth_settings['access_pending_redirect_to_message'];
+				$error_message = apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] );
 				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( $error_message, $page_title );
