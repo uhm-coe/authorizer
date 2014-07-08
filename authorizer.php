@@ -488,11 +488,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else if ( $user && in_array( 'administrator', $user->roles ) ) {
 				// User has a WordPress account, but is not in the blocked or approved
 				// list. If they are an administrator, let them in.
+				return;
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
 				// (Note: this will include 'inactive' existing users.)
-				if ( ! $this->is_email_in_list( $user_email, 'pending' ) ) {
+				if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 					$pending_user = array();
 					$pending_user['email'] = $user_email;
 					$pending_user['role'] = $auth_settings['access_default_role'];
@@ -1951,9 +1952,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_users_approved'] = array();
 			}
 
+			// Make sure there are no empty entries in the pending list
+			foreach ( $auth_settings['access_users_pending'] as $key => $user_info ) {
+				if ( strlen( $user_info['email'] ) < 1 ) {
+					unset( $auth_settings['access_users_pending'][$key] );
+				}
+			}
+
 			// Make sure the WordPress user accounts for people in the approved
 			// list have the same role as what's chosen in the approved list.
-			foreach( $auth_settings['access_users_approved'] as $user_info ) {
+			foreach ( $auth_settings['access_users_approved'] as $user_info ) {
 				$wp_user = get_user_by( 'email', $user_info['email'] );
 				if ( $wp_user ) {
 					if ( $multisite_mode === 'multisite' && is_multisite() ) {
