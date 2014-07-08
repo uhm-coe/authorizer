@@ -2106,8 +2106,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'approved'); auth_ignore_user(this, 'pending');" value="Approve" />
-							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user(this, 'blocked'); auth_ignore_user(this, 'pending');" value="Block" />
+							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false, false ); auth_ignore_user( this, 'pending' );" value="Approve" />
+							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false, false ); auth_ignore_user( this, 'pending' );" value="Block" />
 							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this);" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						</li>
 					<?php endforeach; ?>
@@ -2185,7 +2185,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						</select>
 						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<?php if ( ! $is_current_user ): ?>
-							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'blocked'); <?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
+							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false, false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
 							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						<?php endif; ?>
 						<?php echo $local_user_icon; ?>

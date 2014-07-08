@@ -26,8 +26,11 @@ function choose_tab( list_name, delay ) {
 }
 
 // Add user to list (multisite options page).
-function auth_multisite_add_user( caller, list, create_local_account ) {
+function auth_multisite_add_user( caller, list, create_local_account, should_save ) {
 	var is_multisite = true;
+
+	// Set the default save behavior if not provided.
+	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Default to the approved list.
 	list = typeof list !== 'undefined' ? list : 'approved';
@@ -40,10 +43,10 @@ function auth_multisite_add_user( caller, list, create_local_account ) {
 		return;
 	}
 
-	auth_add_user( caller, list, create_local_account, is_multisite );
+	auth_add_user( caller, list, create_local_account, should_save, is_multisite );
 }
 // Add user to list (list = blocked or approved).
-function auth_add_user( caller, list, create_local_account, is_multisite ) {
+function auth_add_user( caller, list, create_local_account, should_save, is_multisite ) {
 	var $ = jQuery;
 
 	// Skip email address validation if adding from pending list (not user-editable).
@@ -51,6 +54,9 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+
+	// Set the default save behavior if not provided.
+	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Default to the approved list.
 	list = typeof list !== 'undefined' ? list : 'approved';
@@ -107,7 +113,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		var ajax_save_function = is_multisite ? 'save_auth_multisite_settings( this )' : 'save_auth_settings( this )';
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\'); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false, false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
@@ -134,10 +140,12 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		$( buttons ).removeAttr( 'disabled' );
 
 		// Update the options in the database with this change.
-		if ( is_multisite ) {
-			save_auth_multisite_settings( caller, create_local_account );
-		} else {
-			save_auth_settings( buttons, create_local_account );
+		if ( should_save ) {
+			if ( is_multisite ) {
+				save_auth_multisite_settings( caller, create_local_account );
+			} else {
+				save_auth_settings( buttons, create_local_account );
+			}
 		}
 
 		return true;
@@ -145,20 +153,26 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 }
 
 // Remove user from list (multisite options page).
-function auth_multisite_ignore_user( caller, list_name ) {
+function auth_multisite_ignore_user( caller, list_name, should_save ) {
 	var is_multisite = true;
+
+	// Set the default save behavior if not provided.
+	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Set default list if not provided.
 	list_name = typeof list_name !== 'undefined' ? list_name : '';
 
-	auth_ignore_user( caller, list_name, is_multisite );
+	auth_ignore_user( caller, list_name, should_save, is_multisite );
 }
 // Remove user from list.
-function auth_ignore_user( caller, list_name, is_multisite ) {
+function auth_ignore_user( caller, list_name, should_save, is_multisite ) {
 	var $ = jQuery;
 
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+
+	// Set the default save behavior if not provided.
+	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Set default list if not provided.
 	list_name = typeof list_name !== 'undefined' ? list_name : '';
@@ -174,10 +188,12 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
 		$( this ).remove();
 
 		// Update the options in the database with this change.
-		if ( is_multisite ) {
-			save_auth_multisite_settings( caller );
-		} else {
-			save_auth_settings( caller );
+		if ( should_save ) {
+			if ( is_multisite ) {
+				save_auth_multisite_settings( caller );
+			} else {
+				save_auth_settings( caller );
+			}
 		}
 	});
 }
