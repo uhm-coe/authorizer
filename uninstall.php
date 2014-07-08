@@ -7,6 +7,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) )  {
 
 // Delete options in database.
 delete_option( 'auth_settings' );
+delete_option( 'auth_settings_recently_sent_emails' );
 delete_option( 'auth_settings_advanced_admin_notice' );
 delete_option( 'auth_settings_advanced_login_error' );
 delete_option( 'auth_settings_advanced_lockouts_time_last_failed' );

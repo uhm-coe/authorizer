@@ -3507,6 +3507,30 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return false;
 			}
 
+			// Make sure we didn't just email this user (can happen with
+			// multiple admins saving at the same time, or by clicking
+			// Approve button too rapidly).
+			$recently_sent_emails = get_option( 'auth_settings_recently_sent_emails' );
+			if ( $recently_sent_emails === FALSE ) {
+				$recently_sent_emails = array();
+			}
+			foreach ( $recently_sent_emails as $key => $recently_sent_email ) {
+				if ( $recently_sent_email['time'] < strtotime( 'now -1 minutes' ) ) {
+					// Remove emails sent more than 1 minute ago.
+					unset( $recently_sent_emails[$key] );
+				} else if ( $recently_sent_email['email'] === $email ) {
+					// Sent an email to this user within the last 1 minute, so
+					// quit without sending.
+					return false;
+				}
+			}
+			// Add the email we're about to send to the list.
+			$recently_sent_emails[] = array(
+				'email' => $email,
+				'time' => time(),
+			);
+			update_option( 'auth_settings_recently_sent_emails', $recently_sent_emails );
+
 			// Get welcome email subject and body text
 			$subject = $this->get_plugin_option( 'access_email_approved_users_subject' );
 			$body = apply_filters( 'the_content', $this->get_plugin_option( 'access_email_approved_users_body' ) );
