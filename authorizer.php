@@ -3193,34 +3193,30 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		} // END add_dashboard_widgets()
 
 		function add_auth_dashboard_widget() {
-			?>
-			<div class="inside">
-				<form method="post" id="auth_settings_access_form" action="">
-					<p><?php $this->print_section_info_access_login(); ?></p>
-					<div style="display: none;">
-						<h2>Who can log into the site?</h2>
-						<?php $this->print_radio_auth_access_who_can_login(); ?>
-					</div>
-					<div style="display: none;">
-						<h2>Who can view the site?</h2>
-						<?php $this->print_radio_auth_access_who_can_view(); ?>
-					</div>
-					<div>
-						<h2>Pending Users</h2>
-						<?php $this->print_combo_auth_access_users_pending(); ?>
-					</div>
-					<div>
-						<h2>Approved Users</h2>
-						<?php $this->print_combo_auth_access_users_approved(); ?>
-					</div>
-					<div>
-						<h2>Blocked Users</h2>
-						<?php $this->print_combo_auth_access_users_blocked(); ?>
-					</div>
-					<br class="clear" />
-				</form>
-			</div>
-			<?php
+			?><form method="post" id="auth_settings_access_form" action="">
+				<?php $this->print_section_info_access_login(); ?>
+				<div style="display: none;">
+					<h2>Who can log into the site?</h2>
+					<?php $this->print_radio_auth_access_who_can_login(); ?>
+				</div>
+				<div style="display: none;">
+					<h2>Who can view the site?</h2>
+					<?php $this->print_radio_auth_access_who_can_view(); ?>
+				</div>
+				<div>
+					<h2>Pending Users</h2>
+					<?php $this->print_combo_auth_access_users_pending(); ?>
+				</div>
+				<div>
+					<h2>Approved Users</h2>
+					<?php $this->print_combo_auth_access_users_approved(); ?>
+				</div>
+				<div>
+					<h2>Blocked Users</h2>
+					<?php $this->print_combo_auth_access_users_blocked(); ?>
+				</div>
+				<br class="clear" />
+			</form><?php
 		} // END add_auth_dashboard_widget()
 
 		function ajax_save_auth_dashboard_widget() {
