@@ -374,6 +374,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function check_user_access( $user, $user_email ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings_access_users_pending = $this->sanitize_user_list(
+				$this->get_plugin_option( 'access_users_pending', 'single admin' )
+			);
+			$auth_settings_access_users_approved = $this->sanitize_user_list(
+				array_merge(
+					$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+					$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+				)
+			);
 
 			// Check our externally authenticated user against the block list.
 			// If they are blocked, set the relevant user meta field, and show
@@ -403,9 +412,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// If this user happens to be in the pending list (rare),
 				// remove them from pending before adding them to approved.
 				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
-					foreach ( $auth_settings['access_users_pending'] as $key => $pending_user ) {
+					foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
 						if ( $pending_user['email'] === $user_email ) {
-							unset( $auth_settings['access_users_pending'][ $key ] );
+							unset( $auth_settings_access_users_pending[ $key ] );
 							break;
 						}
 					}
@@ -418,18 +427,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'role' => $approved_role,
 					'date_added' => date( "Y-m-d H:i:s" ),
 				);
-				if ( ! is_array ( $auth_settings['access_users_approved'] ) ) {
-					$auth_settings['access_users_approved'] = array();
-				}
-				array_push( $auth_settings['access_users_approved'], $approved_user );
-				update_option( 'auth_settings', $auth_settings );
+				array_push( $auth_settings_access_users_approved, $approved_user );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 			}
 
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
 			if ( $this->is_email_in_list( $user_email, 'approved', 'multisite' ) ) {
-				$user_info = $this->get_user_info_from_list( $user_email, $auth_settings['access_users_approved'] );
+				$user_info = $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
 				// If the approved external user does not have a WordPress account, create it
 				if ( ! $user ) {
@@ -489,17 +495,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else {
 				// User isn't an admin, is not blocked, and is not approved.
 				// Add them to the pending list and notify them and their instructor.
-				// (Note: this will include 'inactive' existing users.)
 				if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 					$pending_user = array();
 					$pending_user['email'] = $user_email;
 					$pending_user['role'] = $auth_settings['access_default_role'];
 					$pending_user['date_added'] = '';
-					if ( ! is_array ( $auth_settings['access_users_pending'] ) ) {
-						$auth_settings['access_users_pending'] = array();
-					}
-					array_push( $auth_settings['access_users_pending'], $pending_user );
-					update_option( 'auth_settings', $auth_settings );
+					array_push( $auth_settings_access_users_pending, $pending_user );
+					update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 
 					// Notify instructor about new pending user if that option is set.
 					foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
@@ -1690,14 +1692,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Access Lists Defaults.
-			if ( ! array_key_exists( 'access_users_pending', $auth_settings ) ) {
-				$auth_settings['access_users_pending'] = array();
+			$auth_settings_access_users_pending = get_option( 'auth_settings_access_users_pending' );
+			if ( $auth_settings_access_users_pending === FALSE ) {
+				$auth_settings_access_users_pending = array();
 			}
-			if ( ! array_key_exists( 'access_users_approved', $auth_settings ) ) {
-				$auth_settings['access_users_approved'] = array();
+			$auth_settings_access_users_approved = get_option( 'auth_settings_access_users_approved' );
+			if ( $auth_settings_access_users_approved === FALSE ) {
+				$auth_settings_access_users_approved = array();
 			}
-			if ( ! array_key_exists( 'access_users_blocked', $auth_settings ) ) {
-				$auth_settings['access_users_blocked'] = array();
+			$auth_settings_access_users_blocked = get_option( 'auth_settings_access_users_blocked' );
+			if ( $auth_settings_access_users_blocked === FALSE ) {
+				$auth_settings_access_users_blocked = array();
 			}
 
 			// Login Access Defaults.
@@ -1936,47 +1941,41 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Settings sanitizer callback
+		 * List sanitizer.
+		 * $side_effect = 'none' or 'update roles' to make sure WP user roles match
+		 * $multisite_mode = 'single' or 'multisite' to indicate which user roles to change (this site or all sites)
 		 */
-		function sanitize_options( $auth_settings, $multisite_mode = 'single' ) {
-			// If the pending user list isn't a list, make it.
-			if ( ! is_array( $auth_settings['access_users_pending'] ) ) {
-				$auth_settings['access_users_pending'] = array();
+		function sanitize_user_list( $list, $side_effect = 'none', $multisite_mode = 'single' ) {
+			// If it's not a list, make it so.
+			if ( ! is_array( $list ) ) {
+				$list = array();
 			}
-
-			// If the approved user list isn't a list, make it.
-			if ( ! is_array( $auth_settings['access_users_approved'] ) ) {
-				$auth_settings['access_users_approved'] = array();
-			}
-
-			// Make sure there are no empty entries in the pending list
-			foreach ( $auth_settings['access_users_pending'] as $key => $user_info ) {
+			foreach ( $list as $key => $user_info ) {
 				if ( strlen( $user_info['email'] ) < 1 ) {
-					unset( $auth_settings['access_users_pending'][$key] );
-				}
-			}
-
-			// Make sure the WordPress user accounts for people in the approved
-			// list have the same role as what's chosen in the approved list.
-			foreach ( $auth_settings['access_users_approved'] as $user_info ) {
-				$wp_user = get_user_by( 'email', $user_info['email'] );
-				if ( $wp_user ) {
-					if ( $multisite_mode === 'multisite' && is_multisite() ) {
-						$blogs = get_blogs_of_user( $wp_user->ID );
-						foreach ( $blogs as $blog ) {
-							add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
+					// Make sure there are no empty entries in the list
+					unset( $list[$key] );
+				} else if ( $side_effect === 'update roles' )
+					// Make sure the WordPress user accounts have the same role
+					// as that indicated in the list.
+					$wp_user = get_user_by( 'email', $user_info['email'] );
+					if ( $wp_user ) {
+						if ( is_multisite() && $multisite_mode === 'multisite' ) {
+							foreach ( get_blogs_of_user( $wp_user->ID ) as $blog ) {
+								add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
+							}
+						} else {
+							$wp_user->set_role( $user_info['role'] );
 						}
-					} else {
-						$wp_user->set_role( $user_info['role'] );
 					}
 				}
 			}
+			return $list;
+		}
 
-			// If the blocked user list isn't a list, make it.
-			if ( ! is_array( $auth_settings['access_users_blocked'] ) ) {
-				$auth_settings['access_users_blocked'] = array();
-			}
-
+		/**
+		 * Settings sanitizer callback
+		 */
+		function sanitize_options( $auth_settings, $multisite_mode = 'single' ) {
 			// Default to "Approved Users" login access restriction.
 			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'external_users', 'approved_users' ) ) ) {
 				$auth_settings['access_who_can_login'] = 'approved_users';
@@ -3339,6 +3338,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function get_plugin_option( $option, $admin_mode = 'single admin', $override_mode = 'no override', $print_mode = 'no overlay' ) {
 
+			// Special case for user lists (they are saved seperately to prevent concurrency issues).
+			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) {
+				$list = $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings_' . $option );
+				if ( is_multisite() && $admin_mode === 'multisite admin' ) {
+					$list = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_' . $option, array() );
+				}
+				return $list;
+			}
+
 			// Get all plugin options.
 			$auth_settings = $this->get_plugin_options( $admin_mode, $override_mode );
 
@@ -3436,9 +3444,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
 					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
 					$auth_settings['ldap_lostpassword_url'] = $auth_multisite_settings['ldap_lostpassword_url'];
-
-					// Append network approved users to access_users_approved
-					$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
 
 					// Override access_who_can_login and access_who_can_view
 					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
@@ -3598,23 +3603,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( empty( $email ) )
 				return false;
 
-			$auth_settings = get_option( 'auth_settings' );
-
 			switch ( $list ) {
 				case 'pending':
-					return $this->in_multi_array( $email, $auth_settings['access_users_pending'] );
+					$auth_settings_access_users_pending = array_merge(
+						$this->get_plugin_option( 'access_users_pending', 'single admin' ),
+						$this->get_plugin_option( 'access_users_pending', 'multisite admin' )
+					);
+					return $this->in_multi_array( $email, $auth_settings_access_users_pending );
 					break;
 				case 'blocked':
-					return $this->in_multi_array( $email, $auth_settings['access_users_blocked'] );
+					$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
+					return $this->in_multi_array( $email, $auth_settings_access_users_blocked );
 					break;
 				case 'approved':
 				default:
-					// Add in the users from the multisite options
-					if ( is_multisite() && $multisite_mode === 'multisite' ) {
-						$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
-						$auth_settings['access_users_approved'] = array_merge( $auth_multisite_settings['access_users_approved'], $auth_settings['access_users_approved'] );
-					}
-					return $this->in_multi_array( $email, $auth_settings['access_users_approved'] );
+					$auth_settings_access_users_approved = array_merge(
+						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+					);
+					return $this->in_multi_array( $email, $auth_settings_access_users_approved );
 					break;
 			}
 		} // END is_email_in_list
