@@ -80,6 +80,15 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 	opacity: 0.5;
 }
 
+/* Limit dashboard widget size */
+/*
+#auth_dashboard_widget > .inside {
+	max-height: 300px;
+	overflow-y: scroll;
+	margin-top: 0;
+}
+*/
+
 #auth_dashboard_widget input, #auth_dashboard_widget select {
 	font-size: 90%;
 }
