@@ -18,21 +18,11 @@ if ( is_multisite() ) {
 	delete_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings' );
 }
 
-// For security, delete inactive and blocked users (since we can't
-// enforce their inactivity without this plugin enabled, which means
-// they would be able to reset their passwords and log in). If they
-// have any content, reassign it to the current user (the user
-// uninstalling the plugin).
+// For security, delete blocked users (since we can't enforce their blocked
+// status without this plugin enabled, which means they would be able to reset
+// their passwords and log in). If they have any content, reassign it to the
+// current user (the user uninstalling the plugin).
 if ( ! is_multisite() ) {
-	$inactive_users = get_users( array(
-		'meta_key' => 'auth_inactive',
-		'meta_value' => 'yes',
-	));
-	$current_user = wp_get_current_user();
-	foreach ( $inactive_users as $inactive_user ) {
-		wp_delete_user( $inactive_user->ID, $current_user->ID );
-	}
-
 	$blocked_users = get_users( array(
 		'meta_key' => 'auth_blocked',
 		'meta_value' => 'yes',
