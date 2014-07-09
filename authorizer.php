@@ -92,8 +92,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Register actions.
 
+			// Perform plugin updates if newer version installed.
+			add_action( 'plugins_loaded', array( $this, 'auth_update_check' ) );
+
 			// Update the user meta with this user's failed login attempt.
-			add_action('wp_login_failed', array( $this, 'update_login_failed_count' ) );
+			add_action( 'wp_login_failed', array( $this, 'update_login_failed_count' ) );
 
 			// Create menu item in Settings
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
@@ -3379,7 +3382,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function get_plugin_options( $admin_mode = 'single admin', $override_mode = 'no override' ) {
 			// Grab plugin settings (skip if in multisite admin mode).
-			$auth_settings =  $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings' );
+			$auth_settings = $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings' );
 
 			// Initialize to empty array if the plugin option doesn't exist.
 			if ( $auth_settings === FALSE ) {
@@ -3752,6 +3755,59 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return substr( $s, 0, -2 );
 		} // END seconds_as_sentence()
+
+
+		/**
+		 * Plugin Update Routines.
+		 */
+		function auth_update_check() {
+			// Update: migrate user lists to own options (addresses concurrency
+			// when saving plugin options, since user lists are changed often
+			// and we don't want to overwrite changes to the lists when an
+			// admin saves all of the plugin options.)
+			// Note: Pending user list is changed whenever a new user tries to
+			// log in; approved and blocked lists are changed whenever an admin
+			// changes them from the multisite panel, the dashboard widget, or
+			// the plugin options page.
+			$update_if_older_than = 20140709;
+			$auth_version = get_option( 'auth_version' );
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Copy single site user lists to new options (if they exist).
+				$auth_settings = get_option( 'auth_settings' );
+				if ( is_array( $auth_settings ) && array_key_exists('access_users_pending', $auth_settings ) ) {
+					update_option( 'auth_settings_access_users_pending', $auth_settings['access_users_pending'] );
+				}
+				if ( is_array( $auth_settings ) && array_key_exists('access_users_approved', $auth_settings ) ) {
+					update_option( 'auth_settings_access_users_approved', $auth_settings['access_users_approved'] );
+				}
+				if ( is_array( $auth_settings ) && array_key_exists('access_users_blocked', $auth_settings ) ) {
+					update_option( 'auth_settings_access_users_blocked', $auth_settings['access_users_blocked'] );
+				}
+				// Copy multisite user lists to new options (if they exist).
+				if ( is_multisite() ) {
+					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_pending', $auth_multisite_settings ) ) {
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
+					}
+					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_approved', $auth_multisite_settings ) ) {
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
+					}
+					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_blocked', $auth_multisite_settings ) ) {
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
+					}
+				}
+				// Update version to reflect this change has been made.
+				update_option( 'auth_version', $update_if_older_than );
+			}
+
+			// // Update: TEMPLATE
+			// $update_if_older_than = YYYYMMDD;
+			// $auth_version = get_option( 'auth_version' );
+			// if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+			// 	UPDATE CODE HERE
+			// 	update_option( 'auth_version', $update_if_older_than );
+			// }
+		}
 
 	} // END class WP_Plugin_Authorizer
 }
