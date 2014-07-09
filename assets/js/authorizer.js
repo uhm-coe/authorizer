@@ -203,6 +203,9 @@ function auth_ignore_user( caller, list_name, should_save, is_multisite ) {
 function save_auth_settings( caller, create_local_account ) {
 	var $ = jQuery;
 
+	// Enable wait cursor.
+	$( 'html' ).addClass( 'busy' );
+
 	$( caller ).attr( 'disabled', 'disabled' );
 	if ( $( caller ).val() === 'Save Changes' ) {
 		$( caller ).last().after( '<span class="spinner"></span>' );
@@ -272,6 +275,9 @@ function save_auth_settings( caller, create_local_account ) {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
+
+		// Disable wait cursor.
+		$( 'html' ).removeClass( 'busy' );
 	}).fail( function() {
 		// Fail fires if the server doesn't respond or responds with 500 codes
 		var succeeded = false;
@@ -281,6 +287,9 @@ function save_auth_settings( caller, create_local_account ) {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
+
+		// Disable wait cursor.
+		$( 'html' ).removeClass( 'busy' );
 	});
 }
 
@@ -288,6 +297,9 @@ function save_auth_settings( caller, create_local_account ) {
 // Multisite functions
 function save_auth_multisite_settings( caller ) {
 	var $ = jQuery;
+
+	// Enable wait cursor.
+	$( 'html' ).addClass( 'busy' );
 
 	$( caller ).attr( 'disabled', 'disabled' );
 	if ( $( caller ).val() === 'Save Changes' ) {
@@ -385,6 +397,9 @@ function save_auth_multisite_settings( caller ) {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
+
+		// Disable wait cursor.
+		$( 'html' ).removeClass( 'busy' );
 	}).fail( function() {
 		// Fail fires if the server doesn't respond
 		var succeeded = false;
@@ -394,6 +409,9 @@ function save_auth_multisite_settings( caller ) {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
+
+		// Disable wait cursor.
+		$( 'html' ).removeClass( 'busy' );
 	});
 }
 
@@ -523,15 +541,6 @@ function valid_email( email ) {
 
 
 jQuery( document ).ready( function( $ ) {
-	// Enable wait cursor when processing ajax calls.
-	$( function() {
-		$( 'html' ).bind( 'ajaxStart', function() {
-			$( this ).addClass( 'busy' );
-		}).bind( 'ajaxStop', function() {
-			$( this ).removeClass( 'busy' );
-		});
-	});
-
 	// Grab references to form elements that we will show/hide on page load
 	var auth_settings_access_users_pending = $( '#list_auth_settings_access_users_pending' ).closest( 'tr' );
 	var auth_settings_access_users_approved = $( '#list_auth_settings_access_users_approved' ).closest( 'tr' );
