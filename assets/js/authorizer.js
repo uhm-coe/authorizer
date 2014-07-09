@@ -25,6 +25,32 @@ function choose_tab( list_name, delay ) {
 	setTimeout( hide_multisite_overridden_options, delay );
 }
 
+// Update user's role (multisite options page).
+function auth_multisite_change_role( caller ) {
+	var is_multisite = true;
+	auth_change_role( caller, is_multisite );
+}
+
+// Update user's role.
+function auth_change_role( caller, is_multisite ) {
+	var $ = jQuery;
+
+	// Set default for multisite flag (run different save routine if multisite)
+	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+
+	var email = $( caller ).parent().find( '.auth-email' );
+	var role = $( caller ).parent().find( '.auth-role' );
+
+	// Update the options in the database with this change.
+	if ( is_multisite ) {
+		save_auth_multisite_settings( caller );
+	} else {
+		save_auth_settings( caller );
+	}
+
+	return true;
+}
+
 // Add user to list (multisite options page).
 function auth_multisite_add_user( caller, list, create_local_account, should_save ) {
 	var is_multisite = true;
@@ -110,14 +136,13 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 
 	if ( validated ) {
 		// Add the new item.
-		var ajax_save_function = is_multisite ? 'save_auth_multisite_settings( this )' : 'save_auth_settings( this )';
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
 		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false, false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
-				<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + ajax_save_function + ';"> \
+				<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + auth_js_prefix + 'change_role( this );"> \
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
 				' + ban_button + ' \

@@ -2187,7 +2187,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php endif; ?>
 					<li>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
-						<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role" onchange="save_<?php echo $js_function_prefix; ?>settings(this);">
+						<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
 							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
