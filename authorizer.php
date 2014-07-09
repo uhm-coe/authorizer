@@ -230,14 +230,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// time remains until they can try again.
 			$unauthenticated_user = $is_login_attempt ? get_user_by( 'login', $username ) : false;
 			$unauthenticated_user_is_blocked = false;
-			$unauthenticated_user_is_inactive = false;
 			if ( $is_login_attempt && $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 				// Also check the auth_blocked user_meta flag (users in blocked list will get this flag)
 				$unauthenticated_user_is_blocked = get_user_meta( $unauthenticated_user->ID, 'auth_blocked', true ) === 'yes';
-				// Also check the auth_inactive user_meta flag (users removed from approved list will get this flag)
-				$unauthenticated_user_is_inactive = get_user_meta( $unauthenticated_user->ID, 'auth_inactive', true ) === 'yes';
 			} else {
 				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 				$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
@@ -479,9 +476,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
 					$user->set_role( $user_info['role'] );
 				}
-
-				// Make sure this approved user doesn't have an auth_inactive flag.
-				delete_user_meta( $user->ID, 'auth_inactive' );
 
 				return $user;
 
@@ -3086,26 +3080,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$_POST['access_users_approved'] = array();
 			}
 
-			// Figure out if any of the users in the approved list were removed (ignored).
-			// Remove their access by setting the auth_inactive user_meta flag.
-			$new_approved_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_approved'] );
-			foreach ( $auth_multisite_settings['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
-					$ignored_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $ignored_user !== false ) {
-						// Flag this multisite-approved user as inactive
-						$blogs = get_blogs_of_user( $ignored_user->ID );
-						foreach ( $blogs as $blog ) {
-							switch_to_blog( $blog->userblog_id );
-							update_user_meta( $user->ID, 'auth_inactive', 'yes' );
-							restore_current_blog();
-						}
-					}
-				}
-			}
-
 			// Figure out if any of the users in the approved list were added (new).
-			// Remove the auth_inactive flag from their WP account if either exists.
 			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_multisite_settings['access_users_approved'] );
 			foreach ( $_POST['access_users_approved'] as $approved_user ) {
 				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
@@ -3255,26 +3230,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'no override' );
 
-			// Figure out if any of the users in the approved list were removed (ignored).
-			// Remove their access by setting the auth_inactive user_meta flag.
-			$new_approved_list = array_map(
-				function( $user ) {
-					return $user['email'];
-				},
-				$_POST['access_users_approved']
-			);
-			foreach ( $auth_settings['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $new_approved_list ) ) {
-					$ignored_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $ignored_user !== false ) {
-						// Mark this ignored user as inactive (enforce inactivity in this->authenticate()).
-						update_user_meta( $ignored_user->ID, 'auth_inactive', 'yes' );
-					}
-				}
-			}
-
 			// Figure out if any of the users in the approved list were added (new).
-			// Remove the auth_inactive flag from their WP account if either exists.
 			$old_approved_list = array_map(
 				function( $user ) {
 					return $user['email'];
@@ -3287,9 +3243,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( $new_user !== false ) {
 						if ( is_multisite() ) {
 							add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
-						} else {
-							// Mark this new user as active if they have a WP account.
-							delete_user_meta( $new_user->ID, 'auth_inactive', 'yes' );
 						}
 					} else if ( $approved_user['local_user'] === 'true' ) {
 						// Create a WP account for this new *local* user and email the password.
