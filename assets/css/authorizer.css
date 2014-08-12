@@ -5,6 +5,9 @@ body.settings_page_authorizer #wpbody-content > .wrap {
 	padding-left: 20px;
 	padding-right: 0;
 }
+body.settings_page_authorizer #wpbody-content > div.update-nag ~ .wrap {
+	margin-top: -66px;
+}
 body.settings_page_authorizer #wpbody-content > .wrap > h2 {
 	margin: -10px 0 58px 15px;
 	padding-top: 80px;
