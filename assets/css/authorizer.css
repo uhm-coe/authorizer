@@ -15,7 +15,7 @@ body.settings_page_authorizer #wpbody-content > .wrap > h2 {
 	text-shadow: 1px 1px 3px #8d8d8d;
 }
 body.settings_page_authorizer #wpbody-content > .wrap > div.updated {
-	margin: -43px 0 5px;
+	margin: -43px 10px 5px;
 }
 
 body.settings_page_authorizer .nav-tab-wrapper {
