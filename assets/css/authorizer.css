@@ -84,7 +84,7 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 	margin-top: 0;
 }
 
-#auth_dashboard_widget input, #auth_dashboard_widget select {
+#auth_dashboard_widget input[type="text"], #auth_dashboard_widget select {
 	font-size: 90%;
 	width: 90px;
 }
@@ -93,11 +93,14 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 	margin: 0 0 6px;
 }
 
+#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email {
+	width: 130px;
+}
 #auth_dashboard_widget #list_auth_settings_access_users_approved .auth-email,
 #auth_dashboard_widget #new_approved_user_email,
 #auth_dashboard_widget #list_auth_settings_access_users_blocked .auth-email,
 #auth_dashboard_widget #new_blocked_user_email {
-	width: 135px;
+	width: 130px;
 }
 
 #auth_dashboard_widget .auth-date-added {
@@ -106,11 +109,14 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 
 /* Shrink dashboard widget elements on small sizes */
 @media only screen and (max-width: 1090px) {
+	#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email {
+		width: 65px;
+	}
 	#auth_dashboard_widget #list_auth_settings_access_users_approved .auth-email,
 	#auth_dashboard_widget #new_approved_user_email,
 	#auth_dashboard_widget #list_auth_settings_access_users_blocked .auth-email,
 	#auth_dashboard_widget #new_blocked_user_email {
-		width: 85px;
+		width: 65px;
 	}
 	#auth_dashboard_widget select {
 		width: 60px;
