@@ -148,6 +148,10 @@ body.toplevel_page_authorizer .spinner .spinner-text,
 	display: none;
 }
 
+#list_auth_settings_access_users_approved .auth-multisite-user {
+	margin-left: 5px;
+}
+
 /**
  * Overlays
  */
