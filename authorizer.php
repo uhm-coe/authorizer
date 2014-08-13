@@ -121,7 +121,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
 
 			// ajax save options from dashboard widget
-			add_action( 'wp_ajax_save_auth_dashboard_widget', array( $this, 'ajax_save_auth_dashboard_widget' ) );
+			add_action( 'wp_ajax_update_auth_user', array( $this, 'ajax_update_auth_user' ) );
 
 			// ajax save options from multisite options page
 			add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
@@ -1391,27 +1391,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( $this, 'print_section_info_access_lists' ), // Callback (echos section content)
 				'authorizer' // Page this section is shown on (slug)
 			);
-			add_settings_field(
-				'auth_settings_access_users_pending', // HTML element ID
-				'Pending Users', // HTML element Title
-				array( $this, 'print_combo_auth_access_users_pending' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_lists' // Section this setting is shown on
-			);
-			add_settings_field(
-				'auth_settings_access_users_approved', // HTML element ID
-				'Approved Users', // HTML element Title
-				array( $this, 'print_combo_auth_access_users_approved' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_lists' // Section this setting is shown on
-			);
-			add_settings_field(
-				'auth_settings_access_users_blocked', // HTML element ID
-				'Blocked Users', // HTML element Title
-				array( $this, 'print_combo_auth_access_users_blocked' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_lists' // Section this setting is shown on
-			);
 
 			// Create Login Access section
 			add_settings_section(
@@ -1835,6 +1814,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Save default options to database.
 			update_option( 'auth_settings', $auth_settings );
+			update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
 
 			// Multisite defaults.
 			if ( is_multisite() ) {
@@ -1848,8 +1830,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['multisite_override'] = '';
 				}
 				// Access Lists Defaults.
-				if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['access_users_approved'] = array();
+				$auth_multisite_settings_access_users_approved = get_option( 'auth_multisite_settings_access_users_approved' );
+				if ( $auth_multisite_settings_access_users_approved === FALSE ) {
+					$auth_multisite_settings_access_users_approved = array();
 				}
 				// Login Access Defaults.
 				if ( ! array_key_exists( 'access_who_can_login', $auth_multisite_settings ) ) {
@@ -1936,6 +1919,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				// Save default network options to database.
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 		} // END set_default_options()
 
@@ -1954,7 +1938,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( strlen( $user_info['email'] ) < 1 ) {
 					// Make sure there are no empty entries in the list
 					unset( $list[$key] );
-				} else if ( $side_effect === 'update roles' )
+				} else if ( $side_effect === 'update roles' ) {
 					// Make sure the WordPress user accounts have the same role
 					// as that indicated in the list.
 					$wp_user = get_user_by( 'email', $user_info['email'] );
@@ -2090,7 +2074,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Approved</strong> users have access to the site once they successfully log in.</li>
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
-			</div><?php
+			</div>
+			<table class="form-table" style="display: table;">
+				<tbody>
+					<tr>
+						<th scope="row">Pending Users</th>
+						<td><?php $this->print_combo_auth_access_users_pending(); ?></td>
+					</tr>
+					<tr>
+						<th scope="row">Approved Users</th>
+						<td><?php $this->print_combo_auth_access_users_approved(); ?></td>
+					</tr>
+					<tr>
+						<th scope="row">Blocked Users</th>
+						<td><?php $this->print_combo_auth_access_users_blocked(); ?></td>
+					</tr>
+				</tbody>
+			</table>
+			<?php
 		} // END print_section_info_access_lists()
 
 		function print_combo_auth_access_users_pending( $args = '' ) {
@@ -2106,13 +2107,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role">
+							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
+							<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false, false ); auth_ignore_user( this, 'pending' );" value="Approve" />
-							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false, false ); auth_ignore_user( this, 'pending' );" value="Block" />
-							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this);" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
+							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );" value="Approve" />
+							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );" value="Block" />
+							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
@@ -2159,11 +2160,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
 						<?php endif; ?>
 						<li>
-							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_multisite_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
-							<select name="auth_multisite_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
+							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
+							<select name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
-							<input type="text" name="auth_multisite_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
+							<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 						</li>
 					<?php endforeach; ?>
@@ -2182,14 +2183,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $approved_user['is_wp_user'] = false; ?>
 					<?php endif; ?>
 					<li>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
-						<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
+						<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
 							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
-						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<?php if ( ! $is_current_user ): ?>
-							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false, false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
+							<?php if ( ! $multisite_admin_page ) : ?>
+								<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
+							<?php endif; ?>
 							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						<?php endif; ?>
 						<?php echo $local_user_icon; ?>
@@ -2197,7 +2200,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endforeach; ?>
 			</ul>
 			<div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="auth-email" />
+				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="auth-email new" />
 				<select name="new_approved_user_role" id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role ); ?>
 				</select>
@@ -2237,17 +2240,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $blocked_user['is_wp_user'] = false; ?>
 					<?php endif; ?>
 					<li>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][email]" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
-						<select name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][role]" class="auth-role">
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
+						<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role">
 							<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
-						<input type="text" name="auth_settings[<?php echo $option; ?>][<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 			<div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="auth-email" />
+				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="auth-email new" />
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
 					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
 				</select>
@@ -3072,46 +3075,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get multisite settings.
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
-			// Create default user array if it's empty (assert array exists).
-			if ( ! array_key_exists( 'access_users_approved', $auth_multisite_settings ) || ! is_array( $auth_multisite_settings['access_users_approved'] ) ) {
-				$auth_multisite_settings['access_users_approved'] = array();
-			}
-
-			// Create posted user array if it's empty (assert array exists).
-			if ( ! array_key_exists( 'access_users_approved', $_POST ) || ! is_array( $_POST['access_users_approved'] ) ) {
-				$_POST['access_users_approved'] = array();
-			}
-
-			// Figure out if any of the users in the approved list were added (new).
-			$old_approved_list = array_map( function( $user ) { return $user['email']; }, $auth_multisite_settings['access_users_approved'] );
-			foreach ( $_POST['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
-					$new_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $new_user === false && $approved_user['local_user'] === 'true' ) {
-						// Create a WP account for this new *local* user and email the password.
-						$plaintext_password = wp_generate_password(); // random password
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
-						$username = explode( "@", $approved_user['email'] );
-						$username = $username[0];
-						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = $approved_user['email'];
-						}
-						$result = wpmu_create_user(
-							strtolower( $username ),
-							$plaintext_password,
-							strtolower( $approved_user['email'] )
-						);
-						if ( $result !== false ) {
-							// Email password to new user
-							wp_new_user_notification( $result, $plaintext_password );
-						}
-					}
-				}
-			}
-
 			// Sanitize settings
 			$auth_multisite_settings = $this->sanitize_options( $_POST, 'multisite' );
 
@@ -3120,7 +3083,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'multisite_override',
 				'access_who_can_login',
 				'access_who_can_view',
-				'access_users_approved',
 				'access_default_role',
 				'google',
 				'google_clientid',
@@ -3169,17 +3131,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 		} // END add_dashboard_widgets()
 
+
 		function add_auth_dashboard_widget() {
 			?><form method="post" id="auth_settings_access_form" action="">
 				<?php $this->print_section_info_access_login(); ?>
-				<div style="display: none;">
-					<h2>Who can log into the site?</h2>
-					<?php $this->print_radio_auth_access_who_can_login(); ?>
-				</div>
-				<div style="display: none;">
-					<h2>Who can view the site?</h2>
-					<?php $this->print_radio_auth_access_who_can_view(); ?>
-				</div>
 				<div>
 					<h2>Pending Users</h2>
 					<?php $this->print_combo_auth_access_users_pending(); ?>
@@ -3196,7 +3151,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</form><?php
 		} // END add_auth_dashboard_widget()
 
-		function ajax_save_auth_dashboard_widget() {
+
+		function ajax_update_auth_user() {
 
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'edit_users' ) ) {
@@ -3208,116 +3164,263 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die( '' );
 			}
 
-			// If invalid input, set login restriction to only approved users (most restrictive).
-			if ( ! in_array( $_POST['access_who_can_login'], array( 'external_users', 'approved_users' ) ) ) {
-				$_POST['access_who_can_login'] = 'approved_users';
+			// Fail if requesting a change to an invalid setting.
+			if ( ! in_array( $_POST['setting'], array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
+				die( '' );
 			}
 
-			// If invalid input, set view restriction to only approved users (most restrictive).
-			if ( ! in_array( $_POST['access_who_can_view'], array( 'everyone', 'logged_in_users' ) ) ) {
-				$_POST['access_who_can_view'] = 'logged_in_users';
-			}
+			// Editing a pending list entry.
+			if ( $_POST['setting'] === 'access_users_pending' ) {
+				// Initialize posted data if empty.
+				if ( ! ( array_key_exists( 'access_users_pending', $_POST ) && is_array( $_POST['access_users_pending'] ) ) ) {
+					$_POST['access_users_pending'] = array();
+				}
 
-			// If empty lists (pending, approved, blocked), initialize them.
-			if ( ! ( array_key_exists( 'access_users_pending', $_POST ) && is_array( $_POST['access_users_pending'] ) ) ) {
-				$_POST['access_users_pending'] = array();
-			}
-			if ( ! ( array_key_exists( 'access_users_approved', $_POST ) && is_array( $_POST['access_users_approved'] ) ) ) {
-				$_POST['access_users_approved'] = array();
-			}
-			if ( ! ( array_key_exists( 'access_users_blocked', $_POST ) && is_array( $_POST['access_users_blocked'] ) ) ) {
-				$_POST['access_users_blocked'] = array();
-			}
+				// Deal with each modified user (add or remove).
+				foreach ( $_POST['access_users_pending'] as $pending_user ) {
 
-			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'no override' );
+					if ( $pending_user['edit_action'] === 'add' ) {
 
-			// Figure out if any of the users in the approved list were added (new).
-			$old_approved_list = array_map(
-				function( $user ) {
-					return $user['email'];
-				},
-				$auth_settings['access_users_approved']
-			);
-			foreach ( $_POST['access_users_approved'] as $approved_user ) {
-				if ( ! in_array( $approved_user['email'], $old_approved_list ) ) {
-					$new_user = get_user_by( 'email', $approved_user['email'] );
-					if ( $new_user !== false ) {
-						if ( is_multisite() ) {
-							add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
+						// Add new user to pending list and save (skip if it's
+						// already there--someone else might have just done it).
+						if ( ! $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
+							$auth_settings_access_users_pending = $this->sanitize_user_list(
+								$this->get_plugin_option( 'access_users_pending', 'single admin' )
+							);
+							array_push( $auth_settings_access_users_pending, $pending_user );
+							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 						}
-					} else if ( $approved_user['local_user'] === 'true' ) {
-						// Create a WP account for this new *local* user and email the password.
-						$plaintext_password = wp_generate_password(); // random password
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
-						$username = explode( "@", $approved_user['email'] );
-						$username = $username[0];
-						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = $approved_user['email'];
+
+					} else if ( $pending_user['edit_action'] === 'remove' ) {
+
+						// Remove user from pending list and save
+						if ( $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
+							$auth_settings_access_users_pending = $this->sanitize_user_list(
+								$this->get_plugin_option( 'access_users_pending', 'single admin' )
+							);
+							foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
+								if ( $pending_user['email'] == $existing_user['email'] ) {
+									unset( $auth_settings_access_users_pending[$key] );
+									break;
+								}
+							}
+							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 						}
-						$result = wp_insert_user(
-							array(
-								'user_login' => strtolower( $username ),
-								'user_pass' => $plaintext_password,
-								'first_name' => '',
-								'last_name' => '',
-								'user_email' => strtolower( $approved_user['email'] ),
-								'user_registered' => date( 'Y-m-d H:i:s' ),
-								'role' => $approved_user['role'],
-							)
-						);
-						if ( ! is_wp_error( $result ) ) {
-							// Email password to new user
-							wp_new_user_notification( $result, $plaintext_password );
-						}
+
 					}
-
-					// Email new user welcome message if plugin option is set.
-					$this->maybe_email_welcome_message( $approved_user['email'] );
 				}
 			}
 
-			// Figure out if any of the users in the blocked list were removed (ignored).
-			// Remove their auth_blocked user_meta flag if they still have a WP account.
-			if ( is_array( $_POST['access_users_blocked'] ) ) {
-				$new_blocked_list = array_map( function( $user ) { return $user['email']; }, $_POST['access_users_blocked'] );
-				foreach ( $auth_settings['access_users_blocked'] as $blocked_user ) {
-					if ( ! in_array( $blocked_user['email'], $new_blocked_list ) ) {
+			// Editing an approved list entry.
+			if ( $_POST['setting'] === 'access_users_approved' ) {
+				// Initialize posted data if empty.
+				if ( ! ( array_key_exists( 'access_users_approved', $_POST ) && is_array( $_POST['access_users_approved'] ) ) ) {
+					$_POST['access_users_approved'] = array();
+				}
+
+				// Deal with each modified user (add, remove, or change_role).
+				foreach ( $_POST['access_users_approved'] as $approved_user ) {
+					if ( $approved_user['edit_action'] === 'add' ) {
+
+						// New user (create user, or add existing user to current site in multisite).
+						$new_user = get_user_by( 'email', $approved_user['email'] );
+						if ( $new_user !== false ) {
+							if ( is_multisite() ) {
+								add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
+							}
+						} else if ( $approved_user['local_user'] === 'true' ) {
+							// Create a WP account for this new *local* user and email the password.
+							$plaintext_password = wp_generate_password(); // random password
+							// If there's already a user with this username (e.g.,
+							// johndoe/johndoe@gmail.com exists, and we're trying to add
+							// johndoe/johndoe@example.com), use the full email address
+							// as the username.
+							$username = explode( "@", $approved_user['email'] );
+							$username = $username[0];
+							if ( get_user_by( 'login', $username ) !== false ) {
+								$username = $approved_user['email'];
+							}
+							if ( $approved_user['multisite_user'] !== 'false' ) {
+								$result = wpmu_create_user(
+									strtolower( $username ),
+									$plaintext_password,
+									strtolower( $approved_user['email'] )
+								);
+							} else {
+								$result = wp_insert_user(
+									array(
+										'user_login' => strtolower( $username ),
+										'user_pass' => $plaintext_password,
+										'first_name' => '',
+										'last_name' => '',
+										'user_email' => strtolower( $approved_user['email'] ),
+										'user_registered' => date( 'Y-m-d H:i:s' ),
+										'role' => $approved_user['role'],
+									)
+								);
+							}
+							if ( ! is_wp_error( $result ) ) {
+								// Email password to new user
+								wp_new_user_notification( $result, $plaintext_password );
+							}
+
+						}
+
+						// Email new user welcome message if plugin option is set.
+						$this->maybe_email_welcome_message( $approved_user['email'] );
+
+						// Add new user to approved list and save (skip if it's
+						// already there--someone else might have just done it).
+						if ( $approved_user['multisite_user'] !== 'false' ) {
+							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
+								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+								);
+								$approved_user['date_added'] = date( 'M Y' );
+								array_push( $auth_multisite_settings_access_users_approved, $approved_user );
+								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							}
+						} else {
+							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+								$auth_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+								);
+								$approved_user['date_added'] = date( 'M Y' );
+								array_push( $auth_settings_access_users_approved, $approved_user );
+								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							}
+						}
+
+					} else if ( $approved_user['edit_action'] === 'remove' ) {
+
+						// Remove user from approved list and save
+						if ( $approved_user['multisite_user'] !== 'false' ) {
+							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
+								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+								);
+								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
+									if ( $approved_user['email'] == $existing_user['email'] ) {
+										unset( $auth_multisite_settings_access_users_approved[$key] );
+										break;
+									}
+								}
+								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							}
+						} else {
+							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+								$auth_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+								);
+								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
+									if ( $approved_user['email'] == $existing_user['email'] ) {
+										unset( $auth_settings_access_users_approved[$key] );
+										break;
+									}
+								}
+								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							}
+						}
+
+					} else if ( $approved_user['edit_action'] === 'change_role' ) {
+
+						//  Update user's role in WordPress
+						$changed_user = get_user_by( 'email', $approved_user['email'] );
+						if ( $changed_user ) {
+							if ( is_multisite() && $approved_user['multisite_user'] !== 'false' ) {
+								foreach ( get_blogs_of_user( $changed_user->ID ) as $blog ) {
+									add_user_to_blog( $blog->userblog_id, $changed_user->ID, $approved_user['role'] );
+								}
+							} else {
+								$changed_user->set_role( $approved_user['role'] );
+							}
+						}
+
+						if ( $approved_user['multisite_user'] !== 'false' ) {
+							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
+								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+								);
+								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
+									if ( $approved_user['email'] == $existing_user['email'] ) {
+										$auth_multisite_settings_access_users_approved[$key]['role'] = $approved_user['role'];
+										break;
+									}
+								}
+								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							}
+						} else {
+							// Update user's role in approved list and save.
+							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+								$auth_settings_access_users_approved = $this->sanitize_user_list(
+									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+								);
+								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
+									if ( $approved_user['email'] == $existing_user['email'] ) {
+										$auth_settings_access_users_approved[$key]['role'] = $approved_user['role'];
+										break;
+									}
+								}
+								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							}
+						}
+
+					}
+				}
+			}
+
+			// Editing a blocked list entry.
+			if ( $_POST['setting'] === 'access_users_blocked' ) {
+				// Initialize posted data if empty.
+				if ( ! ( array_key_exists( 'access_users_blocked', $_POST ) && is_array( $_POST['access_users_blocked'] ) ) ) {
+					$_POST['access_users_blocked'] = array();
+				}
+
+				// Deal with each modified user (add or remove).
+				foreach ( $_POST['access_users_blocked'] as $blocked_user ) {
+
+					if ( $blocked_user['edit_action'] === 'add' ) {
+
+						// Add new user to blocked list and save (skip if it's
+						// already there--someone else might have just done it).
+						if ( ! $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
+							$auth_settings_access_users_blocked = $this->sanitize_user_list(
+								$this->get_plugin_option( 'access_users_blocked', 'single admin' )
+							);
+							$blocked_user['date_added'] = date( 'M Y' );
+							array_push( $auth_settings_access_users_blocked, $blocked_user );
+							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+						}
+
+					} else if ( $blocked_user['edit_action'] === 'remove' ) {
+
+						// Remove auth_blocked usermeta for the user.
 						$unblocked_user = get_user_by( 'email', $blocked_user['email'] );
 						if ( $unblocked_user !== false ) {
-							// Mark this user as unblocked.
 							delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
 						}
+
+						// Remove user from blocked list and save
+						if ( $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
+							$auth_settings_access_users_blocked = $this->sanitize_user_list(
+								$this->get_plugin_option( 'access_users_blocked', 'single admin' )
+							);
+							foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
+								if ( $blocked_user['email'] == $existing_user['email'] ) {
+									unset( $auth_settings_access_users_blocked[$key] );
+									break;
+								}
+							}
+							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+						}
+
 					}
 				}
 			}
-
-			// Update user lists
-			$auth_settings['access_who_can_login'] = stripslashes( $_POST['access_who_can_login'] );
-			$auth_settings['access_who_can_view'] = stripslashes( $_POST['access_who_can_view'] );
-			$auth_settings['access_users_pending'] = $_POST['access_users_pending'];
-			$auth_settings['access_users_approved'] = $_POST['access_users_approved'];
-			$auth_settings['access_users_blocked'] = $_POST['access_users_blocked'];
-
-			// Prepare for sanitizing: sanitize encrypts LDAP password, so make
-			// sure it gets the unencrypted version. Otherwise it will
-			// re-encrypt, eventually running out of memory.
-			if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
-				$auth_settings['ldap_password'] = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) );
-			}
-
-			// Sanitize settings (also update user roles in approved list).
-			$auth_settings = $this->sanitize_options( $auth_settings );
-
-			// Update options.
-			update_option( 'auth_settings', $auth_settings );
 
 			// Return 'success' value to AJAX call.
 			die( 'success' );
-		} // END ajax_save_auth_dashboard_widget()
+		} // END update_auth_user()
 
 
 
@@ -3339,7 +3442,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function get_plugin_option( $option, $admin_mode = 'single admin', $override_mode = 'no override', $print_mode = 'no overlay' ) {
 
 			// Special case for user lists (they are saved seperately to prevent concurrency issues).
-			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) {
+			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
 				$list = $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings_' . $option );
 				if ( is_multisite() && $admin_mode === 'multisite admin' ) {
 					$list = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_' . $option, array() );
@@ -3605,10 +3708,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			switch ( $list ) {
 				case 'pending':
-					$auth_settings_access_users_pending = array_merge(
-						$this->get_plugin_option( 'access_users_pending', 'single admin' ),
-						$this->get_plugin_option( 'access_users_pending', 'multisite admin' )
-					);
+					$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', 'single admin' );
 					return $this->in_multi_array( $email, $auth_settings_access_users_pending );
 					break;
 				case 'blocked':
@@ -3617,10 +3717,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					break;
 				case 'approved':
 				default:
-					$auth_settings_access_users_approved = array_merge(
-						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+					$auth_settings_access_users_approved = $multisite_mode !== 'single' ?
 						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
-					);
+						: array_merge(
+							$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+							$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+						);
 					return $this->in_multi_array( $email, $auth_settings_access_users_approved );
 					break;
 			}
@@ -3783,24 +3885,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = get_option( 'auth_settings' );
 				if ( is_array( $auth_settings ) && array_key_exists('access_users_pending', $auth_settings ) ) {
 					update_option( 'auth_settings_access_users_pending', $auth_settings['access_users_pending'] );
+					unset( $auth_settings['access_users_pending'] );
+					update_option( 'auth_settings', $auth_settings );
 				}
 				if ( is_array( $auth_settings ) && array_key_exists('access_users_approved', $auth_settings ) ) {
 					update_option( 'auth_settings_access_users_approved', $auth_settings['access_users_approved'] );
+					unset( $auth_settings['access_users_approved'] );
+					update_option( 'auth_settings', $auth_settings );
 				}
 				if ( is_array( $auth_settings ) && array_key_exists('access_users_blocked', $auth_settings ) ) {
 					update_option( 'auth_settings_access_users_blocked', $auth_settings['access_users_blocked'] );
+					unset( $auth_settings['access_users_blocked'] );
+					update_option( 'auth_settings', $auth_settings );
 				}
 				// Copy multisite user lists to new options (if they exist).
 				if ( is_multisite() ) {
 					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_pending', $auth_multisite_settings ) ) {
 						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
+						unset( $auth_multisite_settings['access_users_pending'] );
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_approved', $auth_multisite_settings ) ) {
 						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
+						unset( $auth_multisite_settings['access_users_approved'] );
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 					if ( is_array( $auth_multisite_settings ) && array_key_exists('access_users_blocked', $auth_multisite_settings ) ) {
 						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
+						unset( $auth_multisite_settings['access_users_blocked'] );
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 				}
 				// Update version to reflect this change has been made.

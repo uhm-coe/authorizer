@@ -40,23 +40,25 @@ function auth_change_role( caller, is_multisite ) {
 
 	var email = $( caller ).parent().find( '.auth-email' );
 	var role = $( caller ).parent().find( '.auth-role' );
+	var date_added = $( caller ).parent().find( '.auth-date-added' );
+
+	var user = {
+		'email': email.val(),
+		'role': role.val(),
+		'date_added': date_added.val(),
+		'edit_action': 'change_role',
+		'multisite_user': is_multisite,
+	};
 
 	// Update the options in the database with this change.
-	if ( is_multisite ) {
-		save_auth_multisite_settings( caller );
-	} else {
-		save_auth_settings( caller );
-	}
+	update_auth_user( caller, 'access_users_approved', user );
 
 	return true;
 }
 
 // Add user to list (multisite options page).
-function auth_multisite_add_user( caller, list, create_local_account, should_save ) {
+function auth_multisite_add_user( caller, list, create_local_account ) {
 	var is_multisite = true;
-
-	// Set the default save behavior if not provided.
-	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Default to the approved list.
 	list = typeof list !== 'undefined' ? list : 'approved';
@@ -69,10 +71,10 @@ function auth_multisite_add_user( caller, list, create_local_account, should_sav
 		return;
 	}
 
-	auth_add_user( caller, list, create_local_account, should_save, is_multisite );
+	auth_add_user( caller, list, create_local_account, is_multisite );
 }
 // Add user to list (list = blocked or approved).
-function auth_add_user( caller, list, create_local_account, should_save, is_multisite ) {
+function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	var $ = jQuery;
 
 	// Skip email address validation if adding from pending list (not user-editable).
@@ -80,9 +82,6 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
-
-	// Set the default save behavior if not provided.
-	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Default to the approved list.
 	list = typeof list !== 'undefined' ? list : 'approved';
@@ -92,6 +91,7 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 
 	var email = $( caller ).parent().find( '.auth-email' );
 	var role = $( caller ).parent().find( '.auth-role' );
+	var date_added = $( caller ).parent().find( '.auth-date-added' );
 
 	// Helper variable for disabling buttons while processing. This will be
 	// set differently if our clicked button is nested in a div (below).
@@ -101,8 +101,18 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 	if ( email.length === 0 || role.length === 0 ) {
 		email = $( caller ).parent().parent().find( '.auth-email' );
 		role = $( caller ).parent().parent().find( '.auth-role' );
+		date_added = $( caller ).parent().parent().find( '.auth-date-added' );
 		buttons = $( caller ).parent().children();
 	}
+
+	var user = {
+		'email': email.val(),
+		'role': role.val(),
+		'date_added': date_added.val(),
+		'edit_action': 'add',
+		'local_user': create_local_account,
+		'multisite_user': is_multisite,
+	};
 
 	var next_id = $( '#list_auth_settings_access_users_' + list + ' li' ).length;
 	var validated = true;
@@ -138,7 +148,7 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 		// Add the new item.
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false, false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
@@ -160,47 +170,49 @@ function auth_add_user( caller, list, create_local_account, should_save, is_mult
 		// Remove the 'empty list' item if it exists.
 		$( '#list_auth_settings_access_users_' + list + ' li.auth-empty' ).remove();
 
-		// Reset the new user textboxes
-		email.val( '' );
-		$( buttons ).removeAttr( 'disabled' );
-
 		// Update the options in the database with this change.
-		if ( should_save ) {
-			if ( is_multisite ) {
-				save_auth_multisite_settings( caller, create_local_account );
-			} else {
-				save_auth_settings( buttons, create_local_account );
-			}
+		update_auth_user( buttons, 'access_users_' + list, user );
+
+		// Reset the new user textboxes
+		if ( email.hasClass( 'new' ) ) {
+			email.val( '' );
 		}
+
+		// Re-enable the action buttons now that we're done saving.
+		$( buttons ).removeAttr( 'disabled' );
 
 		return true;
 	}
 }
 
 // Remove user from list (multisite options page).
-function auth_multisite_ignore_user( caller, list_name, should_save ) {
+function auth_multisite_ignore_user( caller, list_name ) {
 	var is_multisite = true;
-
-	// Set the default save behavior if not provided.
-	should_save = typeof should_save !== 'undefined' ? should_save : true;
 
 	// Set default list if not provided.
 	list_name = typeof list_name !== 'undefined' ? list_name : '';
 
-	auth_ignore_user( caller, list_name, should_save, is_multisite );
+	auth_ignore_user( caller, list_name, is_multisite );
 }
 // Remove user from list.
-function auth_ignore_user( caller, list_name, should_save, is_multisite ) {
+function auth_ignore_user( caller, list_name, is_multisite ) {
 	var $ = jQuery;
 
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
-	// Set the default save behavior if not provided.
-	should_save = typeof should_save !== 'undefined' ? should_save : true;
-
 	// Set default list if not provided.
-	list_name = typeof list_name !== 'undefined' ? list_name : '';
+	list_name = typeof list_name !== 'undefined' ? list_name : 'approved';
+
+	var email = $( caller ).parent().find( '.auth-email' );
+
+	var user = {
+		'email': email.val(),
+		'role': '',
+		'date_added': '',
+		'edit_action': 'remove',
+		'multisite_user': is_multisite,
+	};
 
 	// Show an 'empty list' message if we're deleting the last item
 	var list = $( caller ).parent().parent();
@@ -213,24 +225,36 @@ function auth_ignore_user( caller, list_name, should_save, is_multisite ) {
 		$( this ).remove();
 
 		// Update the options in the database with this change.
-		if ( should_save ) {
-			if ( is_multisite ) {
-				save_auth_multisite_settings( caller );
-			} else {
-				save_auth_settings( caller );
-			}
-		}
+		update_auth_user( caller, 'access_users_' + list_name, user );
 	});
 }
 
 
-// Save options from dashboard widget.
-function save_auth_settings( caller, create_local_account ) {
-	var $ = jQuery;
+// Make changes to one of the user lists (pending, approved, blocked) via ajax.
+function update_auth_user( caller, setting, user_to_edit ) {
+	var $ = jQuery,
+		access_users_pending = [],
+		access_users_approved = [],
+		access_users_blocked = [],
+		nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+
+	// Defaults:
+	// setting = 'access_users_pending' or 'access_users_approved' or 'access_users_blocked',
+	// user_to_edit = {
+	//   email: 'johndoe@example.com',
+	//   role: 'subscriber',
+	//   date_added: 'Jun 2014',
+	//   edit_action: 'add' or 'remove' or 'change_role',
+	//   local_user: true or false,
+	//   multisite_user: true or false,
+	// }
+	setting = typeof setting !== 'undefined' ? setting : 'none';
+	user_to_edit = typeof user_to_edit !== 'undefined' ? user_to_edit : {};
 
 	// Enable wait cursor.
 	$( 'html' ).addClass( 'busy' );
 
+	// Enable spinner by element that triggered this event (caller).
 	$( caller ).attr( 'disabled', 'disabled' );
 	if ( $( caller ).val() === 'Save Changes' ) {
 		$( caller ).last().after( '<span class="spinner"></span>' );
@@ -241,52 +265,18 @@ function save_auth_settings( caller, create_local_account ) {
 	}
 	$( 'form .spinner' ).show();
 
-	var access_who_can_login = $( 'form input[name="auth_settings[access_who_can_login]"]:checked' ).val();
-	var access_who_can_view = $( 'form input[name="auth_settings[access_who_can_view]"]:checked' ).val();
-
-	var access_users_pending = {};
-	$( '#list_auth_settings_access_users_pending li' ).each( function( index ) {
-		var user = {};
-		user.email = $( '.auth-email', this ).val();
-		user.role = $( '.auth-role', this ).val();
-		access_users_pending[index] = user;
-	});
-
-	var access_users_approved = {};
-	$( '#list_auth_settings_access_users_approved li' ).each( function( index ) {
-		// Skip the greyed out multisite users, otherwise it will result in duplicates.
-		if ( $( '.auth-multisite-user', this ).length !== 0 ) {
-			return true;
-		}
-		var user = {};
-		user.email = $( '.auth-email', this ).val();
-		user.role = $( '.auth-role', this ).val();
-		user.date_added = $( '.auth-date-added', this ).val();
-		user.local_user = $( '.auth-local-user', this ).length !== 0;
-		access_users_approved[index] = user;
-	});
-
-	// If admin clicked 'add local user', mark the last user in the list of approved
-	// users as a local user (the last user is the user the admin just added).
-	if ( create_local_account ) {
-		access_users_approved[Object.keys( access_users_approved ).length - 1].local_user = true;
+	// Grab the value of the setting we are saving.
+	if ( setting === 'access_users_pending' ) {
+		access_users_pending.push( user_to_edit );
+	} else if ( setting === 'access_users_approved' ) {
+		access_users_approved.push( user_to_edit );
+	} else if ( setting === 'access_users_blocked' ) {
+		access_users_blocked.push( user_to_edit );
 	}
 
-	var access_users_blocked = {};
-	$( '#list_auth_settings_access_users_blocked li' ).each( function( index ) {
-		var user = {};
-		user.email = $( '.auth-email', this ).val();
-		user.role = $( '.auth-role', this ).val();
-		user.date_added = $( '.auth-date-added', this ).val();
-		access_users_blocked[index] = user;
-	});
-
-	var nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
-
 	$.post( ajaxurl, {
-		action: 'save_auth_dashboard_widget',
-		'access_who_can_login': access_who_can_login,
-		'access_who_can_view': access_who_can_view,
+		'action': 'update_auth_user',
+		'setting': setting,
 		'access_users_pending': access_users_pending,
 		'access_users_approved': access_users_approved,
 		'access_users_blocked': access_users_blocked,
