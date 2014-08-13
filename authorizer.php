@@ -784,48 +784,35 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Reset option containing old error messages.
 			delete_option( 'auth_settings_advanced_login_error' );
 
-			// Get the service the current user was authenticated with so we
-			// can log them out of that service.
-			$authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
-			switch ( $authenticated_by ) {
-				case 'google':
-					// Log out of Google.
-					session_start();
-					if ( isset( $_SESSION ) && array_key_exists( 'token', $_SESSION ) ) {
-						$token = json_decode( $_SESSION['token'] )->access_token;
+			if ( session_id() == '' ) {
+				session_start();
+			}
 
-						// Build the Google Client.
-						$client = new Google_Client();
-						$client->setApplicationName( 'WordPress' );
-						$client->setClientId( $auth_settings['google_clientid'] );
-						$client->setClientSecret( $auth_settings['google_clientsecret'] );
-						$client->setRedirectUri( 'postmessage' );
+			// If logged in to CAS, Log out of CAS.
+			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
+				// Set the CAS client configuration if it hasn't been set already.
+				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+			}
+			if ( phpCAS::isAuthenticated() ) {
+				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+			}
 
-						// Revoke the token
-						$client->revokeToken( $token );
+			// If session token set, log out of Google.
+			if ( array_key_exists( 'token', $_SESSION ) ) {
+				$token = json_decode( $_SESSION['token'] )->access_token;
 
-						// Remove the credentials from the user's session.
-						$_SESSION['token'] = '';
-					}
-					break;
-				case 'cas':
-					// Log out of external service: CAS.
-					// Set the CAS client configuration if it hasn't been set already.
-					if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) && ! ( isset( $_SESSION ) && array_key_exists( 'phpCAS', $_SESSION ) ) ) {
-						phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
-					}
-					// Log out of CAS.
-					phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
-					break;
-				case 'ldap':
-					// Log out of LDAP.
-					// Nothing to do here, just pass on to wp logout.
-					break;
-				case 'wordpress':
-				default:
-					// Log out of WordPress.
-					// Nothing to do here, let WordPress take care of it.
-					break;
+				// Build the Google Client.
+				$client = new Google_Client();
+				$client->setApplicationName( 'WordPress' );
+				$client->setClientId( $auth_settings['google_clientid'] );
+				$client->setClientSecret( $auth_settings['google_clientsecret'] );
+				$client->setRedirectUri( 'postmessage' );
+
+				// Revoke the token
+				$client->revokeToken( $token );
+
+				// Remove the credentials from the user's session.
+				$_SESSION['token'] = '';
 			}
 
 		} // END custom_logout()
