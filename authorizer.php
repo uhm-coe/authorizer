@@ -35,7 +35,7 @@ Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-lo
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname(__FILE__) . '/assets/inc/CAS-1.3.2/CAS.php';
+	require_once dirname(__FILE__) . '/assets/inc/CAS-1.3.3/CAS.php';
 }
 
 // Add Google API PHP Client if it's not included.
