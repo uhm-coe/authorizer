@@ -641,7 +641,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Set the CAS client configuration
-			phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+			phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 3 months, then use it to ensure CAS server is legitimate.
@@ -665,7 +665,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Get the TLD from the CAS host for use in matching email addresses
-			// For example: example.edu is the TLD for login.its.example.edu, so user
+			// For example: example.edu is the TLD for authn.example.edu, so user
 			// 'bob' will have the following email address: bob@example.edu.
 			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
@@ -791,7 +791,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If logged in to CAS, Log out of CAS.
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 				// Set the CAS client configuration if it hasn't been set already.
-				phpCAS::client( CAS_VERSION_2_0, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				// Restrict logout request origin to the CAS server only (prevent DDOS).
+				phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 			}
 			if ( phpCAS::isAuthenticated() ) {
 				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
@@ -2561,7 +2563,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="login.its.example.edu" /><?php
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="authn.example.edu" /><?php
 		} // END print_text_cas_host()
 
 		function print_text_cas_port( $args = '' ) {
@@ -2830,7 +2832,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</ul>
 				<p><strong><em>If you enable CAS logins:</em></strong></p>
 				<ul>
-					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., login.its.example.edu).</li>
+					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).</li>
 					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
 					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
 				</ul>
