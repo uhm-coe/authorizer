@@ -408,7 +408,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// and login access is set to "All authenticated users," add them
 			// to the approved list (they'll get an account created below if
 			// they don't have one yet).
-			if ( ! $this->is_email_in_list( $user_email, 'approved', 'multisite' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+			if ( ! $this->is_email_in_list( $user_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
 				// If this user happens to be in the pending list (rare),
 				// remove them from pending before adding them to approved.
 				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
@@ -434,7 +434,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the approved
 			// list. If they are approved, log them in (and create their account
 			// if necessary)
-			if ( $this->is_email_in_list( $user_email, 'approved', 'multisite' ) ) {
+			if ( $this->is_email_in_list( $user_email, 'approved' ) ) {
 				$user_info = $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
 				// If the approved external user does not have a WordPress account, create it
