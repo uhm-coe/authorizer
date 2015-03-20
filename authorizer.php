@@ -1245,14 +1245,28 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: admin_menu
 		 */
 		public function add_plugin_page() {
-			// @see http://codex.wordpress.org/Function_Reference/add_options_page
-			add_options_page(
-				'Authorizer', // Page title
-				'Authorizer', // Menu title
-				'manage_options', // Capability
-				'authorizer', // Menu slug
-				array( $this, 'create_admin_page' ) // function
-			);
+			$admin_menu = $this->get_plugin_option( 'advanced_admin_menu' );
+			if ( $admin_menu === 'settings' ) {
+				// @see http://codex.wordpress.org/Function_Reference/add_options_page
+				add_options_page(
+					'Authorizer', // Page title
+					'Authorizer', // Menu title
+					'manage_options', // Capability
+					'authorizer', // Menu slug
+					array( $this, 'create_admin_page' ) // function
+				);
+			} else {
+				// @see http://codex.wordpress.org/Function_Reference/add_menu_page
+				add_menu_page(
+					'Authorizer', // Page title
+					'Authorizer', // Menu title
+					'manage_options', // Capability
+					'authorizer', // Menu slug
+					array( $this, 'create_admin_page' ), // callback
+					'dashicons-groups', // icon
+					'99.0018465' // position (decimal is to make overlap with other plugins less likely)
+				);
+			}
 		} // END add_plugin_page()
 
 
@@ -1644,6 +1658,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
+			add_settings_field(
+				'auth_settings_advanced_admin_menu', // HTML element ID
+				'Authorizer admin menu item location', // HTML element Title
+				array( $this, 'print_radio_auth_advanced_admin_menu' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
 		} // END page_init()
 
 
@@ -1799,6 +1820,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 				$auth_settings['advanced_branding'] = 'default';
+			}
+			if ( ! array_key_exists( 'advanced_admin_menu', $auth_settings ) ) {
+				$auth_settings['advanced_admin_menu'] = 'top';
 			}
 
 			// Save default options to database.
@@ -2763,6 +2787,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				?><p><em><strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</em></p><?php
 			}
 		} // END print_radio_auth_advanced_branding()
+
+		function print_radio_auth_advanced_admin_menu( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_admin_menu';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_default" name="auth_settings[<?php echo $option; ?>]" value="settings"<?php checked( 'settings' == $auth_settings_option ); ?> /> Show in Settings menu<br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_default" name="auth_settings[<?php echo $option; ?>]" value="top"<?php checked( 'top' == $auth_settings_option ); ?> /> Show in sidebar (top level)<br /><?php
+
+		} // END print_radio_auth_advanced_admin_menu()
 
 
 
