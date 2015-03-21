@@ -1037,6 +1037,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<?php if ( $auth_settings['google'] === '1' ): ?>
 				<script type="text/javascript">
+					// Reload login page if reauth querystring param exists,
+					// since reauth interrupts external logins (e.g., google).
+					if ( location.search.indexOf( 'reauth=1' ) >= 0 ) {
+						location.href = location.href.replace( 'reauth=1', '' );
+					}
+
 					function signInCallback( authResult ) {
 						var $ = jQuery;
 						if ( authResult['status'] && authResult['status']['signed_in'] ) {
