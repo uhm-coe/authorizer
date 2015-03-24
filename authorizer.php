@@ -1302,7 +1302,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Load external resources on this plugin's options page.
-		 * Run on action hook: load-settings_page_authorizer
+		 * Run on action hooks: load-settings_page_authorizer, load-toplevel_page_authorizer, admin_head-index.php
 		 */
 		public function load_options_page() {
 			wp_enqueue_script(

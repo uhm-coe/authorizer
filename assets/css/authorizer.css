@@ -1,3 +1,4 @@
+body.toplevel_page_authorizer #wpbody-content > .wrap,
 body.settings_page_authorizer #wpbody-content > .wrap {
 	background: url("../banner-772x250.jpg") repeat-x 5px -35px;
 	margin-left: -20px;
@@ -5,64 +6,76 @@ body.settings_page_authorizer #wpbody-content > .wrap {
 	padding-left: 20px;
 	padding-right: 0;
 }
+body.toplevel_page_authorizer #wpbody-content > div.update-nag ~ .wrap,
 body.settings_page_authorizer #wpbody-content > div.update-nag ~ .wrap {
 	margin-top: -66px;
 }
+body.toplevel_page_authorizer #wpbody-content > .wrap > h2,
 body.settings_page_authorizer #wpbody-content > .wrap > h2 {
 	margin: -10px 0 58px 15px;
 	padding-top: 80px;
 	font-size: 290%;
 	text-shadow: 1px 1px 3px #8d8d8d;
 }
+body.toplevel_page_authorizer #wpbody-content > .wrap > div.updated,
 body.settings_page_authorizer #wpbody-content > .wrap > div.updated {
 	margin: -43px 10px 5px;
 }
 
+body.toplevel_page_authorizer .nav-tab-wrapper,
 body.settings_page_authorizer .nav-tab-wrapper {
 	margin-left: -20px;
 	padding-left: 30px;
 }
 
+body.toplevel_page_authorizer .nav-tab,
 body.settings_page_authorizer .nav-tab {
 	opacity: 0.7;
 }
+body.toplevel_page_authorizer .nav-tab-active,
 body.settings_page_authorizer .nav-tab-active {
 	opacity: 1.0;
 }
 
+body.toplevel_page_authorizer .ms-selectable,
+body.toplevel_page_authorizer .ms-selection,
 body.settings_page_authorizer .ms-selectable,
 body.settings_page_authorizer .ms-selection {
 	background-color: transparent;
 }
+body.toplevel_page_authorizer .ms-list,
 body.settings_page_authorizer .ms-list {
 	background-color: white;
 }
 
+body.toplevel_page_authorizer .ms-list li,
 body.settings_page_authorizer .ms-list li {
 	margin-bottom: 0;
 }
 
+body.toplevel_page_authorizer .ms-container,
 body.settings_page_authorizer .ms-container {
 	background-position-x: 250px;
 }
 
+body.toplevel_page_authorizer .ms-container ul.ms-list,
 body.settings_page_authorizer .ms-container ul.ms-list {
 	width: 240px;
 }
 
-body.settings_page_authorizer .spinner,
 body.toplevel_page_authorizer .spinner,
+body.settings_page_authorizer .spinner,
 #auth_dashboard_widget .spinner {
 	display: inline-block;
 	float: none;
 	vertical-align: text-bottom;
 }
-body.settings_page_authorizer .spinner,
-body.toplevel_page_authorizer .spinner {
+body.toplevel_page_authorizer .spinner,
+body.settings_page_authorizer .spinner {
 	margin: 4px 5px 0 5px;
 }
-body.settings_page_authorizer .spinner .spinner-text,
 body.toplevel_page_authorizer .spinner .spinner-text,
+body.settings_page_authorizer .spinner .spinner-text,
 #auth_dashboard_widget .spinner .spinner-text {
 	color: green;
 	margin-left: 22px;
