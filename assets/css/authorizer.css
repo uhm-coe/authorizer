@@ -92,7 +92,8 @@ body.settings_page_authorizer .spinner .spinner-text,
 .auth-multisite-username,
 .auth-multisite-email,
 .auth-multisite-role,
-.auth-multisite-date-added {
+.auth-multisite-date-added,
+.auth-multisite-usermeta {
 	opacity: 0.5;
 }
 
@@ -121,6 +122,10 @@ body.settings_page_authorizer .spinner .spinner-text,
 	width: 70px;
 }
 
+#auth_dashboard_widget .auth-usermeta {
+	display: none;
+}
+
 /* Shrink dashboard widget elements on small sizes */
 @media only screen and (max-width: 1090px) {
 	#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email,
@@ -144,6 +149,7 @@ body.settings_page_authorizer .spinner .spinner-text,
 #list_auth_settings_access_users_approved .auth-email,
 #list_auth_settings_access_users_approved .auth-role,
 #list_auth_settings_access_users_approved .auth-date-added,
+#list_auth_settings_access_users_approved .auth-usermeta,
 #new_auth_settings_access_users_approved .auth-email,
 #new_auth_settings_access_users_approved .auth-role {
 	border-color: #8DC33C;
@@ -152,6 +158,7 @@ body.settings_page_authorizer .spinner .spinner-text,
 
 #list_auth_settings_access_users_blocked .auth-email,
 #list_auth_settings_access_users_blocked .auth-date-added,
+#list_auth_settings_access_users_blocked .auth-usermeta,
 #new_auth_settings_access_users_blocked .auth-email {
 	border-color: #EA7E70;
 	background-color: #FACBC5;

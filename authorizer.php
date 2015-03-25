@@ -1671,6 +1671,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
+			add_settings_field(
+				'auth_settings_advanced_usermeta', // HTML element ID
+				'Show custom usermeta in user list', // HTML element Title
+				array( $this, 'print_select_auth_advanced_usermeta' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
 		} // END page_init()
 
 
@@ -1829,6 +1836,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'advanced_admin_menu', $auth_settings ) ) {
 				$auth_settings['advanced_admin_menu'] = 'top';
+			}
+			if ( ! array_key_exists( 'advanced_usermeta', $auth_settings ) ) {
+				$auth_settings['advanced_usermeta'] = '';
 			}
 
 			// Save default options to database.
@@ -2165,6 +2175,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get default role for new user dropdown.
 			$access_default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
 
+			// Get custom usermeta field to show.
+			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
+
 			// Adjust javascript function prefixes if multisite.
 			$js_function_prefix = $admin_mode === 'multisite admin' ? 'auth_multisite_' : 'auth_';
 			$multisite_admin_page = $admin_mode === 'multisite admin';
@@ -2173,17 +2186,28 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( ! $multisite_admin_page ) : ?>
 					<?php foreach ( $auth_settings_option_multisite as $key => $approved_user ): ?>
 						<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
-						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
-							<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
-							<?php $approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles ); ?>
-							<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
-						<?php endif; ?>
+						<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ) :
+							$approved_user['email'] = $approved_wp_user->user_email;
+							$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
+							$approved_user['date_added'] = $approved_wp_user->user_registered;
+						endif; ?>
+						<?php if ( $approved_wp_user && strlen( $advanced_usermeta ) > 0 ) {
+							$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+							if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) {
+								$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+							}
+						} else {
+							$approved_user['usermeta'] = '';
+						} ?>
 						<li>
 							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
 							<select name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
+							<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
+								<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" readonly="true" class="auth-usermeta auth-multisite-usermeta" disabled="disabled" />
+							<?php endif; ?>
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 						</li>
 					<?php endforeach; ?>
@@ -2192,15 +2216,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php $is_current_user = false; ?>
 					<?php $local_user_icon = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true' ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : ''; ?>
 					<?php if ( empty( $approved_user ) || count( $approved_user ) < 1 ) continue; ?>
-					<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ): ?>
-						<?php $approved_user['email'] = $approved_wp_user->user_email; ?>
-						<?php $approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles ); ?>
-						<?php $approved_user['date_added'] = $approved_wp_user->user_registered; ?>
-						<?php $approved_user['is_wp_user'] = true; ?>
-						<?php $is_current_user = $approved_wp_user->ID === get_current_user_id(); ?>
-					<?php else: ?>
-						<?php $approved_user['is_wp_user'] = false; ?>
-					<?php endif; ?>
+					<?php $approved_user['usermeta'] = ''; ?>
+					<?php if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ) {
+						$approved_user['email'] = $approved_wp_user->user_email;
+						$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
+						$approved_user['date_added'] = $approved_wp_user->user_registered;
+						$approved_user['is_wp_user'] = true;
+						$is_current_user = $approved_wp_user->ID === get_current_user_id();
+					} else {
+						$approved_user['is_wp_user'] = false;
+					} ?>
+					<?php if ( $approved_wp_user && strlen( $advanced_usermeta ) > 0 ) {
+						$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+						if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) {
+							$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+						}
+					} else {
+						$approved_user['usermeta'] = '';
+					} ?>
 					<li>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
 						<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
@@ -2208,6 +2241,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
 						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+						<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
+							<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
+						<?php endif; ?>
 						<?php if ( ! $is_current_user ): ?>
 							<?php if ( ! $multisite_admin_page ) : ?>
 								<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>
@@ -2804,6 +2840,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_default" name="auth_settings[<?php echo $option; ?>]" value="top"<?php checked( 'top' == $auth_settings_option ); ?> /> Show in sidebar (top level)<br /><?php
 
 		} // END print_radio_auth_advanced_admin_menu()
+
+		function print_select_auth_advanced_usermeta( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_usermeta';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
+				<option value="">-- None --</option>
+				<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : ?>
+					<option value="<?php echo $meta_key; ?>" <?php if ( $auth_settings_option === $meta_key ) echo ' selected="selected"'; ?>><?php echo $meta_key; ?></option>
+				<?php endforeach; ?>
+			</select><?php
+		} // END print_select_auth_advanced_usermeta()
 
 
 
@@ -3894,6 +3944,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return substr( $s, 0, -2 );
 		} // END seconds_as_sentence()
+
+		// Helper function to get all available usermeta keys as an array.
+		function get_all_usermeta_keys() {
+			global $wpdb;
+			$usermeta_keys = $wpdb->get_col( "SELECT DISTINCT $wpdb->usermeta.meta_key FROM $wpdb->usermeta" );
+			return $usermeta_keys;
+		}
 
 
 		/**
