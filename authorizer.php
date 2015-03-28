@@ -2849,7 +2849,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<option value="">-- None --</option>
-				<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : ?>
+				<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : if ( substr( $meta_key, 0, 3 ) === 'wp_' ) continue; ?>
 					<option value="<?php echo $meta_key; ?>" <?php if ( $auth_settings_option === $meta_key ) echo ' selected="selected"'; ?>><?php echo $meta_key; ?></option>
 				<?php endforeach; ?>
 			</select><?php
