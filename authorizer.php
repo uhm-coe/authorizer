@@ -2243,6 +2243,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
 							<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
+							<a class="button button-small button-primary" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 						<?php endif; ?>
 						<?php if ( ! $is_current_user ): ?>
 							<?php if ( ! $multisite_admin_page ) : ?>

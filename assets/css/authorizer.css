@@ -184,6 +184,13 @@ body.settings_page_authorizer .spinner .spinner-text,
 #list_auth_settings_access_users_approved .auth-multisite-user {
 	margin-left: 5px;
 }
+#list_auth_settings_access_users_approved .auth-usermeta + .button {
+	margin: 3px 4px 3px -33px;
+	height: 23px;
+	width: 26px;
+	vertical-align: top !important;
+	display: none;
+}
 
 /**
  * Overlays
@@ -453,6 +460,9 @@ html.busy, html.busy * {
 }
 .glyphicon-remove:before {
 	content: "\e014";
+}
+.glyphicon-floppy-saved:before {
+	content: "\e173";
 }
 
 /**

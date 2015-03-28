@@ -767,6 +767,15 @@ jQuery( document ).ready( function( $ ) {
 		}
 	});
 
+	// Show save button if usermeta field is modified.
+	$( 'form input.auth-usermeta' ).bind( 'keyup', function ( event ) {
+		// Don't do anything if tab or arrow keys were pressed.
+		if ( event.which === 9 || event.which === 37 || event.which === 38 || event.which === 39 || event.which === 40 ) {
+			return;
+		}
+		$( this ).siblings( '.button' ).css( 'display', 'inline-block' );
+	});
+
 	// List management function: pressing enter in the email, or role
 	// field adds the user to the list.
 	$( 'form input.auth-email, form select.auth-role' ).bind( 'keyup', function( e ) {
