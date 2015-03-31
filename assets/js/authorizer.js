@@ -201,7 +201,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		// Add the new item.
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-		var ban_button = list === 'approved' ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
