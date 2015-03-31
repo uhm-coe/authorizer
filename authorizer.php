@@ -126,6 +126,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// ajax save options from multisite options page
 			add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
 
+			// ajax save usermeta from options page
+			add_action( 'wp_ajax_update_auth_usermeta', array( $this, 'ajax_update_auth_usermeta' ) );
+
 			// ajax verify google login
 			add_action( 'wp_ajax_process_google_login', array( $this, 'ajax_process_google_login' ) );
 			add_action( 'wp_ajax_nopriv_process_google_login', array( $this, 'ajax_process_google_login' ) );
@@ -3231,6 +3234,40 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<br class="clear" />
 			</form><?php
 		} // END add_auth_dashboard_widget()
+
+
+		function ajax_update_auth_usermeta() {
+
+			// Fail silently if current user doesn't have permissions.
+			if ( ! current_user_can( 'edit_users' ) ) {
+				die( '' );
+			}
+
+			// Nonce check.
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+				die( '' );
+			}
+
+			// Fail if required post data doesn't exist.
+			if ( ! array_key_exists( 'email', $_REQUEST ) || ! array_key_exists( 'usermeta', $_REQUEST ) ) {
+				die( '' );
+			}
+
+			// Fail if user doesn't exist.
+			if ( ! ( $wp_user = get_user_by( 'email', $_REQUEST['email'] ) ) ) {
+				die( '' );
+			}
+
+			// Update user's usermeta value for usermeta key stored in authorizer options.
+			$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
+			$meta_value = $_REQUEST['usermeta'];
+			if ( ! update_user_meta( $wp_user->ID, $meta_key, $meta_value ) ) {
+				die( '' );
+			}
+
+			// Return 'success' value to AJAX call.
+			die( 'success' );
+		}
 
 
 		function ajax_update_auth_user() {

@@ -25,6 +25,59 @@ function choose_tab( list_name, delay ) {
 	setTimeout( hide_multisite_overridden_options, delay );
 }
 
+// Update user's usermeta field.
+function auth_update_usermeta( caller ) {
+	var $ = jQuery,
+		$caller = $( caller ),
+		$usermeta = $caller.siblings( '.auth-usermeta' ),
+		email = $caller.siblings( '.auth-email' ).val(),
+		usermeta = $usermeta.val(),
+		nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+
+	// Disable inputs, show spinner.
+	$caller.attr( 'disabled', 'disabled' );
+	$usermeta.attr( 'disabled', 'disabled' );
+	$caller.last().after( '<span class="spinner"></span>' );
+	$( 'html' ).addClass( 'busy' );
+
+	// Call ajax save function.
+	$.post( ajaxurl, {
+		'action': 'update_auth_usermeta',
+		'email': email,
+		'usermeta': usermeta,
+		'nonce_save_auth_settings': nonce_save_auth_settings,
+	}, function ( response ) {
+		var succeeded = response === 'success';
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+
+		// Enable inputs, remove spinner.
+		$caller.removeAttr( 'disabled' );
+		$usermeta.removeAttr( 'disabled' );
+		$caller.css( 'display', 'none' );
+		$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
+			$( this ).remove();
+		});
+		$( 'html' ).removeClass( 'busy' );
+
+	}).fail( function () {
+		var succeeded = false;
+		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_wait = succeeded ? 500 : 2000;
+
+		// Enable inputs, remove spinner.
+		$caller.removeAttr( 'disabled' );
+		$usermeta.removeAttr( 'disabled' );
+		$usermeta.css( 'display', 'none' );
+		$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
+			$( this ).remove();
+		});
+		$( 'html' ).removeClass( 'busy' );
+
+	});
+
+}
+
 // Update user's role (multisite options page).
 function auth_multisite_change_role( caller ) {
 	var is_multisite = true;
