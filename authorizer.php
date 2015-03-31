@@ -173,22 +173,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			global $wpdb;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
-			if ( is_multisite() ) {
-				if ( isset( $_GET['networkwide'] ) && ( $_GET['networkwide'] == 1 ) ) {
-					$old_blog = $wpdb->blogid;
-					// Get all blog ids
-					$blogs = wp_get_sites( array(
-						'network_id' => $wpdb->siteid,
-						'limit' => 999999,
-					));
-					foreach ( $blogs as $blog ) {
-						switch_to_blog( $blog['blog_id'] );
-						// Set meaningful defaults for other sites in the network.
-						$this->set_default_options();
-					}
-					switch_to_blog( $old_blog );
-					return;
+			if ( is_multisite() && isset( $_GET['networkwide'] ) && $_GET['networkwide'] == 1 ) {
+				$old_blog = $wpdb->blogid;
+				// Get all blog ids
+				$blogs = wp_get_sites( array( 'limit' => 999999 ) );
+				foreach ( $blogs as $blog ) {
+					switch_to_blog( $blog['blog_id'] );
+					// Set meaningful defaults for other sites in the network.
+					$this->set_default_options();
 				}
+				switch_to_blog( $old_blog );
+				return;
 			}
 
 			// Set meaningful defaults for this site.
@@ -3446,7 +3441,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// on individual sites and remove this user from them (to prevent duplicate entries).
 						if ( $approved_user['multisite_user'] !== 'false' && is_multisite() ) {
 							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
-							foreach ( wp_get_sites() as $site ) {
+							foreach ( wp_get_sites( array( 'limit' => 999999 ) ) as $site ) {
 								foreach ( $list_names as $list_name ) {
 									$user_list = get_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, array() );
 									$list_changed = false;
