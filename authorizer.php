@@ -104,6 +104,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Create options page
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
+			// Update user role in approved list if it's changed in the WordPress edit user page.
+			add_action( 'edit_user_profile_update', array( $this, 'edit_user_profile_update_role' ) );
+
 			// Enqueue javascript and css on the plugin's options page, the
 			// dashboard (for the widget), and the network admin.
 			add_action( 'load-settings_page_authorizer', array( $this, 'load_options_page' ) );
@@ -2075,6 +2078,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			return $auth_settings;
 		} // END sanitize_options()
 
+
+		/**
+		 * Keep authorizer approved users' roles in sync with WordPress roles
+		 * if someone changes the role via the WordPress Edit User options page.
+		 *
+		 * @action edit_user_profile_update
+		 * @ref https://codex.wordpress.org/Plugin_API/Action_Reference/edit_user_profile_update
+		 * @param  int $user_id The user ID of the user being edited
+		 */
+		function edit_user_profile_update_role( $user_id ) {
+			if ( ! current_user_can( 'edit_user', $user_id ) ) {
+				return;
+			}
+
+			// If user is in approved list, update his/her associated role.
+			$wp_user = get_user_by( 'id', $user_id );
+			if ( $this->is_email_in_list( $wp_user->get( 'user_email' ), 'approved' ) ) {
+				$auth_settings_access_users_approved = $this->sanitize_user_list(
+					$this->get_plugin_option( 'access_users_approved', 'single admin' )
+				);
+				// Find approved user and update their role.
+				foreach ( $auth_settings_access_users_approved as $key => $user ) {
+					if ( $user['email'] === $wp_user->get( 'user_email' ) ) {
+						$auth_settings_access_users_approved[$key]['role'] = $_REQUEST['role'];
+					}
+				}
+
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			}
+		}
 
 		/**
 		 * Settings print callbacks
