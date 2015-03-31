@@ -3442,6 +3442,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
+						// If we've added a new multisite user, go through all pending/approved/blocked lists
+						// on individual sites and remove this user from them (to prevent duplicate entries).
+						if ( $approved_user['multisite_user'] !== 'false' && is_multisite() ) {
+							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
+							foreach ( wp_get_sites() as $site ) {
+								foreach ( $list_names as $list_name ) {
+									$user_list = get_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, array() );
+									$list_changed = false;
+									foreach ( $user_list as $key => $user ) {
+										if ( $user['email'] == $approved_user['email'] ) {
+											unset( $user_list[$key] );
+											$list_changed = true;
+										}
+									}
+									if ( $list_changed ) {
+										update_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, $user_list );
+									}
+								}
+							}
+						}
+
 					} else if ( $approved_user['edit_action'] === 'remove' ) {
 
 						// Remove user from approved list and save
