@@ -1,8 +1,8 @@
 === Authorizer ===
-Contributors: figureone, the_magician, pat-trick
+Contributors: figureone, the_magician, pkarjala
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
-Tested up to: 3.9.1
+Tested up to: 4.1.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -56,6 +56,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.1 =
+* Updates and bug fixes.
+* Wed Apr 1, 2015
 
 = 2.0 =
 * First public release.
