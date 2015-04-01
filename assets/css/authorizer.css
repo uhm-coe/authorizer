@@ -23,7 +23,7 @@ body.settings_page_authorizer #wpbody-content > .wrap > div.updated {
 }
 
 body.toplevel_page_authorizer #wpbody-content > .wrap > form > h2 {
-	margin: -10px 0 13px 15px;
+	margin: -5px 0 13px 15px;
 	padding-top: 8px;
 	font-size: 290%;
 	text-shadow: 1px 1px 3px #8d8d8d;
@@ -37,8 +37,8 @@ body.toplevel_page_authorizer #wpbody-content > .wrap > form > div.updated {
 
 body.toplevel_page_authorizer .nav-tab-wrapper,
 body.settings_page_authorizer .nav-tab-wrapper {
-	margin-left: -20px;
-	padding-left: 30px;
+	margin-left: -20px !important;
+	padding-left: 30px !important;
 }
 
 body.toplevel_page_authorizer .nav-tab,
