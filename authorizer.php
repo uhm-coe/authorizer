@@ -3902,11 +3902,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! is_array( $haystack ) ) {
 				return false;
 			}
-			if ( $case_sensitivity === 'case sensitive' ) {
+			if ( $case_sensitivity === 'case insensitive' ) {
 				$needle = strtolower( $needle );
 			}
 			foreach ( $haystack as $item ) {
-				if ( $case_sensitivity === 'case sensitive' && ! is_array( $item ) ) {
+				if ( $case_sensitivity === 'case insensitive' && ! is_array( $item ) ) {
 					$item = strtolower( $item );
 				}
 				if ( ( $strict_mode === 'strict' ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) {
