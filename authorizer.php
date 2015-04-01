@@ -2191,7 +2191,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.</li>
 				</ol>
 			</div>
-			<table class="form-table" style="display: table;">
+			<table class="form-table">
 				<tbody>
 					<tr>
 						<th scope="row">Pending Users</th>

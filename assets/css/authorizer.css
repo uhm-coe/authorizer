@@ -94,6 +94,10 @@ body.settings_page_authorizer .spinner .spinner-text,
 	margin-left: 22px;
 }
 
+div.section_info, div.section_info ~ table {
+	display: none;
+}
+
 #section_info_access_lists ~ table .animated_wrapper {
 	/* slightly smaller so the shake animation doesn't create a horizontal scroll bar */
 	width: 95%;
