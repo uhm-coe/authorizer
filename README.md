@@ -1,5 +1,5 @@
 # Authorizer
-Contributors: figureone, the_magician, pat-trick
+Contributors: figureone, the_magician, pkarjala
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Link: https://wordpress.org/plugins/authorizer/
 
@@ -51,6 +51,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 ![](assets/screenshot-12.png?raw=true "Authorizer Option overridden by a Network Admin Option.")
 
 ## Changelog
+
+= 2.1 =
+* Updates and bug fixes.
+* Wed Apr 1, 2015
 
 ### 2.0
 * First public release.
