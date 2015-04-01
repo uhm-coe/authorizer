@@ -181,14 +181,70 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					switch_to_blog( $blog['blog_id'] );
 					// Set meaningful defaults for other sites in the network.
 					$this->set_default_options();
+					// Add current WordPress users to the approved list.
+					$this->add_wp_users_to_approved_list();
 				}
 				switch_to_blog( $old_blog );
-				return;
+			} else {
+				// Set meaningful defaults for this site.
+				$this->set_default_options();
+				// Add current WordPress users to the approved list.
+				$this->add_wp_users_to_approved_list();
 			}
 
-			// Set meaningful defaults for this site.
-			$this->set_default_options();
 		} // END activate()
+
+		/**
+		 * Adds all WordPress users in the current site to the approved list,
+		 * unless they are already in the blocked list. Also removes them
+		 * from the pending list if they are there.
+		 *
+		 * Runs in plugin activation hook.
+		 *
+		 * @return void
+		 */
+		private function add_wp_users_to_approved_list() {
+			// Add current WordPress users to the approved list.
+			$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', 'single admin' );
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
+			$default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
+			$updated = false;
+			foreach ( get_users() as $user ) {
+				// Skip if user is in blocked list.
+				if ( $this->in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
+					continue;
+				}
+				// Skip if user is in multisite approved list.
+				if ( $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
+					continue;
+				}
+				// Add to approved list if not there.
+				if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
+					$approved_user = array(
+						'email' => $user->user_email,
+						'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+						'local_user' => true,
+					);
+					array_push( $auth_settings_access_users_approved, $approved_user );
+					$updated = true;
+				}
+				// Remove from pending list if there.
+				foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
+					if ( $pending_user['email'] == $user->user_email ) {
+						unset( $auth_settings_access_users_pending[$key] );
+						$updated = true;
+					}
+				}
+			}
+			if ( $updated ) {
+				update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			}
+		}
+
 
 		/**
 		 * Plugin deactivation.
