@@ -94,6 +94,11 @@ body.settings_page_authorizer .spinner .spinner-text,
 	margin-left: 22px;
 }
 
+#section_info_access_lists ~ table .animated_wrapper {
+	/* slightly smaller so the shake animation doesn't create a horizontal scroll bar */
+	width: 95%;
+}
+
 .auth-email {
 	width: 160px;
 }
