@@ -1860,7 +1860,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['multisite_override'] = '';
 				}
 				// Access Lists Defaults.
-				$auth_multisite_settings_access_users_approved = get_option( 'auth_multisite_settings_access_users_approved' );
+				$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved' );
 				if ( $auth_multisite_settings_access_users_approved === FALSE ) {
 					$auth_multisite_settings_access_users_approved = array();
 				}
