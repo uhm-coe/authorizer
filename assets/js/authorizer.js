@@ -176,11 +176,12 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	$( buttons ).attr( 'disabled', 'disabled' );
 
-	// Check if the name being added already exists in the list.
+	// Check if the name being added already exists in any list.
 	if ( ! skip_validation && validated ) {
-		$( '#list_auth_settings_access_users_' + list + ' input.auth-email' ).each( function() {
+		$( 'li > input.auth-email' ).each( function() {
 			if ( this.value == email.val() ) {
 				validated = false;
+				email.parent().effect( 'shake', shake_speed );
 				$( this ).parent().effect( 'shake', shake_speed );
 				$( buttons ).removeAttr( 'disabled' );
 				return false;
