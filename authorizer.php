@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: https://github.com/figureone/authorizer
 Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.1
+Version: 2.2
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2
@@ -35,14 +35,14 @@ Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-lo
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname(__FILE__) . '/assets/inc/CAS-1.3.3/CAS.php';
+	require_once dirname(__FILE__) . '/inc/CAS-1.3.3/CAS.php';
 }
 
 // Add Google API PHP Client if it's not included.
 // @see https://github.com/google/google-api-php-client
 if ( ! class_exists( 'Google_Client' ) ) {
-	set_include_path( get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/assets/inc/google-api-php-client/src' );
-	require_once dirname(__FILE__) . '/assets/inc/google-api-php-client/src/Google/Client.php';
+	set_include_path( get_include_path() . PATH_SEPARATOR . dirname(__FILE__) . '/inc/google-api-php-client/src' );
+	require_once dirname(__FILE__) . '/inc/google-api-php-client/src/Google/Client.php';
 }
 
 if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
@@ -702,7 +702,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 3 months, then use it to ensure CAS server is legitimate.
-			$cacert_path = plugin_dir_path( __FILE__ ) . 'assets/inc/cacert.pem';
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'inc/cacert.pem';
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
 			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
@@ -1011,7 +1011,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function auth_public_scripts() {
 			// Load (and localize) public scripts
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
-			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/assets/js/authorizer-public.js', __FILE__ ) );
+			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ) );
 			$auth_localized = array(
 				'wp_login_url' => wp_login_url( $current_path ),
 				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
@@ -1020,7 +1020,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			//update_option( 'auth_settings_advanced_public_notice', false);
 
 			// Load public css
-			wp_register_style( 'authorizer-public-css', plugins_url( 'assets/css/authorizer-public.css', __FILE__ ) );
+			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ) );
 			wp_enqueue_style( 'authorizer-public-css' );
 		} // END auth_public_scripts()
 
@@ -1034,10 +1034,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 
 			// Enqueue scripts appearing on wp-login.php.
-			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/assets/js/authorizer-login.js', __FILE__ ), array( 'jquery' ) );
+			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ) );
 
 			// Enqueue styles appearing on wp-login.php.
-			wp_register_style( 'authorizer-login-css', plugins_url( '/assets/css/authorizer-login.css', __FILE__ ) );
+			wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', __FILE__ ) );
 			wp_enqueue_style( 'authorizer-login-css' );
 
 			/**
@@ -1073,7 +1073,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we're using Google logins, load those resources.
 			if ( $auth_settings['google'] === '1' ) {
-				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/assets/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ) );
+				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ) );
 				?>
 				<meta name="google-signin-clientid" content="<?php echo $auth_settings['google_clientid']; ?>" />
 				<meta name="google-signin-scope" content="email" />
@@ -1364,7 +1364,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function load_options_page() {
 			wp_enqueue_script(
 				'authorizer',
-				plugins_url( 'assets/js/authorizer.js', __FILE__ ),
+				plugins_url( 'js/authorizer.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '5.0', true
 			);
 			$js_auth_config = array( 'baseurl' => get_bloginfo( 'url' ) );
@@ -1372,14 +1372,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			wp_enqueue_script(
 				'jquery.multi-select',
-				plugins_url( 'assets/inc/jquery.multi-select/js/jquery.multi-select.js', __FILE__ ),
+				plugins_url( 'inc/jquery.multi-select/js/jquery.multi-select.js', __FILE__ ),
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'assets/css/authorizer.css', __FILE__ ) );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ) );
 			wp_enqueue_style( 'authorizer-css' );
 
-			wp_register_style( 'jquery-multi-select-css', plugins_url( 'assets/inc/jquery.multi-select/css/multi-select.css', __FILE__ ) );
+			wp_register_style( 'jquery-multi-select-css', plugins_url( 'inc/jquery.multi-select/css/multi-select.css', __FILE__ ) );
 			wp_enqueue_style( 'jquery-multi-select-css' );
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
