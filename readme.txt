@@ -57,7 +57,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 == Changelog ==
 
 = 2.2 =
-* Urgent fix for assets folder (deploy script missed it)
+* 2.2.0: Urgent fix for assets folder (deploy script missed it)
+* 2.2.1: readme fix
+* 2.2.2: asset fix
 * Wed Apr 1, 2015
 
 = 2.1 =

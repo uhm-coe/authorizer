@@ -1,6 +1,6 @@
 body.toplevel_page_authorizer #wpbody-content > .wrap,
 body.settings_page_authorizer #wpbody-content > .wrap {
-	background: url("../banner-772x250.jpg") repeat-x 5px -35px;
+	background: url("../images/banner-772x250.jpg") repeat-x 5px -35px;
 	margin-left: -20px;
 	margin-right: 0;
 	padding-left: 20px;
