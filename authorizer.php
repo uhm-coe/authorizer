@@ -845,19 +845,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				session_start();
 			}
 
+			$current_user_authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
+
 			// If logged in to CAS, Log out of CAS.
-			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
-				// Set the CAS client configuration if it hasn't been set already.
-				phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
-				// Restrict logout request origin to the CAS server only (prevent DDOS).
-				phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
-			}
-			if ( phpCAS::isAuthenticated() ) {
-				phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+			if ( $current_user_authenticated_by === 'cas' && $auth_settings['cas'] === '1' ) {
+				if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
+					// Set the CAS client configuration if it hasn't been set already.
+					phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+					// Restrict logout request origin to the CAS server only (prevent DDOS).
+					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
+				}
+				if ( phpCAS::isAuthenticated() ) {
+					phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+				}
 			}
 
 			// If session token set, log out of Google.
-			if ( array_key_exists( 'token', $_SESSION ) ) {
+			if ( $current_user_authenticated_by === 'google' && array_key_exists( 'token', $_SESSION ) ) {
 				$token = json_decode( $_SESSION['token'] )->access_token;
 
 				// Build the Google Client.
