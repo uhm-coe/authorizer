@@ -205,7 +205,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function add_wp_users_to_approved_list() {
 			// Add current WordPress users to the approved list.
-			$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
 			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', 'single admin' );
 			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
