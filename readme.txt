@@ -56,6 +56,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.2.3 =
+* 2.2.3: fix for multisite function being called on non-multisite installs (prevented plugin installation)
+* Thu Apr 16, 2015
+
 = 2.2 =
 * 2.2.0: Urgent fix for assets folder (deploy script missed it)
 * 2.2.1: readme fix
