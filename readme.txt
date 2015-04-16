@@ -56,6 +56,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.2.4 =
+* fix: only run cas or google logout routines if the current user was authenticated by one of those services
+* Thu Apr 16, 2015
+
 = 2.2.3 =
 * 2.2.3: fix for multisite function being called on non-multisite installs (prevented plugin installation)
 * Thu Apr 16, 2015
