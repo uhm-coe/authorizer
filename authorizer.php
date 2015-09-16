@@ -560,12 +560,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					array_push( $auth_settings_access_users_pending, $pending_user );
 					update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 
+					// Create strings used in the email notification.
+					$site_name = get_bloginfo( 'name' );
+					$site_url = get_bloginfo( 'url' );
+					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
+
 					// Notify instructor about new pending user if that option is set.
 					foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
 						wp_mail(
 							$user_recipient->user_email,
-							'Action required: Pending user ' . $pending_user['email'] . ' at ' . get_bloginfo( 'name' ),
-							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . "\n\nPlease log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=authorizer' )
+							"Action required: Pending user {$pending_user['email']} at $site_name",
+							"A new user has tried to access the $site_name site you manage at:\n$site_url\n\n" .
+							"Please log in to approve or deny their request:\n$authorizer_options_url\n"
 						);
 					}
 				}
@@ -1284,8 +1290,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return array of links to show in the admin sidebar.
 		 */
 		public function plugin_settings_link( $links ) {
-			$settings_link = '<a href="options-general.php?page=authorizer">Settings</a>';
-			array_unshift( $links, $settings_link );
+			$admin_menu = $this->get_plugin_option( 'advanced_admin_menu' );
+			$settings_url = $admin_menu === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( 'admin.php?page=authorizer' );
+			array_unshift( $links, '<a href="' . $settings_url . '">Settings</a>' );
 			return $links;
 		} // END plugin_settings_link()
 
