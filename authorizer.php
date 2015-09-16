@@ -565,7 +565,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						wp_mail(
 							$user_recipient->user_email,
 							'Action required: Pending user ' . $pending_user['email'] . ' at ' . get_bloginfo( 'name' ),
-							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . ".\n\n Please log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=authorizer' )
+							"A new user has tried to access the " . get_bloginfo( 'name' ) . " site you manage at:\n" . get_bloginfo( 'url' ) . "\n\nPlease log in to approve or deny their request:\n" . admin_url( 'options-general.php?page=authorizer' )
 						);
 					}
 				}
