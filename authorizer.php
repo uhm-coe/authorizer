@@ -1325,7 +1325,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_options_page(
 					'Authorizer', // Page title
 					'Authorizer', // Menu title
-					'manage_options', // Capability
+					'create_users', // Capability
 					'authorizer', // Menu slug
 					array( $this, 'create_admin_page' ) // function
 				);
@@ -1334,7 +1334,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_menu_page(
 					'Authorizer', // Page title
 					'Authorizer', // Menu title
-					'manage_options', // Capability
+					'create_users', // Capability
 					'authorizer', // Menu slug
 					array( $this, 'create_admin_page' ), // callback
 					'dashicons-groups', // icon
@@ -3304,7 +3304,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		function add_dashboard_widgets() {
 			// Only users who can edit can see the authorizer dashboard widget
-			if ( current_user_can( 'edit_users' ) ) {
+			if ( current_user_can( 'create_users' ) ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'auth_dashboard_widget', 'Authorizer Settings', array( $this, 'add_auth_dashboard_widget' ) );
 			}
@@ -3334,7 +3334,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function ajax_update_auth_usermeta() {
 
 			// Fail silently if current user doesn't have permissions.
-			if ( ! current_user_can( 'edit_users' ) ) {
+			if ( ! current_user_can( 'create_users' ) ) {
 				die( '' );
 			}
 
@@ -3368,7 +3368,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function ajax_update_auth_user() {
 
 			// Fail silently if current user doesn't have permissions.
-			if ( ! current_user_can( 'edit_users' ) ) {
+			if ( ! current_user_can( 'create_users' ) ) {
 				die( '' );
 			}
 
