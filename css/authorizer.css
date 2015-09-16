@@ -6,6 +6,23 @@ body.settings_page_authorizer #wpbody-content > .wrap {
 	padding-left: 20px;
 	padding-right: 0;
 }
+body.network-admin.toplevel_page_authorizer #wpbody-content > .wrap,
+body.network-admin.settings_page_authorizer #wpbody-content > .wrap {
+	background: url("../images/banner-772x250.jpg") repeat-x 5px 0px;
+	margin-top: 5px;
+}
+body.network-admin.toplevel_page_authorizer #wpbody-content > div.update-nag ~ .wrap > form > h2,
+body.network-admin.settings_page_authorizer #wpbody-content > div.update-nag ~ .wrap > form > h2 {
+	visibility: hidden;
+}
+body.network-admin.toplevel_page_authorizer #wpbody-content > .wrap > form > h2,
+body.network-admin.settings_page_authorizer #wpbody-content > .wrap > form > h2 {
+	padding-top: 50px;
+}
+body.network-admin.toplevel_page_authorizer #wpbody-content > .wrap > form > .wrap,
+body.network-admin.settings_page_authorizer #wpbody-content > .wrap > form > .wrap {
+	margin-top: 1px;
+}
 body.toplevel_page_authorizer #wpbody-content > div.update-nag ~ .wrap,
 body.settings_page_authorizer #wpbody-content > div.update-nag ~ .wrap {
 	margin-top: -66px;
