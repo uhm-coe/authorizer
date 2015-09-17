@@ -1,5 +1,5 @@
 # Authorizer
-Contributors: figureone, the_magician, pkarjala
+Contributors: figureone, the_magician, pkarjala, aargh-a-knot
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Link: https://wordpress.org/plugins/authorizer/
 
