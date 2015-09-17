@@ -133,6 +133,9 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	// Skip email address validation if adding from pending list (not user-editable).
 	var skip_validation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
 
+	// Skip email address validation if we're banning an existing user (since they're already in a list).
+	skip_validation = skip_validation || $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1;
+
 	// Set default for multisite flag (run different save routine if multisite)
 	is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
 
@@ -269,7 +272,7 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
 	};
 
 	// Show an 'empty list' message if we're deleting the last item
-	var list = $( caller ).parent().parent();
+	var list = $( caller ).closest( 'ul' );
 	if ( $( 'li', list ).length <= 1 ) {
 		$( list ).append( '<li class="auth-empty"><em>No ' + list_name + ' users</em></li>' );
 	}
