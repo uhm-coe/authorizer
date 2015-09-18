@@ -56,6 +56,16 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.0 =
+* Fix: Site admins in a network can only access authorizer if the following option is enabled in Network Settings: "Allow site administrators to add new users to their site via the "Users → Add New" page." Props @aargh-a-knot.
+* Fix: Block user button wasn't correctly moving a user from the approved list to the blocked list.
+* Fix: Settings link in plugins list now correctly goes to the Authorizer page if it is shown in the top level menu.
+* Enhancement: New icon for authorizer in the plugin directory.
+* Enhancement: images have been optimized with ImageOptim.
+* Enhancement: Banner in multisite options aligns better when update notifications are present.
+* Enhancement: Checkbox and radio option labels are now clickable in authorizer options.
+* Verified compatibility with WordPress 4.3.1.
+
 = 2.2.4 =
 * fix: only run cas or google logout routines if the current user was authenticated by one of those services
 * Thu Apr 16, 2015
