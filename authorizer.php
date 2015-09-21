@@ -4008,6 +4008,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Use curl to retrieve the URL.
 			$handle = curl_init( $url );
 			curl_setopt( $handle,  CURLOPT_RETURNTRANSFER, TRUE );
+			curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, FALSE );
 			$response = curl_exec( $handle );
 			$http_code = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
 			curl_close( $handle );
