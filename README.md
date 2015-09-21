@@ -1,7 +1,7 @@
 # Authorizer
 
-WordPress Plugin: [https://wordpress.org/plugins/authorizer/][wp]
-Changelog: [https://github.com/figureone/authorizer/blob/master/readme.txt][changelog]
+* WordPress Plugin: [https://wordpress.org/plugins/authorizer/][wp]
+* Changelog: [https://github.com/figureone/authorizer/blob/master/readme.txt][changelog]
 
 *Authorizer* is a WordPress plugin that restricts access to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
