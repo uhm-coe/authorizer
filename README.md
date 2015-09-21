@@ -1,4 +1,4 @@
-# [Authorizer][https://wordpress.org/plugins/authorizer/]
+# [Authorizer][wp]
 
 *Authorizer* is a WordPress plugin that restricts access to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
@@ -20,10 +20,13 @@
 
 The [University of Hawai'i][http://hawaii.edu/], which provides authentication for student, faculty, and staff members via a centralized service (CAS or LDAP).
 
-## [Changelog][https://github.com/figureone/authorizer/blob/master/readme.txt]
+## [Changelog][changelog]
 
 ## Screenshots
 
 ![](assets/screenshot-1.png?raw=true "WordPress Login screen with Google Logins and CAS Logins enabled.")
 ![](assets/screenshot-2.png?raw=true "Authorizer Dashboard Widget.")
 ![](assets/screenshot-3.png?raw=true "Authorizer Options: Access Lists.")
+
+[wp]: https://wordpress.org/plugins/authorizer/
+[changelog]: https://github.com/figureone/authorizer/blob/master/readme.txt
