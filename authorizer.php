@@ -2230,8 +2230,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<input type="button" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );" value="Approve" />
-							<input type="button" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );" value="Block" />
+							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> Approve</a>
+							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
 							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 						</li>
 					<?php endforeach; ?>
@@ -2355,7 +2355,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role ); ?>
 				</select>
 				<div class="btn-group">
-					<input type="button" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'approved');" value="Approve" />
+					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'approved');"><span class="glyphicon glyphicon-ok"></span> Approve</a>
 					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
 						<span class="sr-only">Toggle Dropdown</span>
@@ -2404,7 +2404,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
 					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
 				</select>
-				<input class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');" value="Block" /><br />
+				<a href="javascript:void(0);" class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
 			</div>
 			<?php
 		} // END print_combo_auth_access_users_blocked()

@@ -478,6 +478,9 @@ html.busy, html.busy * {
 .glyphicon-globe:before {
 	content: "\e135";
 }
+.glyphicon-ok:before {
+	content: "\e013";
+}
 .glyphicon-ban-circle:before {
 	content: "\e090";
 }

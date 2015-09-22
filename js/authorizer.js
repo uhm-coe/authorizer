@@ -838,7 +838,7 @@ jQuery( document ).ready( function( $ ) {
 	// field adds the user to the list.
 	$( 'form input.auth-email, form select.auth-role' ).bind( 'keyup', function( e ) {
 		if ( e.which == 13 ) { // Enter key
-			$( this ).parent().find( 'input[type="button"]' ).trigger( 'click' );
+			$( this ).parent().find( 'a' ).trigger( 'click' );
 			return false;
 		}
 	});
