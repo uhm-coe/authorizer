@@ -842,7 +842,7 @@ jQuery( document ).ready( function( $ ) {
 			return false;
 		}
 	});
-	$( 'form input.auth-email' ).bind( 'keydown', function( e ) {
+	$( 'form input.auth-email, form select.auth-role' ).bind( 'keydown', function( e ) {
 		if ( e.which == 13 ) { // Enter key
 			e.preventDefault();
 			return false;
