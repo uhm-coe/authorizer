@@ -2232,7 +2232,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							</select>
 							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> Approve</a>
 							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
-							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
+							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span> Ignore</a>
 						</li>
 					<?php endforeach; ?>
 				<?php else: ?>
