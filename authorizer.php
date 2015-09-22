@@ -2404,7 +2404,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
 					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
 				</select>
-				<a href="javascript:void(0);" class="button-primary" type="button" id="block_user_new" onclick="auth_add_user(this, 'blocked');"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
+				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user(this, 'blocked');"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
 			</div>
 			<?php
 		} // END print_combo_auth_access_users_blocked()

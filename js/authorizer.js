@@ -834,15 +834,17 @@ jQuery( document ).ready( function( $ ) {
 		$( this ).siblings( '.button' ).css( 'display', 'inline-block' );
 	});
 
-	// List management function: pressing enter in the email, or role
-	// field adds the user to the list.
-	$( 'form input.auth-email, form select.auth-role' ).bind( 'keyup', function( e ) {
+	// List management function: pressing enter in the new approved or new
+	// blocked user (email or role field) adds the user to the list.
+	$( '#new_approved_user_email, #new_approved_user_role, #new_blocked_user_email' ).bind( 'keyup', function( e ) {
 		if ( e.which == 13 ) { // Enter key
 			$( this ).parent().find( 'a' ).trigger( 'click' );
 			return false;
 		}
 	});
-	$( 'form input.auth-email, form select.auth-role' ).bind( 'keydown', function( e ) {
+
+	// Don't submit form (i.e., save options) when hitting enter in any user list field.
+	$( 'input.auth-email, select.auth-role, input.auth-date-added, input.auth-usermeta' ).bind( 'keydown', function( e ) {
 		if ( e.which == 13 ) { // Enter key
 			e.preventDefault();
 			return false;
