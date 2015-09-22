@@ -473,6 +473,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
 						if ( $pending_user['email'] === $user_email ) {
 							unset( $auth_settings_access_users_pending[ $key ] );
+							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 							break;
 						}
 					}
