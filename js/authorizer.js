@@ -23,6 +23,10 @@ function choose_tab( list_name, delay ) {
 
 	// Hide site options if they are overridden by a multisite setting.
 	setTimeout( hide_multisite_overridden_options, delay );
+
+	// Save user's active tab to sessionStorage (so we can restore it on reload).
+	// Note: session storage persists until the browser tab is closed.
+	sessionStorage.setItem( 'tab', list_name );
 }
 
 // Update user's usermeta field.
@@ -858,13 +862,17 @@ jQuery( document ).ready( function( $ ) {
 		selectionHeader: '<div class="custom-header">Public Pages</div>',
 	});
 
-	// Switch to the first tab (or the tab indicated in the querystring).
-	var tab = querystring( 'tab' );
-	if ( tab.length > 0 && $.inArray( tab[0], [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) >= 0 ) {
-		choose_tab( tab, animation_speed );
-	} else {
-		choose_tab( 'access_lists' );
+	// Switch to the first tab (or the tab indicated in sessionStorage, or the querystring).
+	var tab = '';
+	if ( sessionStorage.getItem( 'tab' ) ) {
+		tab = sessionStorage.getItem( 'tab' );
+	} else if ( querystring( 'tab' ).length > 0 ) {
+		tab = querystring( 'tab' )[0];
 	}
+	if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) < 0 ) {
+		tab = 'access_lists';
+	}
+	choose_tab( tab, animation_speed );
 
 	// Hide/show multisite settings based on override checkbox.
 	$( 'input[name="auth_settings[multisite_override]"]' ).change( function() {
