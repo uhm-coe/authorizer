@@ -24,6 +24,10 @@ function choose_tab( list_name, delay ) {
 	// Hide site options if they are overridden by a multisite setting.
 	setTimeout( hide_multisite_overridden_options, delay );
 
+	// Hide Save Changes button if we're on the access lists page (changing
+	// access lists saves automatically via AJAX).
+	$( 'body:not(.network-admin) #submit' ).toggle( list_name !== 'access_lists' );
+
 	// Save user's active tab to sessionStorage (so we can restore it on reload).
 	// Note: session storage persists until the browser tab is closed.
 	sessionStorage.setItem( 'tab', list_name );
