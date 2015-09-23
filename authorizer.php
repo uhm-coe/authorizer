@@ -397,7 +397,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check this external user's access against the access lists
 			// (pending, approved, blocked)
-			$result = $this->check_user_access( $user, $externally_authenticated_email );
+			$result = $this->check_user_access( $user, $externally_authenticated_email, $result );
 
 			// Fail with message if error.
 			if ( is_wp_error( $result ) ) {
@@ -425,11 +425,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @param WP_User $user       User to check
 		 * @param [type]  $user_email User's plaintext email (in case current user doesn't have a WP account)
+		 * @param [type]  $user_data Array of keys for user email, first_name, last_name, and authenticated_by
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
 		 *    null if user has access (success)
 		 */
-		private function check_user_access( $user, $user_email ) {
+		private function check_user_access( $user, $user_email, $user_data = array() ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 			$auth_settings_access_users_pending = $this->sanitize_user_list(
@@ -511,8 +512,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						array(
 							'user_login' => strtolower( $username ),
 							'user_pass' => wp_generate_password(), // random password
-							'first_name' => '',
-							'last_name' => '',
+							'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
+							'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
 							'user_email' => strtolower( $user_info['email'] ),
 							'user_registered' => date( 'Y-m-d H:i:s' ),
 							'role' => $user_info['role'],
@@ -526,6 +527,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Authenticate as new user
 					$user = new WP_User( $result );
+				} else {
+					// Update first/last names of WordPress user from external
+					// service if that option is set.
+					if ( ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'cas' && array_key_exists( 'cas_attr_update_on_login', $auth_settings )  && $auth_settings['cas_attr_update_on_login'] == 1 ) || ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'ldap' && array_key_exists( 'ldap_attr_update_on_login', $auth_settings )  && $auth_settings['ldap_attr_update_on_login'] == 1 ) ) {
+						if ( array_key_exists( 'first_name', $user_data ) && strlen( $user_data['first_name'] ) > 0 ) {
+							wp_update_user( array(
+								'ID' => $user->ID,
+								'first_name' => $user_data['first_name'],
+							));
+						}
+						if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
+							wp_update_user( array(
+								'ID' => $user->ID,
+								'last_name' => $user_data['last_name'],
+							));
+						}
+					}
 				}
 
 				// If this is multisite, add new user to current blog.
@@ -688,6 +706,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return array(
 				'email' => $email,
+				'first_name' => '',
+				'last_name' => '',
 				'authenticated_by' => 'google',
 			);
 		} // END custom_authenticate_google()
@@ -739,12 +759,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get username that successfully authenticated against the external service (CAS).
 			$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
 
-			// We'll track how this user was authenticated in user meta.
-			$authenticated_by = 'cas';
+			// Get user first name and last name.
+			$cas_attributes = phpCAS::getAttributes();
+			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_first_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_first_name']] : '';
+			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_last_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_last_name']] : '';
 
 			return array(
 				'email' => $externally_authenticated_email,
-				'authenticated_by' => $authenticated_by,
+				'first_name' => $first_name,
+				'last_name' => $last_name,
+				'authenticated_by' => 'cas',
 			);
 		} // END custom_authenticate_cas()
 
@@ -786,6 +810,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Authenticate against LDAP using options provided in plugin settings.
 			$result = false;
 			$ldap_user_dn = '';
+			$first_name = '';
+			$last_name = '';
 
 			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
@@ -797,14 +823,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
 			}
-			// Look up the bind DN of the user trying to log in by
-			// performing an LDAP search for the login username in the
-			// field specified in the LDAP settings. This setup is common.
+			// Look up the bind DN (and first/last name) of the user trying to
+			// log in by performing an LDAP search for the login username in
+			// the field specified in the LDAP settings. This setup is common.
+			$ldap_attributes_to_retrieve = array( 'dn' );
+			if ( array_key_exists( 'ldap_attr_first_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_first_name'] ) > 0 ) {
+				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_first_name'] );
+			}
+			if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 ) {
+				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_last_name'] );
+			}
 			$ldap_search = ldap_search(
 				$ldap,
 				$auth_settings['ldap_search_base'],
 				"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
-				array( 'dn' ) // Just get the dn (no other attributes)
+				$ldap_attributes_to_retrieve
 			);
 			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 
@@ -813,9 +846,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'no_ldap', 'No LDAP user found.' );
 			}
 
-			// Get the bind dn; if there are multiple results returned, just get the last one.
+			// Get the bind dn and first/last names; if there are multiple results returned, just get the last one.
 			for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
 				$ldap_user_dn = $ldap_entries[$i]['dn'];
+
+				// Get user first name and last name.
+				if ( array_key_exists( 'ldap_attr_first_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_first_name'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_first_name']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_first_name']][0] ) > 0 ) {
+					$first_name = $ldap_entries[$i][$auth_settings['ldap_attr_first_name']][0];
+				}
+				if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_last_name'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_last_name']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0] ) > 0 ) {
+					$last_name = $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0];
+				}
 			}
 
 			$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
@@ -830,11 +871,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// User successfully authenticated against LDAP, so set the relevant variables.
 			$externally_authenticated_email = $username . '@' . $tld;
 
-			// We'll track how this user was authenticated in user meta.
-			$authenticated_by = 'ldap';
-
 			return array(
 				'email' => $externally_authenticated_email,
+				'first_name' => $first_name,
+				'last_name' => $last_name,
 				'authenticated_by' => 'ldap',
 			);
 		} // END custom_authenticate_ldap()
