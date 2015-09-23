@@ -34,9 +34,19 @@ body.settings_page_authorizer #wpbody-content > .wrap > h2 {
 	font-size: 290%;
 	text-shadow: 1px 1px 3px #8d8d8d;
 }
-body.toplevel_page_authorizer #wpbody-content > .wrap > div.updated,
-body.settings_page_authorizer #wpbody-content > .wrap > div.updated {
+body.toplevel_page_authorizer #wpbody-content > .wrap > .updated,
+body.settings_page_authorizer #wpbody-content > .wrap > .updated {
 	margin: -43px 10px 5px;
+}
+
+body.toplevel_page_authorizer #wpbody-content > .wrap > .notice,
+body.settings_page_authorizer #wpbody-content > .wrap > .notice {
+	margin: -40px 10px 2px;
+}
+
+body.toplevel_page_authorizer #wpbody-content > .wrap > .notice ~ .updated,
+body.settings_page_authorizer #wpbody-content > .wrap > .notice ~ .updated {
+	margin-top: 7px;
 }
 
 body.toplevel_page_authorizer #wpbody-content > .wrap > form > h2 {
