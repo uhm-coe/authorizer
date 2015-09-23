@@ -1454,21 +1454,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Add notices to the top of the options page.
 		 * Run on action hook chain: load-settings_page_authorizer > admin_notices
 		 * Description: Check for invalid settings combinations and show a warning message, e.g.:
-		 *   if (cas url inaccessible) {
-		 *     echo "<div class='updated settings-error'><p>Can't reach Sakai.</p></div>";
-		 *   }
+		 *   if ( cas url inaccessible ) : ?>
+		 *     <div class='updated settings-error'><p>Can't reach CAS server.</p></div>
+		 *   <?php endif;
 		 */
 		public function admin_notices() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 
-			if ( $auth_settings['cas'] === '1' ) {
+			if ( $auth_settings['cas'] === '1' ) :
 				// Check if provided CAS URL is accessible.
 				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
-				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) {
-					echo "<div class='updated settings-error'><p>Can't reach CAS server. Please provide <a href='javascript:choose_tab(\"external\");'>accurate CAS settings</a> if you intend to use it.</p></div>";
-				}
-			}
+				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) :
+					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
+					?><div class='notice notice-warning is-dismissible'>
+						<p>Can't reach CAS server. Please provide <a href='<?php echo $authorizer_options_url; ?>&tab=external'>accurate CAS settings</a> if you intend to use it.</p>
+					</div><?php
+				endif;
+			endif;
 		} // END admin_notices()
 
 
