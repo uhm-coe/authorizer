@@ -868,10 +868,10 @@ jQuery( document ).ready( function( $ ) {
 
 	// Switch to the first tab (or the tab indicated in sessionStorage, or the querystring).
 	var tab = '';
-	if ( sessionStorage.getItem( 'tab' ) ) {
-		tab = sessionStorage.getItem( 'tab' );
-	} else if ( querystring( 'tab' ).length > 0 ) {
+	if ( querystring( 'tab' ).length > 0 ) {
 		tab = querystring( 'tab' )[0];
+	} else if ( sessionStorage.getItem( 'tab' ) ) {
+		tab = sessionStorage.getItem( 'tab' );
 	}
 	if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) < 0 ) {
 		tab = 'access_lists';
