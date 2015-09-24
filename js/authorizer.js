@@ -730,10 +730,10 @@ jQuery( document ).ready( function( $ ) {
 
 	// On load: Show/hide public access options if everyone can see site
 	if ( ! $( '#radio_auth_settings_access_who_can_view_logged_in_users' ).is( ':checked' ) ) {
-		$( 'div.animated_wrapper', auth_settings_access_public_pages ).hide();
-		$( 'div.animated_wrapper', auth_settings_access_redirect_to_login ).hide();
-		$( 'div.animated_wrapper', auth_settings_access_public_warning ).hide();
-		$( 'div.animated_wrapper', auth_settings_access_redirect_to_message ).hide();
+		animate_option( 'hide_immediately', auth_settings_access_public_pages );
+		animate_option( 'hide_immediately', auth_settings_access_redirect_to_login );
+		animate_option( 'hide_immediately', auth_settings_access_public_warning );
+		animate_option( 'hide_immediately', auth_settings_access_redirect_to_message );
 	}
 
 	// Hide Google options if unchecked
@@ -771,108 +771,64 @@ jQuery( document ).ready( function( $ ) {
 	// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
 	$( 'input[name="auth_settings[access_who_can_login]"]' ).change( function() {
 		// Hide user whitelist unless "Only specific students below" is checked
-		if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {
-			animate_option( 'hide', auth_settings_access_role_receive_pending_emails );
-			animate_option( 'hide', auth_settings_access_pending_redirect_to_message );
-			animate_option( 'hide', auth_settings_access_blocked_redirect_to_message );
-			animate_option( 'hide', auth_settings_access_should_email_approved_users );
-			animate_option( 'hide', auth_settings_access_email_approved_users_subject );
-			animate_option( 'hide', auth_settings_access_email_approved_users_body );
-		} else {
-			animate_option( 'show', auth_settings_access_role_receive_pending_emails );
-			animate_option( 'show', auth_settings_access_pending_redirect_to_message );
-			animate_option( 'show', auth_settings_access_blocked_redirect_to_message );
-			animate_option( 'show', auth_settings_access_should_email_approved_users );
-			animate_option( 'show', auth_settings_access_email_approved_users_subject );
-			animate_option( 'show', auth_settings_access_email_approved_users_body );
-		}
+		var action = $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ? 'show' : 'hide';
+		animate_option( action, auth_settings_access_role_receive_pending_emails );
+		animate_option( action, auth_settings_access_pending_redirect_to_message );
+		animate_option( action, auth_settings_access_blocked_redirect_to_message );
+		animate_option( action, auth_settings_access_should_email_approved_users );
+		animate_option( action, auth_settings_access_email_approved_users_subject );
+		animate_option( action, auth_settings_access_email_approved_users_body );
 	});
 
 	// Event handler: Hide Welcome email body/subject options if "Send welcome email" is off.
 	$( 'input[name="auth_settings[access_should_email_approved_users]"]' ).change( function() {
-		if ( $( this ).is( ':checked' ) ) {
-			animate_option( 'show', auth_settings_access_email_approved_users_subject );
-			animate_option( 'show', auth_settings_access_email_approved_users_body );
-		} else {
-			animate_option( 'hide', auth_settings_access_email_approved_users_subject );
-			animate_option( 'hide', auth_settings_access_email_approved_users_body );
-		}
+		var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+		animate_option( action, auth_settings_access_email_approved_users_subject );
+		animate_option( action, auth_settings_access_email_approved_users_body );
 	});
 
 	// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
 	$( 'input[name="auth_settings[access_who_can_view]"]' ).change( function() {
-		if ( $( '#radio_auth_settings_access_who_can_view_everyone' ).is( ':checked' ) ) {
-			animate_option( 'hide', auth_settings_access_redirect_to_login );
-			animate_option( 'hide', auth_settings_access_redirect_to_message );
-			animate_option( 'hide', auth_settings_access_public_pages );
-			animate_option( 'hide', auth_settings_access_public_warning );
-		} else {
-			animate_option( 'show', auth_settings_access_redirect_to_login );
-			animate_option( 'show', auth_settings_access_redirect_to_message );
-			animate_option( 'show', auth_settings_access_public_pages );
-			animate_option( 'show', auth_settings_access_public_warning );
-		}
+		var action = $( '#radio_auth_settings_access_who_can_view_everyone' ).is( ':checked' ) ? 'hide' : 'show';
+		animate_option( action, auth_settings_access_redirect_to_login );
+		animate_option( action, auth_settings_access_redirect_to_message );
+		animate_option( action, auth_settings_access_public_pages );
+		animate_option( action, auth_settings_access_public_warning );
 	});
 
 	// Event handler: Show/hide Google options based on checkbox
 	$( 'input[name="auth_settings[google]"]' ).change( function() {
-		if ( $( this ).is( ':checked' ) ) {
-			animate_option( 'show', auth_settings_external_google_clientid );
-			animate_option( 'show', auth_settings_external_google_clientsecret );
-		} else {
-			animate_option( 'hide', auth_settings_external_google_clientid );
-			animate_option( 'hide', auth_settings_external_google_clientsecret );
-		}
+		var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+		animate_option( action, auth_settings_external_google_clientid );
+		animate_option( action, auth_settings_external_google_clientsecret );
 	});
 
 	// Event handler: Show/hide CAS options based on checkbox
 	$( 'input[name="auth_settings[cas]"]' ).change( function() {
-		if ( $( this ).is( ':checked' ) ) {
-			animate_option( 'show', auth_settings_external_cas_custom_label );
-			animate_option( 'show', auth_settings_external_cas_host );
-			animate_option( 'show', auth_settings_external_cas_port );
-			animate_option( 'show', auth_settings_external_cas_path );
-			animate_option( 'show', auth_settings_external_cas_attr_first_name );
-			animate_option( 'show', auth_settings_external_cas_attr_last_name );
-			animate_option( 'show', auth_settings_external_cas_attr_update_on_login );
-		} else {
-			animate_option( 'hide', auth_settings_external_cas_custom_label );
-			animate_option( 'hide', auth_settings_external_cas_host );
-			animate_option( 'hide', auth_settings_external_cas_port );
-			animate_option( 'hide', auth_settings_external_cas_path );
-			animate_option( 'hide', auth_settings_external_cas_attr_first_name );
-			animate_option( 'hide', auth_settings_external_cas_attr_last_name );
-			animate_option( 'hide', auth_settings_external_cas_attr_update_on_login );
-		}
+		var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+		animate_option( action, auth_settings_external_cas_custom_label );
+		animate_option( action, auth_settings_external_cas_host );
+		animate_option( action, auth_settings_external_cas_port );
+		animate_option( action, auth_settings_external_cas_path );
+		animate_option( action, auth_settings_external_cas_attr_first_name );
+		animate_option( action, auth_settings_external_cas_attr_last_name );
+		animate_option( action, auth_settings_external_cas_attr_update_on_login );
 	});
 
 	// Event handler: Show/hide LDAP options based on checkbox
 	$( 'input[name="auth_settings[ldap]"]' ).change( function() {
-		if ( $( this ).is( ':checked' ) ) {
-			animate_option( 'show', auth_settings_external_ldap_host );
-			animate_option( 'show', auth_settings_external_ldap_port );
-			animate_option( 'show', auth_settings_external_ldap_search_base );
-			animate_option( 'show', auth_settings_external_ldap_uid );
-			animate_option( 'show', auth_settings_external_ldap_user );
-			animate_option( 'show', auth_settings_external_ldap_password );
-			animate_option( 'show', auth_settings_external_ldap_tls );
-			animate_option( 'show', auth_settings_external_ldap_lostpassword_url );
-			animate_option( 'show', auth_settings_external_ldap_attr_first_name );
-			animate_option( 'show', auth_settings_external_ldap_attr_last_name );
-			animate_option( 'show', auth_settings_external_ldap_attr_update_on_login );
-		} else {
-			animate_option( 'hide', auth_settings_external_ldap_host );
-			animate_option( 'hide', auth_settings_external_ldap_port );
-			animate_option( 'hide', auth_settings_external_ldap_search_base );
-			animate_option( 'hide', auth_settings_external_ldap_uid );
-			animate_option( 'hide', auth_settings_external_ldap_user );
-			animate_option( 'hide', auth_settings_external_ldap_password );
-			animate_option( 'hide', auth_settings_external_ldap_tls );
-			animate_option( 'hide', auth_settings_external_ldap_lostpassword_url );
-			animate_option( 'hide', auth_settings_external_ldap_attr_first_name );
-			animate_option( 'hide', auth_settings_external_ldap_attr_last_name );
-			animate_option( 'hide', auth_settings_external_ldap_attr_update_on_login );
-		}
+		var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+		animate_option( action, auth_settings_external_ldap_host );
+		animate_option( action, auth_settings_external_ldap_port );
+		animate_option( action, auth_settings_external_ldap_search_base );
+		animate_option( action, auth_settings_external_ldap_uid );
+		animate_option( action, auth_settings_external_ldap_user );
+		animate_option( action, auth_settings_external_ldap_password );
+		animate_option( action, auth_settings_external_ldap_tls );
+		animate_option( action, auth_settings_external_ldap_lostpassword_url );
+		animate_option( action, auth_settings_external_ldap_attr_first_name );
+		animate_option( action, auth_settings_external_ldap_attr_last_name );
+		animate_option( action, auth_settings_external_ldap_attr_update_on_login );
 	});
 
 	// Show save button if usermeta field is modified.
