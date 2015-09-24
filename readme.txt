@@ -56,6 +56,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.1 =
+* Fix: Skip SSL check when checking if a CAS server is reachable.
+* Fix: Pressing enter on Access List form elements now does the right thing.
+* Feature: Update first and last names from CAS or LDAP attributes.
+
 = 2.3.0 =
 * Fix: Site admins in a network can only access authorizer if the following option is enabled in Network Settings: "Allow site administrators to add new users to their site via the "Users → Add New" page." Props @aargh-a-knot.
 * Fix: Block user button wasn't correctly moving a user from the approved list to the blocked list.
