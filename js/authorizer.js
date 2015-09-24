@@ -422,6 +422,9 @@ function save_auth_multisite_settings( caller ) {
 	var cas_host = $( '#auth_settings_cas_host' ).val();
 	var cas_port = $( '#auth_settings_cas_port' ).val();
 	var cas_path = $( '#auth_settings_cas_path' ).val();
+	var cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
+	var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
+	var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
 
 	var ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';
 	var ldap_host = $( '#auth_settings_ldap_host' ).val();
@@ -432,6 +435,9 @@ function save_auth_multisite_settings( caller ) {
 	var ldap_password = $( '#auth_settings_ldap_password' ).val();
 	var ldap_tls = $( '#auth_settings_ldap_tls' ).is( ':checked' ) ? '1' : '';
 	var ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).val();
+	var ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
+	var ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
+	var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
 
 	var advanced_lockouts = {
 		'attempts_1': $( '#auth_settings_advanced_lockouts_attempts_1' ).val(),
@@ -458,6 +464,9 @@ function save_auth_multisite_settings( caller ) {
 		'cas_host': cas_host,
 		'cas_port': cas_port,
 		'cas_path': cas_path,
+		'cas_attr_first_name': cas_attr_first_name,
+		'cas_attr_last_name': cas_attr_last_name,
+		'cas_attr_update_on_login': cas_attr_update_on_login,
 		'ldap': ldap,
 		'ldap_host': ldap_host,
 		'ldap_port': ldap_port,
@@ -467,6 +476,9 @@ function save_auth_multisite_settings( caller ) {
 		'ldap_password': ldap_password,
 		'ldap_tls': ldap_tls,
 		'ldap_lostpassword_url': ldap_lostpassword_url,
+		'ldap_attr_first_name': ldap_attr_first_name,
+		'ldap_attr_last_name': ldap_attr_last_name,
+		'ldap_attr_update_on_login': ldap_attr_update_on_login,
 		'advanced_lockouts': advanced_lockouts,
 		'advanced_hide_wp_login': advanced_hide_wp_login,
 	}, function( response ) {
@@ -645,6 +657,9 @@ jQuery( document ).ready( function( $ ) {
 	var auth_settings_external_cas_host = $( '#auth_settings_cas_host' ).closest( 'tr' );
 	var auth_settings_external_cas_port = $( '#auth_settings_cas_port' ).closest( 'tr' );
 	var auth_settings_external_cas_path = $( '#auth_settings_cas_path' ).closest( 'tr' );
+	var auth_settings_external_cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).closest( 'tr' );
+	var auth_settings_external_cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).closest( 'tr' );
+	var auth_settings_external_cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).closest( 'tr' );
 	var auth_settings_external_ldap = $( '#auth_settings_ldap' ).closest( 'tr' );
 	var auth_settings_external_ldap_host = $( '#auth_settings_ldap_host' ).closest( 'tr' );
 	var auth_settings_external_ldap_port = $( '#auth_settings_ldap_port' ).closest( 'tr' );
@@ -654,6 +669,9 @@ jQuery( document ).ready( function( $ ) {
 	var auth_settings_external_ldap_password = $( '#auth_settings_ldap_password' ).closest( 'tr' );
 	var auth_settings_external_ldap_tls = $( '#auth_settings_ldap_tls' ).closest( 'tr' );
 	var auth_settings_external_ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).closest( 'tr' );
+	var auth_settings_external_ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).closest( 'tr' );
+	var auth_settings_external_ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).closest( 'tr' );
+	var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
 
 	// Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
 	$( 'th, td', auth_settings_access_users_pending ).wrapInner( '<div class="animated_wrapper" />' );
@@ -675,6 +693,9 @@ jQuery( document ).ready( function( $ ) {
 	$( 'th, td', auth_settings_external_cas_host ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_cas_port ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_cas_path ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_cas_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_cas_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_cas_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_ldap_search_base ).wrapInner( '<div class="animated_wrapper" />' );
@@ -683,6 +704,9 @@ jQuery( document ).ready( function( $ ) {
 	$( 'th, td', auth_settings_external_ldap_password ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_ldap_tls ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_external_ldap_lostpassword_url ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_ldap_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_ldap_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
+	$( 'th, td', auth_settings_external_ldap_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 
 	// If we're viewing the dashboard widget, reset a couple of the relevant
 	// option variables (since they're aren't nested in table rows).
@@ -724,6 +748,9 @@ jQuery( document ).ready( function( $ ) {
 		animate_option( 'hide_immediately', auth_settings_external_cas_host );
 		animate_option( 'hide_immediately', auth_settings_external_cas_port );
 		animate_option( 'hide_immediately', auth_settings_external_cas_path );
+		animate_option( 'hide_immediately', auth_settings_external_cas_attr_first_name );
+		animate_option( 'hide_immediately', auth_settings_external_cas_attr_last_name );
+		animate_option( 'hide_immediately', auth_settings_external_cas_attr_update_on_login );
 	}
 
 	// Hide LDAP options if unchecked
@@ -736,6 +763,9 @@ jQuery( document ).ready( function( $ ) {
 		animate_option( 'hide_immediately', auth_settings_external_ldap_password );
 		animate_option( 'hide_immediately', auth_settings_external_ldap_tls );
 		animate_option( 'hide_immediately', auth_settings_external_ldap_lostpassword_url );
+		animate_option( 'hide_immediately', auth_settings_external_ldap_attr_first_name );
+		animate_option( 'hide_immediately', auth_settings_external_ldap_attr_last_name );
+		animate_option( 'hide_immediately', auth_settings_external_ldap_attr_update_on_login );
 	}
 
 	// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -802,11 +832,17 @@ jQuery( document ).ready( function( $ ) {
 			animate_option( 'show', auth_settings_external_cas_host );
 			animate_option( 'show', auth_settings_external_cas_port );
 			animate_option( 'show', auth_settings_external_cas_path );
+			animate_option( 'show', auth_settings_external_cas_attr_first_name );
+			animate_option( 'show', auth_settings_external_cas_attr_last_name );
+			animate_option( 'show', auth_settings_external_cas_attr_update_on_login );
 		} else {
 			animate_option( 'hide', auth_settings_external_cas_custom_label );
 			animate_option( 'hide', auth_settings_external_cas_host );
 			animate_option( 'hide', auth_settings_external_cas_port );
 			animate_option( 'hide', auth_settings_external_cas_path );
+			animate_option( 'hide', auth_settings_external_cas_attr_first_name );
+			animate_option( 'hide', auth_settings_external_cas_attr_last_name );
+			animate_option( 'hide', auth_settings_external_cas_attr_update_on_login );
 		}
 	});
 
@@ -821,6 +857,9 @@ jQuery( document ).ready( function( $ ) {
 			animate_option( 'show', auth_settings_external_ldap_password );
 			animate_option( 'show', auth_settings_external_ldap_tls );
 			animate_option( 'show', auth_settings_external_ldap_lostpassword_url );
+			animate_option( 'show', auth_settings_external_ldap_attr_first_name );
+			animate_option( 'show', auth_settings_external_ldap_attr_last_name );
+			animate_option( 'show', auth_settings_external_ldap_attr_update_on_login );
 		} else {
 			animate_option( 'hide', auth_settings_external_ldap_host );
 			animate_option( 'hide', auth_settings_external_ldap_port );
@@ -830,6 +869,9 @@ jQuery( document ).ready( function( $ ) {
 			animate_option( 'hide', auth_settings_external_ldap_password );
 			animate_option( 'hide', auth_settings_external_ldap_tls );
 			animate_option( 'hide', auth_settings_external_ldap_lostpassword_url );
+			animate_option( 'hide', auth_settings_external_ldap_attr_first_name );
+			animate_option( 'hide', auth_settings_external_ldap_attr_last_name );
+			animate_option( 'hide', auth_settings_external_ldap_attr_update_on_login );
 		}
 	});
 

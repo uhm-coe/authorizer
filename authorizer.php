@@ -1677,6 +1677,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_cas_attr_first_name', // HTML element ID
+				'CAS attribute containing first name', // HTML element Title
+				array( $this, 'print_text_cas_attr_first_name' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_cas_attr_last_name', // HTML element ID
+				'CAS attribute containing last name', // HTML element Title
+				array( $this, 'print_text_cas_attr_last_name' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_cas_attr_update_on_login', // HTML element ID
+				'CAS attribute update', // HTML element Title
+				array( $this, 'print_checkbox_cas_attr_update_on_login' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_external_ldap', // HTML element ID
 				'LDAP Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
@@ -1736,6 +1757,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_ldap_lostpassword_url', // HTML element ID
 				'Custom lost password URL', // HTML element Title
 				array( $this, 'print_text_ldap_lostpassword_url' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_attr_first_name', // HTML element ID
+				'LDAP attribute containing first name', // HTML element Title
+				array( $this, 'print_text_ldap_attr_first_name' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_attr_last_name', // HTML element ID
+				'LDAP attribute containing last name', // HTML element Title
+				array( $this, 'print_text_ldap_attr_last_name' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_attr_update_on_login', // HTML element ID
+				'LDAP attribute update', // HTML element Title
+				array( $this, 'print_checkbox_ldap_attr_update_on_login' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -1896,6 +1938,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'cas_path', $auth_settings ) ) {
 				$auth_settings['cas_path'] = '';
 			}
+			if ( ! array_key_exists( 'cas_attr_first_name', $auth_settings ) ) {
+				$auth_settings['cas_attr_first_name'] = '';
+			}
+			if ( ! array_key_exists( 'cas_attr_last_name', $auth_settings ) ) {
+				$auth_settings['cas_attr_last_name'] = '';
+			}
+			if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_settings ) ) {
+				$auth_settings['cas_attr_update_on_login'] = '';
+			}
 
 			if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
 				$auth_settings['ldap_host'] = '';
@@ -1920,6 +1971,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_settings ) ) {
 				$auth_settings['ldap_lostpassword_url'] = '';
+			}
+			if ( ! array_key_exists( 'ldap_attr_first_name', $auth_settings ) ) {
+				$auth_settings['ldap_attr_first_name'] = '';
+			}
+			if ( ! array_key_exists( 'ldap_attr_last_name', $auth_settings ) ) {
+				$auth_settings['ldap_attr_last_name'] = '';
+			}
+			if ( ! array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) ) {
+				$auth_settings['ldap_attr_update_on_login'] = '';
 			}
 
 			// Advanced defaults.
@@ -2013,6 +2073,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_path'] = '';
 				}
+				if ( ! array_key_exists( 'cas_attr_first_name', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_attr_first_name'] = '';
+				}
+				if ( ! array_key_exists( 'cas_attr_last_name', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_attr_last_name'] = '';
+				}
+				if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_attr_update_on_login'] = '';
+				}
 				if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_host'] = '';
 				}
@@ -2036,6 +2105,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_lostpassword_url'] = '';
+				}
+				if ( ! array_key_exists( 'ldap_attr_first_name', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_attr_first_name'] = '';
+				}
+				if ( ! array_key_exists( 'ldap_attr_last_name', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_attr_last_name'] = '';
+				}
+				if ( ! array_key_exists( 'ldap_attr_update_on_login', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_attr_update_on_login'] = '';
 				}
 				// Advanced defaults.
 				if ( ! array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
@@ -2134,6 +2212,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize CAS Port (int)
 			$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
+			// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ) {
+				$auth_settings['cas_attr_update_on_login'] = '1';
+			}
+
 			// Sanitize LDAP Host setting
 			$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
 
@@ -2155,6 +2238,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
 				// encrypt the directory user password for some minor obfuscation in the database.
 				$auth_settings['ldap_password'] = base64_encode( $this->encrypt( $auth_settings['ldap_password'] ) );
+			}
+
+			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ) {
+				$auth_settings['ldap_attr_update_on_login'] = '1';
 			}
 
 			// Make sure public pages is an empty array if it's empty
@@ -2791,6 +2879,37 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="/cas" /><?php
 		} // END print_text_cas_path()
 
+		function print_text_cas_attr_first_name( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_attr_first_name';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="givenName" /><?php
+		} // END print_text_cas_attr_first_name()
+
+		function print_text_cas_attr_last_name( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_attr_last_name';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sn" /><?php
+		} // END print_text_cas_attr_last_name()
+
+		function print_checkbox_cas_attr_update_on_login( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_attr_update_on_login';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Update first and last name fields on login (will overwrite any name the user has supplied in their profile)</label><?php
+		} // END print_checkbox_cas_attr_update_on_login()
+
+
 		function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap';
@@ -2884,6 +3003,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
 		} // END print_text_ldap_lostpassword_url()
+
+		function print_text_ldap_attr_first_name( $args = '' ) {
+			// Get plugin option.
+			$option = 'ldap_attr_first_name';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="givenname" /><?php
+		} // END print_text_ldap_attr_first_name()
+
+		function print_text_ldap_attr_last_name( $args = '' ) {
+			// Get plugin option.
+			$option = 'ldap_attr_last_name';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sn" /><?php
+		} // END print_text_ldap_attr_last_name()
+
+		function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
+			// Get plugin option.
+			$option = 'ldap_attr_update_on_login';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Update first and last name fields on login (will overwrite any name the user has supplied in their profile)</label><?php
+		} // END print_checkbox_ldap_attr_update_on_login()
 
 
 		function print_section_info_advanced( $args = '' ) {
@@ -3065,6 +3214,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).</li>
 					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
 					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
+					<li><strong>CAS attribute containing first name</strong>: Enter the CAS attribute that has the user\'s first name. When this user first logs in, their WordPress account will have their first name retrieved from CAS and added to their WordPress profile.</li>
+					<li><strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user\'s last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added to their WordPress profile.</li>
+					<li><strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.</li>
 				</ul>
 				<p><strong><em>If you enable LDAP logins:</em></strong></p>
 				<ul>
@@ -3075,6 +3227,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</li>
 					<li><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</li>
 					<li><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</li>
+					<li><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</li>
+					<li><strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user\'s first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.</li>
+					<li><strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user\'s last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.</li>
+					<li><strong>LDAP attribute update</strong>: Select whether the first and last names retrieved from LDAP should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.</li>
 				</ul>';
 			$screen->add_help_tab(
 				array(
@@ -3087,7 +3243,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add help tab for Advanced Settings
 			$help_auth_settings_advanced_content = '
 				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
-				<p><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn\'t change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</p>
 				<p><strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so: <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
 				<p><strong>Custom WordPress login branding</strong>: If you\'d like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</p>
 			';
@@ -3209,6 +3364,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row">CAS attribute containing first name</th>
+								<td><?php $this->print_text_cas_attr_first_name( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS attribute containing last name</th>
+								<td><?php $this->print_text_cas_attr_last_name( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">CAS attribute update</th>
+								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row">LDAP Logins</th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -3243,6 +3410,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<tr>
 								<th scope="row">Custom lost password URL</th>
 								<td><?php $this->print_text_ldap_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute containing first name</th>
+								<td><?php $this->print_text_ldap_attr_first_name( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute containing last name</th>
+								<td><?php $this->print_text_ldap_attr_last_name( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute update</th>
+								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -3310,6 +3489,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'cas_host',
 				'cas_port',
 				'cas_path',
+				'cas_attr_first_name',
+				'cas_attr_last_name',
+				'cas_attr_update_on_login',
 				'ldap',
 				'ldap_host',
 				'ldap_port',
@@ -3319,6 +3501,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_password',
 				'ldap_tls',
 				'ldap_lostpassword_url',
+				'ldap_attr_first_name',
+				'ldap_attr_last_name',
+				'ldap_attr_update_on_login',
 				'advanced_lockouts',
 				'advanced_hide_wp_login',
 			);
@@ -3812,6 +3997,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['cas_attr_first_name'] = $auth_multisite_settings['cas_attr_first_name'];
+					$auth_settings['cas_attr_last_name'] = $auth_multisite_settings['cas_attr_last_name'];
+					$auth_settings['cas_attr_update_on_login'] = $auth_multisite_settings['cas_attr_update_on_login'];
 					$auth_settings['ldap'] = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
@@ -3821,6 +4009,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
 					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
 					$auth_settings['ldap_lostpassword_url'] = $auth_multisite_settings['ldap_lostpassword_url'];
+					$auth_settings['ldap_attr_first_name'] = $auth_multisite_settings['ldap_attr_first_name'];
+					$auth_settings['ldap_attr_last_name'] = $auth_multisite_settings['ldap_attr_last_name'];
+					$auth_settings['ldap_attr_update_on_login'] = $auth_multisite_settings['ldap_attr_update_on_login'];
 
 					// Override access_who_can_login and access_who_can_view
 					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
