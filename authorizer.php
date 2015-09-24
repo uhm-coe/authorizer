@@ -759,8 +759,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get username that successfully authenticated against the external service (CAS).
 			$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
 
-			// Get user first name and last name.
+			// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
 			$cas_attributes = phpCAS::getAttributes();
+
+			// If a CAS attribute has been specified as containing the email address, use that instead.
+			if ( array_key_exists( 'cas_attr_email', $auth_settings ) && strlen( $auth_settings['cas_attr_email'] ) > 0 && array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0 ) {
+				$externally_authenticated_email = $cas_attributes[$auth_settings['cas_attr_email']];
+			}
+
+			// Get user first name and last name.
 			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_first_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_first_name']] : '';
 			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_last_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_last_name']] : '';
 
@@ -812,6 +819,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap_user_dn = '';
 			$first_name = '';
 			$last_name = '';
+			$email = '';
 
 			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
@@ -832,6 +840,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 ) {
 				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_last_name'] );
+			}
+			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 ) {
+				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_email'] );
 			}
 			$ldap_search = ldap_search(
 				$ldap,
@@ -857,6 +868,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_last_name'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_last_name']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0] ) > 0 ) {
 					$last_name = $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0];
 				}
+				// Get user email if it is specified in another field.
+				if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_email'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_email']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] ) > 0 ) {
+					$email = $ldap_entries[$i][$auth_settings['ldap_attr_email']][0];
+				}
 			}
 
 			$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
@@ -870,6 +885,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
 			$externally_authenticated_email = $username . '@' . $tld;
+
+			// If an LDAP attribute has been specified as containing the email address, use that instead.
+			if ( strlen( $email ) > 0 ) {
+				$externally_authenticated_email = $email;
+			}
 
 			return array(
 				'email' => $externally_authenticated_email,
@@ -1677,6 +1697,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_cas_attr_email', // HTML element ID
+				'CAS attribute containing email address', // HTML element Title
+				array( $this, 'print_text_cas_attr_email' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_cas_attr_first_name', // HTML element ID
 				'CAS attribute containing first name', // HTML element Title
 				array( $this, 'print_text_cas_attr_first_name' ), // Callback (echos form element)
@@ -1729,6 +1756,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_ldap_uid', // HTML element ID
 				'LDAP attribute containing username', // HTML element Title
 				array( $this, 'print_text_ldap_uid' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_ldap_attr_email', // HTML element ID
+				'LDAP attribute containing email address', // HTML element Title
+				array( $this, 'print_text_ldap_attr_email' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -1938,6 +1972,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'cas_path', $auth_settings ) ) {
 				$auth_settings['cas_path'] = '';
 			}
+			if ( ! array_key_exists( 'cas_attr_email', $auth_settings ) ) {
+				$auth_settings['cas_attr_email'] = '';
+			}
 			if ( ! array_key_exists( 'cas_attr_first_name', $auth_settings ) ) {
 				$auth_settings['cas_attr_first_name'] = '';
 			}
@@ -1959,6 +1996,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'ldap_uid', $auth_settings ) ) {
 				$auth_settings['ldap_uid'] = '';
+			}
+			if ( ! array_key_exists( 'ldap_attr_email', $auth_settings ) ) {
+				$auth_settings['ldap_attr_email'] = '';
 			}
 			if ( ! array_key_exists( 'ldap_user', $auth_settings ) ) {
 				$auth_settings['ldap_user'] = '';
@@ -2073,6 +2113,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_path'] = '';
 				}
+				if ( ! array_key_exists( 'cas_attr_email', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_attr_email'] = '';
+				}
 				if ( ! array_key_exists( 'cas_attr_first_name', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_attr_first_name'] = '';
 				}
@@ -2093,6 +2136,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_uid'] = '';
+				}
+				if ( ! array_key_exists( 'ldap_attr_email', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_attr_email'] = '';
 				}
 				if ( ! array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_user'] = '';
@@ -2879,6 +2925,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="/cas" /><?php
 		} // END print_text_cas_path()
 
+		function print_text_cas_attr_email( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_attr_email';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
+		} // END print_text_cas_attr_email()
+
 		function print_text_cas_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_first_name';
@@ -2962,6 +3018,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="uid" style="width:80px;" /><?php
 		} // END print_text_ldap_uid()
+
+		function print_text_ldap_attr_email( $args = '' ) {
+			// Get plugin option.
+			$option = 'ldap_attr_email';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
+		} // END print_text_ldap_attr_email()
 
 		function print_text_ldap_user( $args = '' ) {
 			// Get plugin option.
@@ -3364,6 +3430,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row">CAS attribute containing email</th>
+								<td><?php $this->print_text_cas_attr_email( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row">CAS attribute containing first name</th>
 								<td><?php $this->print_text_cas_attr_first_name( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -3394,6 +3464,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<tr>
 								<th scope="row">LDAP attribute containing username</th>
 								<td><?php $this->print_text_ldap_uid( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row">LDAP attribute containing email</th>
+								<td><?php $this->print_text_ldap_attr_email( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Directory User</th>
@@ -3489,6 +3563,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'cas_host',
 				'cas_port',
 				'cas_path',
+				'cas_attr_email',
 				'cas_attr_first_name',
 				'cas_attr_last_name',
 				'cas_attr_update_on_login',
@@ -3497,6 +3572,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_port',
 				'ldap_search_base',
 				'ldap_uid',
+				'ldap_attr_email',
 				'ldap_user',
 				'ldap_password',
 				'ldap_tls',
@@ -3997,6 +4073,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['cas_attr_email'] = $auth_multisite_settings['cas_attr_email'];
 					$auth_settings['cas_attr_first_name'] = $auth_multisite_settings['cas_attr_first_name'];
 					$auth_settings['cas_attr_last_name'] = $auth_multisite_settings['cas_attr_last_name'];
 					$auth_settings['cas_attr_update_on_login'] = $auth_multisite_settings['cas_attr_update_on_login'];
@@ -4005,6 +4082,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
 					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
 					$auth_settings['ldap_uid'] = $auth_multisite_settings['ldap_uid'];
+					$auth_settings['ldap_attr_email'] = $auth_multisite_settings['ldap_attr_email'];
 					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
 					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
