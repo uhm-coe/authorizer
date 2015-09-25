@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: https://github.com/figureone/authorizer
 Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.3.1
+Version: 2.3.2
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2
@@ -1129,7 +1129,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function auth_public_scripts() {
 			// Load (and localize) public scripts
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
-			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array(), '2.3.1' );
+			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array(), '2.3.2' );
 			$auth_localized = array(
 				'wp_login_url' => wp_login_url( $current_path ),
 				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
@@ -1138,7 +1138,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			//update_option( 'auth_settings_advanced_public_notice', false);
 
 			// Load public css
-			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ), array(), '2.3.1' );
+			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-public-css' );
 		} // END auth_public_scripts()
 
@@ -1153,10 +1153,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 
 			// Enqueue scripts appearing on wp-login.php.
-			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.3.1' );
+			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 
 			// Enqueue styles appearing on wp-login.php.
-			wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', __FILE__ ), array(), '2.3.1' );
+			wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-login-css' );
 
 			/**
@@ -1184,15 +1184,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					continue;
 				}
 				if ( $auth_settings['advanced_branding'] === $branding_option['value'] ) {
-					wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.3.1' );
-					wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.3.1' );
+					wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.3.2' );
+					wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.3.2' );
 					wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
 				}
 			}
 
 			// If we're using Google logins, load those resources.
 			if ( $auth_settings['google'] === '1' ) {
-				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ), '2.3.1' ); ?>
+				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ), '2.3.2' ); ?>
 				<meta name="google-signin-clientid" content="<?php echo $auth_settings['google_clientid']; ?>" />
 				<meta name="google-signin-scope" content="email" />
 				<meta name="google-signin-cookiepolicy" content="single_host_origin" />
@@ -1474,7 +1474,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.3.1', true
+				array( 'jquery-effects-shake' ), '2.3.2', true
 			);
 			$js_auth_config = array( 'baseurl' => get_bloginfo( 'url' ) );
 			wp_localize_script( 'authorizer', 'auth_config',  $js_auth_config );
@@ -1485,7 +1485,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.3.1' );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'inc/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );

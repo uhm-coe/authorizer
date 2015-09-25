@@ -56,6 +56,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.2 =
+* Feature: Add the ability to specify which CAS or LDAP attribute contains the user's email address. Useful for organizations that use an ID or something other than an email to authenticate.
+* Feature:  You can now choose an ACF field to show next to users in the approved list. It will show a dropdown with the available values if the field type is select, and an input[text] otherwise.
+* Fix: Preapproved users' usermeta or ACF values get saved and applied when they log in for the first time.
+
 = 2.3.1 =
 * Fix: Skip SSL check when checking if a CAS server is reachable.
 * Fix: Pressing enter on Access List form elements now does the right thing.
