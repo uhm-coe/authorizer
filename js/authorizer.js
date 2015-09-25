@@ -45,7 +45,7 @@ function auth_update_usermeta( caller ) {
 	// Disable inputs, show spinner.
 	$caller.attr( 'disabled', 'disabled' );
 	$usermeta.attr( 'disabled', 'disabled' );
-	$caller.last().after( '<span class="spinner"></span>' );
+	$usermeta.after( '<span class="spinner is-active"></span>' );
 	$( 'html' ).addClass( 'busy' );
 
 	// Call ajax save function.
@@ -223,7 +223,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 				' + ban_button + ' \
 				<a class="button" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a> \
 				' + local_icon + ' \
-				<span class="spinner"></span> \
+				<span class="spinner is-active"></span> \
 			</li> \
 		' ).appendTo( '#list_auth_settings_access_users_' + list + '' ).slideDown( 250 );
 
@@ -322,11 +322,11 @@ function update_auth_user( caller, setting, user_to_edit ) {
 	// Enable spinner by element that triggered this event (caller).
 	$( caller ).attr( 'disabled', 'disabled' );
 	if ( $( caller ).val() === 'Save Changes' ) {
-		$( caller ).last().after( '<span class="spinner"></span>' );
+		$( caller ).last().after( '<span class="spinner is-active"></span>' );
 	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
-		$( caller ).last().next().next().after( '<span class="spinner"></span>' );
+		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
 	} else {
-		$( caller ).last().next().after( '<span class="spinner"></span>' );
+		$( caller ).last().next().after( '<span class="spinner is-active"></span>' );
 	}
 	$( 'form .spinner' ).show();
 
@@ -383,11 +383,11 @@ function save_auth_multisite_settings( caller ) {
 
 	$( caller ).attr( 'disabled', 'disabled' );
 	if ( $( caller ).val() === 'Save Changes' ) {
-		$( caller ).last().after( '<span class="spinner"></span>' );
+		$( caller ).last().after( '<span class="spinner is-active"></span>' );
 	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
-		$( caller ).last().next().next().after( '<span class="spinner"></span>' );
+		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
 	} else {
-		$( caller ).last().next().after( '<span class="spinner"></span>' );
+		$( caller ).last().next().after( '<span class="spinner is-active"></span>' );
 	}
 	$( 'form .spinner' ).show();
 
