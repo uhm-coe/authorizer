@@ -548,7 +548,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									update_user_meta( $user->ID, $meta_key, $user_info['usermeta']['meta_value'] );
 								}
 							}
-						} elseif ( is_multisite() && count( $user_info['usermeta'] ) > 0 ) ) {
+						} elseif ( is_multisite() && count( $user_info['usermeta'] ) > 0 ) {
 							// Update usermeta for each multisite blog defined for this user.
 							foreach ( $user_info['usermeta'] as $blog_id => $usermeta ) {
 								if ( array_key_exists( 'meta_key', $usermeta ) && array_key_exists( 'meta_value', $usermeta ) ) {
@@ -2499,7 +2499,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 							continue;
 						endif;
-						$approved_wp_user = get_user_by( 'email', $approved_user['email'] )
+						$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $approved_wp_user ) :
 							$approved_user['email'] = $approved_wp_user->user_email;
 							$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
