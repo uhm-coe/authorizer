@@ -141,9 +141,11 @@ div.section_info, div.section_info ~ table {
 .auth-multisite-username,
 .auth-multisite-email,
 .auth-multisite-role,
-.auth-multisite-date-added,
-.auth-multisite-usermeta {
+.auth-multisite-date-added {
 	opacity: 0.5;
+}
+.auth-multisite-usermeta[disabled="disabled"] {
+	opacity: 0;
 }
 
 #auth_dashboard_widget > .inside {
