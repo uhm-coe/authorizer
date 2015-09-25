@@ -521,12 +521,55 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					);
 
 					// Fail with message if error.
-					if ( is_wp_error( $result ) ) {
+					if ( is_wp_error( $result ) || $result == 0 ) {
 						return $result;
 					}
 
 					// Authenticate as new user
 					$user = new WP_User( $result );
+
+					// Check if this new user has any preassigned usermeta
+					// values in their approved list entry, and apply them to
+					// their new WordPress account.
+					if ( array_key_exists( 'usermeta', $user_info ) && is_array( $user_info['usermeta'] ) ) {
+						$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
+
+						if ( array_key_exists( 'meta_key', $user_info['usermeta'] ) && array_key_exists( 'meta_value', $user_info['usermeta'] ) ) {
+							// Only update the usermeta if the stored value matches
+							// the option set in authorizer settings (if they don't
+							// match it's probably old data).
+							if ( $meta_key === $user_info['usermeta']['meta_key'] ) {
+								// Update user's usermeta value for usermeta key stored in authorizer options.
+								if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+									// We have an ACF field value, so use the ACF function to update it.
+									update_field( str_replace('acf___', '', $meta_key ), $user_info['usermeta']['meta_value'], 'user_' . $user->ID );
+								} else {
+									// We have a normal usermeta value, so just update it via the WordPress function.
+									update_user_meta( $user->ID, $meta_key, $user_info['usermeta']['meta_value'] );
+								}
+							}
+						} elseif ( is_multisite() && count( $user_info['usermeta'] ) > 0 ) ) {
+							// Update usermeta for each multisite blog defined for this user.
+							foreach ( $user_info['usermeta'] as $blog_id => $usermeta ) {
+								if ( array_key_exists( 'meta_key', $usermeta ) && array_key_exists( 'meta_value', $usermeta ) ) {
+									// Add this new user to the blog before we create their user meta (this step typically happens below, but we need it to happen early so we can create user meta here).
+									if ( ! is_user_member_of_blog( $user->ID, $blog_id ) ) {
+										add_user_to_blog( $blog_id, $user->ID, $user_info['role'] );
+									}
+									switch_to_blog( $blog_id );
+									// Update user's usermeta value for usermeta key stored in authorizer options.
+									if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+										// We have an ACF field value, so use the ACF function to update it.
+										update_field( str_replace('acf___', '', $meta_key ), $usermeta['meta_value'], 'user_' . $user->ID );
+									} else {
+										// We have a normal usermeta value, so just update it via the WordPress function.
+										update_user_meta( $user->ID, $meta_key, $usermeta['meta_value'] );
+									}
+									restore_current_blog();
+								}
+							}
+						}
+					}
 				} else {
 					// Update first/last names of WordPress user from external
 					// service if that option is set.
@@ -2456,7 +2499,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 							continue;
 						endif;
-						if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ) :
+						$approved_wp_user = get_user_by( 'email', $approved_user['email'] )
+						if ( $approved_wp_user ) :
 							$approved_user['email'] = $approved_wp_user->user_email;
 							$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
 							$approved_user['date_added'] = $approved_wp_user->user_registered;
@@ -2476,7 +2520,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							</select>
 							<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
 							<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
-								<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" readonly="true" class="auth-usermeta auth-multisite-usermeta" disabled="disabled" />
+								<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"<?php if ( ! $approved_wp_user ) echo ' readonly="true" disabled="disabled"'; ?> class="auth-usermeta auth-multisite-usermeta" />
 							<?php endif; ?>
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 						</li>
@@ -2488,29 +2532,30 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
-					$approved_user['usermeta'] = '';
 					if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ) :
 						$approved_user['email'] = $approved_wp_user->user_email;
 						$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
 						$approved_user['date_added'] = $approved_wp_user->user_registered;
 						$approved_user['is_wp_user'] = true;
 						$is_current_user = $approved_wp_user->ID === get_current_user_id();
+						// Get usermeta field from the WordPress user's real usermeta.
+						if ( strlen( $advanced_usermeta ) > 0 ) :
+							if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+								// Get ACF Field value for the user
+								$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
+							else :
+								// Get regular usermeta value for the user.
+								$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+							endif;
+
+							if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
+								$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+							endif;
+						endif;
 					else :
 						$approved_user['is_wp_user'] = false;
 					endif;
-					if ( $approved_wp_user && strlen( $advanced_usermeta ) > 0 ) :
-						if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
-							// Get ACF Field value for the user
-							$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
-						else :
-							// Get regular usermeta value for the user.
-							$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
-						endif;
-
-						if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
-							$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
-						endif;
-					else :
+					if ( ! array_key_exists( 'usermeta', $approved_user ) ) :
 						$approved_user['usermeta'] = '';
 					endif; ?>
 					<li>
@@ -3663,6 +3708,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		} // END add_auth_dashboard_widget()
 
 
+		// Fired on a change event from the optional usermeta field in the
+		// approved user list. Updates the selected usermeta value, or saves it
+		// in the user's approved list entry if the user hasn't logged in yet
+		// and created a WordPress account.
 		function ajax_update_auth_usermeta() {
 
 			// Fail silently if current user doesn't have permissions.
@@ -3680,25 +3729,83 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die( '' );
 			}
 
-			// Fail if user doesn't exist.
-			if ( ! ( $wp_user = get_user_by( 'email', $_REQUEST['email'] ) ) ) {
-				die( '' );
-			}
-
-			// Update user's usermeta value for usermeta key stored in authorizer options.
-			$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
+			// Get values to update from post data.
+			$email = $_REQUEST['email'];
 			$meta_value = $_REQUEST['usermeta'];
-			if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
-				// We have an ACF field value, so use the ACF function to update it.
-				update_field( str_replace('acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
+			$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
+
+			// If user doesn't exist, save usermeta selection to authorizer
+			// list. This value will get saved to usermeta when the user first
+			// logs in (i.e., when their WordPress account is created).
+			if ( ! ( $wp_user = get_user_by( 'email', $email ) ) ) {
+				// Look through multisite approved users and add a usermeta
+				// reference for the current blog if the user is found.
+				$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+				$should_update_auth_multisite_settings_access_users_approved = false;
+				foreach ( $auth_multisite_settings_access_users_approved as $index => $approved_user ) {
+					if ( $email === $approved_user['email'] ) {
+						if ( ! is_array( $auth_multisite_settings_access_users_approved[$index]['usermeta'] ) ) {
+							// Initialize the array of usermeta for each blog this user belongs to.
+							$auth_multisite_settings_access_users_approved[$index]['usermeta'] = array();
+						} else {
+							// There is already usermeta associated with this
+							// preapproved user; iterate through it and make
+							// sure it's not for old meta_keys (delete it if
+							// so). This can happen if someone changes the
+							// usermeta key in authorizer options, and we don't
+							// want to hang on to old data.
+							foreach ( $auth_multisite_settings_access_users_approved[$index]['usermeta'] as $blog_id => $usermeta ) {
+								if ( array_key_exists( 'meta_key', $usermeta ) && $usermeta['meta_key'] === $meta_key ) {
+									continue;
+								} else {
+									unset( $auth_multisite_settings_access_users_approved[$index]['usermeta'][$blog_id] );
+								}
+							}
+						}
+						$auth_multisite_settings_access_users_approved[$index]['usermeta'][get_current_blog_id()] = array(
+							'meta_key' => $meta_key,
+							'meta_value' => $meta_value,
+						);
+						$should_update_auth_multisite_settings_access_users_approved = true;
+					}
+				}
+				if ( $should_update_auth_multisite_settings_access_users_approved ) {
+					update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				}
+
+				// Look through the approved users (of the current blog in a
+				// multisite install, or just of the single site) and add a
+				// usermeta reference if the user is found.
+				$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+				$should_update_auth_settings_access_users_approved = false;
+				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
+					if ( $email === $approved_user['email'] ) {
+						$auth_multisite_settings_access_users_approved[$index]['usermeta'] = array(
+							'meta_key' => $meta_key,
+							'meta_value' => $meta_value,
+						);
+						$should_update_auth_settings_access_users_approved = true;
+					}
+				}
+				if ( $should_update_auth_settings_access_users_approved ) {
+					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				}
+
 			} else {
-				// We have a normal usermeta value, so just update it via the WordPress function.
-				update_user_meta( $wp_user->ID, $meta_key, $meta_value );
+				// Update user's usermeta value for usermeta key stored in authorizer options.
+				if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+					// We have an ACF field value, so use the ACF function to update it.
+					update_field( str_replace('acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
+				} else {
+					// We have a normal usermeta value, so just update it via the WordPress function.
+					update_user_meta( $wp_user->ID, $meta_key, $meta_value );
+				}
+
 			}
 
 			// Return 'success' value to AJAX call.
 			die( 'success' );
-		}
+		} // END ajax_update_auth_usermeta()
 
 
 		function ajax_update_auth_user() {
@@ -4410,7 +4517,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		// Helper function to get a single user info array from one of the
 		// access control lists (pending, approved, or blocked).
 		// Returns: false if not found; otherwise
-		//  array( 'email' => '', 'role' => '', 'date_added' => '');
+		//  array( 'email' => '', 'role' => '', 'date_added' => '', ['usermeta' => [''|array()]] );
 		function get_user_info_from_list( $email, $list ) {
 			foreach ( $list as $user_info ) {
 				if ( $user_info['email'] === $email ) {
