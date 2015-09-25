@@ -220,7 +220,7 @@ div.section_info, div.section_info ~ table {
 #list_auth_settings_access_users_approved .auth-multisite-user {
 	margin-left: 5px;
 }
-#list_auth_settings_access_users_approved .auth-usermeta + .button {
+#list_auth_settings_access_users_approved .auth-usermeta + .button.update-usermeta {
 	margin: 3px 4px 3px -33px;
 	height: 23px;
 	width: 26px;

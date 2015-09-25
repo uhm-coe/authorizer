@@ -37,10 +37,15 @@ function choose_tab( list_name, delay ) {
 function auth_update_usermeta( caller ) {
 	var $ = jQuery,
 		$caller = $( caller ),
-		$usermeta = $caller.siblings( '.auth-usermeta' ),
+		$usermeta = $caller.parent().children( '.auth-usermeta' ),
 		email = $caller.siblings( '.auth-email' ).val(),
 		usermeta = $usermeta.val(),
 		nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+
+	// Remove reference to caller if it's the usermeta field itself (not a button triggering the save).
+	if ( $caller.hasClass( 'auth-usermeta' ) ) {
+		$caller = $();
+	}
 
 	// Disable inputs, show spinner.
 	$caller.attr( 'disabled', 'disabled' );
@@ -68,7 +73,7 @@ function auth_update_usermeta( caller ) {
 		});
 		$( 'html' ).removeClass( 'busy' );
 
-	}).fail( function () {
+	}).fail( function ( response ) {
 		var succeeded = false;
 		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;

@@ -2499,7 +2499,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$approved_user['is_wp_user'] = false;
 					endif;
 					if ( $approved_wp_user && strlen( $advanced_usermeta ) > 0 ) :
-						$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+						if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+							// Get ACF Field value for the user
+							$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
+						else :
+							// Get regular usermeta value for the user.
+							$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+						endif;
+
 						if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
 							$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
 						endif;
@@ -2513,9 +2520,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
 						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-						<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
-							<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
-							<a class="button button-small button-primary" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+						<?php if ( strlen( $advanced_usermeta ) > 0 ) :
+							$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
+							if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+								$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
+								if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
+									$should_show_usermeta_in_text_field = false; ?>
+									<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );" >
+										<option value=""<?php if ( strlen( $approved_user['usermeta'] ) < 1 ) echo ' selected="selected"'; ?>>-- None --</option>
+										<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
+											<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
+										<?php endforeach; ?>
+									</select>
+								<?php endif; ?>
+							<?php endif; ?>
+							<?php if ( $should_show_usermeta_in_text_field ) : ?>
+								<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
+								<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+							<?php endif; ?>
 						<?php endif; ?>
 						<?php if ( ! $is_current_user ): ?>
 							<?php if ( ! $multisite_admin_page ) : ?>
@@ -3203,9 +3225,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<option value="">-- None --</option>
-				<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : if ( substr( $meta_key, 0, 3 ) === 'wp_' ) continue; ?>
-					<option value="<?php echo $meta_key; ?>" <?php if ( $auth_settings_option === $meta_key ) echo ' selected="selected"'; ?>><?php echo $meta_key; ?></option>
-				<?php endforeach; ?>
+				<?php if ( class_exists( 'acf' ) ) :
+					$fields = get_field_objects( 'user_' . get_current_user_id() ); ?>
+					<optgroup label="ACF Fields:">
+						<?php foreach ( $fields as $field => $field_object ) : ?>
+							<option value="acf___<?php echo $field_object['key']; ?>"<?php if ( $auth_settings_option === "acf___{$field_object['key']}" ) echo ' selected="selected"'; ?>><?php echo $field_object['label']; ?></option>
+						<?php endforeach; ?>
+					</optgroup>
+				<?php endif; ?>
+				<optgroup label="All Usermeta:">
+					<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : if ( substr( $meta_key, 0, 3 ) === 'wp_' ) continue; ?>
+						<option value="<?php echo $meta_key; ?>"<?php if ( $auth_settings_option === $meta_key ) echo ' selected="selected"'; ?>><?php echo $meta_key; ?></option>
+					<?php endforeach; ?>
+				</optgroup>
 			</select><?php
 		} // END print_select_auth_advanced_usermeta()
 
@@ -3656,8 +3688,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Update user's usermeta value for usermeta key stored in authorizer options.
 			$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
 			$meta_value = $_REQUEST['usermeta'];
-			if ( ! update_user_meta( $wp_user->ID, $meta_key, $meta_value ) ) {
-				die( '' );
+			if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+				// We have an ACF field value, so use the ACF function to update it.
+				update_field( str_replace('acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
+			} else {
+				// We have a normal usermeta value, so just update it via the WordPress function.
+				update_user_meta( $wp_user->ID, $meta_key, $meta_value );
 			}
 
 			// Return 'success' value to AJAX call.
