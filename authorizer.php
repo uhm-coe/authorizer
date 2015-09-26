@@ -3830,7 +3830,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$should_update_auth_settings_access_users_approved = false;
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 					if ( $email === $approved_user['email'] ) {
-						$auth_multisite_settings_access_users_approved[$index]['usermeta'] = array(
+						$auth_settings_access_users_approved[$index]['usermeta'] = array(
 							'meta_key' => $meta_key,
 							'meta_value' => $meta_value,
 						);
