@@ -2535,7 +2535,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 										$should_show_usermeta_in_text_field = false; ?>
 										<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta auth-multisite-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );">
-											<option value=""<?php if ( strlen( $approved_user['usermeta'] ) < 1 || count( $approved_user['usermeta'] ) < 1 ) echo ' selected="selected"'; ?>>-- None --</option>
+											<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
 											<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 												<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && array_key_exists( get_current_blog_id(), $approved_user['usermeta'] ) && $key === $approved_user['usermeta'][get_current_blog_id()]['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
 											<?php endforeach; ?>
@@ -2598,7 +2598,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 									$should_show_usermeta_in_text_field = false; ?>
 									<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );" >
-										<option value=""<?php if ( strlen( $approved_user['usermeta'] ) < 1 || count( $approved_user['usermeta'] ) < 1 ) echo ' selected="selected"'; ?>>-- None --</option>
+										<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
 										<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 											<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
 										<?php endforeach; ?>
