@@ -3271,9 +3271,33 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<option value="">-- None --</option>
 				<?php if ( class_exists( 'acf' ) ) :
-					$fields = get_field_objects( 'user_' . get_current_user_id() ); ?>
-					<optgroup label="ACF Fields:">
-						<?php foreach ( $fields as $field => $field_object ) : ?>
+					// Get ACF fields. Note: it would be much easier to use `get_field_objects()`
+					// or `get_field_objects( 'user_' . get_current_user_id() )`, but neither will
+					// list fields that have never been given values for users (i.e., new ACF
+					// fields). Therefore we fall back on finding any ACF fields applied to users
+					// (user_role or user_form location rules in the field group definition).
+					$fields = array();
+					$acf_field_group_ids = array();
+					$acf_field_groups = new WP_Query( array(
+						'post_type' => 'acf-field-group',
+					));
+					while ( $acf_field_groups->have_posts() ) : $acf_field_groups->the_post();
+						if ( strpos( get_the_content(), 's:5:"param";s:9:"user_role"' ) !== false || strpos( get_the_content(), 's:5:"param";s:9:"user_form"' ) !== false ) :
+							array_push( $acf_field_group_ids, get_the_ID() );
+						endif;
+					endwhile; wp_reset_postdata();
+					foreach ( $acf_field_group_ids as $acf_field_group_id ) :
+						$acf_fields = new WP_Query( array(
+							'post_type' => 'acf-field',
+							'post_parent' => $acf_field_group_id,
+						));
+						while ( $acf_fields->have_posts() ) : $acf_fields->the_post();
+							global $post;
+							$fields[$post->post_name] = get_field_object( $post->post_name );
+						endwhile; wp_reset_postdata();
+					endforeach; ?>
+					<optgroup label="ACF User Fields:">
+						<?php foreach ( (array)$fields as $field => $field_object ) : ?>
 							<option value="acf___<?php echo $field_object['key']; ?>"<?php if ( $auth_settings_option === "acf___{$field_object['key']}" ) echo ' selected="selected"'; ?>><?php echo $field_object['label']; ?></option>
 						<?php endforeach; ?>
 					</optgroup>
