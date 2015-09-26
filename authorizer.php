@@ -2504,13 +2504,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$approved_user['email'] = $approved_wp_user->user_email;
 							$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
 							$approved_user['date_added'] = $approved_wp_user->user_registered;
-						endif;
-						if ( $approved_wp_user && strlen( $advanced_usermeta ) > 0 ) :
-							$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
-							if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
-								$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+							// Get usermeta field from the WordPress user's real usermeta.
+							if ( strlen( $advanced_usermeta ) > 0 ) :
+								if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+									// Get ACF Field value for the user
+									$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
+								else :
+									// Get regular usermeta value for the user.
+									$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+								endif;
+
+								if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
+									$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+								endif;
 							endif;
-						else :
+						endif;
+						if ( ! array_key_exists( 'usermeta', $approved_user ) ) :
 							$approved_user['usermeta'] = '';
 						endif; ?>
 						<li>
@@ -2519,8 +2528,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
 							<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
-							<?php if ( strlen( $advanced_usermeta ) > 0 ) : ?>
-								<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"<?php if ( ! $approved_wp_user ) echo ' readonly="true" disabled="disabled"'; ?> class="auth-usermeta auth-multisite-usermeta" />
+							<?php if ( strlen( $advanced_usermeta ) > 0 ) :
+								$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
+								if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+									$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
+									if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
+										$should_show_usermeta_in_text_field = false; ?>
+										<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta auth-multisite-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );">
+											<option value=""<?php if ( strlen( $approved_user['usermeta'] ) < 1 ) echo ' selected="selected"'; ?>>-- None --</option>
+											<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
+												<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
+											<?php endforeach; ?>
+										</select>
+									<?php endif; ?>
+								<?php endif; ?>
+								<?php if ( $should_show_usermeta_in_text_field ) : ?>
+									<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta auth-multisite-usermeta" />
+									<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+								<?php endif; ?>
 							<?php endif; ?>
 							&nbsp;&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 						</li>
@@ -2532,7 +2557,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
-					if ( $approved_wp_user = get_user_by( 'email', $approved_user['email'] ) ) :
+					$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
+					if ( $approved_wp_user ) :
 						$approved_user['email'] = $approved_wp_user->user_email;
 						$approved_user['role'] = $multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
 						$approved_user['date_added'] = $approved_wp_user->user_registered;
