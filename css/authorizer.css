@@ -154,7 +154,7 @@ div.section_info, div.section_info ~ table {
 
 #auth_dashboard_widget input[type="text"], #auth_dashboard_widget select {
 	font-size: 90%;
-	width: 90px;
+	width: 14%;
 }
 
 #auth_dashboard_widget input[type="radio"] {
@@ -173,10 +173,6 @@ div.section_info, div.section_info ~ table {
 	width: 70px;
 }
 
-#auth_dashboard_widget .auth-usermeta {
-	display: none;
-}
-
 /* Shrink dashboard widget elements on small sizes */
 @media only screen and (max-width: 1090px) {
 	#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email,
@@ -184,10 +180,10 @@ div.section_info, div.section_info ~ table {
 	#auth_dashboard_widget #new_approved_user_email,
 	#auth_dashboard_widget #list_auth_settings_access_users_blocked .auth-email,
 	#auth_dashboard_widget #new_blocked_user_email {
-		width: 65px;
+		width: 20%;
 	}
-	#auth_dashboard_widget select {
-		width: 60px;
+	#auth_dashboard_widget select.auth-role {
+		width: 18%;
 	}
 }
 
