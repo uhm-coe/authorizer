@@ -3297,7 +3297,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<option value="">-- None --</option>
 				<?php if ( class_exists( 'acf' ) ) :
-					// Get ACF fields. Note: it would be much easier to use `get_field_objects()`
+					// Get ACF 5 fields. Note: it would be much easier to use `get_field_objects()`
 					// or `get_field_objects( 'user_' . get_current_user_id() )`, but neither will
 					// list fields that have never been given values for users (i.e., new ACF
 					// fields). Therefore we fall back on finding any ACF fields applied to users
@@ -3321,7 +3321,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							global $post;
 							$fields[$post->post_name] = get_field_object( $post->post_name );
 						endwhile; wp_reset_postdata();
-					endforeach; ?>
+					endforeach;
+					// Get ACF 4 fields.
+					$acf4_field_groups = new WP_Query( array(
+						'post_type' => 'acf',
+					));
+					while ( $acf4_field_groups->have_posts() ) : $acf4_field_groups->the_post();
+						$field_group_rules = get_post_meta( get_the_ID(), 'rule', true );
+						if ( is_array( $field_group_rules ) && array_key_exists( 'param', $field_group_rules ) && $field_group_rules['param'] === 'ef_user' ) :
+							$acf4_fields = get_post_custom( get_the_ID() );
+							foreach ( $acf4_fields as $meta_key => $meta_value ) :
+								if ( strpos( $meta_key, 'field_' ) === 0 ) :
+									$meta_value = unserialize( $meta_value[0] );
+									$fields[$meta_key] = $meta_value;
+								endif;
+							endforeach;
+						endif;
+					endwhile; wp_reset_postdata(); ?>
 					<optgroup label="ACF User Fields:">
 						<?php foreach ( (array)$fields as $field => $field_object ) : ?>
 							<option value="acf___<?php echo $field_object['key']; ?>"<?php if ( $auth_settings_option === "acf___{$field_object['key']}" ) echo ' selected="selected"'; ?>><?php echo $field_object['label']; ?></option>
