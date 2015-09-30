@@ -81,7 +81,7 @@ function auth_update_usermeta( caller ) {
 		// Enable inputs, remove spinner.
 		$caller.removeAttr( 'disabled' );
 		$usermeta.removeAttr( 'disabled' );
-		$usermeta.css( 'display', 'none' );
+		$caller.css( 'display', 'none' );
 		$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
 		});
