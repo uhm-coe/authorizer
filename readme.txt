@@ -15,7 +15,7 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* requires the following:
 
-* **CAS server** or **LDAP server** (plugin needs the URL)
+* **CAS server** (2.x, 3.x, or 4.x) or **LDAP server** (plugin needs the URL)
 * PHP extentions: php5-mcrypt, php5-ldap, php5-curl
 
 *Authorizer* provides the following options:
@@ -58,6 +58,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 = 2.3.3 =
 * Fix: disappearing usermeta box if server is unreachable.
+* Update documentation with supported CAS versions.
 
 = 2.3.2 =
 * Feature: Add the ability to specify which CAS or LDAP attribute contains the user's email address. Useful for organizations that use an ID or something other than an email to authenticate.
