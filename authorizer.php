@@ -1071,7 +1071,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Check to see if the requested page is public. If so, show it.
-			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $wp->query_vars['pagename'] );
+			$current_page_name = property_exists( $wp, 'query_vars' ) && array_key_exists( 'name', $wp->query_vars ) && strlen( $wp->query_vars['name'] ) > 0 ? $wp->query_vars['name'] : '';
+			if ( ! $current_page_name ) {
+				// Different WordPress versions store the page slug in different places; look for it elsewhere.
+				if ( property_exists( $wp, 'query_vars' ) && array_key_exists( 'pagename', $wp->query_vars ) && strlen( $wp->query_vars['pagename'] ) > 0 ) {
+					$current_page_name = $wp->query_vars['pagename'];
+				}
+			}
+			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $current_page_name );
 			if ( ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
