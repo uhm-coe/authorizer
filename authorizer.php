@@ -2878,17 +2878,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
-			$post_types = get_post_types( '', 'names' );
+			$post_types = array_merge( array( 'page', 'post' ), get_post_types( array( '_builtin' => false ), 'names' ) );
 			$post_types = is_array( $post_types ) ? $post_types : array();
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
-				<optgroup label="Special">
+				<optgroup label="Home">
 					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>>Home Page</option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ): ?>
 					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
-					<?php $pages = get_pages( array( 'post_type' => $post_type ) ); ?>
+					<?php $pages = get_posts( array( 'post_type' => $post_type, 'posts_per_page' => -1 ) ); ?>
 					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
 					<?php foreach ( $pages as $page ): ?>
 						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
