@@ -1091,6 +1091,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return;
 			}
 
+			// Check to see if any category assigned to the requested page is public. If so, show it.
+			$current_page_categories = wp_get_post_categories( $current_page_id, array( 'fields' => 'slugs' ) );
+			foreach( $current_page_categories as $current_page_category ) {
+				if ( in_array( 'cat_' . $current_page_category, $auth_settings['access_public_pages'] ) ) {
+					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
+						update_option( 'auth_settings_advanced_public_notice', false );
+					} else {
+						update_option( 'auth_settings_advanced_public_notice', true );
+					}
+					return;
+				}
+			}
+
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			if ( $auth_settings['access_redirect'] === 'message' ) {
 				$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
@@ -2902,6 +2915,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
+				<optgroup label="Categories">
+					<?php foreach ( get_categories() as $category ) : ?>
+						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
+					<?php endforeach; ?>
+				</optgroup>
 			</select><?php
 		} // END print_multiselect_auth_access_public_pages()
 

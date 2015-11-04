@@ -59,6 +59,8 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 = 2.3.3 =
 * Fix: disappearing usermeta box if server is unreachable.
 * Update documentation with supported CAS versions.
+* Feature: Allow posts to be marked as public on restricted access sites.
+* Feature: Allow categories to be marked as public on restricted access sites.
 
 = 2.3.2 =
 * Feature: Add the ability to specify which CAS or LDAP attribute contains the user's email address. Useful for organizations that use an ID or something other than an email to authenticate.
