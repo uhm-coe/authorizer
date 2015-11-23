@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: https://github.com/figureone/authorizer
 Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.3.3
+Version: 2.3.4
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 License: GPL2
@@ -2467,8 +2467,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
-							<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role">
+							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
+							<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
 							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> Approve</a>
@@ -2543,18 +2543,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$approved_user['usermeta'] = '';
 						endif; ?>
 						<li>
-							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
-							<select name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role auth-multisite-role" disabled="disabled">
+							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
+							<select id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
 							</select>
-							<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
+							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>_date_added" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added auth-multisite-date-added" disabled="disabled" />
 							<?php if ( strlen( $advanced_usermeta ) > 0 ) :
 								$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
 								if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
 									$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
 									if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 										$should_show_usermeta_in_text_field = false; ?>
-										<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta auth-multisite-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );">
+										<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" class="auth-usermeta auth-multisite-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );">
 											<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
 											<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 												<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && array_key_exists( get_current_blog_id(), $approved_user['usermeta'] ) && $key === $approved_user['usermeta'][get_current_blog_id()]['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
@@ -2563,7 +2563,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									<?php endif; ?>
 								<?php endif; ?>
 								<?php if ( $should_show_usermeta_in_text_field ) : ?>
-									<input type="text" name="auth_multisite_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta auth-multisite-usermeta" />
+									<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta auth-multisite-usermeta" />
 									<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 								<?php endif; ?>
 							<?php endif; ?>
@@ -2605,19 +2605,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$approved_user['usermeta'] = '';
 					endif; ?>
 					<li>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
-						<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
+						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
 							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
 							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
 						</select>
-						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_date_added" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<?php if ( strlen( $advanced_usermeta ) > 0 ) :
 							$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
 							if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
 								$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
 								if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 									$should_show_usermeta_in_text_field = false; ?>
-									<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" class="auth-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );" >
+									<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" class="auth-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );" >
 										<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
 										<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 											<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
@@ -2626,7 +2626,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<?php endif; ?>
 							<?php endif; ?>
 							<?php if ( $should_show_usermeta_in_text_field ) : ?>
-								<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][usermeta]" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
+								<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>" class="auth-usermeta" />
 								<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 							<?php endif; ?>
 						<?php endif; ?>
@@ -2641,8 +2641,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endforeach; ?>
 			</ul>
 			<div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" name="new_approved_user_email" id="new_approved_user_email" placeholder="email address" class="auth-email new" />
-				<select name="new_approved_user_role" id="new_approved_user_role" class="auth-role">
+				<input type="text" id="new_approved_user_email" placeholder="email address" class="auth-email new" />
+				<select id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role ); ?>
 				</select>
 				<div class="btn-group">
@@ -2681,18 +2681,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $blocked_user['is_wp_user'] = false; ?>
 					<?php endif; ?>
 					<li>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][email]" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
-						<select name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][role]" class="auth-role">
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
+						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
 							<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
-						<input type="text" name="auth_settings_<?php echo $option; ?>[<?php echo $key; ?>][date_added]" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_date_added" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked');" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 			<div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" name="new_blocked_user_email" id="new_blocked_user_email" placeholder="email address" class="auth-email new" />
-				<select name="new_blocked_user_role" id="new_blocked_user_role" class="auth-role">
+				<input type="text" id="new_blocked_user_email" placeholder="email address" class="auth-email new" />
+				<select id="new_blocked_user_role" class="auth-role">
 					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
 				</select>
 				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user(this, 'blocked');"><span class="glyphicon glyphicon-ban-circle"></span> Block</a>
