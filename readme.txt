@@ -56,6 +56,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.5 =
+* Feature: Allow individual sites in a network/multisite install to override Authorizer's multisite settings and be configured independently.
+
 = 2.3.4 =
 * Quick fix: Remove user lists from post data when saving options (fixes an issue with hitting apache/php post size limits when 5000+ approved users exist).
 
