@@ -1022,7 +1022,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Always allow access if WordPress is installing
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
 				// Always allow access to admins
-				( is_admin() ) ||
+				( current_user_can( 'create_users' ) ) ||
 				// Allow access if option is set to 'everyone'
 				( $auth_settings['access_who_can_view'] == 'everyone' ) ||
 				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'
@@ -1921,6 +1921,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
+			// On multisite installs, add an option to override all multisite settings on individual sites.
+			if ( is_multisite() ) {
+				add_settings_field(
+					'auth_settings_advanced_override_multisite', // HTML element ID
+					'Override multisite options', // HTML element Title
+					array( $this, 'print_checkbox_auth_advanced_override_multisite' ), // Callback (echos form element)
+					'authorizer', // Page this setting is shown on (slug)
+					'auth_settings_advanced' // Section this setting is shown on
+				);
+			}
 		} // END page_init()
 
 
@@ -2106,6 +2116,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'advanced_usermeta', $auth_settings ) ) {
 				$auth_settings['advanced_usermeta'] = '';
+			}
+			if ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) ) {
+				$auth_settings['advanced_override_multisite'] = '';
 			}
 
 			// Save default options to database.
@@ -2491,11 +2504,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get multisite approved users (add them to top of list, greyed out).
+			$auth_override_multisite = $this->get_plugin_option( 'advanced_override_multisite' );
 			$auth_multisite_settings = $this->get_plugin_options( 'multisite admin' );
 			$option_multisite = 'access_users_approved';
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
+				$auth_override_multisite != '1' &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				$auth_multisite_settings['multisite_override'] === '1'
 			) {
@@ -2714,14 +2729,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
-			// Workaround: javascript code hides/shows other settings based
-			// on the selection in this option. If this option is overridden
-			// by a multisite option, it should show that value in order to
-			// correctly display the other appropriate options.
-			// Side effect: this site option will be overwritten by the
-			// multisite option on save. Since this is a 2-item radio, we
-			// determined this was acceptable.
-			if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
+			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+				$auth_settings_option = $this->get_plugin_option( $option );
+			} else if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+				// Workaround: javascript code hides/shows other settings based
+				// on the selection in this option. If this option is overridden
+				// by a multisite option, it should show that value in order to
+				// correctly display the other appropriate options.
+				// Side effect: this site option will be overwritten by the
+				// multisite option on save. Since this is a 2-item radio, we
+				// determined this was acceptable.
 				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
 			}
 
@@ -2836,14 +2854,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
-			// Workaround: javascript code hides/shows other settings based
-			// on the selection in this option. If this option is overridden
-			// by a multisite option, it should show that value in order to
-			// correctly display the other appropriate options.
-			// Side effect: this site option will be overwritten by the
-			// multisite option on save. Since this is a 2-item radio, we
-			// determined this was acceptable.
-			if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
+			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+				$auth_settings_option = $this->get_plugin_option( $option );
+			} else if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+				// Workaround: javascript code hides/shows other settings based
+				// on the selection in this option. If this option is overridden
+				// by a multisite option, it should show that value in order to
+				// correctly display the other appropriate options.
+				// Side effect: this site option will be overwritten by the
+				// multisite option on save. Since this is a 2-item radio, we
+				// determined this was acceptable.
 				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
 			}
 
@@ -3376,6 +3397,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</optgroup>
 			</select><?php
 		} // END print_select_auth_advanced_usermeta()
+
+		function print_checkbox_auth_advanced_override_multisite( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_override_multisite';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Configure this site independently (don't inherit any multisite settings)</label><?php
+		} // END print_checkbox_auth_advanced_override_multisite()
 
 
 
@@ -4227,14 +4257,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// If the requested and appropriate, print the overlay hiding the
+			// If requested and appropriate, print the overlay hiding the
 			// single site option that is overridden by a multisite option.
 			if (
 				$admin_mode !== 'multisite admin' &&
 				$override_mode === 'allow override' &&
 				$print_mode === 'print overlay' &&
 				array_key_exists( 'multisite_override', $auth_settings ) &&
-				$auth_settings['multisite_override'] === '1'
+				$auth_settings['multisite_override'] === '1' &&
+				( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || $auth_settings['advanced_override_multisite'] != '1' )
 			) {
 				// Get original plugin options (not overridden value). We'll
 				// show this old value behind the disabled overlay.
@@ -4248,6 +4279,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</span>
 				</div>
 				<?php
+			}
+
+			// If we're getting an option in a site that has overridden the multisite override, make
+			// sure we are returning the option value from that site (not the multisite value).
+			if ( array_key_exists( 'advanced_override_multisite', $auth_settings ) && $auth_settings['advanced_override_multisite'] == '1' ) {
+				$auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
 			}
 
 			return $auth_settings[$option];
@@ -4269,8 +4306,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = array();
 			}
 
-			// Merge multisite options if we're in a network.
-			if ( is_multisite() ) {
+			// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
+			if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || $auth_settings['advanced_override_multisite'] != '1' ) ) {
 				// Get multisite options.
 				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
@@ -4494,12 +4531,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				break;
 			case 'approved':
 			default:
-				$auth_settings_access_users_approved = $multisite_mode !== 'single' ?
-					$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
-					: array_merge(
-					$this->get_plugin_option( 'access_users_approved', 'single admin' ),
-					$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
-				);
+				if ( $multisite_mode !== 'single' ) {
+					// Get multisite users only.
+					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
+				} else if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+					// This site has overridden any multisite settings, so only get its users.
+					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+				} else {
+					// Get all site users and all multisite users.
+					$auth_settings_access_users_approved = array_merge(
+						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+					);
+				}
 				return $this->in_multi_array( $email, $auth_settings_access_users_approved );
 				break;
 			}
