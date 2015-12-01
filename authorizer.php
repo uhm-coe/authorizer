@@ -864,12 +864,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$last_name = '';
 			$email = '';
 
+			// Establish LDAP connection.
 			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			if ( $auth_settings['ldap_tls'] == 1 ) {
 				ldap_start_tls( $ldap );
 			}
-			$result = @ldap_bind( $ldap, $auth_settings['ldap_user'], $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) ) );
+
+			// Set bind credentials; attempt an anonymous bind if not provided.
+			$bind_rdn = NULL;
+			$bind_password = NULL;
+			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
+				$bind_rdn = $auth_settings['ldap_user'];
+				$bind_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) );
+			}
+
+			// Attempt LDAP bind.
+			$result = @ldap_bind( $ldap, $bind_rdn, $bind_password );
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
