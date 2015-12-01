@@ -56,6 +56,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.6 =
+* Feature: Allow anonymous LDAP binds.
+* Fix: Concurrency issue with large number of approved users. Props @manakuke.
+
 = 2.3.5 =
 * Feature: Allow individual sites in a network/multisite install to override Authorizer's multisite settings and be configured independently.
 
