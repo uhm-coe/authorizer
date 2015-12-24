@@ -2454,6 +2454,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		function print_section_info_access_lists( $args = '' ) {
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
 			?><div id="section_info_access_lists" class="section_info">
 				<p>Manage who has access to this site using these lists.</p>
 				<ol>
@@ -2465,15 +2466,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row">Pending Users</th>
+						<th scope="row">Pending Users <em>(<?php echo $this->get_user_count_from_list( 'pending', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_pending(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row">Approved Users</th>
+						<th scope="row">Approved Users <em>(<?php echo $this->get_user_count_from_list( 'approved', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_approved(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row">Blocked Users</th>
+						<th scope="row">Blocked Users <em>(<?php echo $this->get_user_count_from_list( 'blocked', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_blocked(); ?></td>
 					</tr>
 				</tbody>
@@ -4562,6 +4563,42 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				break;
 			}
 		} // END is_email_in_list
+
+		/**
+		 * Helper function to get number of users (including multisite users)
+		 * in a given list (pending, approved, or blocked).
+		 *   @param string $list
+		 *   @param string $admin_mode 'single admin' or 'multisite admin' determines whether to include multisite users
+		 *   @return int number of users in list
+		 */
+		function get_user_count_from_list( $list, $admin_mode = 'single admin' ) {
+			$auth_settings_access_users = array();
+
+			switch ( $list ) {
+			case 'pending':
+				$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', 'single admin' );
+				break;
+			case 'blocked':
+				$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
+				break;
+			case 'approved':
+				if ( $admin_mode !== 'single admin' ) {
+					// Get multisite users only.
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
+				} else if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+					// This site has overridden any multisite settings, so only get its users.
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+				} else {
+					// Get all site users and all multisite users.
+					$auth_settings_access_users = array_merge(
+						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
+						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+					);
+				}
+			}
+
+			return count( $auth_settings_access_users );
+		}
 
 		/**
 		 * Helper function to search a multidimensional array for a value.
