@@ -56,6 +56,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.7 =
+* Feature: Show number of users in pending, approved, and blocked lists on Authorizer options page. Props @manakuke for the idea!
+
 = 2.3.6 =
 * Feature: Allow anonymous LDAP binds.
 * Fix: Concurrency issue with large number of approved users. Props @manakuke.
