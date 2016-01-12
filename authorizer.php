@@ -1032,6 +1032,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 
+			// Grab current user.
+			$current_user = wp_get_current_user();
+
 			$has_access = (
 				// Always allow access if WordPress is installing
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
@@ -1040,7 +1043,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Allow access if option is set to 'everyone'
 				( $auth_settings['access_who_can_view'] == 'everyone' ) ||
 				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'
-				( $auth_settings['access_who_can_view'] == 'logged_in_users' && $this->is_user_logged_in_and_blog_user() )
+				( $auth_settings['access_who_can_view'] == 'logged_in_users' && $this->is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) )
 			);
 
 			/**
