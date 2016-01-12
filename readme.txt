@@ -56,6 +56,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.8 =
+* Fix for a fringe case where WordPress users removed from the approved list weren't blocked from accessing a site restricted to approved users.
+
 = 2.3.7 =
 * Feature: Show number of users in pending, approved, and blocked lists on Authorizer options page. Props @manakuke for the idea!
 
