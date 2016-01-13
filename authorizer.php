@@ -121,7 +121,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'login_form', array( $this, 'login_form_add_external_service_links' ) );
 
 			// Verify current user has access to page they are visiting
-			add_action( 'parse_request', array( $this, 'restrict_access' ), 1 );
+			add_action( 'parse_request', array( $this, 'restrict_access' ), 20 );
 
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_update_auth_user', array( $this, 'ajax_update_auth_user' ) );
@@ -1027,7 +1027,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function restrict_access( $wp ) {
-			remove_action( 'parse_request', array( $this, 'restrict_access' ), 1 ); // only need it the first time
+			remove_action( 'parse_request', array( $this, 'restrict_access' ), 20 ); // only need it the first time
 
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
