@@ -1070,7 +1070,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_advanced_public_notice', false );
 
 				// We've determined that the current user has access, so simply return to grant access.
-				return;
+				return $wp;
 			}
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
@@ -1105,7 +1105,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				} else {
 					update_option( 'auth_settings_advanced_public_notice', true );
 				}
-				return;
+				return $wp;
 			}
 
 			// Check to see if any category assigned to the requested page is public. If so, show it.
@@ -1117,7 +1117,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					} else {
 						update_option( 'auth_settings_advanced_public_notice', true );
 					}
-					return;
+					return $wp;
 				}
 			}
 
