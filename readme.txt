@@ -56,6 +56,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.9 =
+* Fix for conflict with [WordPress REST API (Version 2)](https://wordpress.org/plugins/rest-api/) plugin. Props @nurbson for the report.
+
 = 2.3.8 =
 * Fix for a fringe case where WordPress users removed from the approved list weren't blocked from accessing a site restricted to approved users.
 
