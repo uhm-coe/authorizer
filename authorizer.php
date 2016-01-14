@@ -814,9 +814,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			phpCAS::setCasServerCACert( $cacert_path );
 
 			// Authenticate against CAS
-			if ( ! phpCAS::isAuthenticated() && ! phpCAS::checkAuthentication() ) {
-				phpCAS::forceAuthentication();
-				die();
+			try {
+				if ( ! phpCAS::isAuthenticated() && ! phpCAS::checkAuthentication() ) {
+					phpCAS::forceAuthentication();
+					die();
+				}
+			} catch ( CAS_AuthenticationException $e ) {
+				error_log( 'CAS server returned an Authentication Exception. Details:' );
+				error_log( print_r( $e, true ) );
 			}
 
 			// Get the TLD from the CAS host for use in matching email addresses
