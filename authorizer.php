@@ -792,7 +792,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			phpCAS::setCasServerCACert( $cacert_path );
 
 			// Authenticate against CAS
-			if ( ! phpCAS::isAuthenticated() ) {
+			if ( ! phpCAS::isAuthenticated() && ! phpCAS::checkAuthentication() ) {
 				phpCAS::forceAuthentication();
 				die();
 			}
