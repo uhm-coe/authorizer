@@ -348,7 +348,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Start external authentication.
-			$externally_authenticated_email = '';
+			$externally_authenticated_emails = array();
 			$authenticated_by = '';
 
 			// Try Google authentication if it's enabled and we don't have a
@@ -356,62 +356,83 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $auth_settings['google'] === '1' ) {
 				$result = $this->custom_authenticate_google( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
-					$externally_authenticated_email = $result['email'];
+					if ( is_array( $result['email'] ) ) {
+						$externally_authenticated_emails = $result['email'];
+					} else {
+						$externally_authenticated_emails[] = $result['email'];
+					}
 					$authenticated_by = $result['authenticated_by'];
 				}
 			}
 
 			// Try CAS authentication if it's enabled and we don't have a
 			// successful login yet.
-			if ( $auth_settings['cas'] === '1' && strlen( $externally_authenticated_email ) === 0 ) {
+			if ( $auth_settings['cas'] === '1' && count( $externally_authenticated_emails ) === 0 ) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
-					$externally_authenticated_email = $result['email'];
+					if ( is_array( $result['email'] ) ) {
+						$externally_authenticated_emails = $result['email'];
+					} else {
+						$externally_authenticated_emails[] = $result['email'];
+					}
 					$authenticated_by = $result['authenticated_by'];
 				}
 			}
 
 			// Try LDAP authentication if it's enabled and we don't have an
 			// authenticated user yet.
-			if ( $auth_settings['ldap'] === '1' && strlen( $externally_authenticated_email ) === 0 ) {
+			if ( $auth_settings['ldap'] === '1' && count( $externally_authenticated_emails ) === 0 ) {
 				$result = $this->custom_authenticate_ldap( $auth_settings, $username, $password );
 				if ( ! is_wp_error( $result ) ) {
-					$externally_authenticated_email = $result['email'];
+					if ( is_array( $result['email'] ) ) {
+						$externally_authenticated_emails = $result['email'];
+					} else {
+						$externally_authenticated_emails[] = $result['email'];
+					}
 					$authenticated_by = $result['authenticated_by'];
 				}
 			}
 
 			// Skip to WordPress authentication if we don't have an externally
 			// authenticated user.
-			if ( strlen( $externally_authenticated_email ) < 1 ) {
+			if ( count( $externally_authenticated_emails ) < 1 ) {
 				return null;
 			}
 
 			// If we've made it this far, we should have an externally
 			// authenticated user. The following should be set:
-			//   $externally_authenticated_email
+			//   $externally_authenticated_emails
 			//   $authenticated_by
 
 			// Get the external user's WordPress account by email address.
-			$user = get_user_by( 'email', $externally_authenticated_email );
+			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
+				$user = get_user_by( 'email', $externally_authenticated_email );
 
-			// Check this external user's access against the access lists
-			// (pending, approved, blocked)
-			$result = $this->check_user_access( $user, $externally_authenticated_email, $result );
+				// Check this external user's access against the access lists
+				// (pending, approved, blocked)
+				$result = $this->check_user_access( $user, $externally_authenticated_email, $result );
 
-			// Fail with message if error.
-			if ( is_wp_error( $result ) ) {
-				return $result;
-			}
+				// Fail with message if there was an error creating/adding the user.
+				if ( is_wp_error( $result ) || $result === 0 ) {
+					return $result;
+				}
 
-			// If we created a new user in check_user_access(), log that user in.
-			if ( get_class( $result ) === 'WP_User' ) {
-				$user = $result;
-			}
+				// If we created a new user in check_user_access(), log that user in.
+				if ( get_class( $result ) === 'WP_User' ) {
+					$user = $result;
+				}
 
-			// We'll track how this user was authenticated in user meta.
-			if ( $user ) {
-				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+				// We'll track how this user was authenticated in user meta.
+				if ( $user ) {
+					update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+				}
+
+				// If we've already found a WordPress user associated with one
+				// of the supplied email addresses, don't keep examining other
+				// email addresses associated with the externally authenticated user.
+				if ( $user !== FALSE ) {
+					break;
+				}
 			}
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
@@ -429,6 +450,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
 		 *    null if user has access (success)
+		 *    WP_User if user has access and a new account was created for them
 		 */
 		private function check_user_access( $user, $user_email, $user_data = array() ) {
 			// Grab plugin settings.
@@ -524,7 +546,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					);
 
 					// Fail with message if error.
-					if ( is_wp_error( $result ) || $result == 0 ) {
+					if ( is_wp_error( $result ) || $result === 0 ) {
 						return $result;
 					}
 
@@ -809,7 +831,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$cas_attributes = phpCAS::getAttributes();
 
 			// If a CAS attribute has been specified as containing the email address, use that instead.
-			if ( array_key_exists( 'cas_attr_email', $auth_settings ) && strlen( $auth_settings['cas_attr_email'] ) > 0 && array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0 ) {
+			// Email attribute can be a string or an array of strings.
+			if (
+				array_key_exists( 'cas_attr_email', $auth_settings ) &&
+				strlen( $auth_settings['cas_attr_email'] ) > 0 &&
+				array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && (
+					(
+						is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
+						count( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+					) || (
+						is_string( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
+						strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+					)
+				)
+			) {
 				$externally_authenticated_email = $cas_attributes[$auth_settings['cas_attr_email']];
 			}
 
