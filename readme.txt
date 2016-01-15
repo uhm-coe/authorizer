@@ -56,6 +56,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.10 =
+* Handle multiple email addresses registered to a single CAS login (if any are blocked, the user is blocked; otherwise if any are approved, the user is approved).
+* Better error reporting on CAS errors.
+
 = 2.3.9 =
 * Fix for conflict with [WordPress REST API (Version 2)](https://wordpress.org/plugins/rest-api/) plugin. Props @nurbson for the report.
 
