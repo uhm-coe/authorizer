@@ -399,6 +399,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
+			// Remove duplicate emails, if any.
+			$externally_authenticated_emails = array_unique( $externally_authenticated_emails );
+
 			// If we've made it this far, we should have an externally
 			// authenticated user. The following should be set:
 			//   $externally_authenticated_emails
@@ -408,31 +411,31 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
 				$user = get_user_by( 'email', $externally_authenticated_email );
 
-				// Check this external user's access against the access lists
-				// (pending, approved, blocked)
-				$result = $this->check_user_access( $user, $externally_authenticated_email, $result );
-
-				// Fail with message if there was an error creating/adding the user.
-				if ( is_wp_error( $result ) || $result === 0 ) {
-					return $result;
-				}
-
-				// If we created a new user in check_user_access(), log that user in.
-				if ( get_class( $result ) === 'WP_User' ) {
-					$user = $result;
-				}
-
-				// We'll track how this user was authenticated in user meta.
-				if ( $user ) {
-					update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
-				}
-
 				// If we've already found a WordPress user associated with one
 				// of the supplied email addresses, don't keep examining other
 				// email addresses associated with the externally authenticated user.
 				if ( $user !== FALSE ) {
 					break;
 				}
+			}
+
+			// Check this external user's access against the access lists
+			// (pending, approved, blocked)
+			$result = $this->check_user_access( $user, $externally_authenticated_emails, $result );
+
+			// Fail with message if there was an error creating/adding the user.
+			if ( is_wp_error( $result ) || $result === 0 ) {
+				return $result;
+			}
+
+			// If we created a new user in check_user_access(), log that user in.
+			if ( get_class( $result ) === 'WP_User' ) {
+				$user = $result;
+			}
+
+			// We'll track how this user was authenticated in user meta.
+			if ( $user ) {
+				update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
 			}
 
 			// If we haven't exited yet, we have a valid/approved user, so authenticate them.
@@ -445,14 +448,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * don't have access.
 		 *
 		 * @param WP_User $user       User to check
-		 * @param [type]  $user_email User's plaintext email (in case current user doesn't have a WP account)
+		 * @param [type]  $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account)
 		 * @param [type]  $user_data Array of keys for user email, first_name, last_name, and authenticated_by
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
 		 *    null if user has access (success)
 		 *    WP_User if user has access and a new account was created for them
 		 */
-		private function check_user_access( $user, $user_email, $user_data = array() ) {
+		private function check_user_access( $user, $user_emails, $user_data = array() ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
 			$auth_settings_access_users_pending = $this->sanitize_user_list(
@@ -468,210 +471,222 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check our externally authenticated user against the block list.
 			// If they are blocked, set the relevant user meta field, and show
 			// them an error screen.
-			if ( $this->is_email_in_list( $user_email, 'blocked' ) ) {
-				// If the blocked external user has a WordPress account, change
-				// its password and mark it as blocked.
-				if ( $user ) {
-					// Mark user as blocked (enforce block in this->authenticate()).
-					update_user_meta( $user->ID, 'auth_blocked', 'yes' );
-				}
+			foreach ( $user_emails as $user_email ) {
+				if ( $this->is_email_in_list( $user_email, 'blocked' ) ) {
+					// If the blocked external user has a WordPress account, change
+					// its password and mark it as blocked.
+					if ( $user ) {
+						// Mark user as blocked (enforce block in this->authenticate()).
+						update_user_meta( $user->ID, 'auth_blocked', 'yes' );
+					}
 
-				// Notify user about blocked status and return without authenticating them.
-				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
-				$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
-				$error_message = apply_filters( 'the_content', $auth_settings['access_blocked_redirect_to_message'] );
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
-				update_option( 'auth_settings_advanced_login_error', $error_message );
-				wp_die( $error_message, $page_title );
+					// Notify user about blocked status and return without authenticating them.
+					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
+					$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
+					$error_message = apply_filters( 'the_content', $auth_settings['access_blocked_redirect_to_message'] );
+					$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
+					update_option( 'auth_settings_advanced_login_error', $error_message );
+					wp_die( $error_message, $page_title );
+				}
 			}
 
 			// If this externally authenticated user isn't in the approved list
 			// and login access is set to "All authenticated users," add them
 			// to the approved list (they'll get an account created below if
 			// they don't have one yet).
-			$is_newly_approved_user = false;
-			if ( ! $this->is_email_in_list( $user_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
-				$is_newly_approved_user = true;
+			$last_email = end( $user_emails );
+			reset( $user_emails );
+			foreach ( $user_emails as $user_email ) {
+				$is_newly_approved_user = false;
+				if ( ! $this->is_email_in_list( $user_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+					$is_newly_approved_user = true;
 
-				// If this user happens to be in the pending list (rare),
-				// remove them from pending before adding them to approved.
-				if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
-					foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-						if ( $pending_user['email'] === $user_email ) {
-							unset( $auth_settings_access_users_pending[ $key ] );
-							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
-							break;
+					// If this user happens to be in the pending list (rare),
+					// remove them from pending before adding them to approved.
+					if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
+						foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
+							if ( $pending_user['email'] === $user_email ) {
+								unset( $auth_settings_access_users_pending[ $key ] );
+								update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+								break;
+							}
 						}
 					}
+
+					// Add this user to the approved list.
+					$approved_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
+					$approved_user = array(
+						'email' => $user_email,
+						'role' => $approved_role,
+						'date_added' => date( "Y-m-d H:i:s" ),
+					);
+					array_push( $auth_settings_access_users_approved, $approved_user );
+					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 				}
 
-				// Add this user to the approved list.
-				$approved_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
-				$approved_user = array(
-					'email' => $user_email,
-					'role' => $approved_role,
-					'date_added' => date( "Y-m-d H:i:s" ),
-				);
-				array_push( $auth_settings_access_users_approved, $approved_user );
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-			}
+				// Check our externally authenticated user against the approved
+				// list. If they are approved, log them in (and create their account
+				// if necessary)
+				if ( $is_newly_approved_user || $this->is_email_in_list( $user_email, 'approved' ) ) {
+					$user_info = $is_newly_approved_user ? $approved_user : $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
-			// Check our externally authenticated user against the approved
-			// list. If they are approved, log them in (and create their account
-			// if necessary)
-			if ( $is_newly_approved_user || $this->is_email_in_list( $user_email, 'approved' ) ) {
-				$user_info = $is_newly_approved_user ? $approved_user : $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
+					// If the approved external user does not have a WordPress account, create it
+					if ( ! $user ) {
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
+						$username = explode( "@", $user_info['email'] );
+						$username = $username[0];
+						if ( get_user_by( 'login', $username ) !== false ) {
+							$username = $approved_user['email'];
+						}
+						$result = wp_insert_user(
+							array(
+								'user_login' => strtolower( $username ),
+								'user_pass' => wp_generate_password(), // random password
+								'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
+								'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
+								'user_email' => strtolower( $user_info['email'] ),
+								'user_registered' => date( 'Y-m-d H:i:s' ),
+								'role' => $user_info['role'],
+							)
+						);
 
-				// If the approved external user does not have a WordPress account, create it
-				if ( ! $user ) {
-					// If there's already a user with this username (e.g.,
-					// johndoe/johndoe@gmail.com exists, and we're trying to add
-					// johndoe/johndoe@example.com), use the full email address
-					// as the username.
-					$username = explode( "@", $user_info['email'] );
-					$username = $username[0];
-					if ( get_user_by( 'login', $username ) !== false ) {
-						$username = $approved_user['email'];
-					}
-					$result = wp_insert_user(
-						array(
-							'user_login' => strtolower( $username ),
-							'user_pass' => wp_generate_password(), // random password
-							'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
-							'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
-							'user_email' => strtolower( $user_info['email'] ),
-							'user_registered' => date( 'Y-m-d H:i:s' ),
-							'role' => $user_info['role'],
-						)
-					);
+						// Fail with message if error.
+						if ( is_wp_error( $result ) || $result === 0 ) {
+							return $result;
+						}
 
-					// Fail with message if error.
-					if ( is_wp_error( $result ) || $result === 0 ) {
-						return $result;
-					}
+						// Authenticate as new user
+						$user = new WP_User( $result );
 
-					// Authenticate as new user
-					$user = new WP_User( $result );
+						// Check if this new user has any preassigned usermeta
+						// values in their approved list entry, and apply them to
+						// their new WordPress account.
+						if ( array_key_exists( 'usermeta', $user_info ) && is_array( $user_info['usermeta'] ) ) {
+							$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
 
-					// Check if this new user has any preassigned usermeta
-					// values in their approved list entry, and apply them to
-					// their new WordPress account.
-					if ( array_key_exists( 'usermeta', $user_info ) && is_array( $user_info['usermeta'] ) ) {
-						$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
-
-						if ( array_key_exists( 'meta_key', $user_info['usermeta'] ) && array_key_exists( 'meta_value', $user_info['usermeta'] ) ) {
-							// Only update the usermeta if the stored value matches
-							// the option set in authorizer settings (if they don't
-							// match it's probably old data).
-							if ( $meta_key === $user_info['usermeta']['meta_key'] ) {
-								// Update user's usermeta value for usermeta key stored in authorizer options.
-								if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
-									// We have an ACF field value, so use the ACF function to update it.
-									update_field( str_replace('acf___', '', $meta_key ), $user_info['usermeta']['meta_value'], 'user_' . $user->ID );
-								} else {
-									// We have a normal usermeta value, so just update it via the WordPress function.
-									update_user_meta( $user->ID, $meta_key, $user_info['usermeta']['meta_value'] );
-								}
-							}
-						} elseif ( is_multisite() && count( $user_info['usermeta'] ) > 0 ) {
-							// Update usermeta for each multisite blog defined for this user.
-							foreach ( $user_info['usermeta'] as $blog_id => $usermeta ) {
-								if ( array_key_exists( 'meta_key', $usermeta ) && array_key_exists( 'meta_value', $usermeta ) ) {
-									// Add this new user to the blog before we create their user meta (this step typically happens below, but we need it to happen early so we can create user meta here).
-									if ( ! is_user_member_of_blog( $user->ID, $blog_id ) ) {
-										add_user_to_blog( $blog_id, $user->ID, $user_info['role'] );
-									}
-									switch_to_blog( $blog_id );
+							if ( array_key_exists( 'meta_key', $user_info['usermeta'] ) && array_key_exists( 'meta_value', $user_info['usermeta'] ) ) {
+								// Only update the usermeta if the stored value matches
+								// the option set in authorizer settings (if they don't
+								// match it's probably old data).
+								if ( $meta_key === $user_info['usermeta']['meta_key'] ) {
 									// Update user's usermeta value for usermeta key stored in authorizer options.
 									if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
 										// We have an ACF field value, so use the ACF function to update it.
-										update_field( str_replace('acf___', '', $meta_key ), $usermeta['meta_value'], 'user_' . $user->ID );
+										update_field( str_replace('acf___', '', $meta_key ), $user_info['usermeta']['meta_value'], 'user_' . $user->ID );
 									} else {
 										// We have a normal usermeta value, so just update it via the WordPress function.
-										update_user_meta( $user->ID, $meta_key, $usermeta['meta_value'] );
+										update_user_meta( $user->ID, $meta_key, $user_info['usermeta']['meta_value'] );
 									}
-									restore_current_blog();
+								}
+							} elseif ( is_multisite() && count( $user_info['usermeta'] ) > 0 ) {
+								// Update usermeta for each multisite blog defined for this user.
+								foreach ( $user_info['usermeta'] as $blog_id => $usermeta ) {
+									if ( array_key_exists( 'meta_key', $usermeta ) && array_key_exists( 'meta_value', $usermeta ) ) {
+										// Add this new user to the blog before we create their user meta (this step typically happens below, but we need it to happen early so we can create user meta here).
+										if ( ! is_user_member_of_blog( $user->ID, $blog_id ) ) {
+											add_user_to_blog( $blog_id, $user->ID, $user_info['role'] );
+										}
+										switch_to_blog( $blog_id );
+										// Update user's usermeta value for usermeta key stored in authorizer options.
+										if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+											// We have an ACF field value, so use the ACF function to update it.
+											update_field( str_replace('acf___', '', $meta_key ), $usermeta['meta_value'], 'user_' . $user->ID );
+										} else {
+											// We have a normal usermeta value, so just update it via the WordPress function.
+											update_user_meta( $user->ID, $meta_key, $usermeta['meta_value'] );
+										}
+										restore_current_blog();
+									}
 								}
 							}
 						}
-					}
-				} else {
-					// Update first/last names of WordPress user from external
-					// service if that option is set.
-					if ( ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'cas' && array_key_exists( 'cas_attr_update_on_login', $auth_settings )  && $auth_settings['cas_attr_update_on_login'] == 1 ) || ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'ldap' && array_key_exists( 'ldap_attr_update_on_login', $auth_settings )  && $auth_settings['ldap_attr_update_on_login'] == 1 ) ) {
-						if ( array_key_exists( 'first_name', $user_data ) && strlen( $user_data['first_name'] ) > 0 ) {
-							wp_update_user( array(
-								'ID' => $user->ID,
-								'first_name' => $user_data['first_name'],
-							));
+					} else {
+						// Update first/last names of WordPress user from external
+						// service if that option is set.
+						if ( ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'cas' && array_key_exists( 'cas_attr_update_on_login', $auth_settings )  && $auth_settings['cas_attr_update_on_login'] == 1 ) || ( array_key_exists( 'authenticated_by', $user_data ) && $user_data['authenticated_by'] === 'ldap' && array_key_exists( 'ldap_attr_update_on_login', $auth_settings )  && $auth_settings['ldap_attr_update_on_login'] == 1 ) ) {
+							if ( array_key_exists( 'first_name', $user_data ) && strlen( $user_data['first_name'] ) > 0 ) {
+								wp_update_user( array(
+									'ID' => $user->ID,
+									'first_name' => $user_data['first_name'],
+								));
+							}
+							if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
+								wp_update_user( array(
+									'ID' => $user->ID,
+									'last_name' => $user_data['last_name'],
+								));
+							}
 						}
-						if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
-							wp_update_user( array(
-								'ID' => $user->ID,
-								'last_name' => $user_data['last_name'],
-							));
+					}
+
+					// If this is multisite, add new user to current blog.
+					if ( is_multisite() && ! is_user_member_of_blog( $user->ID ) ) {
+						$result = add_user_to_blog( get_current_blog_id(), $user->ID, $user_info['role'] );
+
+						// Fail with message if error.
+						if ( is_wp_error( $result ) ) {
+							return $result;
 						}
 					}
-				}
 
-				// If this is multisite, add new user to current blog.
-				if ( is_multisite() && ! is_user_member_of_blog( $user->ID ) ) {
-					$result = add_user_to_blog( get_current_blog_id(), $user->ID, $user_info['role'] );
-
-					// Fail with message if error.
-					if ( is_wp_error( $result ) ) {
-						return $result;
+					// Ensure user has the same role as their entry in the approved list.
+					// (This is just a precaution, the role should already be set when
+					// saving admin options in the sanitizing function.)
+					if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
+						$user->set_role( $user_info['role'] );
 					}
-				}
 
-				// Ensure user has the same role as their entry in the approved list.
-				// (This is just a precaution, the role should already be set when
-				// saving admin options in the sanitizing function.)
-				if ( $user_info && ! array_key_exists( $user_info['role'], $user->roles ) ) {
-					$user->set_role( $user_info['role'] );
-				}
+					return $user;
 
-				return $user;
+				} elseif ( $user && in_array( 'administrator', $user->roles ) ) {
+					// User has a WordPress account, but is not in the blocked or approved
+					// list. If they are an administrator, let them in.
+					return;
 
-			} elseif ( $user && in_array( 'administrator', $user->roles ) ) {
-				// User has a WordPress account, but is not in the blocked or approved
-				// list. If they are an administrator, let them in.
-				return;
-			} else {
-				// User isn't an admin, is not blocked, and is not approved.
-				// Add them to the pending list and notify them and their instructor.
-				if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
-					$pending_user = array();
-					$pending_user['email'] = $user_email;
-					$pending_user['role'] = $auth_settings['access_default_role'];
-					$pending_user['date_added'] = '';
-					array_push( $auth_settings_access_users_pending, $pending_user );
-					update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+				// Note: only do this for the last email address we are checking (we need
+				// to iterate through them all to make sure one of them isn't approved).
+				} elseif ( $user_email === $last_email ) {
+					// User isn't an admin, is not blocked, and is not approved.
+					// Add them to the pending list and notify them and their instructor.
+					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
+						$pending_user = array();
+						$pending_user['email'] = $user_email;
+						$pending_user['role'] = $auth_settings['access_default_role'];
+						$pending_user['date_added'] = '';
+						array_push( $auth_settings_access_users_pending, $pending_user );
+						update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 
-					// Create strings used in the email notification.
-					$site_name = get_bloginfo( 'name' );
-					$site_url = get_bloginfo( 'url' );
-					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
+						// Create strings used in the email notification.
+						$site_name = get_bloginfo( 'name' );
+						$site_url = get_bloginfo( 'url' );
+						$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 
-					// Notify instructor about new pending user if that option is set.
-					foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
-						wp_mail(
-							$user_recipient->user_email,
-							"Action required: Pending user {$pending_user['email']} at $site_name",
-							"A new user has tried to access the $site_name site you manage at:\n$site_url\n\n" .
-							"Please log in to approve or deny their request:\n$authorizer_options_url\n"
-						);
+						// Notify instructor about new pending user if that option is set.
+						foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
+							wp_mail(
+								$user_recipient->user_email,
+								"Action required: Pending user {$pending_user['email']} at $site_name",
+								"A new user has tried to access the $site_name site you manage at:\n$site_url\n\n" .
+								"Please log in to approve or deny their request:\n$authorizer_options_url\n"
+							);
+						}
 					}
-				}
 
-				// Notify user about pending status and return without authenticating them.
-				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
-				$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
-				$error_message = apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] );
-				$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
-				update_option( 'auth_settings_advanced_login_error', $error_message );
-				wp_die( $error_message, $page_title );
+					// Notify user about pending status and return without authenticating them.
+					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
+					$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
+					$error_message = apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] );
+					$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
+					update_option( 'auth_settings_advanced_login_error', $error_message );
+					wp_die( $error_message, $page_title );
+				}
 			}
+
+			// Sanity check: if we made it here without returning, something has gone wrong.
+			return new WP_Error( 'invalid_login', 'Invalid login attempted.' );
 
 		} // END check_user_access()
 
@@ -1125,7 +1140,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$current_user = wp_get_current_user();
 
 				// Check user access; block if not, add them to pending list if open, let them through otherwise.
-				$result = $this->check_user_access( $current_user, $current_user->user_email );
+				$result = $this->check_user_access( $current_user, array( $current_user->user_email ) );
 			}
 
 			// Check to see if the requested page is public. If so, show it.
