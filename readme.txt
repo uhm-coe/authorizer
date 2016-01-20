@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
-Tested up to: 4.4
+Tested up to: 4.4.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -55,6 +55,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.3.11 =
+* Fix for issue with LDAP logins created in the last update. Props @ebraux for the [report](https://wordpress.org/support/topic/ldap-external-stopped-working-since-updating-to-2410)!
 
 = 2.3.10 =
 * Handle multiple email addresses registered to a single CAS login (if any are blocked, the user is blocked; otherwise if any are approved, the user is approved).
