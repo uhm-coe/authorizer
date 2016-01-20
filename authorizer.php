@@ -395,7 +395,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Skip to WordPress authentication if we don't have an externally
 			// authenticated user.
-			if ( count( $externally_authenticated_emails ) < 1 ) {
+			if ( count( array_filter( $externally_authenticated_emails ) ) < 1 ) {
 				return null;
 			}
 
