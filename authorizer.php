@@ -399,8 +399,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// Remove duplicate emails, if any.
-			$externally_authenticated_emails = array_unique( $externally_authenticated_emails );
+			// Remove duplicate and blank emails, if any.
+			$externally_authenticated_emails = array_filter( array_unique( $externally_authenticated_emails ) );
 
 			// If we've made it this far, we should have an externally
 			// authenticated user. The following should be set:
@@ -449,7 +449,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @param WP_User $user       User to check
 		 * @param [type]  $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account)
-		 * @param [type]  $user_data Array of keys for user email, first_name, last_name, and authenticated_by
+		 * @param [type]  $user_data Array of keys for email(s), username, first_name, last_name, and authenticated_by
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
 		 *    null if user has access (success)
@@ -536,8 +536,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// johndoe/johndoe@gmail.com exists, and we're trying to add
 						// johndoe/johndoe@example.com), use the full email address
 						// as the username.
-						$username = explode( "@", $user_info['email'] );
-						$username = $username[0];
+						if ( array_key_exists( 'username', $user_data ) ) {
+							$username = $user_data['username'];
+						} else {
+							$username = explode( '@', $user_info['email'] );
+							$username = $username[0];
+						}
 						if ( get_user_by( 'login', $username ) !== false ) {
 							$username = $approved_user['email'];
 						}
@@ -754,7 +758,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Validate this user's credentials against Google.
 		 *
 		 * @param array   $auth_settings Plugin settings
-		 * @return [mixed] Array containing 'email' and 'authenticated_by'
+		 * @return [mixed] Array containing email, authenticated_by,
+		 *                       first_name, last_name, and username
 		 *                       strings for the successfully authenticated
 		 *                       user, or WP_Error() object on failure.
 		 */
@@ -786,9 +791,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get email address
 			$attributes = $ticket->getAttributes();
 			$email = $attributes['payload']['email'];
+			$username = current( explode( '@', $email ) );
 
 			return array(
 				'email' => $email,
+				'username' => $username,
 				'first_name' => '',
 				'last_name' => '',
 				'authenticated_by' => 'google',
@@ -869,12 +876,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$externally_authenticated_email = $cas_attributes[$auth_settings['cas_attr_email']];
 			}
 
+			// Get username (as specified by the CAS server).
+			$username = phpCAS::getUser();
+
 			// Get user first name and last name.
 			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_first_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_first_name']] : '';
 			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_last_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_last_name']] : '';
 
 			return array(
 				'email' => $externally_authenticated_email,
+				'username' => $username,
 				'first_name' => $first_name,
 				'last_name' => $last_name,
 				'authenticated_by' => 'cas',
@@ -1006,6 +1017,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			return array(
 				'email' => $externally_authenticated_email,
+				'username' => $username,
 				'first_name' => $first_name,
 				'last_name' => $last_name,
 				'authenticated_by' => 'ldap',
@@ -2418,7 +2430,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize LDAP Port (int)
 			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
 
-			// Sanitize LDAP attributes (basically make sure they don't have any parantheses)
+			// Sanitize LDAP attributes (basically make sure they don't have any parentheses)
 			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
 
 			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string)
@@ -4086,7 +4098,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							// johndoe/johndoe@gmail.com exists, and we're trying to add
 							// johndoe/johndoe@example.com), use the full email address
 							// as the username.
-							$username = explode( "@", $approved_user['email'] );
+							$username = explode( '@', $approved_user['email'] );
 							$username = $username[0];
 							if ( get_user_by( 'login', $username ) !== false ) {
 								$username = $approved_user['email'];
