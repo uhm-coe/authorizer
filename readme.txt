@@ -56,6 +56,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.3.12 =
+* The username of new LDAP users will be the value of the attribute specified in "LDAP attribute containing username" instead of the portion of their email address before the @ symbol.
+
 = 2.3.11 =
 * Fix for issue with LDAP logins created in the last update. Props @ebraux for the [report](https://wordpress.org/support/topic/ldap-external-stopped-working-since-updating-to-2410)!
 
