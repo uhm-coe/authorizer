@@ -33,6 +33,10 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 == Frequently Asked Questions ==
 
+= Help! I've disabled WordPress logins, my external logins (Google/CAS/LDAP) aren't working, and now I can't get back in! =
+
+If you add external=wordpress to the wp-login.php URL querystring, you can always get the WordPress login form to reappear. For example, if your site is at [https://www.example.com](https://www.example.com), then the URL would be: [https://www.example.com/wp-login.php?external=wordpress](https://www.example.com/wp-login.php?external=wordpress)
+
 = Where is this plugin used? =
 
 The [University of Hawai'i][uh], which provides authentication for student, faculty, and staff members via a centralized service (CAS or LDAP).
