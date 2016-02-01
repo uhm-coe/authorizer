@@ -837,14 +837,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Authenticate against CAS
 			try {
-				if ( ! phpCAS::isAuthenticated() && ! phpCAS::checkAuthentication() ) {
+				if ( ! phpCAS::isAuthenticated() ) {
 					phpCAS::forceAuthentication();
 					die();
 				}
 			} catch ( CAS_AuthenticationException $e ) {
-				error_log( 'CAS server returned an Authentication Exception. Details:' );
-				error_log( print_r( $e, true ) );
-				wp_die( 'CAS server returned an Authentication Exception. Please try again later.', 'Authentication Exception' );
+				// CAS server likely threw an error in isAuthenticated(), so make sure
+				// this user hasn't already been authenticated first.
+				// ref: http://stackoverflow.com/questions/26032050/not-recognized-cas-ticket
+				// ref: http://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__publicAuth.html#ga21fd1c2665d2e21c03e6a6dd1860cf4d
+				try {
+					if ( ! phpCAS::checkAuthentication() ) {
+						phpCAS::forceAuthentication();
+						die();
+					}
+				} catch ( CAS_AuthenticationException $e ) {
+					error_log( 'CAS server returned an Authentication Exception. Details:' );
+					error_log( print_r( $e, true ) );
+					wp_die( 'CAS server returned an Authentication Exception. Please try again later.', 'Authentication Exception' );
+				}
 			}
 
 			// Get the TLD from the CAS host for use in matching email addresses
