@@ -854,7 +854,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				} catch ( CAS_AuthenticationException $e ) {
 					error_log( 'CAS server returned an Authentication Exception. Details:' );
 					error_log( print_r( $e, true ) );
-					wp_die( 'CAS server returned an Authentication Exception. Please try again later.', 'Authentication Exception' );
+
+					// CAS server is throwing errors on this login, so try logging the
+					// user out of CAS and redirecting them to the login page.
+					phpCAS::logoutWithRedirectService( wp_login_url() );
+					die();
 				}
 			}
 
