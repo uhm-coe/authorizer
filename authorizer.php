@@ -842,15 +842,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					die();
 				}
 			} catch ( CAS_AuthenticationException $e ) {
-				// CAS server likely threw an error in isAuthenticated(), so make sure
-				// this user hasn't already been authenticated first.
-				// ref: http://stackoverflow.com/questions/26032050/not-recognized-cas-ticket
-				// ref: http://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__publicAuth.html#ga21fd1c2665d2e21c03e6a6dd1860cf4d
+				// CAS server threw an error in isAuthenticated(), potentially because
+				// the cached ticket is outdated. Try renewing the authentication.
 				try {
-					if ( ! phpCAS::checkAuthentication() ) {
-						phpCAS::forceAuthentication();
-						die();
-					}
+					phpCAS::renewAuthentication();
 				} catch ( CAS_AuthenticationException $e ) {
 					error_log( 'CAS server returned an Authentication Exception. Details:' );
 					error_log( print_r( $e, true ) );
