@@ -844,7 +844,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} catch ( CAS_AuthenticationException $e ) {
 				error_log( 'CAS server returned an Authentication Exception. Details:' );
 				error_log( print_r( $e, true ) );
-				wp_die( 'CAS server returned an Authentication Exception. Details:' . print_r( $e, true ), 'Authentication Exception' );
+				wp_die( 'CAS server returned an Authentication Exception. Please try again later.', 'Authentication Exception' );
 			}
 
 			// Get the TLD from the CAS host for use in matching email addresses
