@@ -120,6 +120,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Modify login page with external auth links (if enabled; e.g., google or cas)
 			add_action( 'login_form', array( $this, 'login_form_add_external_service_links' ) );
 
+			// Redirect to CAS login when visiting login page (only if option is
+			// enabled, CAS is the only service, and WordPress logins are hidden).
+			add_action( 'login_head', array( $this, 'login_head_maybe_redirect_to_cas' ) );
+
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 9 );
 
@@ -1421,6 +1425,53 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Redirect to CAS login when visiting login page (only if option is
+		 * enabled, CAS is the only service, and WordPress logins are hidden).
+		 */
+		function login_head_maybe_redirect_to_cas() {
+			// Grab plugin settings.
+			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+
+			// Check whether we should redirect to CAS.
+			if (
+				array_key_exists( 'cas_auto_login', $auth_settings ) && $auth_settings['cas_auto_login'] === '1' &&
+				array_key_exists( 'cas', $auth_settings ) && $auth_settings['cas'] === '1' &&
+				( ! array_key_exists( 'ldap', $auth_settings ) || $auth_settings['ldap'] !== '1' ) &&
+				( ! array_key_exists( 'google', $auth_settings ) || $auth_settings['google'] !== '1' ) &&
+				array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && $auth_settings['advanced_hide_wp_login'] === '1'
+			) {
+				// Generate CAS authentication URL.
+				$auth_url_cas = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+				// Remove force reauth param if it exists so this
+				// authentication attempt doesn't get stopped by WordPress.
+				if ( strpos( $auth_url_cas, 'reauth=1' ) !== false ) {
+					if ( strpos( $auth_url_cas, '&reauth=1' ) !== false ) {
+						// There are parames before reauth, so just remove reauth
+						$auth_url_cas = str_replace( '&reauth=1', '', $auth_url_cas );
+					} elseif ( strpos( $auth_url_cas, '?reauth=1&' ) !== false ) {
+						// Reauth is first param with others behind it, so remove it and next delimiter.
+						$auth_url_cas = str_replace( 'reauth=1&', '', $auth_url_cas );
+					} else {
+						// Reauth is first and only param, so remove it and '?'
+						$auth_url_cas = str_replace( '?reauth=1', '', $auth_url_cas );
+					}
+
+				}
+
+				// Add special param indicating this is CAS authentication attempt.
+				if ( strpos( $auth_url_cas, 'external=cas' ) === false ) {
+					$auth_url_cas .= strpos( $auth_url_cas, '?' ) !== false ? '&external=cas' : '?external=cas';
+				}
+
+				// Redirect to CAS.
+				wp_redirect( $auth_url_cas );
+				exit;
+			}
+		} // END login_head_maybe_redirect_to_cas()
+
+
+		/**
 		 * Implements hook: do_action( 'wp_login_failed', $username );
 		 * Update the user meta for the user that just failed logging in.
 		 * Keep track of time of last failed attempt and number of failed attempts.
@@ -1881,6 +1932,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_cas_auto_login', // HTML element ID
+				'CAS automatic login', // HTML element Title
+				array( $this, 'print_checkbox_cas_auto_login' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_external_ldap', // HTML element ID
 				'LDAP Logins', // HTML element Title
 				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
@@ -2150,6 +2208,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_settings ) ) {
 				$auth_settings['cas_attr_update_on_login'] = '';
 			}
+			if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
+				$auth_settings['cas_auto_login'] = '';
+			}
 
 			if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
 				$auth_settings['ldap_host'] = '';
@@ -2294,6 +2355,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_attr_update_on_login'] = '';
 				}
+				if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_auto_login'] = '';
+				}
 				if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_host'] = '';
 				}
@@ -2430,6 +2494,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string)
 			if ( array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ) {
 				$auth_settings['cas_attr_update_on_login'] = '1';
+			}
+
+			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ) {
+				$auth_settings['cas_auto_login'] = '1';
 			}
 
 			// Sanitize LDAP Host setting
@@ -3198,6 +3267,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Update first and last name fields on login (will overwrite any name the user has supplied in their profile)</label><?php
 		} // END print_checkbox_cas_attr_update_on_login()
 
+		function print_checkbox_cas_auto_login( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_auto_login';
+			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden</label>
+			<p><small>Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.</p><?php
+		} // END print_checkbox_cas_auto_login()
+
 
 		function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
@@ -3738,6 +3818,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row">CAS automatic login</th>
+								<td><?php $this->print_checkbox_cas_auto_login( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row">LDAP Logins</th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -3859,6 +3943,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'cas_attr_first_name',
 				'cas_attr_last_name',
 				'cas_attr_update_on_login',
+				'cas_auto_login',
 				'ldap',
 				'ldap_host',
 				'ldap_port',
@@ -4442,6 +4527,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_attr_first_name'] = $auth_multisite_settings['cas_attr_first_name'];
 					$auth_settings['cas_attr_last_name'] = $auth_multisite_settings['cas_attr_last_name'];
 					$auth_settings['cas_attr_update_on_login'] = $auth_multisite_settings['cas_attr_update_on_login'];
+					$auth_settings['cas_auto_login'] = $auth_multisite_settings['cas_auto_login'];
 					$auth_settings['ldap'] = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
