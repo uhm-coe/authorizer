@@ -1691,8 +1691,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( $auth_settings['cas'] === '1' ) :
 				// Check if provided CAS URL is accessible.
-				$protocol = $auth_settings['cas_port'] == '80' ? 'http' : 'https';
-				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . $auth_settings['cas_path'] ) ) :
+				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ) ) ? 'http' : 'https';
+				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'] ) ) :
 					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?><div class='notice notice-warning is-dismissible'>
 						<p>Can't reach CAS server. Please provide <a href='<?php echo $authorizer_options_url; ?>&tab=external'>accurate CAS settings</a> if you intend to use it.</p>
@@ -4814,8 +4814,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Use curl to retrieve the URL.
 			$handle = curl_init( $url );
-			curl_setopt( $handle,  CURLOPT_RETURNTRANSFER, TRUE );
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'inc/cacert.pem';
+			curl_setopt( $handle, CURLOPT_CAINFO, $cacert_path );
+			curl_setopt( $handle, CURLOPT_RETURNTRANSFER, TRUE );
 			curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, FALSE );
+			curl_setopt( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
 			$response = curl_exec( $handle );
 			$http_code = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
 			curl_close( $handle );
