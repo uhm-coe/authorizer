@@ -1405,10 +1405,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( $auth_settings['advanced_hide_wp_login'] === '1' && strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false ): ?>
 					<style type="text/css">
 						#loginform {
-							padding-bottom: 8px;
+							padding-bottom: 8px !important;
 						}
 						#loginform p>label, #loginform p.forgetmenot, #loginform p.submit, p#nav {
-							display: none;
+							display: none !important;
 						}
 					</style>
 				<?php elseif ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
