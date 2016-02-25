@@ -821,8 +821,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'cas_not_available', 'CAS is not enabled.' );
 			}
 
+			// Get the CAS server version (default to SAML_VERSION_1_1).
+			// See: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+			$cas_version = SAML_VERSION_1_1;
+			if ( $auth_settings['cas_version'] === 'CAS_VERSION_3_0' ) {
+				$cas_version = CAS_VERSION_3_0;
+			} else if ( $auth_settings['cas_version'] === 'CAS_VERSION_2_0' ) {
+				$cas_version = CAS_VERSION_2_0;
+			} else if ( $auth_settings['cas_version'] === 'CAS_VERSION_1_0' ) {
+				$cas_version = CAS_VERSION_1_0;
+			}
+
 			// Set the CAS client configuration
-			phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+			phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 3 months, then use it to ensure CAS server is legitimate.
@@ -1904,6 +1915,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_cas_version', // HTML element ID
+				'CAS server version', // HTML element Title
+				array( $this, 'print_select_cas_version' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_cas_attr_email', // HTML element ID
 				'CAS attribute containing email address', // HTML element Title
 				array( $this, 'print_text_cas_attr_email' ), // Callback (echos form element)
@@ -2196,6 +2214,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'cas_path', $auth_settings ) ) {
 				$auth_settings['cas_path'] = '';
 			}
+			if ( ! array_key_exists( 'cas_version', $auth_settings ) ) {
+				$auth_settings['cas_version'] = 'SAML_VERSION_1_1';
+			}
 			if ( ! array_key_exists( 'cas_attr_email', $auth_settings ) ) {
 				$auth_settings['cas_attr_email'] = '';
 			}
@@ -2342,6 +2363,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_path'] = '';
+				}
+				if ( ! array_key_exists( 'cas_version', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_version'] = 'SAML_VERSION_1_1';
 				}
 				if ( ! array_key_exists( 'cas_attr_email', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_attr_email'] = '';
@@ -3227,6 +3251,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="/cas" /><?php
 		} // END print_text_cas_path()
 
+		function print_select_cas_version( $args = '' ) {
+			// Get plugin option.
+			$option = 'cas_version';
+			$auth_settings_option = $this->get_plugin_option( $option );
+
+			// Print option elements.
+			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
+				<option value="SAML_VERSION_1_1" <?php selected( $auth_settings_option, 'SAML_VERSION_1_1' ); ?>>SAML_VERSION_1_1</option>
+				<option value="CAS_VERSION_3_0" <?php selected( $auth_settings_option, 'CAS_VERSION_3_0' ); ?>>CAS_VERSION_3_0</option>
+				<option value="CAS_VERSION_2_0" <?php selected( $auth_settings_option, 'CAS_VERSION_2_0' ); ?>>CAS_VERSION_2_0</option>
+				<option value="CAS_VERSION_1_0" <?php selected( $auth_settings_option, 'CAS_VERSION_1_0' ); ?>>CAS_VERSION_1_0</option>
+			</select><?php
+		} // END print_select_cas_version()
+
 		function print_text_cas_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_email';
@@ -3802,6 +3840,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row">CAS server version</th>
+								<td><?php $this->print_select_cas_version( array( 'multisite_admin' => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row">CAS attribute containing email</th>
 								<td><?php $this->print_text_cas_attr_email( array( 'multisite_admin' => true ) ); ?></td>
 							</tr>
@@ -3939,6 +3981,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'cas_host',
 				'cas_port',
 				'cas_path',
+				'cas_version',
 				'cas_attr_email',
 				'cas_attr_first_name',
 				'cas_attr_last_name',
@@ -4523,6 +4566,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
 					$auth_settings['cas_port'] = $auth_multisite_settings['cas_port'];
 					$auth_settings['cas_path'] = $auth_multisite_settings['cas_path'];
+					$auth_settings['cas_version'] = $auth_multisite_settings['cas_version'];
 					$auth_settings['cas_attr_email'] = $auth_multisite_settings['cas_attr_email'];
 					$auth_settings['cas_attr_first_name'] = $auth_multisite_settings['cas_attr_first_name'];
 					$auth_settings['cas_attr_last_name'] = $auth_multisite_settings['cas_attr_last_name'];
