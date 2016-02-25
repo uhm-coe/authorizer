@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
-Tested up to: 4.4.1
+Tested up to: 4.4.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -59,6 +59,14 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.4.0 =
+* Feature: Add option to log into CAS automatically (only if no other external service is configured, and only if WordPress logins are hidden). Props @manakuke for the idea!
+* Feature: Option to configure older CAS server versions (SAML_VERSION_1_1, CAS_VERSION_3_0, CAS_VERSION_2_0, CAS_VERSION_1_0). Props @autredr for the suggestion and helping debug!
+* Fix: Better CAS server availability checking. Props @autredr for the code!
+* Documentation: readme.txt now includes the URL to access WordPress logins if they've been disabled.
+* Update phpCAS from 1.3.3 to 1.3.4. See [changelog](https://github.com/Jasig/phpCAS/blob/master/docs/ChangeLog).
+* Fix for [WordPress REST API (Version 2)](https://wordpress.org/plugins/rest-api/) bypassing Authorizer restricted access. Props @nurbson for the report.
 
 = 2.3.12 =
 * The username of new LDAP users will be the value of the attribute specified in "LDAP attribute containing username" instead of the portion of their email address before the @ symbol.
