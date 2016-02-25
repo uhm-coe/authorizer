@@ -32,6 +32,9 @@ Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authe
 Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
 */
 
+define( 'MULTISITE_ADMIN', 'multisite_admin' );
+define( 'SINGLE_ADMIN', 'single_admin');
+
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
@@ -210,10 +213,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function add_wp_users_to_approved_list() {
 			// Add current WordPress users to the approved list.
 			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
-			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', 'single admin' );
-			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
-			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
-			$default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
+			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+			$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 			$updated = false;
 			foreach ( get_users() as $user ) {
 				// Skip if user is in blocked list.
@@ -313,7 +316,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Make sure $last_attempt (time) and $num_attempts are positive integers.
 			// Note: this addresses resetting them if either is unset from above.
@@ -461,14 +464,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function check_user_access( $user, $user_emails, $user_data = array() ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 			$auth_settings_access_users_pending = $this->sanitize_user_list(
-				$this->get_plugin_option( 'access_users_pending', 'single admin' )
+				$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
 			);
 			$auth_settings_access_users_approved = $this->sanitize_user_list(
 				array_merge(
-					$this->get_plugin_option( 'access_users_approved', 'single admin' ),
-					$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+					$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+					$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 				)
 			);
 
@@ -726,7 +729,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Build the Google Client.
 			$client = new Google_Client();
@@ -1057,7 +1060,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function custom_logout() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Reset option containing old error messages.
 			delete_option( 'auth_settings_advanced_login_error' );
@@ -1121,7 +1124,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function restrict_access( $wp ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Grab current user.
 			$current_user = wp_get_current_user();
@@ -1278,7 +1281,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function login_enqueue_scripts_and_styles() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Enqueue scripts appearing on wp-login.php.
 			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
@@ -1335,7 +1338,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function load_login_footer_js() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' ); ?>
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<?php if ( $auth_settings['google'] === '1' ): ?>
 				<script type="text/javascript">
 					// Reload login page if reauth querystring param exists,
@@ -1382,7 +1385,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function login_form_add_external_service_links() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			$auth_url_cas = '';
 			if ( $auth_settings['cas'] === '1' ) {
@@ -1441,7 +1444,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function login_head_maybe_redirect_to_cas() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Check whether we should redirect to CAS.
 			if (
@@ -1489,7 +1492,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function update_login_failed_count( $username ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			// Get user trying to log in.
 			// If this isn't a real user, update the global failed attempt
@@ -1537,7 +1540,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function custom_lostpassword_url( $lostpassword_url ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			if (
 				array_key_exists( 'ldap_lostpassword_url', $auth_settings ) &&
@@ -1698,7 +1701,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function admin_notices() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( 'single admin', 'allow override' );
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
 			if ( $auth_settings['cas'] === '1' ) :
 				// Check if provided CAS URL is accessible.
@@ -2586,7 +2589,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$wp_user = get_user_by( 'id', $user_id );
 			if ( $this->is_email_in_list( $wp_user->get( 'user_email' ), 'approved' ) ) {
 				$auth_settings_access_users_approved = $this->sanitize_user_list(
-					$this->get_plugin_option( 'access_users_approved', 'single admin' )
+					$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 				);
 				// Find approved user and update their role.
 				foreach ( $auth_settings_access_users_approved as $key => $user ) {
@@ -2603,7 +2606,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Settings print callbacks
 		 */
 		function print_section_info_tabs( $args = '' ) {
-			if ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ): ?>
+			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args )): ?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists');">Access Lists</a>
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external');">External Service</a>
@@ -2622,7 +2625,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		function print_section_info_access_lists( $args = '' ) {
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$admin_mode = $this->get_admin_mode( $args );
 			?><div id="section_info_access_lists" class="section_info">
 				<p>Manage who has access to this site using these lists.</p>
 				<ol>
@@ -2682,13 +2685,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_combo_auth_access_users_approved( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_users_approved';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$admin_mode = $this->get_admin_mode( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'no override' );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get multisite approved users (add them to top of list, greyed out).
 			$auth_override_multisite = $this->get_plugin_option( 'advanced_override_multisite' );
-			$auth_multisite_settings = $this->get_plugin_options( 'multisite admin' );
+			$auth_multisite_settings = $this->get_plugin_options( MULTISITE_ADMIN );
 			$option_multisite = 'access_users_approved';
 			$auth_settings_option_multisite = array();
 			if (
@@ -2697,19 +2700,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				$auth_multisite_settings['multisite_override'] === '1'
 			) {
-				$auth_settings_option_multisite = $this->get_plugin_option( $option, 'multisite admin', 'allow override' );
+				$auth_settings_option_multisite = $this->get_plugin_option( $option, MULTISITE_ADMIN, 'allow override' );
 				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
 			}
 
 			// Get default role for new user dropdown.
-			$access_default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
+			$access_default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 
 			// Get custom usermeta field to show.
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
 			// Adjust javascript function prefixes if multisite.
-			$js_function_prefix = $admin_mode === 'multisite admin' ? 'auth_multisite_' : 'auth_';
-			$multisite_admin_page = $admin_mode === 'multisite admin';
+			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
+			$multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( ! $multisite_admin_page ) :
@@ -2864,7 +2867,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get default role for new blocked user dropdown.
-			$access_default_role = $this->get_plugin_option( 'access_default_role', 'single admin', 'allow override' );
+			$access_default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 
 			// Print option elements.
 			?><ul id="list_auth_settings_<?php echo $option; ?>" style="margin:0;">
@@ -2909,13 +2912,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_radio_auth_access_who_can_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_who_can_login';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$admin_mode = $this->get_admin_mode( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
 			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
-			} else if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+			} else if ( is_multisite() && $admin_mode === SINGLE_ADMIN && $this->get_plugin_option( 'multisite_override', MULTISITE_ADMIN ) === '1' ) {
 				// Workaround: javascript code hides/shows other settings based
 				// on the selection in this option. If this option is overridden
 				// by a multisite option, it should show that value in order to
@@ -2923,7 +2926,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Side effect: this site option will be overwritten by the
 				// multisite option on save. Since this is a 2-item radio, we
 				// determined this was acceptable.
-				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
+				$auth_settings_option = $this->get_plugin_option( $option, MULTISITE_ADMIN );
 			}
 
 			// Print option elements.
@@ -3034,13 +3037,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_radio_auth_access_who_can_view( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_who_can_view';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
+			$admin_mode = $this->get_admin_mode( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
 			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
-			} else if ( is_multisite() && $admin_mode === 'single admin' && $this->get_plugin_option( 'multisite_override', 'multisite admin' ) === '1' ) {
+			} else if ( is_multisite() && $admin_mode === SINGLE_ADMIN && $this->get_plugin_option( 'multisite_override', MULTISITE_ADMIN ) === '1' ) {
 				// Workaround: javascript code hides/shows other settings based
 				// on the selection in this option. If this option is overridden
 				// by a multisite option, it should show that value in order to
@@ -3048,7 +3051,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Side effect: this site option will be overwritten by the
 				// multisite option on save. Since this is a 2-item radio, we
 				// determined this was acceptable.
-				$auth_settings_option = $this->get_plugin_option( $option, 'multisite admin' );
+				$auth_settings_option = $this->get_plugin_option( $option, MULTISITE_ADMIN );
 			}
 
 			// Print option elements.
@@ -3134,11 +3137,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</div><?php
 		} // END print_section_info_external()
 
+		function get_admin_mode( $args ) {
+			if ( is_array( $args ) && array_key_exists( MULTISITE_ADMIN, $args ) && $args[MULTISITE_ADMIN] === true ) {
+				return MULTISITE_ADMIN;
+			} else {
+				return SINGLE_ADMIN;
+			}
+		}
+
 		function print_select_auth_access_default_role( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_default_role';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
@@ -3149,8 +3159,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_auth_external_google( $args = '' ) {
 			// Get plugin option.
 			$option = 'google';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-curl extension is installed on server.
 			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed)</span>' : '';
@@ -3162,8 +3171,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_google_clientid( $args = '' ) {
 			// Get plugin option.
 			$option = 'google_clientid';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			$site_url_parts = parse_url( get_site_url() );
@@ -3187,8 +3195,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_google_clientsecret( $args = '' ) {
 			// Get plugin option.
 			$option = 'google_clientsecret';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
@@ -3197,8 +3204,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_auth_external_cas( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-curl extension is installed on server.
 			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed)</span>' : '';
@@ -3210,8 +3216,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_custom_label( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_custom_label';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>The button on the login page will read:<p><a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><span class="dashicons dashicons-lock" style="margin: 4px 4px 0 0;"></span> <strong>Sign in with </strong><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="CAS" style="width: 100px;" /></a></p><?php
@@ -3220,8 +3225,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_host( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_host';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="authn.example.edu" /><?php
@@ -3230,8 +3234,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_port( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_port';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="443" style="width:50px;" /><?php
@@ -3240,8 +3243,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_path( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_path';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="/cas" /><?php
@@ -3250,8 +3252,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_select_cas_version( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_version';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow_override', 'print overlay' );
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
@@ -3265,8 +3266,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_email';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
@@ -3275,8 +3275,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_first_name';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="givenName" /><?php
@@ -3285,8 +3284,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_cas_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_last_name';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sn" /><?php
@@ -3295,8 +3293,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_cas_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_update_on_login';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Update first and last name fields on login (will overwrite any name the user has supplied in their profile)</label><?php
@@ -3305,8 +3302,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_cas_auto_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_auto_login';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden</label>
@@ -3317,8 +3313,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-ldap extension is installed on server.
 			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
@@ -3330,8 +3325,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_host( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_host';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="ldap.example.edu" /><?php
@@ -3340,8 +3334,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_port( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_port';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="389" style="width:50px;" /><?php
@@ -3350,8 +3343,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_search_base( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_search_base';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="ou=people,dc=example,dc=edu" style="width:225px;" /><?php
@@ -3360,8 +3352,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_uid( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_uid';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="uid" style="width:80px;" /><?php
@@ -3370,8 +3361,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_email';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
@@ -3380,8 +3370,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_user( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_user';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="cn=directory-user,ou=specials,dc=example,dc=edu" style="width:330px;" /><?php
@@ -3390,8 +3379,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_password_ldap_password( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_password';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
@@ -3401,8 +3389,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_ldap_tls( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_tls';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Use TLS</label><?php
@@ -3411,8 +3398,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_lostpassword_url( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_lostpassword_url';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="https://myschool.example.edu:8888/am-forgot-password" style="width: 400px;" /><?php
@@ -3421,8 +3407,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_first_name';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="givenname" /><?php
@@ -3431,8 +3416,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_ldap_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_last_name';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sn" /><?php
@@ -3441,8 +3425,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_update_on_login';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Update first and last name fields on login (will overwrite any name the user has supplied in their profile)</label><?php
@@ -3458,8 +3441,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_text_auth_advanced_lockouts( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_lockouts';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>After
@@ -3482,8 +3464,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_hide_wp_login';
-			$admin_mode = ( is_array( $args ) && array_key_exists( 'multisite_admin', $args ) && $args['multisite_admin'] === true ) ? 'multisite admin' : 'single admin';
-			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Hide WordPress Logins</label>
@@ -3775,7 +3756,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
 
 					<div class="wrap" id="auth_multisite_settings">
-						<?php $this->print_section_info_tabs( array( 'multisite_admin' => true ) ); ?>
+						<?php $this->print_section_info_tabs( array( MULTISITE_ADMIN => true ) ); ?>
 
 						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 
@@ -3786,15 +3767,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Who can log in to sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_who_can_login( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_radio_auth_access_who_can_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Who can view sites in this network?</th>
-								<td><?php $this->print_radio_auth_access_who_can_view( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_radio_auth_access_who_can_view( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Approved Users (All Sites)<br /><small><em>Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.</em></small></th>
-								<td><?php $this->print_combo_auth_access_users_approved( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_combo_auth_access_users_approved( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -3802,115 +3783,115 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Default role for new users</th>
-								<td><?php $this->print_select_auth_access_default_role( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_select_auth_access_default_role( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Google Logins</th>
-								<td><?php $this->print_checkbox_auth_external_google( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_google( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Google Client ID</th>
-								<td><?php $this->print_text_google_clientid( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_google_clientid( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Google Client Secret</th>
-								<td><?php $this->print_text_google_clientsecret( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_google_clientsecret( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS Logins</th>
-								<td><?php $this->print_checkbox_auth_external_cas( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_cas( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS Custom Label</th>
-								<td><?php $this->print_text_cas_custom_label( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_custom_label( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server hostname</th>
-								<td><?php $this->print_text_cas_host( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_host( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server port</th>
-								<td><?php $this->print_text_cas_port( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_port( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server path/context</th>
-								<td><?php $this->print_text_cas_path( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_path( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS server version</th>
-								<td><?php $this->print_select_cas_version( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_select_cas_version( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS attribute containing email</th>
-								<td><?php $this->print_text_cas_attr_email( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_email( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS attribute containing first name</th>
-								<td><?php $this->print_text_cas_attr_first_name( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_first_name( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS attribute containing last name</th>
-								<td><?php $this->print_text_cas_attr_last_name( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_last_name( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS attribute update</th>
-								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">CAS automatic login</th>
-								<td><?php $this->print_checkbox_cas_auto_login( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_cas_auto_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Logins</th>
-								<td><?php $this->print_checkbox_auth_external_ldap( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_ldap( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Host</th>
-								<td><?php $this->print_text_ldap_host( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_host( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Port</th>
-								<td><?php $this->print_text_ldap_port( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_port( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Search Base</th>
-								<td><?php $this->print_text_ldap_search_base( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_search_base( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute containing username</th>
-								<td><?php $this->print_text_ldap_uid( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_uid( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute containing email</th>
-								<td><?php $this->print_text_ldap_attr_email( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_email( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Directory User</th>
-								<td><?php $this->print_text_ldap_user( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_user( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP Directory User Password</th>
-								<td><?php $this->print_password_ldap_password( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_password_ldap_password( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Secure Connection (TLS)</th>
-								<td><?php $this->print_checkbox_ldap_tls( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_ldap_tls( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Custom lost password URL</th>
-								<td><?php $this->print_text_ldap_lostpassword_url( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_lostpassword_url( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute containing first name</th>
-								<td><?php $this->print_text_ldap_attr_first_name( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_first_name( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute containing last name</th>
-								<td><?php $this->print_text_ldap_attr_last_name( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_last_name( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">LDAP attribute update</th>
-								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -3918,11 +3899,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row">Limit invalid login attempts</th>
-								<td><?php $this->print_text_auth_advanced_lockouts( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_text_auth_advanced_lockouts( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row">Hide WordPress Logins</th>
-								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( 'multisite_admin' => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -4116,7 +4097,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Look through the approved users (of the current blog in a
 				// multisite install, or just of the single site) and add a
 				// usermeta reference if the user is found.
-				$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+				$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				$should_update_auth_settings_access_users_approved = false;
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 					if ( $email === $approved_user['email'] ) {
@@ -4181,7 +4162,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// already there--someone else might have just done it).
 						if ( ! $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
 							$auth_settings_access_users_pending = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_pending', 'single admin' )
+								$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
 							);
 							array_push( $auth_settings_access_users_pending, $pending_user );
 							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
@@ -4192,7 +4173,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// Remove user from pending list and save
 						if ( $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
 							$auth_settings_access_users_pending = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_pending', 'single admin' )
+								$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
 							);
 							foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
 								if ( $pending_user['email'] == $existing_user['email'] ) {
@@ -4270,7 +4251,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( $approved_user['multisite_user'] !== 'false' ) {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+									$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 								);
 								$approved_user['date_added'] = date( 'M Y' );
 								array_push( $auth_multisite_settings_access_users_approved, $approved_user );
@@ -4279,7 +4260,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						} else {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								$approved_user['date_added'] = date( 'M Y' );
 								array_push( $auth_settings_access_users_approved, $approved_user );
@@ -4314,7 +4295,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( $approved_user['multisite_user'] !== 'false' ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+									$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
@@ -4327,7 +4308,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						} else {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
@@ -4356,7 +4337,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( $approved_user['multisite_user'] !== 'false' ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+									$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
@@ -4370,7 +4351,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							// Update user's role in approved list and save.
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', 'single admin' )
+									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
@@ -4402,7 +4383,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// already there--someone else might have just done it).
 						if ( ! $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
 							$auth_settings_access_users_blocked = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_blocked', 'single admin' )
+								$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 							);
 							$blocked_user['date_added'] = date( 'M Y' );
 							array_push( $auth_settings_access_users_blocked, $blocked_user );
@@ -4420,7 +4401,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// Remove user from blocked list and save
 						if ( $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
 							$auth_settings_access_users_blocked = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_blocked', 'single admin' )
+								$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 							);
 							foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
 								if ( $blocked_user['email'] == $existing_user['email'] ) {
@@ -4452,17 +4433,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Retrieves a specific plugin option from db. Multisite enabled.
 		 *
 		 * @param string  $option        Option name
-		 * @param string  $admin_mode    'multisite admin' will retrieve the multisite value
+		 * @param string  $admin_mode    MULTISITE_ADMIN will retrieve the multisite value
 		 * @param string  $override_mode 'allow override' will retrieve the multisite value if it exists
 		 * @param string  $print_mode    'print overlay' will output overlay that hides this option on the settings page
 		 * @return mixed                 Option value, or null on failure
 		 */
-		private function get_plugin_option( $option, $admin_mode = 'single admin', $override_mode = 'no override', $print_mode = 'no overlay' ) {
+		private function get_plugin_option( $option, $admin_mode = SINGLE_ADMIN, $override_mode = 'no override', $print_mode = 'no overlay' ) {
 
 			// Special case for user lists (they are saved seperately to prevent concurrency issues).
 			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
-				$list = $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings_' . $option );
-				if ( is_multisite() && $admin_mode === 'multisite admin' ) {
+				$list = $admin_mode === MULTISITE_ADMIN ? array() : get_option( 'auth_settings_' . $option );
+				if ( is_multisite() && $admin_mode === MULTISITE_ADMIN ) {
 					$list = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_' . $option, array() );
 				}
 				return $list;
@@ -4479,7 +4460,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If requested and appropriate, print the overlay hiding the
 			// single site option that is overridden by a multisite option.
 			if (
-				$admin_mode !== 'multisite admin' &&
+				$admin_mode !== MULTISITE_ADMIN &&
 				$override_mode === 'allow override' &&
 				$print_mode === 'print overlay' &&
 				array_key_exists( 'multisite_override', $auth_settings ) &&
@@ -4517,13 +4498,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Retrieves all plugin options from db. Multisite enabled.
 		 *
-		 * @param string  $admin_mode    'multisite admin' will retrieve the multisite value
+		 * @param string  $admin_mode    MULTISITE_ADMIN will retrieve the multisite value
 		 * @param string  $override_mode 'allow override' will retrieve the multisite value if it exists
 		 * @return mixed                 Option value, or null on failure
 		 */
-		private function get_plugin_options( $admin_mode = 'single admin', $override_mode = 'no override' ) {
-			// Grab plugin settings (skip if in multisite admin mode).
-			$auth_settings = $admin_mode === 'multisite admin' ? array() : get_option( 'auth_settings' );
+		private function get_plugin_options( $admin_mode = SINGLE_ADMIN, $override_mode = 'no override' ) {
+			// Grab plugin settings (skip if in MULTISITE_ADMIN mode).
+			$auth_settings = $admin_mode === MULTISITE_ADMIN ? array() : get_option( 'auth_settings' );
 
 			// Initialize to empty array if the plugin option doesn't exist.
 			if ( $auth_settings === FALSE ) {
@@ -4537,7 +4518,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Return the multisite options if we're viewing the network admin options page.
 				// Otherwise override options with their multisite equivalents.
-				if ( $admin_mode === 'multisite admin' ) {
+				if ( $admin_mode === MULTISITE_ADMIN ) {
 					$auth_settings = $auth_multisite_settings;
 				} elseif (
 					$override_mode === 'allow override' &&
@@ -4556,8 +4537,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// since access_users_approved has a multisite equivalent,
 					// you must retrieve them both seperately. This is done
 					// because the two lists should be treated differently.
-					// $approved_users    = $this->get_plugin_option( 'access_users_approved', 'single admin' );
-					// $ms_approved_users = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
+					// $approved_users    = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+					// $ms_approved_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
 
 					// Override external services (google, cas, or ldap) and associated options
 					$auth_settings['google'] = $auth_multisite_settings['google'];
@@ -4748,26 +4729,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			switch ( $list ) {
 			case 'pending':
-				$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', 'single admin' );
+				$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 				return $this->in_multi_array( $email, $auth_settings_access_users_pending );
 				break;
 			case 'blocked':
-				$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
+				$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
 				return $this->in_multi_array( $email, $auth_settings_access_users_blocked );
 				break;
 			case 'approved':
 			default:
 				if ( $multisite_mode !== 'single' ) {
 					// Get multisite users only.
-					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
+					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
 				} else if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
 					// This site has overridden any multisite settings, so only get its users.
-					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				} else {
 					// Get all site users and all multisite users.
 					$auth_settings_access_users_approved = array_merge(
-						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
-						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+						$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 					);
 				}
 				return $this->in_multi_array( $email, $auth_settings_access_users_approved );
@@ -4779,31 +4760,31 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Helper function to get number of users (including multisite users)
 		 * in a given list (pending, approved, or blocked).
 		 *   @param string $list
-		 *   @param string $admin_mode 'single admin' or 'multisite admin' determines whether to include multisite users
+		 *   @param string $admin_mode SINGLE_ADMIN or MULTISITE_ADMIN determines whether to include multisite users
 		 *   @return int number of users in list
 		 */
-		function get_user_count_from_list( $list, $admin_mode = 'single admin' ) {
+		function get_user_count_from_list( $list, $admin_mode = SINGLE_ADMIN ) {
 			$auth_settings_access_users = array();
 
 			switch ( $list ) {
 			case 'pending':
-				$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', 'single admin' );
+				$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 				break;
 			case 'blocked':
-				$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', 'single admin' );
+				$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
 				break;
 			case 'approved':
-				if ( $admin_mode !== 'single admin' ) {
+				if ( $admin_mode !== SINGLE_ADMIN ) {
 					// Get multisite users only.
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', 'multisite admin' );
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
 				} else if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
 					// This site has overridden any multisite settings, so only get its users.
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', 'single admin' );
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				} else {
 					// Get all site users and all multisite users.
 					$auth_settings_access_users = array_merge(
-						$this->get_plugin_option( 'access_users_approved', 'single admin' ),
-						$this->get_plugin_option( 'access_users_approved', 'multisite admin' )
+						$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 					);
 				}
 			}
