@@ -161,7 +161,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Create login cookie (used by google login)
 			if ( ! isset( $_COOKIE['login_unique'] ) ) {
-				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( COOKIE_DOMAIN ) ? COOKIE_DOMAIN : '' );
+				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
 			}
 
 		} // END __construct()
@@ -2485,12 +2485,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Default to WordPress login access redirect.
-			if ( ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
+			if ( array_key_exists( 'access_redirect', $auth_settings ) && ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
 				$auth_settings['access_redirect'] = 'login';
 			}
 
 			// Default to warning message for anonymous users on public pages.
-			if ( ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
+			if ( array_key_exists( 'access_public_warning', $auth_settings ) && ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 
@@ -2554,7 +2554,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Make sure public pages is an empty array if it's empty
-			if ( ! is_array( $auth_settings['access_public_pages'] ) ) {
+			if ( array_key_exists( 'access_public_pages', $auth_settings ) && ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
 
