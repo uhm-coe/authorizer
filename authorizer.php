@@ -4964,6 +4964,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Plugin Update Routines.
 		 */
 		function auth_update_check() {
+			// Update: Set default values for newly added options (forgot to do
+			// this, so some users are getting debug log notices about undefined
+			// indexes in $auth_settings).
+			$update_if_older_than = 20150318;
+			$auth_version = get_option( 'auth_version' );
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+			 // Provide default values for any $auth_settings options that don't exist.
+			 $this->set_default_options();
+			 // Update version to reflect this change has been made.
+			 update_option( 'auth_version', $update_if_older_than );
+			}
+
 			// Update: migrate user lists to own options (addresses concurrency
 			// when saving plugin options, since user lists are changed often
 			// and we don't want to overwrite changes to the lists when an
