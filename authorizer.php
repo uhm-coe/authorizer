@@ -4973,13 +4973,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Update: Set default values for newly added options (forgot to do
 			// this, so some users are getting debug log notices about undefined
 			// indexes in $auth_settings).
-			$update_if_older_than = 20150318;
+			$update_if_older_than = 20160318;
 			$auth_version = get_option( 'auth_version' );
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
-			 // Provide default values for any $auth_settings options that don't exist.
-			 $this->set_default_options();
-			 // Update version to reflect this change has been made.
-			 update_option( 'auth_version', $update_if_older_than );
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					global $wpdb;
+					$old_blog = $wpdb->blogid;
+					// Get all blog ids
+					$blogs = wp_get_sites( array( 'limit' => 999999 ) );
+					foreach ( $blogs as $blog ) {
+						switch_to_blog( $blog['blog_id'] );
+						// Set meaningful defaults for other sites in the network.
+						$this->set_default_options();
+					}
+					switch_to_blog( $old_blog );
+				} else {
+					// Set meaningful defaults for this site.
+					$this->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				update_option( 'auth_version', $update_if_older_than );
 			}
 
 			// Update: migrate user lists to own options (addresses concurrency
