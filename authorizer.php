@@ -2473,7 +2473,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Settings sanitizer callback
 		 */
-		function sanitize_options( $auth_settings, $multisite_mode = 'single' ) {
+		function sanitize_options( $auth_settings ) {
 			// Default to "Approved Users" login access restriction.
 			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'external_users', 'approved_users' ) ) ) {
 				$auth_settings['access_who_can_login'] = 'approved_users';
@@ -2485,11 +2485,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Default to WordPress login access redirect.
+			// Note: this option doesn't exist in multisite options, so we first
+			// check to see if it exists.
 			if ( array_key_exists( 'access_redirect', $auth_settings ) && ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
 				$auth_settings['access_redirect'] = 'login';
 			}
 
 			// Default to warning message for anonymous users on public pages.
+			// Note: this option doesn't exist in multisite options, so we first
+			// check to see if it exists.
 			if ( array_key_exists( 'access_public_warning', $auth_settings ) && ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
@@ -2502,11 +2506,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string)
 			if ( array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ) {
 				$auth_settings['cas'] = '1';
-			}
-
-			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ) {
-				$auth_settings['ldap'] = '1';
 			}
 
 			// Sanitize CAS Host setting
@@ -2523,6 +2522,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string)
 			if ( array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ) {
 				$auth_settings['cas_auto_login'] = '1';
+			}
+
+			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string)
+			if ( array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ) {
+				$auth_settings['ldap'] = '1';
 			}
 
 			// Sanitize LDAP Host setting
@@ -2554,6 +2558,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Make sure public pages is an empty array if it's empty
+			// Note: this option doesn't exist in multisite options, so we first
+			// check to see if it exists.
 			if ( array_key_exists( 'access_public_pages', $auth_settings ) && ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
@@ -3965,7 +3971,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 
 			// Sanitize settings
-			$auth_multisite_settings = $this->sanitize_options( $_POST, 'multisite' );
+			$auth_multisite_settings = $this->sanitize_options( $_POST );
 
 			// Filter options to only the allowed values (multisite options are a subset of all options)
 			$allowed = array(
