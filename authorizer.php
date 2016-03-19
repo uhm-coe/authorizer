@@ -2498,15 +2498,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 
+			// Sanitize Send welcome email (checkbox: value can only be '1' or empty string)
+			$auth_settings['access_should_email_approved_users'] = array_key_exists( 'access_should_email_approved_users', $auth_settings ) && strlen( $auth_settings['access_should_email_approved_users'] ) > 0 ? '1' : '';
+
 			// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ) {
-				$auth_settings['google'] = '1';
-			}
+			$auth_settings['google'] = array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ? '1' : '';
 
 			// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ) {
-				$auth_settings['cas'] = '1';
-			}
+			$auth_settings['cas'] = array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ? '1' : '';
 
 			// Sanitize CAS Host setting
 			$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
@@ -2515,19 +2514,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
 			// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ) {
-				$auth_settings['cas_attr_update_on_login'] = '1';
-			}
+			$auth_settings['cas_attr_update_on_login'] = array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ? '1' : '';
 
 			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ) {
-				$auth_settings['cas_auto_login'] = '1';
-			}
+			$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
 
 			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ) {
-				$auth_settings['ldap'] = '1';
-			}
+			$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
 
 			// Sanitize LDAP Host setting
 			$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
@@ -2539,9 +2532,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
 
 			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ) {
-				$auth_settings['ldap_tls'] = '1';
-			}
+			$auth_settings['ldap_tls'] = array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ? '1' : '';
 
 			// Sanitize LDAP Lost Password URL
 			$auth_settings['ldap_lostpassword_url'] = filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_SANITIZE_URL );
@@ -2553,9 +2544,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ) {
-				$auth_settings['ldap_attr_update_on_login'] = '1';
-			}
+			$auth_settings['ldap_attr_update_on_login'] = array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ? '1' : '';
 
 			// Make sure public pages is an empty array if it's empty
 			// Note: this option doesn't exist in multisite options, so we first
@@ -2571,9 +2560,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string)
-			if ( array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ) {
-				$auth_settings['advanced_hide_wp_login'] = '1';
-			}
+			$auth_settings['advanced_hide_wp_login'] = array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ? '1' : '';
+
+			// Sanitize Override multisite options (checkbox: value can only be '1' or empty string)
+			$auth_settings['advanced_override_multisite'] = array_key_exists( 'advanced_override_multisite', $auth_settings ) && strlen( $auth_settings['advanced_override_multisite'] ) > 0 ? '1' : '';
 
 			return $auth_settings;
 		} // END sanitize_options()
