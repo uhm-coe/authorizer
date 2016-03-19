@@ -4516,6 +4516,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
 			}
 
+			// Set option to null if it wasn't found.
+			if ( ! array_key_exists( $option, $auth_settings ) ) {
+				return null;
+			}
+
 			return $auth_settings[$option];
 		}
 
