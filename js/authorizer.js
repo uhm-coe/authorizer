@@ -541,7 +541,7 @@ function hide_multisite_settings_if_disabled() {
 			'top': settings.position().top,
 			'left': settings.position().left - 20,
 			'width': '100%',
-			'height': settings.height() + 35,
+			'height': settings.height(),
 			'padding-left': 20,
 		});
 		overlay.show();
