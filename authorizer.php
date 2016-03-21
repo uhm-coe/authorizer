@@ -167,6 +167,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
 			}
 
+			// Remove user from authorizer lists when that user is deleted in WordPress.
+			add_action( 'delete_user', array( $this, 'remove_user_from_authorizer_when_deleted' ) );
+
+			// Remove multisite user from authorizer lists when that user is deleted from Network Users.
+			if ( is_multisite() ) {
+				add_action( 'remove_user_from_blog', array( $this, 'remove_network_user_from_site_when_removed' ), 10, 2 );
+				add_action( 'wpmu_delete_user', array( $this, 'remove_network_user_from_authorizer_when_deleted' ) );
+			}
+
 		} // END __construct()
 
 
@@ -4584,6 +4593,88 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return $auth_settings;
+		}
+
+
+		/**
+		 * Remove user from authorizer lists when that user is deleted in WordPress.
+		 * Run on action hook: delete_user
+		 */
+		function remove_user_from_authorizer_when_deleted( $user_id ) {
+			$userdata = get_userdata( $user_id );
+			$deleted_email = $userdata->user_email;
+
+			// Remove user from pending/approved lists and save.
+			$list_names = array( 'access_users_pending', 'access_users_approved' );
+			foreach ( $list_names as $list_name ) {
+				$user_list = $this->sanitize_user_list( $this->get_plugin_option( $list_name, SINGLE_ADMIN ) );
+				$list_changed = false;
+				foreach ( $user_list as $key => $existing_user ) {
+					if ( $deleted_email === $existing_user['email'] ) {
+						$list_changed = true;
+						unset( $user_list[$key] );
+					}
+				}
+				if ( $list_changed ) {
+					update_option( 'auth_settings_' . $list_name, $user_list );
+				}
+			}
+		}
+
+
+		/**
+		 * Remove multisite user from authorizer lists when that user is deleted from Network Users.
+		 * Run on action hook: wpmu_delete_user
+		 */
+		function remove_network_user_from_authorizer_when_deleted( $user_id ) {
+			$userdata = get_userdata( $user_id );
+			$deleted_email = $userdata->user_email;
+
+			// Go through multisite approved user list and remove this user.
+			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+				$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+			);
+			$list_changed = false;
+			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
+				if ( $deleted_email === $existing_user['email'] ) {
+					$list_changed = true;
+					unset( $auth_multisite_settings_access_users_approved[$key] );
+				}
+			}
+			if ( $list_changed ) {
+				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			}
+
+			// Go through all pending/approved lists on individual sites and remove this user from them.
+			foreach ( wp_get_sites( array( 'limit' => 999999 ) ) as $site ) {
+				$this->remove_network_user_from_site_when_removed( $user_id, $site['blog_id'] );
+			}
+
+		}
+
+
+		/**
+		 * Remove multisite user from a specific site's lists when that user is removed from the site.
+		 * Run on action hook: remove_user_from_blog
+		 */
+		function remove_network_user_from_site_when_removed( $user_id, $blog_id ) {
+			$userdata = get_userdata( $user_id );
+			$deleted_email = $userdata->user_email;
+
+			$list_names = array( 'access_users_pending', 'access_users_approved' );
+			foreach ( $list_names as $list_name ) {
+				$user_list = get_blog_option( $blog_id, 'auth_settings_' . $list_name, array() );
+				$list_changed = false;
+				foreach ( $user_list as $key => $existing_user ) {
+					if ( $deleted_email === $existing_user['email'] ) {
+						$list_changed = true;
+						unset( $user_list[$key] );
+					}
+				}
+				if ( $list_changed ) {
+					update_blog_option( $blog_id, 'auth_settings_' . $list_name, $user_list );
+				}
+			}
 		}
 
 
