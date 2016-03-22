@@ -465,7 +465,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @param WP_User $user       User to check
 		 * @param [type]  $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account)
-		 * @param [type]  $user_data Array of keys for email(s), username, first_name, last_name, and authenticated_by
+		 * @param [type]  $user_data Array of keys for email, username, first_name, last_name,
+		 *    authenticated_by, google_attributes, cas_attributes, ldap_attributes.
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
 		 *    null if user has access (success)
@@ -484,15 +485,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
+			/**
+			 * Filter whether to block the currently logging in user based on any of
+			 * their user attributes.
+			 *
+			 * @param bool $user_is_blocked Whether to block the currently logging in user.
+			 * @param array $user_data User data returned from external service.
+			 */
+			$allow_login = apply_filters( 'authorizer_allow_login', true, $user_data );
+
 			// Check our externally authenticated user against the block list.
 			// If they are blocked, set the relevant user meta field, and show
 			// them an error screen.
 			foreach ( $user_emails as $user_email ) {
-				if ( $this->is_email_in_list( $user_email, 'blocked' ) ) {
-					// If the blocked external user has a WordPress account, change
-					// its password and mark it as blocked.
+				if ( ! $allow_login || $this->is_email_in_list( $user_email, 'blocked' ) ) {
+
+					// Add user to blocked list if it was blocked via the filter.
+					if ( ! $allow_login && ! $this->is_email_in_list( $user_email, 'blocked' ) ) {
+						$auth_settings_access_users_blocked = $this->sanitize_user_list(
+							$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
+						);
+						array_push( $auth_settings_access_users_blocked, array(
+							'email' => $user_email,
+							'date_added' => date( 'M Y' ),
+						));
+						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+					}
+
+					// If the blocked external user has a WordPress account, mark it as
+					// blocked (enforce block in this->authenticate()).
 					if ( $user ) {
-						// Mark user as blocked (enforce block in this->authenticate()).
 						update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 					}
 
@@ -815,6 +837,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'first_name' => '',
 				'last_name' => '',
 				'authenticated_by' => 'google',
+				'google_attributes' => $attributes,
 			);
 		} // END custom_authenticate_google()
 
@@ -926,6 +949,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'first_name' => $first_name,
 				'last_name' => $last_name,
 				'authenticated_by' => 'cas',
+				'cas_attributes' => $cas_attributes,
 			);
 		} // END custom_authenticate_cas()
 
@@ -1058,6 +1082,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'first_name' => $first_name,
 				'last_name' => $last_name,
 				'authenticated_by' => 'ldap',
+				'ldap_attributes' => $ldap_entries,
 			);
 		} // END custom_authenticate_ldap()
 
