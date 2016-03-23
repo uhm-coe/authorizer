@@ -35,12 +35,6 @@ Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-lo
 define( 'MULTISITE_ADMIN', 'multisite_admin' );
 define( 'SINGLE_ADMIN', 'single_admin' );
 
-/* Translation function */
-function authorizer_load_textdomain() {
-  load_plugin_textdomain( 'authorizer', false, plugin_basename( dirname( __FILE__ ) ) . '/languages' );
-}
-add_action( 'plugins_loaded', 'authorizer_load_textdomain' );
-
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
@@ -100,6 +94,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Register actions.
+
+			// Enable localization. Translation files stored in /languages.
+			add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
 
 			// Perform plugin updates if newer version installed.
 			add_action( 'plugins_loaded', array( $this, 'auth_update_check' ) );
@@ -5054,6 +5051,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			global $wpdb;
 			$usermeta_keys = $wpdb->get_col( "SELECT DISTINCT $wpdb->usermeta.meta_key FROM $wpdb->usermeta" );
 			return $usermeta_keys;
+		}
+
+
+		/**
+		 * Load translated strings from *.mo files in /languages.
+		 */
+		function load_textdomain() {
+			load_plugin_textdomain(
+				'authorizer',
+				false,
+				plugin_basename( dirname( __FILE__ ) ) . '/languages'
+			);
 		}
 
 
