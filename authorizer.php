@@ -6,6 +6,8 @@ Description: Authorizer limits login attempts, restricts access to specified use
 Version: 2.4.0
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
+Text Domain: authorizer
+Domain Path: /languages
 License: GPL2
 */
 
