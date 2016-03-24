@@ -3873,6 +3873,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'CAS automatic login', 'authorizer' ); ?></th>
+								<td><?php $this->print_checkbox_cas_auto_login( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'LDAP Logins', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
