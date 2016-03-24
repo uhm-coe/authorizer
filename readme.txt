@@ -1,5 +1,5 @@
 === Authorizer ===
-Contributors: figureone, the_magician, pkarjala, aargh-a-knot
+Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
 Tested up to: 4.4.2
@@ -59,6 +59,37 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.5.0 =
+* Translations: Props to @elarequi for wrapping text strings in the translation functions and for providing Spanish translations.
+	- Fichero authorizer.php: Se preparan todas las cadenas necesarias, para hacerlas traducibles.
+	- Se crea el directorio /languages, con los ficheros de traducción.
+* Translations: Props @jojaba for providing French translations.
+* Feature: Allow 404 pages to be shown publicly on restricted sites.
+* Feature: Add filter to inspect CAS attributes and deny access based on any values there. Props @jojaba for the suggestion. Example:
+`/**
+ * Filter whether to block the currently logging in user based on any of their
+ * user attributes.
+ *
+ * @param bool  $allow_login Whether to block the currently logging in user.
+ * @param array $user_data   User data returned from external service.
+ */
+function check_cas_attributes( $allow_login, $user_data ) {
+  // Block access to CAS logins from library guests.
+  if (
+    isset( $user_data['cas_attributes']['eduPersonPrimaryAffiliation'] ) &&
+    'library-walk-in' === $user_data['cas_attributes']['eduPersonPrimaryAffiliation']
+  ) {
+    $allow_login = false;
+  }
+  return $allow_login;
+}
+add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );`
+* Feature: Add action for inspecting attributes returned from CAS.
+* Fix: Users deleted in WordPress will be removed from Authorizer lists. Props @jojaba for catching that.
+* Fix: Some plugin options were getting reset when switching between multisite and single site modes. Props @jojaba for finding it.
+* Fix: Save button in multisite options was unavailable when disabling multisite override.
+* Cleaned up code complexity. Props @mackensen for the pull requests.
 
 = 2.4.0 =
 * Feature: Add option to log into CAS automatically (only if no other external service is configured, and only if WordPress logins are hidden). Props @manakuke for the idea!
