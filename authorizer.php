@@ -3234,7 +3234,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
 				<optgroup label="<?php _e( 'Home', 'authorizer' ); ?>">
-					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php _e( 'Home Page', 'authorizer' ); ?></option>
 					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ): ?>
