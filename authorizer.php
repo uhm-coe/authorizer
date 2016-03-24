@@ -326,7 +326,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// pretend they don't exist).
 			if ( $unauthenticated_user_is_blocked ) {
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.' ) );
+				return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.', 'authorizer' ) );
 			}
 
 			// Grab plugin settings.
@@ -361,7 +361,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error(
 					'empty_password',
 					sprintf(
-						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ),
+						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_long_lockout,
 						$this->seconds_as_sentence( $seconds_remaining_long_lockout ),
@@ -377,7 +377,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error(
 					'empty_password',
 					sprintf(
-						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ),
+						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_short_lockout,
 						$this->seconds_as_sentence( $seconds_remaining_short_lockout ),
@@ -1782,7 +1782,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( $notice && strlen( $notice ) > 0 ) { ?>
 				<div class="error">
-					<p><?php _e( $notice ); ?></p>
+					<p><?php echo $notice; ?></p>
 				</div><?php
 			}
 		} // END show_advanced_admin_notice()
@@ -3854,7 +3854,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function create_network_admin_page() {
 			if ( ! current_user_can( 'manage_network_options' ) ) {
-				wp_die( __( 'You do not have sufficient permissions to access this page.' ) );
+				wp_die( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ) );
 			}
 			$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ); ?>
 			<div class="wrap">
