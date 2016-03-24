@@ -358,14 +358,32 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_long_lockout, $this->seconds_as_sentence( $seconds_remaining_long_lockout ), wp_lostpassword_url() ) );
+				return new WP_Error(
+					'empty_password',
+					sprintf(
+						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ),
+						$username,
+						$seconds_remaining_long_lockout,
+						$this->seconds_as_sentence( $seconds_remaining_long_lockout ),
+						wp_lostpassword_url()
+					)
+				);
 			} elseif ( $is_login_attempt && $num_attempts > $num_attempts_short_lockout && $seconds_remaining_short_lockout > 0 ) {
 				// Normal lockout (1st round of invalid attempts reached)
 				// Note: set the error code to 'empty_password' so it doesn't
 				// trigger the wp_login_failed hook, which would continue to
 				// increment the failed attempt count.
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-				return new WP_Error( 'empty_password', sprintf( __( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ), $username, $seconds_remaining_short_lockout, $this->seconds_as_sentence( $seconds_remaining_short_lockout ), wp_lostpassword_url() ) );
+				return new WP_Error(
+					'empty_password',
+					sprintf(
+						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?' ),
+						$username,
+						$seconds_remaining_short_lockout,
+						$this->seconds_as_sentence( $seconds_remaining_short_lockout ),
+						wp_lostpassword_url()
+					)
+				);
 			}
 
 			// Start external authentication.
@@ -525,9 +543,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Notify user about blocked status and return without authenticating them.
 					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
-					$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
-					$error_message = apply_filters( 'the_content', $auth_settings['access_blocked_redirect_to_message'] );
-					$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
+					$page_title = sprintf(
+						/* translators: %s: Name of blog */
+						__( '%s - Access Restricted', 'authorizer' ),
+						get_bloginfo( 'name' )
+					);
+					$error_message =
+						apply_filters( 'the_content', $auth_settings['access_blocked_redirect_to_message'] ) .
+						'<hr />' .
+						'<p style="text-align: center;">' .
+						'<a class="button" href="' . wp_logout_url( $redirect_to ) . '">' .
+						__( 'Back', 'authorizer' ) .
+						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
 					wp_die( $error_message, $page_title );
 				}
@@ -715,9 +742,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
 							wp_mail(
 								$user_recipient->user_email,
-								"Action required: Pending user {$pending_user['email']} at $site_name",
-								"A new user has tried to access the $site_name site you manage at:\n$site_url\n\n" .
-								"Please log in to approve or deny their request:\n$authorizer_options_url\n"
+								sprintf(
+									/* translators: 1: User email 2: Name of site */
+									__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
+									$pending_user['email'],
+									$site_name
+								),
+								sprintf(
+									/* translators: 1: Name of site 2: URL of site 3: URL of authorizer */
+									__( 'A new user has tried to access the %1$s site you manage at:\n%2$s\n\nPlease log in to approve or deny their request:\n%3$s\n', 'authorizer' ),
+									$site_name,
+									$site_url,
+									$authorizer_options_url
+								)
 							);
 						}
 					}
@@ -725,15 +762,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Notify user about pending status and return without authenticating them.
 					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
 					$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
-					$error_message = apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] );
-					$error_message .= '<hr /><p style="text-align: center;"><a class="button" href="' . wp_logout_url( $redirect_to ) . '">Back</a></p>';
+					$error_message =
+						apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] ) .
+						'<hr />' .
+						'<p style="text-align: center;">' .
+						'<a class="button" href="' . wp_logout_url( $redirect_to ) . '">' .
+						__( 'Back', 'authorizer' ) .
+						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
 					wp_die( $error_message, $page_title );
 				}
 			}
 
 			// Sanity check: if we made it here without returning, something has gone wrong.
-			return new WP_Error( 'invalid_login', 'Invalid login attempted.' );
+			return new WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 
 		} // END check_user_access()
 
@@ -813,7 +855,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// No token, so this is not a succesful Google login.
 			if ( is_null( $token ) ) {
-				return new WP_Error( 'no_google_login', 'No Google credentials provided.' );
+				return new WP_Error( 'no_google_login', __( 'No Google credentials provided.', 'authorizer' ) );
 			}
 
 			// Build the Google Client.
@@ -828,7 +870,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Invalid ticket, so this in not a successful Google login.
 			if ( ! $ticket ) {
-				return new WP_Error( 'invalid_google_login', 'Invalid Google credentials provided.' );
+				return new WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 			}
 
 			// Get email address
@@ -858,7 +900,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function custom_authenticate_cas( $auth_settings ) {
 			// Move on if CAS hasn't been requested here.
 			if ( empty( $_GET['external'] ) || $_GET['external'] !== 'cas' ) {
-				return new WP_Error( 'cas_not_available', 'CAS is not enabled.' );
+				return new WP_Error( 'cas_not_available', __( 'CAS is not enabled.', 'authorizer' ) );
 			}
 
 			// Get the CAS server version (default to SAML_VERSION_1_1).
@@ -885,7 +927,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $cacert_contents !== false ) {
 					file_put_contents( $cacert_path, $cacert_contents );
 				} else {
-					return new WP_Error( 'cannot_update_cacert', 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.' );
+					return new WP_Error( 'cannot_update_cacert', __( 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.', 'authorizer' ) );
 				}
 			}
 			phpCAS::setCasServerCACert( $cacert_path );
@@ -902,7 +944,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				try {
 					phpCAS::renewAuthentication();
 				} catch ( CAS_AuthenticationException $e ) {
-					error_log( 'CAS server returned an Authentication Exception. Details:' );
+					error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) );
 					error_log( print_r( $e, true ) );
 
 					// CAS server is throwing errors on this login, so try logging the
@@ -983,14 +1025,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 			if ( empty( $password ) ) {
-				return new WP_Error( 'empty_password', 'You must provide a password.' );
+				return new WP_Error( 'empty_password', __( 'You must provide a password.', 'authorizer' ) );
 			}
 
 			// Make sure php5-ldap extension is installed on server.
 			if ( ! function_exists( 'ldap_connect' ) ) {
 				// Note: this error message won't get shown to the user because
 				// authenticate will fall back to WP auth when this fails.
-				return new WP_Error( 'ldap_not_installed', 'LDAP logins are disabled because this server does not support them.' );
+				return new WP_Error( 'ldap_not_installed', __( 'LDAP logins are disabled because this server does not support them.', 'authorizer' ) );
 			}
 
 			// Authenticate against LDAP using options provided in plugin settings.
@@ -1019,7 +1061,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$result = @ldap_bind( $ldap, $bind_rdn, $bind_password );
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
-				return new WP_Error( 'ldap_error', 'Could not authenticate using LDAP.' );
+				return new WP_Error( 'ldap_error', __( 'Could not authenticate using LDAP.', 'authorizer' ) );
 			}
 			// Look up the bind DN (and first/last name) of the user trying to
 			// log in by performing an LDAP search for the login username in
@@ -1044,7 +1086,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
 			if ( $ldap_entries['count'] < 1 ) {
-				return new WP_Error( 'no_ldap', 'No LDAP user found.' );
+				return new WP_Error( 'no_ldap', __( 'No LDAP user found.', 'authorizer' ) );
 			}
 
 			// Get the bind dn and first/last names; if there are multiple results returned, just get the last one.
@@ -1070,7 +1112,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// through to wp authentication after failing LDAP (since
 				// this could be a local account that happens to be the
 				// same name as an LDAP user).
-				return new WP_Error( 'using_wp_authentication', 'Moving on to WordPress authentication...' );
+				return new WP_Error( 'using_wp_authentication', __( 'Moving on to WordPress authentication.', 'authorizer' ) );
 			}
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
@@ -1256,9 +1298,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			if ( $auth_settings['access_redirect'] === 'message' ) {
-				$page_title = get_bloginfo( 'name' ) . ' - Access Restricted';
-				$error_message = apply_filters( 'the_content', $auth_settings['access_redirect_to_message'] );
-				$error_message .= '<hr /><p style="text-align:center;margin-bottom:-15px;"><a class="button" href="' . wp_login_url( $current_path ) . '">Log In</a></p>';
+				$page_title = sprintf(
+					/* translators: %s: Name of blog */
+					__( '%s - Access Restricted', 'authorizer' ),
+					get_bloginfo( 'name' )
+				);
+				$error_message =
+					apply_filters( 'the_content', $auth_settings['access_redirect_to_message'] ) .
+					'<hr />' .
+					'<p style="text-align: center;margin-bottom: -15px;">' .
+					'<a class="button" href="' . wp_login_url( $current_path ) . '">' .
+					__( 'Log In', 'authorizer' ) .
+					'</a></p>';
 				wp_die( $error_message, $page_title );
 			} else { // if ( $auth_settings['access_redirect'] === 'login' ) {
 				wp_redirect( wp_login_url( $current_path ), 302 );
@@ -1286,8 +1337,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function show_advanced_login_error( $errors ) {
 			$error = get_option( 'auth_settings_advanced_login_error' );
 			delete_option( 'auth_settings_advanced_login_error' );
-
-			//$errors .= '    ' . $error . "<br />\n";
 			$errors = '    ' . $error . "<br />\n";
 			return $errors;
 		} // END show_advance_login_error()
@@ -1451,12 +1500,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} ?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
-					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label">Sign in with Google</span></a></p>
+					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php _e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
 					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>"><span class="dashicons dashicons-lock"></span><span class="label">Sign in with <?php echo $auth_settings['cas_custom_label']; ?></span></a></p>
+					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>">
+						<span class="dashicons dashicons-lock"></span>
+						<span class="label"><?php
+							printf(
+								/* translators: %s: Custom CAS label from authorizer options */
+								__( 'Sign in with %s', 'authorizer' ),
+					 			$auth_settings['cas_custom_label']
+							);
+						?></span>
+					</a></p>
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['advanced_hide_wp_login'] === '1' && strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false ): ?>
@@ -1469,7 +1527,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 					</style>
 				<?php elseif ( $auth_settings['cas'] === '1' || $auth_settings['google'] === '1' ): ?>
-					<h3> &mdash; or &mdash; </h3>
+					<h3> &mdash; <?php _e( 'or', 'authorizer' ); ?> &mdash; </h3>
 				<?php endif; ?>
 			</div>
 			<?php
@@ -1611,7 +1669,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function plugin_settings_link( $links ) {
 			$admin_menu = $this->get_plugin_option( 'advanced_admin_menu' );
 			$settings_url = $admin_menu === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( 'admin.php?page=authorizer' );
-			array_unshift( $links, '<a href="' . $settings_url . '">Settings</a>' );
+			array_unshift( $links, '<a href="' . $settings_url . '">' . __( 'Settings', 'authorizer' ) . '</a>' );
 			return $links;
 		} // END plugin_settings_link()
 
@@ -1626,7 +1684,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return array of links to show in the network admin sidebar.
 		 */
 		public function network_admin_plugin_settings_link( $links ) {
-			$settings_link = '<a href="admin.php?page=authorizer">' . __( 'Network Settings', 'authorizer' ).  '</a>';
+			$settings_link = '<a href="admin.php?page=authorizer">' . __( 'Network Settings', 'authorizer' ) . '</a>';
 			array_unshift( $links, $settings_link );
 			return $links;
 		} // END network_admin_plugin_settings_link()
@@ -1748,7 +1806,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'] ) ) :
 					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?><div class='notice notice-warning is-dismissible'>
-						<p><?php _e("Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo $authorizer_options_url; ?>&tab=external'><?php _e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php _e( 'if you intend to use it.', 'authorizer' ); ?></p>
+						<p><?php _e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo $authorizer_options_url; ?>&tab=external'><?php _e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php _e( 'if you intend to use it.', 'authorizer' ); ?></p>
 					</div><?php
 				endif;
 			endif;
@@ -1993,7 +2051,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_cas_auto_login', // HTML element ID
-				'CAS automatic login', // HTML element Title
+				__( 'CAS automatic login', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_cas_auto_login' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -2179,22 +2237,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_role_receive_pending_emails'] = '---';
 			}
 			if ( ! array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
-				$auth_settings['access_pending_redirect_to_message'] = '<p>' . __("You're not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your administrator.", 'authorizer' ) . '</p>';
+				$auth_settings['access_pending_redirect_to_message'] = '<p>' . __( "You're not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your administrator.", 'authorizer' ) . '</p>';
 			}
 			if ( ! array_key_exists( 'access_blocked_redirect_to_message', $auth_settings ) ) {
-				$auth_settings['access_blocked_redirect_to_message'] = '<p>' . __("You're not currently allowed to log into this site. If you think this is a mistake, please contact your administrator.", 'authorizer' ) . '</p>';
+				$auth_settings['access_blocked_redirect_to_message'] = '<p>' . __( "You're not currently allowed to log into this site. If you think this is a mistake, please contact your administrator.", 'authorizer' ) . '</p>';
 			}
 			if ( ! array_key_exists( 'access_should_email_approved_users', $auth_settings ) ) {
 				$auth_settings['access_should_email_approved_users'] = '';
 			}
 			if ( ! array_key_exists( 'access_email_approved_users_subject', $auth_settings ) ) {
-				$auth_settings['access_email_approved_users_subject'] = 'Welcome to [site_name]!';
+				$auth_settings['access_email_approved_users_subject'] = sprintf(
+					/* translators: %s: Shortcode for name of site */
+					__( 'Welcome to %s!', 'authorizer' ),
+					'[site_name]'
+				);
 			}
 			if ( ! array_key_exists( 'access_email_approved_users_body', $auth_settings ) ) {
-				$auth_settings['access_email_approved_users_body'] =
-					'Hello [user_email],' . PHP_EOL .
-					'Welcome to [site_name]! You now have access to all content on the site. Please visit us here:' . PHP_EOL .
-					'[site_url]';
+				$auth_settings['access_email_approved_users_body'] = sprintf(
+					/* translators: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL */
+					__( 'Hello %1$s,\nWelcome to %2$s! You now have access to all content on the site. Please visit us here:\n%3$s\n', 'authorizer' ),
+					'[user_email]',
+					'[site_name]',
+					'[site_url]'
+				);
 			}
 
 			// Public Access to Private Page Defaults.
@@ -2211,7 +2276,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 			if ( ! array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
-				$auth_settings['access_redirect_to_message'] = '<p>' . __( '<strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content.', 'authorizer' ) . '</p>';
+				$auth_settings['access_redirect_to_message'] = '<p>' . __( 'Notice: You are browsing this site anonymously, and only have access to a portion of its content.', 'authorizer' ) . '</p>';
 			}
 
 
@@ -2668,7 +2733,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><div id="section_info_access_lists" class="section_info">
 				<p><?php _e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
 				<ol>
-					<li><?php _e("<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ); ?></li>
+					<li><?php _e( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ); ?></li>
 					<li><?php _e( '<strong>Approved</strong> users have access to the site once they successfully log in.', 'authorizer' ); ?></li>
 					<li><?php _e( '<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ); ?></li>
 				</ol>
@@ -2795,7 +2860,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 										$should_show_usermeta_in_text_field = false; ?>
 										<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" class="auth-usermeta auth-multisite-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );">
-											<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
+											<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 											<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 												<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && array_key_exists( get_current_blog_id(), $approved_user['usermeta'] ) && $key === $approved_user['usermeta'][get_current_blog_id()]['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
 											<?php endforeach; ?>
@@ -2858,7 +2923,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
 									$should_show_usermeta_in_text_field = false; ?>
 									<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_usermeta" class="auth-usermeta" onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );" >
-										<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>>-- None --</option>
+										<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 										<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 											<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
 										<?php endforeach; ?>
@@ -2980,7 +3045,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
-				<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php _e("None (Don't send notification emails)", 'authorizer' ); ?></option>
+				<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php _e( "None (Don't send notification emails)", 'authorizer' ); ?></option>
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
 			</select><?php
 		} // END print_select_auth_access_role_receive_pending_emails()
@@ -3062,7 +3127,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			?><small><?php _e( 'You can use <b>[site_name]</b>, <b>[site_url]</b>, and <b>[user_email]</b> shortcodes.', 'authorizer' ); ?></small><?php
+			?><small><?php printf(
+				/* translators: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
+				__( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ),
+				'<b>[site_name]</b>',
+				'<b>[site_url]</b>',
+				'<b>[user_email]</b>'
+			); ?></small><?php
 
 		} // END print_wysiwyg_auth_access_email_approved_users_body()
 
@@ -3149,7 +3220,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
-				<optgroup label="Home">
+				<optgroup label="<?php _e( 'Home', 'authorizer' ); ?>">
 					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>>Home Page</option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ): ?>
@@ -3161,7 +3232,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
-				<optgroup label="Categories">
+				<optgroup label="<?php _e( 'Categories', 'authorizer' ); ?>">
 					<?php foreach ( get_categories() as $category ) : ?>
 						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
 					<?php endforeach; ?>
@@ -3201,7 +3272,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-curl extension is installed on server.
-			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed)</span>' : '';
+			$curl_installed_message = ! function_exists( 'curl_init' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable Google Logins', 'authorizer' ); ?></label> <?php echo $curl_installed_message; ?><?php
@@ -3215,7 +3286,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			$site_url_parts = parse_url( get_site_url() );
 			$site_url_host = $site_url_parts['scheme'] . '://' . $site_url_parts['host'] . '/';
-			?><?php _e("If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' ); ?>
+			?><?php _e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' ); ?>
 			<ol>
 				<li><?php _e( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ); ?></li>
 				<li><?php _e( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ); ?>
@@ -3344,8 +3415,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>">Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden</label>
-			<p><small>Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.</p><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
+			<p><small><?php _e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small></p><?php
 		} // END print_checkbox_cas_auto_login()
 
 
@@ -3355,7 +3426,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-ldap extension is installed on server.
-			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed)</span>' : '';
+			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo $ldap_installed_message; ?><?php
@@ -3633,7 +3704,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e("Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label><?php
 		} // END print_checkbox_auth_advanced_override_multisite()
 
 
@@ -3646,12 +3717,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$screen = get_current_screen();
 
 			// Add help tab for Access Lists Settings
-			$help_auth_settings_access_lists_content = "
-				<p><strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.</p>
-				<p><strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.</p>
-				<p><strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.</p>
-				<p>Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.</p>
-			";
+			$help_auth_settings_access_lists_content = '
+				<p>' . __( "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) .'</p>
+				<p>' . __( "<strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.", 'authorizer' ) . '</p>
+				<p>' . __( "Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.", 'authorizer' ) . '</p>
+			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_access_lists_content',
@@ -3662,87 +3733,88 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Login Access Settings
 			$help_auth_settings_access_login_content = '
-				<p>' . __("<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.", 'authorizer' ) . '</p>
-				<p>' . __("<strong>Which role should receive email notifications about pending users?</strong>: If you've restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Which role should receive email notifications about pending users?</strong>: If you've restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.", 'authorizer' ) . '</p>
 				<p>' . __( '<strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.', 'authorizer' ) . '</p>
 			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_access_login_content',
-					'title' => 'Login Access',
+					'title' => __( 'Login Access', 'authorizer' ),
 					'content' => $help_auth_settings_access_login_content,
 				)
 			);
 
 			// Add help tab for Public Access Settings
-			$help_auth_settings_access_public_content = "
-				<p><strong>Who can view the site?</strong>: You can restrict the site's visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site's privacy using the settings below.</p>
-				<p><strong>What pages (if any) should be available to everyone?</strong>: If you'd like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.</p>
-				<p><strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.</p>
-				<p><strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between showing them the page without any message, or showing them a the page with a message above the content.</p>
-				<p><strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.</p>
-			";
+			$help_auth_settings_access_public_content = '
+				<p>' . __( "<strong>Who can view the site?</strong>: You can restrict the site's visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site's privacy using the settings below.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>What pages (if any) should be available to everyone?</strong>: If you'd like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to the <strong>login screen</strong>, or simply showing them a <strong>message</strong>.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between showing them the page without any message, or showing them a the page with a message above the content.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here.", 'authorizer' ) . '</p>
+			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_access_public_content',
-					'title' => 'Public Access',
+					'title' => __( 'Public Access', 'authorizer' ),
 					'content' => $help_auth_settings_access_public_content,
 				)
 			);
 
 			// Add help tab for External Service (CAS, LDAP) Settings
-			$help_auth_settings_external_content = "
-				<p><strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.</p>
-				<p><strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.</p>
-				<p><strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.</p>
-				<p><strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.</p>
-				<p><strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!</p>
-				<p><strong><em>If you enable Google logins:</em></strong></p>
+			$help_auth_settings_external_content = '
+				<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!", 'authorizer' ) . '</p>
+				<p><strong><em>' . __( "If you enable Google logins:", 'authorizer' ) . '</em></strong></p>
 				<ul>
-					<li><strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com</li>
-					<li><strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT</li>
+					<li>' . __( "<strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT", 'authorizer' ) . '</li>
 				</ul>
-				<p><strong><em>If you enable CAS logins:</em></strong></p>
+				<p><strong><em>' . __( "If you enable CAS logins:", 'authorizer' ) . '</em></strong></p>
 				<ul>
-					<li><strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).</li>
-					<li><strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).</li>
-					<li><strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).</li>
-					<li><strong>CAS attribute containing first name</strong>: Enter the CAS attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from CAS and added to their WordPress profile.</li>
-					<li><strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added to their WordPress profile.</li>
-					<li><strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.</li>
+					<li>' . __( "<strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>CAS attribute containing first name</strong>: Enter the CAS attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from CAS and added to their WordPress profile.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added to their WordPress profile.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.", 'authorizer' ) . '</li>
 				</ul>
-				<p><strong><em>If you enable LDAP logins:</em></strong></p>
+				<p><strong><em>' . __( "If you enable LDAP logins:", 'authorizer' ) . '</em></strong></p>
 				<ul>
-					<li><strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.</li>
-					<li><strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.</li>
-					<li><strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu</li>
-					<li><strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.</li>
-					<li><strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.</li>
-					<li><strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.</li>
-					<li><strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.</li>
-					<li><strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.</li>
-					<li><strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.</li>
-					<li><strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.</li>
-					<li><strong>LDAP attribute update</strong>: Select whether the first and last names retrieved from LDAP should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.</li>
-				</ul>";
+					<li>' . __( "<strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>LDAP attribute update</strong>: Select whether the first and last names retrieved from LDAP should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.", 'authorizer' ) . '</li>
+				</ul>
+			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_external_content',
-					'title' => 'External Service',
+					'title' => __( 'External Service', 'authorizer' ),
 					'content' => $help_auth_settings_external_content,
 				)
 			);
 
 			// Add help tab for Advanced Settings
 			$help_auth_settings_advanced_content = '
-				<p><strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.</p>
-				<p><strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so: <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . "?external=wordpress</a>.</p>
-				<p><strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.</p>
-			";
+				<p>' . __( "<strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.", 'authorizer' ) . '</p>
+				<p>' . __( "<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:", 'authorizer' ) . ' <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
+				<p>' . __( "<strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.", 'authorizer' ) . '</p>
+			';
 			$screen->add_help_tab(
 				array(
 					'id' => 'help_auth_settings_advanced_content',
-					'title' => 'Advanced',
+					'title' => __( 'Advanced', 'authorizer' ),
 					'content' => $help_auth_settings_advanced_content,
 				)
 			);
