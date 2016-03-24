@@ -1296,6 +1296,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
+			// Check to see if this page can't be found and nonexistent (404) pages are public.
+			if ( strlen( $current_page_name ) > 0 && strlen( $current_page_id ) < 1 ) {
+				if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'] ) ) {
+					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
+						update_option( 'auth_settings_advanced_public_notice', false );
+					} else {
+						update_option( 'auth_settings_advanced_public_notice', true );
+					}
+					return $wp;
+				}
+
+			}
+
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			if ( $auth_settings['access_redirect'] === 'message' ) {
 				$page_title = sprintf(
@@ -3222,6 +3235,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
 				<optgroup label="<?php _e( 'Home', 'authorizer' ); ?>">
 					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>>Home Page</option>
+					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ): ?>
 					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
