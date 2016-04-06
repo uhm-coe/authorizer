@@ -8,8 +8,8 @@ body.settings_page_authorizer #wpbody-content > .wrap {
 }
 body.network-admin.toplevel_page_authorizer #wpbody-content > .wrap,
 body.network-admin.settings_page_authorizer #wpbody-content > .wrap {
-	background: url("../images/banner-772x250.jpg") repeat-x 5px 0px;
-	margin-top: 5px;
+	background: url("../images/banner-772x250.jpg") repeat-x 5px -15px;
+	margin-top: 0;
 }
 body.network-admin.toplevel_page_authorizer #wpbody-content > div.update-nag ~ .wrap > form > h2,
 body.network-admin.settings_page_authorizer #wpbody-content > div.update-nag ~ .wrap > form > h2 {
