@@ -1764,8 +1764,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				plugins_url( 'js/authorizer.js', __FILE__ ),
 				array( 'jquery-effects-shake' ), '2.3.2', true
 			);
-			$js_auth_config = array( 'baseurl' => get_bloginfo( 'url' ) );
-			wp_localize_script( 'authorizer', 'auth_config',  $js_auth_config );
+			wp_localize_script( 'authorizer', 'auth_L10n', array(
+				'baseurl' => get_bloginfo( 'url' ),
+				'saved' => _e( 'Saved', 'authorizer' ),
+				'failed' => _e( 'Failed', 'authorizer' ),
+				'local_wordpress_user' => _e( 'Local WordPress user', 'authorizer' ),
+				'block_ban_user' => _e( 'Block/Ban user', 'authorizer' ),
+				'remove_user' => _e( 'Remove user', 'authorizer' ),
+				'no_users_in' => _e( 'No users in', 'authorizer' ),
+				'save_changes' => _e( 'Save Changes', 'authorizer' ),
+				'private_pages' => _e( 'Private Pages', 'authorizer' ),
+				'public_pages' => _e( 'Public Pages', 'authorizer' ),
+			));
 
 			wp_enqueue_script(
 				'jquery.multi-select',

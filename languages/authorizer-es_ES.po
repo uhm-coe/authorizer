@@ -4,6 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Authorizer en español\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/document-gallery\n"
+"POT-Creation-Date: 2016-04-06 11:52-1000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: PNTE <blogs@educacion.navarra.es>\n"
 "Language-Team: PNTE <blogs@educacion.navarra.es>\n"
@@ -143,7 +144,44 @@ msgstr "Configuración en red"
 msgid "Authorizer Settings"
 msgstr "Configuración de Authorizer"
 
-#: authorizer.php:1822
+#: authorizer.php:1769
+msgid "Saved"
+msgstr "Guardado"
+
+#: authorizer.php:1770
+msgid "Failed"
+msgstr "Fallado"
+
+#: authorizer.php:1771
+msgid "Local WordPress user"
+msgstr "Usuario local de WordPress"
+
+#: authorizer.php:1772 authorizer.php:2963
+msgid "Block/Ban user"
+msgstr "Bloquear el usuario o prohibirle el acceso"
+
+#: authorizer.php:1773 authorizer.php:2802 authorizer.php:2965
+#: authorizer.php:3017
+msgid "Remove user"
+msgstr "Eliminar el usuario"
+
+#: authorizer.php:1774
+msgid "No users in"
+msgstr "0 usuarios en"
+
+#: authorizer.php:1775 authorizer.php:4043
+msgid "Save Changes"
+msgstr "Guardar los cambios"
+
+#: authorizer.php:1776
+msgid "Private Pages"
+msgstr "Páginas privadas"
+
+#: authorizer.php:1777
+msgid "Public Pages"
+msgstr "Páginas públicas"
+
+#: authorizer.php:1832
 msgid "Can't reach CAS server. Please provide"
 msgstr "No se puede llegar al servidor CAS. Por favor, proporciona"
 
@@ -1328,10 +1366,6 @@ msgstr "Atributo del CAS que contiene la dirección de email"
 #: authorizer.php:3996
 msgid "LDAP attribute containing email"
 msgstr "Atributo del LDAP que contiene la dirección de email"
-
-#: authorizer.php:4033
-msgid "Save Changes"
-msgstr "Guardar los cambios"
 
 #: authorizer.php:4609
 msgid "This setting is overridden by a"

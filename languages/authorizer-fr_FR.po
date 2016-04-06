@@ -143,7 +143,44 @@ msgstr "Paramètres réseau"
 msgid "Authorizer Settings"
 msgstr "Paramètres d'Authorizer"
 
-#: authorizer.php:1822
+#: authorizer.php:1769
+msgid "Saved"
+msgstr "Enregistré"
+
+#: authorizer.php:1770
+msgid "Failed"
+msgstr "Échec"
+
+#: authorizer.php:1771
+msgid "Local WordPress user"
+msgstr "Utilisateur de WordPress local"
+
+#: authorizer.php:1772 authorizer.php:2963
+msgid "Block/Ban user"
+msgstr "Bloquer / bannir l'utilisateur"
+
+#: authorizer.php:1773 authorizer.php:2802 authorizer.php:2965
+#: authorizer.php:3017
+msgid "Remove user"
+msgstr "Supprimer l'utilisateur"
+
+#: authorizer.php:1774
+msgid "No users in"
+msgstr "0 utilisateurs en"
+
+#: authorizer.php:1775 authorizer.php:4043
+msgid "Save Changes"
+msgstr "Enregistrer les modifications"
+
+#: authorizer.php:1776
+msgid "Private Pages"
+msgstr "Pages privées"
+
+#: authorizer.php:1777
+msgid "Public Pages"
+msgstr "Pages publiques"
+
+#: authorizer.php:1832
 msgid "Can't reach CAS server. Please provide"
 msgstr "Impossible de se connecter au serveur CAS. Veuillez fournir"
 
@@ -1325,10 +1362,6 @@ msgstr "Attribut CAS contenant le courriel"
 #: authorizer.php:3996
 msgid "LDAP attribute containing email"
 msgstr "Attribut LDAP contenant le courriel"
-
-#: authorizer.php:4033
-msgid "Save Changes"
-msgstr "Enregistrer les modifications"
 
 #: authorizer.php:4609
 msgid "This setting is overridden by a"

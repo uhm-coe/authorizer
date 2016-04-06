@@ -121,7 +121,44 @@ msgstr ""
 msgid "Authorizer Settings"
 msgstr ""
 
-#: authorizer.php:1822
+#: authorizer.php:1769
+msgid "Saved"
+msgstr ""
+
+#: authorizer.php:1770
+msgid "Failed"
+msgstr ""
+
+#: authorizer.php:1771
+msgid "Local WordPress user"
+msgstr ""
+
+#: authorizer.php:1772 authorizer.php:2963
+msgid "Block/Ban user"
+msgstr ""
+
+#: authorizer.php:1773 authorizer.php:2802 authorizer.php:2965
+#: authorizer.php:3017
+msgid "Remove user"
+msgstr ""
+
+#: authorizer.php:1774
+msgid "No users in"
+msgstr ""
+
+#: authorizer.php:1775 authorizer.php:4043
+msgid "Save Changes"
+msgstr ""
+
+#: authorizer.php:1776
+msgid "Private Pages"
+msgstr ""
+
+#: authorizer.php:1777
+msgid "Public Pages"
+msgstr ""
+
+#: authorizer.php:1832
 msgid "Can't reach CAS server. Please provide"
 msgstr ""
 
@@ -1055,10 +1092,6 @@ msgstr ""
 
 #: authorizer.php:3996
 msgid "LDAP attribute containing email"
-msgstr ""
-
-#: authorizer.php:4033
-msgid "Save Changes"
 msgstr ""
 
 #: authorizer.php:4609

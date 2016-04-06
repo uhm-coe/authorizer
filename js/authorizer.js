@@ -61,7 +61,7 @@ function auth_update_usermeta( caller ) {
 		'nonce_save_auth_settings': nonce_save_auth_settings,
 	}, function ( response ) {
 		var succeeded = response === 'success';
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 
 		// Enable inputs, remove spinner.
@@ -75,7 +75,7 @@ function auth_update_usermeta( caller ) {
 
 	}).fail( function ( response ) {
 		var succeeded = false;
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 
 		// Enable inputs, remove spinner.
@@ -217,8 +217,8 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	if ( validated ) {
 		// Add the new item.
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
-		var local_icon = create_local_account ? '&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Block/Ban user"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+		var local_icon = create_local_account ? '&nbsp;<a title="' + auth_L10n.local_wordpress_user + '" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
+		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
@@ -226,7 +226,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
 				' + ban_button + ' \
-				<a class="button" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="Remove user"><span class="glyphicon glyphicon-remove"></span></a> \
+				<a class="button" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
 				' + local_icon + ' \
 				<span class="spinner is-active"></span> \
 			</li> \
@@ -287,7 +287,7 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
 	// Show an 'empty list' message if we're deleting the last item
 	var list = $( caller ).closest( 'ul' );
 	if ( $( 'li', list ).length <= 1 ) {
-		$( list ).append( '<li class="auth-empty"><em>No ' + list_name + ' users</em></li>' );
+		$( list ).append( '<li class="auth-empty"><em>' + auth_L10n.no_users_in + ' ' + list_name + '</em></li>' );
 	}
 
 	$( caller ).parent().slideUp( 250, function() {
@@ -326,7 +326,7 @@ function update_auth_user( caller, setting, user_to_edit ) {
 
 	// Enable spinner by element that triggered this event (caller).
 	$( caller ).attr( 'disabled', 'disabled' );
-	if ( $( caller ).val() === 'Save Changes' ) {
+	if ( $( caller ).val() === auth_L10n.save_changes ) {
 		$( caller ).last().after( '<span class="spinner is-active"></span>' );
 	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
 		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
@@ -354,7 +354,7 @@ function update_auth_user( caller, setting, user_to_edit ) {
 	}, function( response ) {
 		// Server responded, but if response isn't 'success' it failed to save.
 		var succeeded = response === 'success';
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
@@ -366,7 +366,7 @@ function update_auth_user( caller, setting, user_to_edit ) {
 	}).fail( function() {
 		// Fail fires if the server doesn't respond or responds with 500 codes
 		var succeeded = false;
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
@@ -387,7 +387,7 @@ function save_auth_multisite_settings( caller ) {
 	$( 'html' ).addClass( 'busy' );
 
 	$( caller ).attr( 'disabled', 'disabled' );
-	if ( $( caller ).val() === 'Save Changes' ) {
+	if ( $( caller ).val() === auth_L10n.save_changes ) {
 		$( caller ).last().after( '<span class="spinner is-active"></span>' );
 	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
 		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
@@ -496,7 +496,7 @@ function save_auth_multisite_settings( caller ) {
 		'advanced_hide_wp_login': advanced_hide_wp_login,
 	}, function( response ) {
 		var succeeded = response === 'success';
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
@@ -508,7 +508,7 @@ function save_auth_multisite_settings( caller ) {
 	}).fail( function() {
 		// Fail fires if the server doesn't respond
 		var succeeded = false;
-		var spinner_text = succeeded ? 'Saved.' : '<span style="color: red;">Failed.</span>';
+		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
 		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
@@ -889,8 +889,8 @@ jQuery( document ).ready( function( $ ) {
 	// Enable the user-friendly multiselect form element on the options page.
 	$( '#auth_settings_access_public_pages' ).multiSelect({
 		selectableOptgroup: true,
-		selectableHeader: '<div class="custom-header">Private Pages</div>',
-		selectionHeader: '<div class="custom-header">Public Pages</div>',
+		selectableHeader: '<div class="custom-header">' + auth_L10n.private_pages + '</div>',
+		selectionHeader: '<div class="custom-header">' + auth_L10n.public_pages + '</div>',
 	});
 
 	// Switch to the first tab (or the tab indicated in sessionStorage, or the querystring).
