@@ -1102,7 +1102,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				// Get user email if it is specified in another field.
 				if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_email'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_email']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] ) > 0 ) {
-					$email = $ldap_entries[$i][$auth_settings['ldap_attr_email']][0];
+					$email = strtolower($ldap_entries[$i][$auth_settings['ldap_attr_email']][0]);
 				}
 			}
 
