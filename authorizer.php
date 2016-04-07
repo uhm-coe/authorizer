@@ -1766,15 +1766,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			wp_localize_script( 'authorizer', 'auth_L10n', array(
 				'baseurl' => get_bloginfo( 'url' ),
-				'saved' => _e( 'Saved', 'authorizer' ),
-				'failed' => _e( 'Failed', 'authorizer' ),
-				'local_wordpress_user' => _e( 'Local WordPress user', 'authorizer' ),
-				'block_ban_user' => _e( 'Block/Ban user', 'authorizer' ),
-				'remove_user' => _e( 'Remove user', 'authorizer' ),
-				'no_users_in' => _e( 'No users in', 'authorizer' ),
-				'save_changes' => _e( 'Save Changes', 'authorizer' ),
-				'private_pages' => _e( 'Private Pages', 'authorizer' ),
-				'public_pages' => _e( 'Public Pages', 'authorizer' ),
+				'saved' => esc_html__( 'Saved', 'authorizer' ),
+				'failed' => esc_html__( 'Failed', 'authorizer' ),
+				'local_wordpress_user' => esc_html__( 'Local WordPress user', 'authorizer' ),
+				'block_ban_user' => esc_html__( 'Block/Ban user', 'authorizer' ),
+				'remove_user' => esc_html__( 'Remove user', 'authorizer' ),
+				'no_users_in' => esc_html__( 'No users in', 'authorizer' ),
+				'save_changes' => esc_html__( 'Save Changes', 'authorizer' ),
+				'private_pages' => esc_html__( 'Private Pages', 'authorizer' ),
+				'public_pages' => esc_html__( 'Public Pages', 'authorizer' ),
 			));
 
 			wp_enqueue_script(
