@@ -1012,10 +1012,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                       user, or WP_Error() object on failure.
 		 */
 		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
-			// Get the TLD from the LDAP host for use in matching email addresses
+			// Get the TLD from the LDAP search base domain components (dc). For
+			// example, ou=people,dc=example,dc=edu,dc=uk would yield user@example.edu.uk
+			$search_base_components = explode( ',', trim( $auth_settings['ldap_search_base'] ) );
+			$tld = array();
+			foreach ( $search_base_components as $search_base_component ) {
+				$component = explode( '=', $search_base_component );
+				if ( count( $component ) === 2 && $component[0] === 'dc' ) {
+					$tld[] = $component[1];
+				}
+			}
+			$tld = implode( '.', $tld );
+
+			// If the TLD is still empty, get the TLD from the LDAP host for use in matching email addresses
 			// For example: example.edu is the TLD for ldap.example.edu, so user
 			// 'bob' will have the following email address: bob@example.edu.
-			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+			if ( empty( $tld ) ) {
+				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+			}
 
 			// remove top level domain if it exists in the username (i.e., if user entered their email)
 			$username = str_replace( '@' . $tld, '', $username );
