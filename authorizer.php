@@ -2367,16 +2367,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['ldap_host'] = '';
 			}
 			if ( ! array_key_exists( 'ldap_port', $auth_settings ) ) {
-				$auth_settings['ldap_port'] = '';
+				$auth_settings['ldap_port'] = '389';
 			}
 			if ( ! array_key_exists( 'ldap_search_base', $auth_settings ) ) {
 				$auth_settings['ldap_search_base'] = '';
 			}
 			if ( ! array_key_exists( 'ldap_uid', $auth_settings ) ) {
-				$auth_settings['ldap_uid'] = '';
+				$auth_settings['ldap_uid'] = 'uid';
 			}
 			if ( ! array_key_exists( 'ldap_attr_email', $auth_settings ) ) {
-				$auth_settings['ldap_attr_email'] = '';
+				$auth_settings['ldap_attr_email'] = 'mail';
 			}
 			if ( ! array_key_exists( 'ldap_user', $auth_settings ) ) {
 				$auth_settings['ldap_user'] = '';
@@ -2516,16 +2516,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['ldap_host'] = '';
 				}
 				if ( ! array_key_exists( 'ldap_port', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['ldap_port'] = '';
+					$auth_multisite_settings['ldap_port'] = '389';
 				}
 				if ( ! array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_search_base'] = '';
 				}
 				if ( ! array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['ldap_uid'] = '';
+					$auth_multisite_settings['ldap_uid'] = 'uid';
 				}
 				if ( ! array_key_exists( 'ldap_attr_email', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['ldap_attr_email'] = '';
+					$auth_multisite_settings['ldap_attr_email'] = 'mail';
 				}
 				if ( ! array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_user'] = '';
