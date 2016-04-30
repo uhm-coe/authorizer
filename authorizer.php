@@ -2390,7 +2390,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['ldap_uid'] = 'uid';
 			}
 			if ( ! array_key_exists( 'ldap_attr_email', $auth_settings ) ) {
-				$auth_settings['ldap_attr_email'] = 'mail';
+				$auth_settings['ldap_attr_email'] = '';
 			}
 			if ( ! array_key_exists( 'ldap_user', $auth_settings ) ) {
 				$auth_settings['ldap_user'] = '';
@@ -2539,7 +2539,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['ldap_uid'] = 'uid';
 				}
 				if ( ! array_key_exists( 'ldap_attr_email', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['ldap_attr_email'] = 'mail';
+					$auth_multisite_settings['ldap_attr_email'] = '';
 				}
 				if ( ! array_key_exists( 'ldap_user', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_user'] = '';
