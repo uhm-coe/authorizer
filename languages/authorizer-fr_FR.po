@@ -57,12 +57,12 @@ msgstr "Action requise : Utilisateur %1$s en attente sur %2$s"
 #: authorizer.php:753
 #, php-format
 msgid ""
-"A new user has tried to access the %1$s site you manage at:\\n%2$s\\n"
-"\\nPlease log in to approve or deny their request:\\n%3$s\\n"
+"A new user has tried to access the %1\\$s site you manage at:\\n%2\\$s\\n"
+"\\nPlease log in to approve or deny their request:\\n%3\\$s\\n"
 msgstr ""
-"Un nouvel utilisateur a tenté d'accéder au site %1$s que vous gérez sur :\\n"
-"%2$s\\n\\nVeuillez vous connecter pour approuver ou refuser sa requête :\\n"
-"%3$s\\n"
+"Un nouvel utilisateur a tenté d'accéder au site %1\\$s que vous gérez sur :\\n"
+"%2\\$s\\n\\nVeuillez vous connecter pour approuver ou refuser sa requête :\\n"
+"%3\\$s\\n"
 
 #: authorizer.php:778
 msgid "Invalid login attempted."
@@ -409,11 +409,11 @@ msgstr "Bienvenue sur %s !"
 #: authorizer.php:2281
 #, php-format
 msgid ""
-"Hello %1$s,\\nWelcome to %2$s! You now have access to all content on the "
-"site. Please visit us here:\\n%3$s\\n"
+"Hello %1\\$s,\\nWelcome to %2\\$s! You now have access to all content on the "
+"site. Please visit us here:\\n%3\\$s\\n"
 msgstr ""
-"Bonjour %1$s,\\nBienvenue sur %2$s ! Vous avez à présent accès à tout le "
-"contenu du site. Veuillez vous rendre ici :\\n%3$s\\n"
+"Bonjour %1\\$s,\\nBienvenue sur %2\\$s ! Vous avez à présent accès à tout le "
+"contenu du site. Veuillez vous rendre ici :\\n%3\\$s\\n"
 
 #: authorizer.php:2302
 msgid ""

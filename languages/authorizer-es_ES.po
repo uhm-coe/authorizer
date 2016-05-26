@@ -59,11 +59,11 @@ msgstr "Acción requerida: hay un usuario pendiente, %1$s, en %2$s"
 #: authorizer.php:753
 #, php-format
 msgid ""
-"A new user has tried to access the %1$s site you manage at:\\n%2$s\\n"
-"\\nPlease log in to approve or deny their request:\\n%3$s\\n"
+"A new user has tried to access the %1\\$s site you manage at:\\n%2\\$s\\n"
+"\\nPlease log in to approve or deny their request:\\n%3\\$s\\n"
 msgstr ""
-"Un nuevo usuario ha tratado de acceder al sitio %1$s que gestionas en:\\n%2$s"
-"\\n\\nPor favor, inicia sesión para aprobar o denegar su petición:\\n%3$s\\n"
+"Un nuevo usuario ha tratado de acceder al sitio %1\\$s que gestionas en:\\n%2\\$s"
+"\\n\\nPor favor, inicia sesión para aprobar o denegar su petición:\\n%3\\$s\\n"
 
 #: authorizer.php:778
 msgid "Invalid login attempted."
@@ -411,11 +411,11 @@ msgstr "Bienvenido a %s!"
 #: authorizer.php:2281
 #, php-format
 msgid ""
-"Hello %1$s,\\nWelcome to %2$s! You now have access to all content on the "
-"site. Please visit us here:\\n%3$s\\n"
+"Hello %1\\$s,\\nWelcome to %2\\$s! You now have access to all content on the "
+"site. Please visit us here:\\n%3\\$s\\n"
 msgstr ""
-"Hola, %1$s,\\nTe damos la bienvenida a %2$s. Ahora ya tienes acceso a todo "
-"el contenido del sitio. Por favor, visítanos aquí:\\n%3$s\\n"
+"Hola, %1\\$s,\\nTe damos la bienvenida a %2\\$s. Ahora ya tienes acceso a todo "
+"el contenido del sitio. Por favor, visítanos aquí:\\n%3\\$s\\n"
 
 #: authorizer.php:2302
 msgid ""

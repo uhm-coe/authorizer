@@ -750,7 +750,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								),
 								sprintf(
 									/* translators: 1: Name of site 2: URL of site 3: URL of authorizer */
-									__( "A new user has tried to access the %1$s site you manage at:\n%2$s\n\nPlease log in to approve or deny their request:\n%3$s\n", 'authorizer' ),
+									__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
 									$site_name,
 									$site_url,
 									$authorizer_options_url
@@ -2292,7 +2292,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'access_email_approved_users_body', $auth_settings ) ) {
 				$auth_settings['access_email_approved_users_body'] = sprintf(
 					/* translators: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL */
-					__( "Hello %1$s,\nWelcome to %2$s! You now have access to all content on the site. Please visit us here:\n%3$s\n", 'authorizer' ),
+					__( "Hello %1\$s,\nWelcome to %2\$s! You now have access to all content on the site. Please visit us here:\n%3\$s\n", 'authorizer' ),
 					'[user_email]',
 					'[site_name]',
 					'[site_url]'
