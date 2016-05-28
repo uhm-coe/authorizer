@@ -1285,7 +1285,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $current_page_name );
-			if ( ! is_array( $auth_settings['access_public_pages'] ) ) {
+			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
 			if ( in_array( $current_page_id, $auth_settings['access_public_pages'] ) ) {
