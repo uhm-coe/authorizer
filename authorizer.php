@@ -560,14 +560,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// If this externally authenticated user isn't in the approved list
-			// and login access is set to "All authenticated users," add them
-			// to the approved list (they'll get an account created below if
-			// they don't have one yet).
+			// Get the default role for this new user.
+			$default_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
+			/**
+			 * Filter the role of the user currently logging in. The role will be
+			 * set to the default (specified in Authorizer options) for new users,
+			 * or the user's current role for existing users. This filter allows
+			 * changing user roles based on custom CAS/LDAP attributes.
+			 * @param bool $role Role of the user currently logging in.
+			 * @param array $user_data User data returned from external service.
+			 */
+			$approved_role = apply_filters( 'authorizer_custom_role', $default_role, $user_data );
+
+			// Iterate through each of the email addresses provided by the external
+			// service and determine if any of them have access.
 			$last_email = end( $user_emails );
 			reset( $user_emails );
 			foreach ( $user_emails as $user_email ) {
 				$is_newly_approved_user = false;
+
+				// If this externally authenticated user isn't in the approved list
+				// and login access is set to "All authenticated users," add them
+				// to the approved list (they'll get an account created below if
+				// they don't have one yet).
 				if ( ! $this->is_email_in_list( $user_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
 					$is_newly_approved_user = true;
 
@@ -584,7 +599,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Add this user to the approved list.
-					$approved_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
 					$approved_user = array(
 						'email' => $user_email,
 						'role' => $approved_role,
@@ -596,9 +610,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Check our externally authenticated user against the approved
 				// list. If they are approved, log them in (and create their account
-				// if necessary)
+				// if necessary).
 				if ( $is_newly_approved_user || $this->is_email_in_list( $user_email, 'approved' ) ) {
 					$user_info = $is_newly_approved_user ? $approved_user : $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
+
+					// If this user's role was modified above (in the
+					// authorizer_custom_role filter), use that value instead of
+					// whatever is specified in the approved list.
+					if ( $default_role !== $approved_role ) {
+						$user_info['role'] = $approved_role;
+					}
 
 					// If the approved external user does not have a WordPress account, create it
 					if ( ! $user ) {
@@ -694,6 +715,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								));
 							}
 						}
+
+						// Update this user's role if it was modified in the
+						// authorizer_custom_role filter.
+						if ( $default_role !== $approved_role ) {
+							wp_update_user( array(
+								'ID' => $user->ID,
+								'role' => $approved_role,
+							));
+						}
 					}
 
 					// If this is multisite, add new user to current blog.
@@ -728,7 +758,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 						$pending_user = array();
 						$pending_user['email'] = $user_email;
-						$pending_user['role'] = $auth_settings['access_default_role'];
+						$pending_user['role'] = $approved_role;
 						$pending_user['date_added'] = '';
 						array_push( $auth_settings_access_users_pending, $pending_user );
 						update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
