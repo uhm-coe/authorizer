@@ -1262,7 +1262,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Allow access if option is set to 'everyone'
 				( $auth_settings['access_who_can_view'] == 'everyone' ) ||
 				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'
-				( $auth_settings['access_who_can_view'] == 'logged_in_users' && $this->is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) )
+				( $auth_settings['access_who_can_view'] == 'logged_in_users' && $this->is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
+				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API
+				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_oauth1=" ) === 0 ) ||
+				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them
+				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_route=" ) === 0 && $_SERVER['REQUEST_METHOD'] !== 'GET' )
+				// Note that GET requests to a rest endpoint will be restricted by authorizer. In that case, error messages will be returned as JSON.
 			);
 
 			/**
@@ -1353,8 +1358,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			}
 
+			// User is denied access, so show them the error message. Render as JSON
+			// if this is a REST API call; otherwise, show the error message via
+			// wp_die() (rendered html), or redirect to the login URL.
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
-			if ( $auth_settings['access_redirect'] === 'message' ) {
+			if ( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_route=" ) === 0 && $_SERVER['REQUEST_METHOD'] === 'GET' ) {
+				wp_send_json( array(
+					'code' => 'rest_cannot_view',
+					'message' => strip_tags( $auth_settings['access_redirect_to_message'] ),
+					'data' => array(
+						'status' => 401,
+					),
+				));
+			} else if ( $auth_settings['access_redirect'] === 'message' ) {
 				$page_title = sprintf(
 					/* translators: %s: Name of blog */
 					__( '%s - Access Restricted', 'authorizer' ),
