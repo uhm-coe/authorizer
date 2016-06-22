@@ -1340,7 +1340,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// Check to see if this page can't be found and nonexistent (404) pages are public.
+			// Check to see if this page can't be found. If so, allow showing the 404 page.
 			if ( strlen( $current_page_name ) > 0 && strlen( $current_page_id ) < 1 ) {
 				if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'] ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
