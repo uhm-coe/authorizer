@@ -4937,7 +4937,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Basic encryption using a public (not secret!) key. Used for general
 		 * database obfuscation of passwords.
 		 */
-		private static $key = '8QxnrvjdtweisvCBKEY!+0' . "\0\0";
+		private static $key = "8QxnrvjdtweisvCBKEY!+0\0\0";
 		function encrypt( $text ) {
 			$result = '';
 
