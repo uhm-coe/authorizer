@@ -9,12 +9,15 @@
         "php": ">=5.2.1"
     },
     "require-dev": {
-      "phpunit/phpunit": "3.7.*"
+        "phpunit/phpunit": "3.7.*",
+        "squizlabs/php_codesniffer": "~2.3"
     },
     "autoload": {
-        "classmap": [
-            "src/"
-        ]
+        "files": ["src/Google/autoload.php"]
     },
-    "include-path": ["src/"]
+    "extra": {
+        "branch-alias": {
+            "dev-v1-master": "1.1.x-dev"
+        }
+    }
 }
