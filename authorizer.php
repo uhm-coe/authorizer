@@ -954,7 +954,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$time_90_days_ago = time() - $time_90_days;
 			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
                                 $caUrl = 'https://curl.haxx.se/ca/cacert.pem';
-                                if ( ! defined( WP_PROXY_HOST ) ) {
+                                if ( ! defined( 'WP_PROXY_HOST' ) ) {
                                         $cacert_contents = file_get_contents( $caUrl );
                                 } else {
                                         $proxyurl = "tcp://" . WP_PROXY_HOST . ":" . WP_PROXY_PORT;
