@@ -43,13 +43,6 @@ if ( ! defined( 'PHPCAS_VERSION' ) ) {
 	require_once dirname( __FILE__ ) . '/inc/CAS-1.3.4/CAS.php';
 }
 
-// Add Google API PHP Client if it's not included.
-// @see https://github.com/google/google-api-php-client
-if ( ! class_exists( 'Google_Client' ) ) {
-	set_include_path( get_include_path() . PATH_SEPARATOR . dirname( __FILE__ ) . '/inc/google-api-php-client/src' );
-	require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/Client.php';
-}
-
 if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	/**
 	 * Define class for plugin: Authorizer.
@@ -839,6 +832,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
+			// Add Google API PHP Client.
+			// @see https://github.com/google/google-api-php-client branch:v1-master
+			require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
+
 			// Build the Google Client.
 			$client = new Google_Client();
 			$client->setApplicationName( 'WordPress' );
@@ -888,6 +885,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'no_google_login', __( 'No Google credentials provided.', 'authorizer' ) );
 			}
 
+			// Add Google API PHP Client.
+			// @see https://github.com/google/google-api-php-client branch:v1-master
+			require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
+
 			// Build the Google Client.
 			$client = new Google_Client();
 			$client->setApplicationName( 'WordPress' );
@@ -896,7 +897,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setRedirectUri( 'postmessage' );
 
 			// Verify this is a successful Google authentication
-			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
+			try {
+				$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
+			} catch ( Google_Auth_Exception $e ) {
+				// Invalid ticket, so this in not a successful Google login.
+				return new WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
+			}
 
 			// Invalid ticket, so this in not a successful Google login.
 			if ( ! $ticket ) {
@@ -1212,6 +1218,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If session token set, log out of Google.
 			if ( $current_user_authenticated_by === 'google' && array_key_exists( 'token', $_SESSION ) ) {
 				$token = json_decode( $_SESSION['token'] )->access_token;
+
+				// Add Google API PHP Client.
+				// @see https://github.com/google/google-api-php-client branch:v1-master
+				require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
 
 				// Build the Google Client.
 				$client = new Google_Client();
