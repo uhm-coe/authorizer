@@ -20,11 +20,12 @@
 	width: 270px;
 	background-color: #dd4b39;
 	border-bottom: 1px solid #bb3f30;
-	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.10);
+	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.20);
 	box-shadow: 0 1px 0 rgba(0,0,0,0.10);
 	-webkit-border-radius: 3px;
 	border-radius: 3px;
 	border-color: transparent;
+	text-shadow: none;
 }
 .button.button-google:hover {
 	background-color: #e74b37;
