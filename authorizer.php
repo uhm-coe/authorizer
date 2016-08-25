@@ -550,7 +550,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Notify user about blocked status and return without authenticating them.
 					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
 					$page_title = sprintf(
-						/* translators: %s: Name of blog */
+						/* TRANSLATORS: %s: Name of blog */
 						__( '%s - Access Restricted', 'authorizer' ),
 						get_bloginfo( 'name' )
 					);
@@ -779,13 +779,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							wp_mail(
 								$user_recipient->user_email,
 								sprintf(
-									/* translators: 1: User email 2: Name of site */
+									/* TRANSLATORS: 1: User email 2: Name of site */
 									__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
 									$pending_user['email'],
 									$site_name
 								),
 								sprintf(
-									/* translators: 1: Name of site 2: URL of site 3: URL of authorizer */
+									/* TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer */
 									__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
 									$site_name,
 									$site_url,
@@ -1401,7 +1401,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				));
 			} else if ( $auth_settings['access_redirect'] === 'message' ) {
 				$page_title = sprintf(
-					/* translators: %s: Name of blog */
+					/* TRANSLATORS: %s: Name of blog */
 					__( '%s - Access Restricted', 'authorizer' ),
 					get_bloginfo( 'name' )
 				);
@@ -1616,7 +1616,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<span class="dashicons dashicons-lock"></span>
 						<span class="label"><?php
 							printf(
-								/* translators: %s: Custom CAS label from authorizer options */
+								/* TRANSLATORS: %s: Custom CAS label from authorizer options */
 								__( 'Sign in with %s', 'authorizer' ),
 					 			$auth_settings['cas_custom_label']
 							);
@@ -2364,14 +2364,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'access_email_approved_users_subject', $auth_settings ) ) {
 				$auth_settings['access_email_approved_users_subject'] = sprintf(
-					/* translators: %s: Shortcode for name of site */
+					/* TRANSLATORS: %s: Shortcode for name of site */
 					__( 'Welcome to %s!', 'authorizer' ),
 					'[site_name]'
 				);
 			}
 			if ( ! array_key_exists( 'access_email_approved_users_body', $auth_settings ) ) {
 				$auth_settings['access_email_approved_users_body'] = sprintf(
-					/* translators: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL */
+					/* TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL */
 					__( "Hello %1\$s,\nWelcome to %2\$s! You now have access to all content on the site. Please visit us here:\n%3\$s\n", 'authorizer' ),
 					'[user_email]',
 					'[site_name]',
@@ -3245,7 +3245,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			?><small><?php printf(
-				/* translators: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
+				/* TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
 				__( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ),
 				'<b>[site_name]</b>',
 				'<b>[site_url]</b>',
