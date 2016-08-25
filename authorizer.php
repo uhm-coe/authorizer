@@ -382,10 +382,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Start external authentication.
 			$externally_authenticated_emails = array();
 			$authenticated_by = '';
+			$result = null;
 
 			// Try Google authentication if it's enabled and we don't have a
 			// successful login yet.
-			if ( $auth_settings['google'] === '1' ) {
+			if (
+				$auth_settings['google'] === '1' &&
+				count( $externally_authenticated_emails ) === 0 &&
+				! is_wp_error( $result )
+			) {
 				$result = $this->custom_authenticate_google( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
@@ -399,7 +404,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Try CAS authentication if it's enabled and we don't have a
 			// successful login yet.
-			if ( $auth_settings['cas'] === '1' && count( $externally_authenticated_emails ) === 0 ) {
+			if (
+				$auth_settings['cas'] === '1' &&
+				count( $externally_authenticated_emails ) === 0 &&
+				! is_wp_error( $result )
+			) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
 				if ( ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
@@ -413,7 +422,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Try LDAP authentication if it's enabled and we don't have an
 			// authenticated user yet.
-			if ( $auth_settings['ldap'] === '1' && count( $externally_authenticated_emails ) === 0 ) {
+			if (
+				$auth_settings['ldap'] === '1' &&
+				count( $externally_authenticated_emails ) === 0 &&
+				! is_wp_error( $result )
+			) {
 				$result = $this->custom_authenticate_ldap( $auth_settings, $username, $password );
 				if ( ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
@@ -428,7 +441,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Skip to WordPress authentication if we don't have an externally
 			// authenticated user.
 			if ( count( array_filter( $externally_authenticated_emails ) ) < 1 ) {
-				return null;
+				return $result;
 			}
 
 			// Remove duplicate and blank emails, if any.
@@ -873,16 +886,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return [mixed] Array containing email, authenticated_by,
 		 *                       first_name, last_name, and username
 		 *                       strings for the successfully authenticated
-		 *                       user, or WP_Error() object on failure.
+		 *                       user, or WP_Error() object on failure,
+		 *                       or null if not attempting a google login.
 		 */
 		private function custom_authenticate_google( $auth_settings ) {
+			// Move on if Google auth hasn't been requested here.
+			if ( empty( $_GET['external'] ) || $_GET['external'] !== 'google' ) {
+				return null;
+			}
+
 			// Get one time use token
 			session_start();
 			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
 
 			// No token, so this is not a succesful Google login.
 			if ( is_null( $token ) ) {
-				return new WP_Error( 'no_google_login', __( 'No Google credentials provided.', 'authorizer' ) );
+				return null;
 			}
 
 			// Add Google API PHP Client.
@@ -931,12 +950,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array   $auth_settings Plugin settings
 		 * @return [mixed] Array containing 'email' and 'authenticated_by'
 		 *                       strings for the successfully authenticated
-		 *                       user, or WP_Error() object on failure.
+		 *                       user, or WP_Error() object on failure,
+		 *                       or null if not attempting a CAS login.
 		 */
 		private function custom_authenticate_cas( $auth_settings ) {
 			// Move on if CAS hasn't been requested here.
 			if ( empty( $_GET['external'] ) || $_GET['external'] !== 'cas' ) {
-				return new WP_Error( 'cas_not_available', __( 'CAS is not enabled.', 'authorizer' ) );
+				return null;
 			}
 
 			// Get the CAS server version (default to SAML_VERSION_1_1).
@@ -1045,7 +1065,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param string  $password      Attempted password from authenticate action
 		 * @return [mixed] Array containing 'email' and 'authenticated_by'
 		 *                       strings for the successfully authenticated
-		 *                       user, or WP_Error() object on failure.
+		 *                       user, or WP_Error() object on failure,
+		 *                       or null if skipping LDAP auth and falling back to WP auth.
 		 */
 		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
 			// Get the TLD from the LDAP search base domain components (dc). For
@@ -1072,17 +1093,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Fail with error message if username or password is blank.
 			if ( empty( $username ) ) {
-				return null;
+				return new WP_Error( 'empty_username', __( 'You must provide a username or email.', 'authorizer' ) );
 			}
 			if ( empty( $password ) ) {
 				return new WP_Error( 'empty_password', __( 'You must provide a password.', 'authorizer' ) );
 			}
 
-			// Make sure php5-ldap extension is installed on server.
+			// If php5-ldap extension isn't installed on server, fall back to WP auth.
 			if ( ! function_exists( 'ldap_connect' ) ) {
-				// Note: this error message won't get shown to the user because
-				// authenticate will fall back to WP auth when this fails.
-				return new WP_Error( 'ldap_not_installed', __( 'LDAP logins are disabled because this server does not support them.', 'authorizer' ) );
+				return null;
 			}
 
 			// Authenticate against LDAP using options provided in plugin settings.
@@ -1111,7 +1130,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$result = @ldap_bind( $ldap, $bind_rdn, $bind_password );
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
-				return new WP_Error( 'ldap_error', __( 'Could not authenticate using LDAP.', 'authorizer' ) );
+				return null;
 			}
 			// Look up the bind DN (and first/last name) of the user trying to
 			// log in by performing an LDAP search for the login username in
@@ -1134,9 +1153,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 
-			// If we didn't find any users in ldap, exit with error (rely on default wordpress authentication)
+			// If we didn't find any users in ldap, fall back to WordPress authentication.
 			if ( $ldap_entries['count'] < 1 ) {
-				return new WP_Error( 'no_ldap', __( 'No LDAP user found.', 'authorizer' ) );
+				return null;
 			}
 
 			// Get the bind dn and first/last names; if there are multiple results returned, just get the last one.
@@ -1162,7 +1181,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// through to wp authentication after failing LDAP (since
 				// this could be a local account that happens to be the
 				// same name as an LDAP user).
-				return new WP_Error( 'using_wp_authentication', __( 'Moving on to WordPress authentication.', 'authorizer' ) );
+				return null;
 			}
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
