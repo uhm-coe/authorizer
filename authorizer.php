@@ -1535,7 +1535,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								//console.log( response );
 
 								// Reload wp-login.php to continue the authentication process.
-								location.reload();
+								window.location.href = window.location.pathname + '?external=google';
 							});
 						} else {
 							// Update the app to reflect a signed out user
