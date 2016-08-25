@@ -1216,7 +1216,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// If session token set, log out of Google.
-			if ( $current_user_authenticated_by === 'google' && array_key_exists( 'token', $_SESSION ) ) {
+			if ( $current_user_authenticated_by === 'google' || array_key_exists( 'token', $_SESSION ) ) {
 				$token = json_decode( $_SESSION['token'] )->access_token;
 
 				// Add Google API PHP Client.
@@ -1234,7 +1234,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$client->revokeToken( $token );
 
 				// Remove the credentials from the user's session.
-				$_SESSION['token'] = '';
+				unset( $_SESSION['token'] );
 			}
 
 		} // END custom_logout()
