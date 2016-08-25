@@ -856,6 +856,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
 			$client->setRedirectUri( 'postmessage' );
 
+			// If the hosted domain parameter is set, restrict logins to that domain.
+			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+				$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
+			}
+
 			// Get one time use token (if it doesn't exist, we'll create one below)
 			session_start();
 			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
@@ -915,6 +920,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
 			$client->setRedirectUri( 'postmessage' );
 
+			// If the hosted domain parameter is set, restrict logins to that domain.
+			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+				$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
+			}
+
 			// Verify this is a successful Google authentication
 			try {
 				$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
@@ -931,7 +941,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get email address
 			$attributes = $ticket->getAttributes();
 			$email = $attributes['payload']['email'];
+			$email_domain = substr( strrchr( $email, '@' ), 1 );
 			$username = current( explode( '@', $email ) );
+
+			// Fail if hd param is set and the logging in user's email address doesn't
+			// match the allowed hosted domain.
+			// See: https://developers.google.com/identity/protocols/OpenIDConnect#hd-param
+			// See: https://github.com/google/google-api-php-client/blob/v1-master/src/Google/Client.php#L407-L416
+			// Note: Will have to upgrade to google-api-php-client v2 or higher for
+			// this to function server-side; it's not complete in v1, so this check
+			// is only performed here.
+			if (
+				array_key_exists( 'google_hosteddomain', $auth_settings ) &&
+				strlen( $auth_settings['google_hosteddomain'] ) > 0 &&
+				$email_domain !== $auth_settings['google_hosteddomain']
+			) {
+				$this->custom_logout();
+				return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) . ' (' . $auth_settings['google_hosteddomain'] . ').' );
+			}
+
 
 			return array(
 				'email' => $email,
@@ -1248,6 +1276,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$client->setClientId( $auth_settings['google_clientid'] );
 				$client->setClientSecret( $auth_settings['google_clientsecret'] );
 				$client->setRedirectUri( 'postmessage' );
+
+				// If the hosted domain parameter is set, restrict logins to that domain.
+				if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+					$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
+				}
 
 				// Revoke the token
 				$client->revokeToken( $token );
@@ -2097,6 +2130,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_google_hosteddomain', // HTML element ID
+				__( 'Google Hosted Domain', 'authorizer' ), // HTML element Title
+				array( $this, 'print_text_google_hosteddomain' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_external_cas', // HTML element ID
 				__( 'CAS Logins', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
@@ -2425,6 +2465,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'google_clientsecret', $auth_settings ) ) {
 				$auth_settings['google_clientsecret'] = '';
 			}
+			if ( ! array_key_exists( 'google_hosteddomain', $auth_settings ) ) {
+				$auth_settings['google_hosteddomain'] = '';
+			}
 
 			if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
 				$auth_settings['cas_custom_label'] = 'CAS';
@@ -2575,6 +2618,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'google_clientsecret', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['google_clientsecret'] = '';
+				}
+				if ( ! array_key_exists( 'google_hosteddomain', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['google_hosteddomain'] = '';
 				}
 				if ( ! array_key_exists( 'cas_custom_label', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_custom_label'] = 'CAS';
@@ -3430,6 +3476,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="sDNgX5_pr_5bly-frKmvp8jT" style="width:220px;" /><?php
 		} // END print_text_google_clientsecret()
 
+		function print_text_google_hosteddomain( $args = '' ) {
+			// Get plugin option.
+			$option = 'google_hosteddomain';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:220px;" /><br />
+			<small><?php _e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?></small>
+			<?php
+		} // END print_text_google_hosteddomain()
+
 		function print_checkbox_auth_external_cas( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas';
@@ -4028,6 +4085,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_google_clientsecret( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'Google Hosted Domain', 'authorizer' ); ?></th>
+								<td><?php $this->print_text_google_hosteddomain( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'CAS Logins', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_external_cas( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
@@ -4180,6 +4241,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'google',
 				'google_clientid',
 				'google_clientsecret',
+				'google_hosteddomain',
 				'cas',
 				'cas_custom_label',
 				'cas_host',
@@ -4770,6 +4832,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['google'] = $auth_multisite_settings['google'];
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+					$auth_settings['google_hosteddomain'] = $auth_multisite_settings['google_hosteddomain'];
 					$auth_settings['cas'] = $auth_multisite_settings['cas'];
 					$auth_settings['cas_custom_label'] = $auth_multisite_settings['cas_custom_label'];
 					$auth_settings['cas_host'] = $auth_multisite_settings['cas_host'];
