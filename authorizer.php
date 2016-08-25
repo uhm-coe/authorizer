@@ -3392,6 +3392,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</li>
 				<li><?php _e( 'Copy/paste your new Client ID/Secret pair into the fields below.', 'authorizer' ); ?></li>
 				<li><?php _e( '<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ); ?></li>
+				<li><?php _e( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ); ?></li>
 			</ol>
 			<input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com" style="width:560px;" /><?php
 		} // END print_text_google_clientid()
