@@ -1544,6 +1544,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							//   "access_denied" - User denied access to your app
 							//   "immediate_failed" - Could not automatically log in the user
 							//console.log('Sign-in state: ' + authResult['error']);
+
+							// If user denies access, reload the login page.
+							if ( authResult['error'] === 'access_denied' || authResult['error'] === 'user_signed_out' ) {
+								window.location.reload();
+							}
 						}
 					}
 				</script>
