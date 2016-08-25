@@ -1007,7 +1007,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
 			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
-				$cacert_contents = file_get_contents( 'http://curl.haxx.se/ca/cacert.pem' );
+                                $caUrl = 'https://curl.haxx.se/ca/cacert.pem';
+                                if ( ! defined( 'WP_PROXY_HOST' ) ) {
+                                        $cacert_contents = file_get_contents( $caUrl );
+                                } else {
+                                        $proxyurl = "tcp://" . WP_PROXY_HOST . ":" . WP_PROXY_PORT;
+                                        $domain = parse_url( $caUrl, PHP_URL_HOST );
+                                        $opts = array(
+                                                'http' => array( 'proxy' => $proxyurl ),
+                                                'ssl' => array( 'SNI_enabled' => true, 'SNI_server_name' => $domain )
+                                        );
+                                        $context = stream_context_create($opts);
+                                        $cacert_contents = file_get_contents( $caUrl, false, $context );
+                                }
+
 				if ( $cacert_contents !== false ) {
 					file_put_contents( $cacert_path, $cacert_contents );
 				} else {
