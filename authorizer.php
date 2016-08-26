@@ -1631,31 +1631,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function login_form_add_external_service_links() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
-
-			$auth_url_cas = '';
-			if ( $auth_settings['cas'] === '1' ) {
-				$auth_url_cas = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-				// Remove force reauth param if it exists so this
-				// authentication attempt doesn't get stopped by WordPress.
-				if ( strpos( $auth_url_cas, 'reauth=1' ) !== false ) {
-					if ( strpos( $auth_url_cas, '&reauth=1' ) !== false ) {
-						// There are parames before reauth, so just remove reauth
-						$auth_url_cas = str_replace( '&reauth=1', '', $auth_url_cas );
-					} elseif ( strpos( $auth_url_cas, '?reauth=1&' ) !== false ) {
-						// Reauth is first param with others behind it, so remove it and next delimiter.
-						$auth_url_cas = str_replace( 'reauth=1&', '', $auth_url_cas );
-					} else {
-						// Reauth is first and only param, so remove it and '?'
-						$auth_url_cas = str_replace( '?reauth=1', '', $auth_url_cas );
-					}
-
-				}
-				// Add special param indicating this is CAS authentication attempt.
-				if ( strpos( $auth_url_cas, 'external=cas' ) === false ) {
-					$auth_url_cas .= strpos( $auth_url_cas, '?' ) !== false ? '&external=cas' : '?external=cas';
-				}
-			} ?>
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
