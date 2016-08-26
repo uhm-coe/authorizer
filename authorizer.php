@@ -1656,6 +1656,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_url_cas .= strpos( $auth_url_cas, '?' ) !== false ? '&external=cas' : '?external=cas';
 				}
 			} ?>
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<div id="auth-external-service-login">
 				<?php if ( $auth_settings['google'] === '1' ): ?>
 					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php _e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
@@ -1663,7 +1664,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 
 				<?php if ( $auth_settings['cas'] === '1' ): ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php echo $auth_url_cas; ?>">
+					<p><a class="button button-primary button-external button-cas" href="<?php echo $this->modify_current_url_for_cas_login(); ?>">
 						<span class="dashicons dashicons-lock"></span>
 						<span class="label"><?php
 							printf(
@@ -1709,32 +1710,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( ! array_key_exists( 'google', $auth_settings ) || $auth_settings['google'] !== '1' ) &&
 				array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && $auth_settings['advanced_hide_wp_login'] === '1'
 			) {
-				// Generate CAS authentication URL.
-				$auth_url_cas = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
-
-				// Remove force reauth param if it exists so this
-				// authentication attempt doesn't get stopped by WordPress.
-				if ( strpos( $auth_url_cas, 'reauth=1' ) !== false ) {
-					if ( strpos( $auth_url_cas, '&reauth=1' ) !== false ) {
-						// There are parames before reauth, so just remove reauth
-						$auth_url_cas = str_replace( '&reauth=1', '', $auth_url_cas );
-					} elseif ( strpos( $auth_url_cas, '?reauth=1&' ) !== false ) {
-						// Reauth is first param with others behind it, so remove it and next delimiter.
-						$auth_url_cas = str_replace( 'reauth=1&', '', $auth_url_cas );
-					} else {
-						// Reauth is first and only param, so remove it and '?'
-						$auth_url_cas = str_replace( '?reauth=1', '', $auth_url_cas );
-					}
-
-				}
-
-				// Add special param indicating this is CAS authentication attempt.
-				if ( strpos( $auth_url_cas, 'external=cas' ) === false ) {
-					$auth_url_cas .= strpos( $auth_url_cas, '?' ) !== false ? '&external=cas' : '?external=cas';
-				}
-
-				// Redirect to CAS.
-				wp_redirect( $auth_url_cas );
+				wp_redirect( $this->modify_current_url_for_cas_login() );
 				exit;
 			}
 		} // END login_head_maybe_redirect_to_cas()
@@ -5341,6 +5317,50 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				false,
 				plugin_basename( dirname( __FILE__ ) ) . '/languages'
 			);
+		}
+
+
+		/**
+		 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
+		 * and external=cas added).
+		 */
+		function modify_current_url_for_cas_login() {
+			// Construct the URL of the current page (wp-login.php).
+			$url = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+
+			// Parse the URL into its components.
+			$parsed_url = parse_url( $url );
+
+			// Fix up the querystring values (remove reauth, make sure external=cas).
+			$querystring = array();
+			if ( array_key_exists( 'query', $parsed_url ) ) {
+				parse_str( $parsed_url['query'], $querystring );
+			}
+			unset( $querystring['reauth'] );
+			$querystring['external'] = 'cas';
+			$parsed_url['query'] = http_build_query( $querystring );
+
+			// Return the URL as a string.
+			return $this->unparse_url( $parsed_url );
+		}
+
+
+		/**
+		 * Reconstruct a URL after it has been deconstructed with parse_url().
+		 * @param $parsed_url array() with keys from parse_url().
+		 * @return string URL constructed from the components in $parsed_url.
+		 */
+		function unparse_url( $parsed_url = array() ) {
+			$scheme = isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] . '://' : '';
+			$host = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
+			$port = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
+			$user = isset( $parsed_url['user'] ) ? $parsed_url['user'] : '';
+			$pass = isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass']  : '';
+			$pass = $user || $pass ? "$pass@" : '';
+			$path = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
+			$query = isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '';
+			$fragment = isset( $parsed_url['fragment'] ) ? '#' . $parsed_url['fragment'] : '';
+			return "$scheme$user$pass$host$port$path$query$fragment";
 		}
 
 
