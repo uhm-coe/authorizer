@@ -1669,7 +1669,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							printf(
 								/* TRANSLATORS: %s: Custom CAS label from authorizer options */
 								__( 'Sign in with %s', 'authorizer' ),
-					 			$auth_settings['cas_custom_label']
+								$auth_settings['cas_custom_label']
 							);
 						?></span>
 					</a></p>
