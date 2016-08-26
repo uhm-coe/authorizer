@@ -1588,6 +1588,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						location.href = location.href.replace( 'reauth=1', '' );
 					}
 
+					function auth_update_querystring_param( uri, key, value ) {
+						var re = new RegExp( '([?&])' + key + '=.*?(&|$)', 'i' );
+						var separator = uri.indexOf( '?' ) !== -1 ? '&' : '?';
+						if ( uri.match( re ) ) {
+							return uri.replace( re, '$1' + key + '=' + value + '$2' );
+						} else {
+							return uri + separator + key + '=' + value;
+						}
+					}
+
 					function signInCallback( authResult ) {
 						var $ = jQuery;
 						if ( authResult['status'] && authResult['status']['signed_in'] ) {
@@ -1605,7 +1615,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								//console.log( response );
 
 								// Reload wp-login.php to continue the authentication process.
-								window.location.href = window.location.pathname + '?external=google';
+								var new_href = auth_update_querystring_param( location.href, 'external', 'google' );
+								if ( location.href === new_href ) {
+									location.reload();
+								} else {
+									location.href = new_href;
+								}
 							});
 						} else {
 							// Update the app to reflect a signed out user
