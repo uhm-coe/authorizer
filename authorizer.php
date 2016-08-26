@@ -5361,7 +5361,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Update: Set default values for newly added options (forgot to do
 			// this, so some users are getting debug log notices about undefined
 			// indexes in $auth_settings).
-			$update_if_older_than = 20160318;
+			$update_if_older_than = 20160825;
 			$auth_version = get_option( 'auth_version' );
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
