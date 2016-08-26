@@ -1007,20 +1007,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
 			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
-                                $caUrl = 'https://curl.haxx.se/ca/cacert.pem';
-                                if ( ! defined( 'WP_PROXY_HOST' ) ) {
-                                        $cacert_contents = file_get_contents( $caUrl );
-                                } else {
-                                        $proxyurl = "tcp://" . WP_PROXY_HOST . ":" . WP_PROXY_PORT;
-                                        $domain = parse_url( $caUrl, PHP_URL_HOST );
-                                        $opts = array(
-                                                'http' => array( 'proxy' => $proxyurl ),
-                                                'ssl' => array( 'SNI_enabled' => true, 'SNI_server_name' => $domain )
-                                        );
-                                        $context = stream_context_create($opts);
-                                        $cacert_contents = file_get_contents( $caUrl, false, $context );
-                                }
+				$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
 
+				// If this WordPress install is behind a proxy, use it to retrieve the updated certs.
+				if ( defined( 'WP_PROXY_HOST' ) && defined( 'WP_PROXY_PORT' ) ) {
+					$context = stream_context_create( array(
+						'http' => array(
+							'proxy' => 'tcp://' . WP_PROXY_HOST . ':' . WP_PROXY_PORT,
+						),
+						'ssl' => array(
+							'SNI_enabled' => true,
+							'SNI_server_name' => parse_url( $cacert_url, PHP_URL_HOST ),
+						),
+					));
+					$cacert_contents = file_get_contents( $cacert_url, false, $context );
+				} else {
+					$cacert_contents = file_get_contents( $cacert_url );
+				}
+
+				// Write out the updated certs to the plugin directory.
 				if ( $cacert_contents !== false ) {
 					file_put_contents( $cacert_path, $cacert_contents );
 				} else {
