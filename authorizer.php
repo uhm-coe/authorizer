@@ -392,7 +392,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				! is_wp_error( $result )
 			) {
 				$result = $this->custom_authenticate_google( $auth_settings );
-				if ( ! is_wp_error( $result ) ) {
+				if ( ! is_null( $result ) && ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
 						$externally_authenticated_emails = $result['email'];
 					} else {
@@ -410,7 +410,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				! is_wp_error( $result )
 			) {
 				$result = $this->custom_authenticate_cas( $auth_settings );
-				if ( ! is_wp_error( $result ) ) {
+				if ( ! is_null( $result ) && ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
 						$externally_authenticated_emails = $result['email'];
 					} else {
@@ -428,7 +428,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				! is_wp_error( $result )
 			) {
 				$result = $this->custom_authenticate_ldap( $auth_settings, $username, $password );
-				if ( ! is_wp_error( $result ) ) {
+				if ( ! is_null( $result ) && ! is_wp_error( $result ) ) {
 					if ( is_array( $result['email'] ) ) {
 						$externally_authenticated_emails = $result['email'];
 					} else {
