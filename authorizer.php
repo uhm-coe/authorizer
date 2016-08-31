@@ -1270,8 +1270,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If logged in to CAS, Log out of CAS.
 			if ( $current_user_authenticated_by === 'cas' && $auth_settings['cas'] === '1' ) {
 				if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
+
+					// Get the CAS server version (default to SAML_VERSION_1_1).
+					// See: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+					$cas_version = SAML_VERSION_1_1;
+					if ( $auth_settings['cas_version'] === 'CAS_VERSION_3_0' ) {
+						$cas_version = CAS_VERSION_3_0;
+					} else if ( $auth_settings['cas_version'] === 'CAS_VERSION_2_0' ) {
+						$cas_version = CAS_VERSION_2_0;
+					} else if ( $auth_settings['cas_version'] === 'CAS_VERSION_1_0' ) {
+						$cas_version = CAS_VERSION_1_0;
+					}
+
 					// Set the CAS client configuration if it hasn't been set already.
-					phpCAS::client( SAML_VERSION_1_1, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+					phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 					// Restrict logout request origin to the CAS server only (prevent DDOS).
 					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 				}
@@ -4093,6 +4105,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_cas_path( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'CAS server version', 'authorizer' ); ?></th>
+								<td><?php $this->print_select_cas_version( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'CAS attribute containing email', 'authorizer' ); ?></th>
 								<td><?php $this->print_text_cas_attr_email( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
@@ -5361,7 +5377,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Update: Set default values for newly added options (forgot to do
 			// this, so some users are getting debug log notices about undefined
 			// indexes in $auth_settings).
-			$update_if_older_than = 20160825;
+			$update_if_older_than = 20160831;
 			$auth_version = get_option( 'auth_version' );
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
