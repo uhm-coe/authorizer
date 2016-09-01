@@ -1003,10 +1003,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 3 months, then use it to ensure CAS server is legitimate.
+			// Note: only try to update if the system has the php_openssl extension;
+			// otherwise the file_get_contents() call will fail (Unable to find the
+			// socket transport "ssl").
 			$cacert_path = plugin_dir_path( __FILE__ ) . 'inc/cacert.pem';
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
-			if ( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago ) {
+			if (
+				extension_loaded( 'openssl' ) &&
+				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago )
+			) {
 				$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
 
 				// If this WordPress install is behind a proxy, use it to retrieve the updated certs.
@@ -3502,6 +3508,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$openssl_installed_message = ! extension_loaded( 'openssl' ) ? __( '<a href="http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working" target="_blank" style="color: red;">PHP openssl extension</a> is not installed', 'authorizer' ) : '';
 
 			// Build error message string.
+			$error_message = '';
 			if ( strlen( $curl_installed_message ) > 0 || strlen( $openssl_installed_message ) > 0 ) {
 				$error_message = '<span style="color: red;">(' .
 					__( 'Warning', 'authorizer' ) . ': ' .
