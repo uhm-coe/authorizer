@@ -1358,7 +1358,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API
 				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_oauth1=" ) === 0 ) ||
 				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them
-				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_route=" ) === 0 && $_SERVER['REQUEST_METHOD'] !== 'GET' )
+				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_route=" ) === 0 && $_SERVER['REQUEST_METHOD'] !== 'GET' ) ||
+				// Allow access for GET requests to /wp-json/ (root), since REST API discovery calls rely on this
+				( property_exists( $wp, 'matched_query' ) && $wp->matched_query === 'rest_route=/' )
 				// Note that GET requests to a rest endpoint will be restricted by authorizer. In that case, error messages will be returned as JSON.
 			);
 
@@ -1386,6 +1388,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_advanced_public_notice', false );
 
 				// We've determined that the current user has access, so simply return to grant access.
+				return $wp;
+			}
+
+			// Allow HEAD requests to the root (usually discovery from a REST client).
+			if ( $_SERVER['REQUEST_METHOD'] === 'HEAD' && empty( $wp->request ) && empty( $wp->matched_query ) ) {
 				return $wp;
 			}
 
