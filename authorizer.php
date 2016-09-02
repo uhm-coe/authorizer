@@ -1062,37 +1062,44 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// Get the TLD from the CAS host for use in matching email addresses
-			// For example: example.edu is the TLD for authn.example.edu, so user
-			// 'bob' will have the following email address: bob@example.edu.
-			$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+			// Get username (as specified by the CAS server).
+			$username = phpCAS::getUser();
+
+			// If we can't get the logging in user's email address from a CAS attribute,
+			// just use the domain from the CAS server hostname. This will only be
+			// used if we can't discover the email address from CAS attributes.
+			$domain = $auth_settings['cas_host'];
 
 			// Get username that successfully authenticated against the external service (CAS).
-			$externally_authenticated_email = strtolower( phpCAS::getUser() ) . '@' . $tld;
+			$externally_authenticated_email = strtolower( $username ) . '@' . $domain;
 
 			// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
 			$cas_attributes = phpCAS::getAttributes();
 
-			// If a CAS attribute has been specified as containing the email address, use that instead.
-			// Email attribute can be a string or an array of strings.
-			if (
-				array_key_exists( 'cas_attr_email', $auth_settings ) &&
-				strlen( $auth_settings['cas_attr_email'] ) > 0 &&
-				array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && (
-					(
-						is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
-						count( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
-					) || (
-						is_string( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
-						strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+			// Get user email if it is specified in another field.
+			if ( array_key_exists( 'cas_attr_email', $auth_settings ) && strlen( $auth_settings['cas_attr_email'] ) > 0 ) {
+				// If the email attribute starts with an at symbol (@), assume that the
+				// email domain is manually entered there (instead of a reference to a
+				// CAS attribute), and combine that with the username to create the email.
+				// Otherwise, look up the CAS attribute for email.
+				if ( substr( $auth_settings['cas_attr_email'], 0, 1 ) === '@' ) {
+					$externally_authenticated_email = strtolower( $username . $auth_settings['cas_attr_email'] );
+				} else if (
+					// If a CAS attribute has been specified as containing the email address, use that instead.
+					// Email attribute can be a string or an array of strings.
+					array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && (
+						(
+							is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
+							count( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+						) || (
+							is_string( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
+							strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+						)
 					)
-				)
-			) {
-				$externally_authenticated_email = $cas_attributes[$auth_settings['cas_attr_email']];
+				) {
+					$externally_authenticated_email = $cas_attributes[$auth_settings['cas_attr_email']];
+				}
 			}
-
-			// Get username (as specified by the CAS server).
-			$username = phpCAS::getUser();
 
 			// Get user first name and last name.
 			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_first_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_first_name']] : '';
@@ -1121,27 +1128,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                       or null if skipping LDAP auth and falling back to WP auth.
 		 */
 		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
-			// Get the TLD from the LDAP search base domain components (dc). For
+			// Get the FQDN from the LDAP search base domain components (dc). For
 			// example, ou=people,dc=example,dc=edu,dc=uk would yield user@example.edu.uk
 			$search_base_components = explode( ',', trim( $auth_settings['ldap_search_base'] ) );
-			$tld = array();
+			$domain = array();
 			foreach ( $search_base_components as $search_base_component ) {
 				$component = explode( '=', $search_base_component );
 				if ( count( $component ) === 2 && $component[0] === 'dc' ) {
-					$tld[] = $component[1];
+					$domain[] = $component[1];
 				}
 			}
-			$tld = implode( '.', $tld );
+			$domain = implode( '.', $domain );
 
-			// If the TLD is still empty, get the TLD from the LDAP host for use in matching email addresses
-			// For example: example.edu is the TLD for ldap.example.edu, so user
-			// 'bob' will have the following email address: bob@example.edu.
-			if ( empty( $tld ) ) {
-				$tld = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+			// If we can't get the logging in user's email address from an LDAP attribute,
+			// just use the domain from the LDAP host. This will only be used if we
+			// can't discover the email address from an LDAP attribute.
+			if ( empty( $domain ) ) {
+				$domain = $auth_settings['ldap_host'];
 			}
 
-			// remove top level domain if it exists in the username (i.e., if user entered their email)
-			$username = str_replace( '@' . $tld, '', $username );
+			// remove @domain if it exists in the username (i.e., if user entered their email)
+			$username = str_replace( '@' . $domain, '', $username );
 
 			// Fail with error message if username or password is blank.
 			if ( empty( $username ) ) {
@@ -1194,7 +1201,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 ) {
 				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_last_name'] );
 			}
-			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 ) {
+			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && substr( $auth_settings['ldap_attr_email'], 0, 1 ) !== '@' ) {
 				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_email'] );
 			}
 			$ldap_search = ldap_search(
@@ -1222,8 +1229,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$last_name = $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0];
 				}
 				// Get user email if it is specified in another field.
-				if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_email'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_email']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] ) > 0 ) {
-					$email = strtolower( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] );
+				if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 ) {
+					// If the email attribute starts with an at symbol (@), assume that the
+					// email domain is manually entered there (instead of a reference to an
+					// LDAP attribute), and combine that with the username to create the email.
+					// Otherwise, look up the LDAP attribute for email.
+					if ( substr( $auth_settings['ldap_attr_email'], 0, 1 ) === '@' ) {
+						$email = strtolower( $username . $auth_settings['ldap_attr_email'] );
+					} else if ( array_key_exists( $auth_settings['ldap_attr_email'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_email']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] ) > 0 ) {
+						$email = strtolower( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] );
+					}
 				}
 			}
 
@@ -1237,7 +1252,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
-			$externally_authenticated_email = $username . '@' . $tld;
+			$externally_authenticated_email = $username . '@' . $domain;
 
 			// If an LDAP attribute has been specified as containing the email address, use that instead.
 			if ( strlen( $email ) > 0 ) {
@@ -3578,7 +3593,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" />
+			<br /><small><?php _e( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ); ?></small><?php
 		} // END print_text_cas_attr_email()
 
 		function print_text_cas_attr_first_name( $args = '' ) {
@@ -3673,7 +3689,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" /><?php
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="mail" />
+			<br /><small><?php _e( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ); ?></small><?php
 		} // END print_text_ldap_attr_email()
 
 		function print_text_ldap_user( $args = '' ) {
