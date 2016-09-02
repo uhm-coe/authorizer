@@ -65,7 +65,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Fix: Include translatable strings found in javascript files.
 * Fix: Force lowercase emails from LDAP. Props @akompanas.
 * Fix: Set some LDAP defaults likely to be the same on all installs : ldap_port, ldap_attr_username.
-* Fix: Construct LDAP default email domain from LDAP search base, not from host (helps to differentiate between subdomain installs and top level domains with country codes).
+* Fix: Construct LDAP default email domain from LDAP search base, not from host (helps to differentiate between subdomain installs and domains with country codes).
 
 = 2.5.0 =
 * Translations: Props to @elarequi for wrapping text strings in the translation functions and for providing Spanish translations.
