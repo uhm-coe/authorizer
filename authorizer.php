@@ -5365,15 +5365,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
 
-			// Make sure we have a selected role (default to subscriber).
-			if ( strlen( $selected_role ) < 1 ) {
-				$selected_role = 'subscriber';
-			}
-
 			// If the currently selected role is not in the list of roles, it
 			// either doesn't exist or the current user is not permitted to
 			// assign it.
-			if ( ! array_key_exists( $selected_role, $roles ) ) {
+			if ( strlen( $selected_role ) > 0 && ! array_key_exists( $selected_role, $roles ) ) {
 				?><option value="<?php echo $selected_role; ?>"><?php echo ucfirst( $selected_role ); ?></option><?php
 
 				// If the role exists, that means the user isn't permitted to
@@ -5398,6 +5393,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
 			}
+
+			// Print default role (no role).
+			$selected = $selected_role === '' ? ' selected="selected"' : '';
+			$disabled = $selected_role !== '' && $disable_input === 'disabled' ? ' disabled="disabled"' : '';
+			if ( is_multisite() && current_user_can( 'manage_network' ) ) {
+				$disabled = '';
+			}
+			?><option value=""<?php echo $selected . $disabled; ?>><?php _e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
+
 		}
 
 
