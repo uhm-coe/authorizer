@@ -237,6 +237,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $this->in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
 					continue;
 				}
+				// Remove from pending list if there.
+				foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
+					if ( $pending_user['email'] == $user->user_email ) {
+						unset( $auth_settings_access_users_pending[$key] );
+						$updated = true;
+					}
+				}
 				// Skip if user is in multisite approved list.
 				if ( $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 					continue;
@@ -251,13 +258,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					);
 					array_push( $auth_settings_access_users_approved, $approved_user );
 					$updated = true;
-				}
-				// Remove from pending list if there.
-				foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-					if ( $pending_user['email'] == $user->user_email ) {
-						unset( $auth_settings_access_users_pending[$key] );
-						$updated = true;
-					}
 				}
 			}
 			if ( $updated ) {
