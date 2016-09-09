@@ -190,9 +190,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() && isset( $_GET['networkwide'] ) && $_GET['networkwide'] == 1 ) {
 				$old_blog = $wpdb->blogid;
 				// Get all blog ids
-				$blogs = wp_get_sites( array( 'limit' => 999999 ) );
-				foreach ( $blogs as $blog ) {
-					switch_to_blog( $blog['blog_id'] );
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+				foreach ( $sites as $site ) {
+					switch_to_blog( $site['blog_id'] );
 					// Set meaningful defaults for other sites in the network.
 					$this->set_default_options();
 					// Add current WordPress users to the approved list.
@@ -4604,7 +4604,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// on individual sites and remove this user from them (to prevent duplicate entries).
 						if ( $approved_user['multisite_user'] !== 'false' && is_multisite() ) {
 							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
-							foreach ( wp_get_sites( array( 'limit' => 999999 ) ) as $site ) {
+							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+							foreach ( $sites as $site ) {
 								foreach ( $list_names as $list_name ) {
 									$user_list = get_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, array() );
 									$list_changed = false;
@@ -4970,7 +4971,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
-			foreach ( wp_get_sites( array( 'limit' => 999999 ) ) as $site ) {
+			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+			foreach ( $sites as $site ) {
 				$this->remove_network_user_from_site_when_removed( $user_id, $site['blog_id'] );
 			}
 
@@ -5429,9 +5431,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					global $wpdb;
 					$old_blog = $wpdb->blogid;
 					// Get all blog ids
-					$blogs = wp_get_sites( array( 'limit' => 999999 ) );
-					foreach ( $blogs as $blog ) {
-						switch_to_blog( $blog['blog_id'] );
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+					foreach ( $sites as $site ) {
+						switch_to_blog( $site['blog_id'] );
 						// Set meaningful defaults for other sites in the network.
 						$this->set_default_options();
 					}
