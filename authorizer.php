@@ -2991,7 +2991,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get multisite approved users (add them to top of list, greyed out).
 			$auth_override_multisite = $this->get_plugin_option( 'advanced_override_multisite' );
 			$auth_multisite_settings = $this->get_plugin_options( MULTISITE_ADMIN );
-			$option_multisite = 'access_users_approved';
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
