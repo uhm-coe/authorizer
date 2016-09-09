@@ -60,6 +60,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.1 =
+* Tested up to WordPress 4.6.1.
+* Update cacert.pem file.
+
 = 2.6.0 =
 * Tested up to WordPress 4.6.
 * Feature: Add method for constructing email address for CAS/LDAP servers that don't return an email attribute. Simply enter @yourdomain.edu into the mail attribute field to have email addresses be constructed as username@yourdomain.edu.
@@ -67,7 +71,6 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Feature: Allow restricting Google logins to a single Google Apps hosted domain (e.g., mycollege.edu).
 * Update google-api-php-client from 1.0.5-beta to 1.1.5.
 * Fix for REST API integration: Authorizer will now deny read/view access via the REST API if the site is private and the user is not authenticated. Other REST API access is unaffected by Authorizer, and is managed by the REST API authentication schema (cookie, oauth, or basic authentication). See [http://v2.wp-api.org/guide/authentication/](http://v2.wp-api.org/guide/authentication/) for details.
-* Update cacert.pem file.
 * Fix: Warn if php_openssl.dll is not installed on Windows servers (cannot update cacert.pem if it's missing).
 * Fix for mcrypt key length error in php 5.6 and higher.
 * Fix for broken newlines in notification emails (also update translations).
