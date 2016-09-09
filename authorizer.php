@@ -194,21 +194,43 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling
 			if ( is_multisite() && isset( $_GET['networkwide'] ) && $_GET['networkwide'] == 1 ) {
-				$old_blog = $wpdb->blogid;
-				// Get all blog ids
+
+				// Add super admins to the multisite approved list.
+				$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+				$should_update_auth_multisite_settings_access_users_approved = false;
+				foreach ( get_super_admins() as $super_admin ) {
+					$user = get_user_by( 'login', $super_admin );
+					// Add to approved list if not there.
+					if ( ! $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
+						$approved_user = array(
+							'email' => $user->user_email,
+							'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+							'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+							'local_user' => true,
+						);
+						array_push( $auth_multisite_settings_access_users_approved, $approved_user );
+						$should_update_auth_multisite_settings_access_users_approved = true;
+					}
+				}
+				if ( $should_update_auth_multisite_settings_access_users_approved ) {
+					update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				}
+
+				// Run plugin activation on each site in the network.
+				$current_blog_id = $wpdb->blogid;
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
 				foreach ( $sites as $site ) {
-					switch_to_blog( $site['blog_id'] );
-					// Set meaningful defaults for other sites in the network.
+					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					switch_to_blog( $blog_id );
+					// Set default plugin options and add current users to approved list.
 					$this->set_default_options();
-					// Add current WordPress users to the approved list.
 					$this->add_wp_users_to_approved_list();
 				}
-				switch_to_blog( $old_blog );
+				switch_to_blog( $current_blog_id );
+
 			} else {
-				// Set meaningful defaults for this site.
+				// Set default plugin options and add current users to approved list.
 				$this->set_default_options();
-				// Add current WordPress users to the approved list.
 				$this->add_wp_users_to_approved_list();
 			}
 
