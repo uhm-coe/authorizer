@@ -4661,8 +4661,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
 							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
 							foreach ( $sites as $site ) {
+								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 								foreach ( $list_names as $list_name ) {
-									$user_list = get_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, array() );
+									$user_list = get_blog_option( $blog_id, 'auth_settings_' . $list_name, array() );
 									$list_changed = false;
 									foreach ( $user_list as $key => $user ) {
 										if ( $user['email'] == $approved_user['email'] ) {
@@ -4671,7 +4672,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 										}
 									}
 									if ( $list_changed ) {
-										update_blog_option( $site['blog_id'], 'auth_settings_' . $list_name, $user_list );
+										update_blog_option( $blog_id, 'auth_settings_' . $list_name, $user_list );
 									}
 								}
 							}
@@ -5027,7 +5028,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Go through all pending/approved lists on individual sites and remove this user from them.
 			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
 			foreach ( $sites as $site ) {
-				$this->remove_network_user_from_site_when_removed( $user_id, $site['blog_id'] );
+				$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+				$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
 			}
 
 		}
@@ -5499,7 +5501,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Get all blog ids
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
 					foreach ( $sites as $site ) {
-						switch_to_blog( $site['blog_id'] );
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
 						// Set meaningful defaults for other sites in the network.
 						$this->set_default_options();
 					}
