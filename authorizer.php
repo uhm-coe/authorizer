@@ -4569,8 +4569,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 							}
 							if ( ! is_wp_error( $result ) ) {
-								// Email password to new user
-								wp_new_user_notification( $result, $plaintext_password );
+								// Email login credentials to new user.
+								wp_new_user_notification( $result, null, 'both' );
 							}
 
 						}
