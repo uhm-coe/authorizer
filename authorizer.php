@@ -162,8 +162,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Load custom javascript for the main site (e.g., for displaying alerts).
 			add_action( 'wp_enqueue_scripts', array( $this, 'auth_public_scripts' ), 20 );
 
-			// If multisite, add network admin options page (global settings for all sites)
+			// Multisite-specific actions.
 			if ( is_multisite() ) {
+				// Add network admin options page (global settings for all sites)
 				add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
 			}
 
@@ -4621,6 +4622,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( $approved_user['edit_action'] === 'add' ) {
 						$new_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $new_user !== false ) {
+							// If this user already has an account on another site in the network, add them to this site.
 							if ( is_multisite() ) {
 								add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
 							}
