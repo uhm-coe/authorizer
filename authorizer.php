@@ -175,9 +175,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Remove user from authorizer lists when that user is deleted in WordPress.
 			add_action( 'delete_user', array( $this, 'remove_user_from_authorizer_when_deleted' ) );
-
-			// Remove multisite user from authorizer lists when that user is deleted from Network Users.
 			if ( is_multisite() ) {
+				// Remove multisite user from authorizer lists when that user is deleted from Network Users.
 				add_action( 'remove_user_from_blog', array( $this, 'remove_network_user_from_site_when_removed' ), 10, 2 );
 				add_action( 'wpmu_delete_user', array( $this, 'remove_network_user_from_authorizer_when_deleted' ) );
 			}
@@ -206,7 +205,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( ! $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 						$approved_user = array(
 							'email' => $user->user_email,
-							'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+							'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 							'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 							'local_user' => true,
 						);
