@@ -693,6 +693,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// Authenticate as new user
 						$user = new WP_User( $result );
 
+						// If multisite, iterate through all sites in the network and add the user
+						// currently logging in to any of them that have the user on the approved list.
+						// Note: this is useful for first-time logins--some users will have access
+						// to multiple sites, and this prevents them from having to log into each
+						// site individually to get access.
+						if ( is_multisite() ) {
+							$site_ids_of_user = array_map(
+								function ( $site_of_user ) { return $site_of_user->userblog_id; },
+								get_blogs_of_user( $user->ID )
+							);
+
+							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+							foreach ( $sites as $site ) {
+								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+
+								// Skip if user is already added to this site.
+								if ( in_array( $blog_id, $site_ids_of_user ) ) {
+									continue;
+								}
+
+								// Check if user is on the approved list of this site they are not added to.
+								$other_auth_settings_access_users_approved = get_blog_option( $blog_id, 'auth_settings_access_users_approved', array() );
+								if ( $this->in_multi_array( $user->user_email, $other_auth_settings_access_users_approved ) ) {
+									$other_user_info = $this->get_user_info_from_list( $user->user_email, $other_auth_settings_access_users_approved );
+									// Add user to other site.
+									add_user_to_blog( $blog_id, $user->ID, $other_user_info['role'] );
+								}
+							}
+						}
+
 						// Check if this new user has any preassigned usermeta
 						// values in their approved list entry, and apply them to
 						// their new WordPress account.
