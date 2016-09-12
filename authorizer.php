@@ -1126,12 +1126,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$username = phpCAS::getUser();
 
 			// If we can't get the logging in user's email address from a CAS attribute,
-			// just use the domain from the CAS server hostname. This will only be
+			// try to guess the domain from the CAS server hostname. This will only be
 			// used if we can't discover the email address from CAS attributes.
-			$domain = $auth_settings['cas_host'];
+			$domain_guess = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
 
 			// Get username that successfully authenticated against the external service (CAS).
-			$externally_authenticated_email = strtolower( $username ) . '@' . $domain;
+			$externally_authenticated_email = strtolower( $username ) . '@' . $domain_guess;
 
 			// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
 			$cas_attributes = phpCAS::getAttributes();
@@ -1204,7 +1204,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// just use the domain from the LDAP host. This will only be used if we
 			// can't discover the email address from an LDAP attribute.
 			if ( empty( $domain ) ) {
-				$domain = $auth_settings['ldap_host'];
+				$domain = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
 			}
 
 			// remove @domain if it exists in the username (i.e., if user entered their email)
