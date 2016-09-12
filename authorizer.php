@@ -1794,6 +1794,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check whether we should redirect to CAS.
 			if (
+				strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false &&
 				array_key_exists( 'cas_auto_login', $auth_settings ) && $auth_settings['cas_auto_login'] === '1' &&
 				array_key_exists( 'cas', $auth_settings ) && $auth_settings['cas'] === '1' &&
 				( ! array_key_exists( 'ldap', $auth_settings ) || $auth_settings['ldap'] !== '1' ) &&
