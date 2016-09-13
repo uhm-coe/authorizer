@@ -181,6 +181,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_action( 'wpmu_delete_user', array( $this, 'remove_network_user_from_authorizer_when_deleted' ) );
 			}
 
+			// Add multisite user to authorizer approved list when that user is added to a blog from the Users screen.
+			add_action( 'invite_user', array( $this, 'add_existing_user_to_authorizer_when_created' ), 10, 3 );
+			add_action( 'added_existing_user', array( $this, 'add_existing_user_to_authorizer_when_created_noconfirmation' ), 10, 2 );
+			add_action( 'after_signup_user', array( $this, 'add_new_user_to_authorizer_when_created' ), 10, 4 );
+
 		}
 
 
@@ -5118,6 +5123,108 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $list_changed ) {
 					update_blog_option( $blog_id, 'auth_settings_' . $list_name, $user_list );
 				}
+			}
+		}
+
+
+		/**
+		 * When an existing user is invited to the current site (or a new user is created),
+		 * add them to the authorizer approved list. This action fires when the admin
+		 * doesn't select the "Skip Confirmation Email" option.
+		 *
+		 * @action invite_user
+		 *
+		 * @param int $user_id The invited user's ID.
+		 * @param array $role The role of the invited user (or none if a new user creation).
+		 * @param string $newuser_key The key of the invitation.
+		 */
+		function add_existing_user_to_authorizer_when_created( $user_id, $role = array(), $newuser_key = '' ) {
+			$user = get_user_by( 'id', $user_id );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles, $role );
+		}
+
+
+		/**
+		 * When an existing user is invited to the current site (or a new user is created),
+		 * add them to the authorizer approved list. This action fires when the admin
+		 * selects the "Skip Confirmation Email" option.
+		 *
+		 * @action added_existing_user
+		 *
+		 * @param int $user_id The invited user's ID.
+		 * @param mixed $result True on success or a WP_Error object if the user doesn't exist.
+		 */
+		function add_existing_user_to_authorizer_when_created_noconfirmation( $user_id, $result ) {
+			$user = get_user_by( 'id', $user_id );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
+		}
+
+
+		/**
+		 * When a new user is invited to the current site (or a new user is created),
+		 * add them to the authorizer approved list.
+		 *
+		 * @action after_signup_user
+		 *
+		 * @param string $user User's requested login name.
+		 * @param string $user_email User's email address.
+		 * @param string $key User's activation key.
+		 * @param array $meta Additional signup meta.
+		 */
+		function add_new_user_to_authorizer_when_created( $user, $user_email, $key, $meta ) {
+			$this->add_user_to_authorizer_when_created( $user_email, time() );
+		}
+
+
+		/**
+		 * Helper: When a new user is added/invited to the current site (or a new
+		 * user is created), add them to the authorizer approved list.
+		 */
+		private function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
+			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+
+			// Get default role if one isn't specified.
+			if ( count( $default_role ) < 1 ) {
+				$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
+			} else {
+				$default_role = strtolower( $default_role['name'] );
+			}
+
+			$updated = false;
+
+			// Skip if user is in blocked list.
+			if ( $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
+				continue;
+			}
+			// Remove from pending list if there.
+			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
+				if ( $pending_user['email'] == $user_email ) {
+					unset( $auth_settings_access_users_pending[$key] );
+					$updated = true;
+				}
+			}
+			// Skip if user is in multisite approved list.
+			if ( $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
+				continue;
+			}
+			// Add to approved list if not there.
+			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
+				$approved_user = array(
+					'email' => $user_email,
+					'role' => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
+					'date_added' => date( 'M Y', strtotime( $date_registered ) ),
+					'local_user' => true,
+				);
+				array_push( $auth_settings_access_users_approved, $approved_user );
+				$updated = true;
+			}
+
+			if ( $updated ) {
+				update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 			}
 		}
 
