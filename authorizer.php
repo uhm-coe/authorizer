@@ -181,10 +181,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_action( 'wpmu_delete_user', array( $this, 'remove_network_user_from_authorizer_when_deleted' ) );
 			}
 
-			// Add multisite user to authorizer approved list when that user is added to a blog from the Users screen.
+			// Add user to authorizer approved list when that user is added to a blog from the Users screen.
+			// Multisite: invite_user action fired when adding (inviting) an existing network user to the current site (with email confirmation).
 			add_action( 'invite_user', array( $this, 'add_existing_user_to_authorizer_when_created' ), 10, 3 );
+			// Multisite: added_existing_user action fired when adding an existing network user to the current site (without email confirmation).
 			add_action( 'added_existing_user', array( $this, 'add_existing_user_to_authorizer_when_created_noconfirmation' ), 10, 2 );
+			// Multisite: after_signup_user action fired when adding a new user to the site (with or without email confirmation).
 			add_action( 'after_signup_user', array( $this, 'add_new_user_to_authorizer_when_created' ), 10, 4 );
+			// Single site: edit_user_created_user action fired when adding a new user to the site (with or without email notification).
+			add_action( 'edit_user_created_user', array( $this, 'add_new_user_to_authorizer_when_created_single_site' ), 10, 2 );
 
 		}
 
@@ -5128,6 +5133,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Multisite:
 		 * When an existing user is invited to the current site (or a new user is created),
 		 * add them to the authorizer approved list. This action fires when the admin
 		 * doesn't select the "Skip Confirmation Email" option.
@@ -5145,6 +5151,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Multisite:
 		 * When an existing user is invited to the current site (or a new user is created),
 		 * add them to the authorizer approved list. This action fires when the admin
 		 * selects the "Skip Confirmation Email" option.
@@ -5161,6 +5168,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Multisite:
 		 * When a new user is invited to the current site (or a new user is created),
 		 * add them to the authorizer approved list.
 		 *
@@ -5173,6 +5181,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function add_new_user_to_authorizer_when_created( $user, $user_email, $key, $meta ) {
 			$this->add_user_to_authorizer_when_created( $user_email, time() );
+		}
+
+
+		/**
+		 * Single site:
+		 * When a new user is added in single site mode, add them to the authorizer
+		 * approved list.
+		 *
+		 * @action edit_user_created_user
+		 *
+		 * @param int $user_id ID of the newly created user.
+		 * @param string $notify Type of notification that should happen. See wp_send_new_user_notifications()
+		 *                       for more information on possible values.
+		 */
+		function add_new_user_to_authorizer_when_created_single_Site( $user_id, $notify ) {
+			$user = get_user_by( 'id', $user_id );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
 		}
 
 
