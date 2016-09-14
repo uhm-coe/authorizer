@@ -175,7 +175,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	}
 
 	var user = {
-		'email': email.val(),
+		'email': $.trim( email.val() ).replace( 'mailto:', '' ),
 		'role': role.val(),
 		'date_added': date_added.val(),
 		'edit_action': 'add',
@@ -186,7 +186,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	var next_id = $( '#list_auth_settings_access_users_' + list + ' li' ).length;
 	var validated = true;
 
-	if ( $.trim( email.val() ) === '' ) {
+	if ( user.email === '' ) {
 		return false;
 	}
 
@@ -195,7 +195,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	// Check if the name being added already exists in any list.
 	if ( ! skip_validation && validated ) {
 		$( 'li > input.auth-email' ).each( function() {
-			if ( this.value == email.val() ) {
+			if ( this.value == user.email ) {
 				validated = false;
 				email.parent().effect( 'shake', shake_speed );
 				$( this ).parent().effect( 'shake', shake_speed );
@@ -207,7 +207,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 
 	// Check if the user being added has a valid email address.
 	if ( ! skip_validation && validated ) {
-		if ( ! valid_email( email.val() ) ) {
+		if ( ! valid_email( user.email ) ) {
 			validated = false;
 			$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
 			$( buttons ).removeAttr( 'disabled' );
@@ -221,7 +221,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
-				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + email.val() + '" readonly="true" class="auth-email" /> \
+				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
 				<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + auth_js_prefix + 'change_role( this );"> \
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
