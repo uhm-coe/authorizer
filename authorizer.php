@@ -4840,6 +4840,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					if ( $blocked_user['edit_action'] === 'add' ) {
 
+						// Add auth_blocked usermeta for the user.
+						$blocked_wp_user = get_user_by( 'email', $blocked_user['email'] );
+						if ( $blocked_wp_user !== false ) {
+							update_user_meta( $blocked_wp_user->ID, 'auth_blocked', 'yes' );
+						}
+
 						// Add new user to blocked list and save (skip if it's
 						// already there--someone else might have just done it).
 						if ( ! $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
