@@ -266,7 +266,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
-			$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 			$updated = false;
 			foreach ( get_users() as $user ) {
 				// Skip if user is in blocked list.
@@ -288,7 +287,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
 					$approved_user = array(
 						'email' => $user->user_email,
-						'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+						'role' => count( $user->roles ) > 0 ? $user->roles[0] : '',
 						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
 					);
@@ -1883,7 +1882,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
-			$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 			$updated = false;
 
 			// Skip if user is in blocked list.
@@ -1905,7 +1903,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
 				$approved_user = array(
 					'email' => $user->user_email,
-					'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+					'role' => count( $user->roles ) > 0 ? $user->roles[0] : '',
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
 				);
@@ -5273,7 +5271,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get default role if one isn't specified.
 			if ( count( $default_role ) < 1 ) {
-				$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
+				$default_role = '';
 			} else {
 				$default_role = strtolower( $default_role['name'] );
 			}
