@@ -225,7 +225,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		// Add the new item.
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="' + auth_L10n.local_wordpress_user + '" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" id="block_user_' + next_id + '" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
 			<li id="new_user_' + next_id + '" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
@@ -233,7 +233,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
 				' + ban_button + ' \
-				<a class="button" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
+				<a class="button" id="ignore_user_' + next_id + '" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
 				' + local_icon + ' \
 				<span class="spinner is-active"></span> \
 			</li> \
