@@ -73,6 +73,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Fix for deprecation warning in WordPress 4.6: wp_get_sites().
 * Fix for deprecation warning in WordPress 4.6: wp_new_user_notification().
 * Fix for multisite users not being removed from pending lists.
+* Improve code efficiency.
 
 = 2.6.2 =
 * Revert LDAP/CAS email domain guessing logic (some existing users rely on the old method to determine email address domains). If email domain or CAS/LDAP attribute containing email address is not specified in Authorizer options, guess that email domain is the last two components of the CAS/LDAP host when splitting by periods (e.g., authn.example.com would return an email domain of example.com).
