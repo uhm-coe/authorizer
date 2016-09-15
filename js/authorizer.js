@@ -183,7 +183,14 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		'multisite_user': is_multisite,
 	};
 
-	var next_id = $( '#list_auth_settings_access_users_' + list + ' li' ).length;
+	// Get next highest user ID.
+	var next_id = 1 + Math.max.apply(
+		null,
+		$( '#list_auth_settings_access_users_' + list + ' li .auth-email' ).map( function ( el, index ) {
+			return parseInt( this.id.replace( 'auth_multisite_settings_access_users_approved_', '' ).replace( 'auth_settings_access_users_approved_', '' ) );
+		})
+	);
+
 	var validated = true;
 
 	if ( user.email === '' ) {
