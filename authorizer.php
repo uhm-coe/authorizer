@@ -5280,7 +5280,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Skip if user is in blocked list.
 			if ( $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
-				continue;
+				return;
 			}
 			// Remove from pending list if there.
 			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
@@ -5291,7 +5291,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Skip if user is in multisite approved list.
 			if ( $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
-				continue;
+				return;
 			}
 			// Add to approved list if not there.
 			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
