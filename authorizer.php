@@ -1878,43 +1878,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return null
 		 */
 		function ensure_wordpress_user_in_approved_list_on_login( $user_login, $user ) {
-			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
-			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
-			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
-			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
-			$updated = false;
-
-			// Skip if user is in blocked list.
-			if ( $this->in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
-				return;
-			}
-			// Remove from pending list if there.
-			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-				if ( $pending_user['email'] == $user->user_email ) {
-					unset( $auth_settings_access_users_pending[$key] );
-					$updated = true;
-				}
-			}
-			// Skip if user is in multisite approved list.
-			if ( $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
-				return;
-			}
-			// Add to approved list if not there.
-			if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
-				$approved_user = array(
-					'email' => $user->user_email,
-					'role' => count( $user->roles ) > 0 ? $user->roles[0] : '',
-					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
-					'local_user' => true,
-				);
-				array_push( $auth_settings_access_users_approved, $approved_user );
-				$updated = true;
-			}
-
-			if ( $updated ) {
-				update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-			}
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
 		}
 
 
