@@ -105,6 +105,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Update the user meta with this user's failed login attempt.
 			add_action( 'wp_login_failed', array( $this, 'update_login_failed_count' ) );
 
+			// Add users who successfully login to the approved list.
+			add_action( 'wp_login', array( $this, 'ensure_wordpress_user_in_approved_list_on_login' ), 10, 2 );
+
 			// Create menu item in Settings
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 
@@ -1862,6 +1865,57 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} else {
 				update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
 				update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			}
+		}
+
+
+		/**
+		 * When they successfully log in, make sure WordPress users are in the approved list.
+		 *
+		 * @action wp_login
+		 *
+		 * @param  string $user_login Username of the user logging in.
+		 * @param  WP_User $user WP_User object of the user logging in.
+		 * @return null
+		 */
+		function ensure_wordpress_user_in_approved_list_on_login( $user_login, $user ) {
+			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+			$default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
+			$updated = false;
+
+			// Skip if user is in blocked list.
+			if ( $this->in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
+				return;
+			}
+			// Remove from pending list if there.
+			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
+				if ( $pending_user['email'] == $user->user_email ) {
+					unset( $auth_settings_access_users_pending[$key] );
+					$updated = true;
+				}
+			}
+			// Skip if user is in multisite approved list.
+			if ( $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
+				return;
+			}
+			// Add to approved list if not there.
+			if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
+				$approved_user = array(
+					'email' => $user->user_email,
+					'role' => count( $user->roles ) > 0 ? $user->roles[0] : $default_role,
+					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+					'local_user' => true,
+				);
+				array_push( $auth_settings_access_users_approved, $approved_user );
+				$updated = true;
+			}
+
+			if ( $updated ) {
+				update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 			}
 		}
 
