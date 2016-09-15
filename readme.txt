@@ -66,6 +66,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Feature: Sync role and email address in approved list when changed elsewhere.
 * Feature: Add super admins to network approved list on plugin activation.
 * Feature: Allow "no role for this site" selection for user roles.
+* Fix for existing WordPress user logging in: make sure they are in the approved list.
 * Fix for local (WordPress) authentication not respecting the blocked list.
 * Fix for whitespace and "mailto:" in emails (trim when clicking approve button).
 * Fix for external=wordpress safety login not working if option to immediately redirect to CAS is enabled.
