@@ -60,6 +60,19 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.3 =
+* Feature: Add user to authorizer approved list when added from the Users screen.
+* Feature: In multisite, add approved user to all approved sites on first login.
+* Feature: Sync role and email address in approved list when changed elsewhere.
+* Feature: Add super admins to network approved list on plugin activation.
+* Feature: Allow "no role for this site" selection for user roles.
+* Fix for local (WordPress) authentication not respecting the blocked list.
+* Fix for whitespace and "mailto:" in emails (trim when clicking approve button).
+* Fix for external=wordpress safety login not working if option to immediately redirect to CAS is enabled.
+* Fix for deprecation warning in WordPress 4.6: wp_get_sites().
+* Fix for deprecation warning in WordPress 4.6: wp_new_user_notification().
+* Fix for multisite users not being removed from pending lists.
+
 = 2.6.2 =
 * Revert LDAP/CAS email domain guessing logic (some existing users rely on the old method to determine email address domains). If email domain or CAS/LDAP attribute containing email address is not specified in Authorizer options, guess that email domain is the last two components of the CAS/LDAP host when splitting by periods (e.g., authn.example.com would return an email domain of example.com).
 
