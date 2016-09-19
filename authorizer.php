@@ -2055,6 +2055,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery' ), '1.8', true
 			);
 
+			wp_enqueue_script(
+				'listjs',
+				plugins_url( 'inc/listjs/list.min.js', __FILE__ ),
+				array( 'jquery' ), '1.2.0', true
+			);
+
+			wp_enqueue_script(
+				'listjs-pagination',
+				plugins_url( 'inc/listjs/list.pagination.min.js', __FILE__ ),
+				array( 'jquery' ), '0.1.1', true
+			);
+
 			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-css' );
 
@@ -3137,7 +3149,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
 			$multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
-			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
+			?><div id="auth_settings_access_users_approved">
+				<input class="search" placeholder="Search" />
+				<button class="sort button-secondary" data-sort="email">Sort by email</button>
+				<button class="sort button-secondary" data-sort="role">Sort by role</button>
+			<ul class="list" id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( ! $multisite_admin_page ) :
 					foreach ( $auth_settings_option_multisite as $key => $approved_user ) :
 						if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
@@ -3167,6 +3183,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$approved_user['usermeta'] = '';
 						endif; ?>
 						<li>
+						<div class="email hidden"><?php echo $approved_user['email']; ?></div>
+						<div class="role hidden"><?php echo $approved_user['role']; ?></div>
 							<input type="text" id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email auth-multisite-email" />
 							<select id="auth_multisite_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role auth-multisite-role" disabled="disabled">
 								<?php $this->wp_dropdown_permitted_roles( $approved_user['role'] ); ?>
@@ -3229,6 +3247,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$approved_user['usermeta'] = '';
 					endif; ?>
 					<li>
+						<div class="email hidden"><?php echo $approved_user['email']; ?></div>
+						<div class="role hidden"><?php echo $approved_user['role']; ?></div>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
 						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
 							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
@@ -3279,6 +3299,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<li><a href="javascript:void(0);" onclick="<?php echo $js_function_prefix; ?>add_user( document.getElementById('approve_user_new' ), 'approved', true);"><?php _e( 'Create a local WordPress <br />account instead, and email <br />the user their password.', 'authorizer' ); ?></a></li>
 					</ul>
 				</div>
+			</div>
+			<ul class="pagination"></ul>
 			</div>
 			<?php
 		}

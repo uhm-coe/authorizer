@@ -924,6 +924,19 @@ jQuery( document ).ready( function( $ ) {
 	});
 	hide_multisite_settings_if_disabled();
 
+	// Enable listjs on user lists.
+	var approved_list = new List( 'auth_settings_access_users_approved', {
+		valueNames: [ 'email', 'role' ],
+		page: 10,
+		plugins: [ ListPagination( {
+			innerWindow: 5,
+			outerWindow: 5,
+		} ) ]
+	});
+	$( document ).on( 'click', '.sort', function ( event ) {
+		event.preventDefault();
+	})
+
 });
 
 
