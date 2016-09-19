@@ -44,7 +44,7 @@ define( 'SINGLE_ADMIN', 'single_admin' );
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/inc/CAS-1.3.4/CAS.php';
+	require_once dirname( __FILE__ ) . '/vendor/CAS-1.3.4/CAS.php';
 }
 
 
@@ -919,7 +919,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add Google API PHP Client.
 			// @see https://github.com/google/google-api-php-client branch:v1-master
-			require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
+			require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 			// Build the Google Client.
 			$client = new Google_Client();
@@ -983,7 +983,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add Google API PHP Client.
 			// @see https://github.com/google/google-api-php-client branch:v1-master
-			require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
+			require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 			// Build the Google Client.
 			$client = new Google_Client();
@@ -1078,7 +1078,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Note: only try to update if the system has the php_openssl extension;
 			// otherwise the file_get_contents() call will fail (Unable to find the
 			// socket transport "ssl").
-			$cacert_path = plugin_dir_path( __FILE__ ) . 'inc/cacert.pem';
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
 			if (
@@ -1391,7 +1391,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Add Google API PHP Client.
 				// @see https://github.com/google/google-api-php-client branch:v1-master
-				require_once dirname( __FILE__ ) . '/inc/google-api-php-client/src/Google/autoload.php';
+				require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 				// Build the Google Client.
 				$client = new Google_Client();
@@ -2015,14 +2015,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			wp_enqueue_script(
 				'jquery.multi-select',
-				plugins_url( 'inc/jquery.multi-select/js/jquery.multi-select.js', __FILE__ ),
+				plugins_url( 'vendor/jquery.multi-select/js/jquery.multi-select.js', __FILE__ ),
 				array( 'jquery' ), '1.8', true
 			);
 
 			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-css' );
 
-			wp_register_style( 'jquery-multi-select-css', plugins_url( 'inc/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
+			wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
 			wp_enqueue_style( 'jquery-multi-select-css' );
 
 			add_action( 'admin_notices', array( $this, 'admin_notices' ) ); // Add any notices to the top of the options page.
@@ -5539,7 +5539,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Use curl to retrieve the URL.
 			$handle = curl_init( $url );
-			$cacert_path = plugin_dir_path( __FILE__ ) . 'inc/cacert.pem';
+			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
 			curl_setopt( $handle, CURLOPT_CAINFO, $cacert_path );
 			curl_setopt( $handle, CURLOPT_RETURNTRANSFER, TRUE );
 			curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, FALSE );

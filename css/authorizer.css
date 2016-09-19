@@ -465,8 +465,8 @@ html.busy, html.busy * {
 @font-face {
 	font-family: 'Glyphicons Halflings';
 
-	src: url('../inc/bootstrap/fonts/glyphicons-halflings-regular.eot');
-	src: url('../inc/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../inc/bootstrap/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../inc/bootstrap/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../inc/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+	src: url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot');
+	src: url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
 }
 .glyphicon {
 	position: relative;
