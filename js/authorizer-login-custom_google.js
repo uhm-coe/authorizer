@@ -20,6 +20,6 @@ function render() {
 	var signinButton = document.getElementById( 'googleplus_button' );
 	signinButton.addEventListener( 'click', function() {
 		gapi.auth.signIn( additionalParams ); // Will use page level configuration
-		jQuery( '#login' ).animate({ opacity: 0.2 }).after( '<div id="signin_overlay"><span class="spinner is-active"></span></div>' );
+		jQuery( '#googleplus_button' ).animate({ opacity: 0.5 });
 	});
 }
