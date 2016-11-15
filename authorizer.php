@@ -3593,7 +3593,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<li><?php _e( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ); ?>
 					<ul>
 						<li><?php _e( 'Application Type: <strong>Web application</strong>', 'authorizer' ); ?></li>
-						<li><?php _e( 'Authorized Javascript Origins:', 'authorizer' ); ?> <strong><?php echo $site_url_host; ?></strong></li>
+						<li><?php _e( 'Authorized Javascript Origins:', 'authorizer' ); ?> <strong><?php echo rtrim( $site_url_host, '/' ); ?></strong></li>
 						<li><?php _e( 'Authorized Redirect URI: <em>none</em>', 'authorizer' ); ?></li>
 					</ul>
 				</li>
