@@ -682,7 +682,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$username = $username[0];
 						}
 						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = $approved_user['email'];
+							$username = $user_info['email'];
 						}
 						$result = wp_insert_user(
 							array(
