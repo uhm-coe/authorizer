@@ -1491,11 +1491,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// We've determined that the current user doesn't have access, so we deal with them now.
 
-			// Fringe case: In a multisite, a user of a different blog can
-			// successfully log in, but they aren't on the 'approved' whitelist
-			// for this blog. Flag these users, and redirect them to their
-			// profile page with a message (so we don't get into a redirect
-			// loop on the wp-login.php page).
+			// Fringe case: In a multisite, a user of a different blog can successfully
+			// log in, but they aren't on the 'approved' whitelist for this blog.
+			// If that's the case, add them to the pending list for this blog.
 			if ( is_multisite() && is_user_logged_in() && ! $has_access ) {
 				$current_user = wp_get_current_user();
 
