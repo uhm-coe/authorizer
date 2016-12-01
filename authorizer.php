@@ -419,6 +419,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						wp_lostpassword_url()
 					)
 				);
+			} else if ( ! $is_login_attempt )
+				// Prevent error message when login form is first shown
+				return $user;
 			}
 
 			// Start external authentication.
