@@ -1254,7 +1254,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			if ( $auth_settings['ldap_tls'] == 1 ) {
-				ldap_start_tls( $ldap );
+                if(!ldap_start_tls( $ldap )) {
+                    return null;
+                }
 			}
 
 			// Set bind credentials; attempt an anonymous bind if not provided.
