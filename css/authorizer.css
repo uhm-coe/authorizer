@@ -234,11 +234,15 @@ div.section_info, div.section_info ~ table {
 	padding: 8px;
 	opacity: 0;
 	border: 1px solid #aaa;
-	margin: 2%;
+	margin: 11px 15em;
 	position: absolute;
 	-webkit-transition: opacity 0.1s ease-in-out;
 	-moz-transition: opacity 0.1s ease-in-out;
 	transition: opacity 0.1s ease-in-out;
+	cursor: default;
+}
+.auth_multisite_override_overlay .overlay-note a {
+	cursor: pointer;
 }
 .auth_multisite_override_overlay:hover .overlay-note {
 	opacity: 1;
