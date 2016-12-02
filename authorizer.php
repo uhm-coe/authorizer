@@ -1222,6 +1222,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// remove @domain if it exists in the username (i.e., if user entered their email)
 			$username = str_replace( '@' . $domain, '', $username );
 
+			// Fail silently (fall back to WordPress authentication) if both username
+			// and password are empty (this will be the case when visiting wp-login.php
+			// for the first time, or when clicking the Log In button without filling
+			// out either field.
+			if ( empty( $username ) && empty( $password ) ) {
+				return null;
+			}
+
 			// Fail with error message if username or password is blank.
 			if ( empty( $username ) ) {
 				return new WP_Error( 'empty_username', __( 'You must provide a username or email.', 'authorizer' ) );
