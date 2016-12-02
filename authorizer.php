@@ -3695,7 +3695,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		function print_select_cas_version( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_version';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow_override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
