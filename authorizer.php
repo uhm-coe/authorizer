@@ -1624,7 +1624,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
 				'wp_login_url' => wp_login_url( $current_path ),
-				'public_warning' => get_option( 'auth_settings_advanced_public_notice' )
+				'public_warning' => get_option( 'auth_settings_advanced_public_notice' ),
+				'anonymous_notice' => $this->get_plugin_option( 'access_redirect_to_message' ),
+				'log_in' => esc_html__( 'Log In', 'authorizer' ),
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 			//update_option( 'auth_settings_advanced_public_notice', false);

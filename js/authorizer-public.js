@@ -5,7 +5,8 @@ jQuery( document ).ready( function( $ ) {
 		$( '#main' ).prepend(' \
 			<div id="alert" class="alert alert-info auth-alert"> \
 				<button type="button" class="close" data-dismiss="alert">&times;</button> \
-				<strong>Notice</strong>: You are browsing this site anonymously, and only have access to a portion of its content. Please <a href="' + auth.wp_login_url + '">log in</a> in order to access all the materials. \
+				' + auth.anonymous_notice + ' \
+				<a class="button" href="' + auth.wp_login_url + '">' + auth.log_in + '</a> \
 			</div> \
 		');
 	}
