@@ -3206,7 +3206,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $approved_user['email']; ?>" readonly="true" class="auth-email" />
 						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role" onchange="<?php echo $js_function_prefix; ?>change_role( this );">
 							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
-							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input ); ?>
+							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input, $admin_mode ); ?>
 						</select>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_date_added" value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
 						<?php if ( strlen( $advanced_usermeta ) > 0 ) :
@@ -3241,7 +3241,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<div id="new_auth_settings_<?php echo $option; ?>">
 				<input type="text" id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
 				<select id="new_approved_user_role" class="auth-role">
-					<?php $this->wp_dropdown_permitted_roles( $access_default_role ); ?>
+					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 				</select>
 				<div class="btn-group">
 					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php _e( 'Approve', 'authorizer' ); ?></a>
@@ -5565,9 +5565,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		// Helper function that builds option tags for a select element for all
 		// roles the current user has permission to assign.
-		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled' ) {
+		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled', $admin_mode = SINGLE_ADMIN ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
+
+			// If we're in network admin, also show any roles that might exist only on
+			// specific sites in the network (themes can add their own roles).
+			if ( $admin_mode === MULTISITE_ADMIN ) {
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+				foreach ( $sites as $site ) {
+					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					switch_to_blog( $blog_id );
+					$roles = array_merge( $roles, get_editable_roles() );
+					restore_current_blog();
+				}
+				$unique_role_names = array();
+				foreach ( $roles as $role_name => $role_info ) {
+					if ( array_key_exists( $role_name, $unique_role_names ) ) {
+						unset( $roles[$role_name] );
+					} else {
+						$unique_role_names[$role_name] = true;
+					}
+				}
+			}
 
 			// If the currently selected role exists, but is not in the list of roles,
 			// the current user is not permitted to assign it. Assume they can't edit
