@@ -232,7 +232,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Run plugin activation on each site in the network.
 				$current_blog_id = $wpdb->blogid;
-				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
 					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 					switch_to_blog( $blog_id );
@@ -715,7 +715,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								get_blogs_of_user( $user->ID )
 							);
 
-							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 							foreach ( $sites as $site ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 
@@ -4759,7 +4759,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// on individual sites and remove this user from them (to prevent duplicate entries).
 						if ( $approved_user['multisite_user'] !== 'false' && is_multisite() ) {
 							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
-							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 							foreach ( $sites as $site ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 								foreach ( $list_names as $list_name ) {
@@ -5130,7 +5130,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
-			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 			foreach ( $sites as $site ) {
 				$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 				$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
@@ -5720,7 +5720,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
 					// Get all blog ids
-					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 						switch_to_blog( $blog_id );
