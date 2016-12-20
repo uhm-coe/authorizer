@@ -5719,8 +5719,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
-					global $wpdb;
-					$old_blog = $wpdb->blogid;
 					// Get all blog ids
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => 999999 ) );
 					foreach ( $sites as $site ) {
@@ -5728,8 +5726,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						switch_to_blog( $blog_id );
 						// Set meaningful defaults for other sites in the network.
 						$this->set_default_options();
+						// Switch back to original blog. See: https://codex.wordpress.org/Function_Reference/restore_current_blog
+						restore_current_blog();
 					}
-					switch_to_blog( $old_blog );
 				} else {
 					// Set meaningful defaults for this site.
 					$this->set_default_options();
