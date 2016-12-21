@@ -4688,6 +4688,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( $approved_user['edit_action'] === 'add' ) {
 						$new_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $new_user !== false ) {
+							// If we're adding an existing multisite user, make sure their
+							// newly-assigned role is updated on all sites they are already in.
+							if ( is_multisite() && $approved_user['multisite_user'] !== 'false' ) {
+								foreach ( get_blogs_of_user( $new_user->ID ) as $blog ) {
+									add_user_to_blog( $blog->userblog_id, $new_user->ID, $approved_user['role'] );
+								}
+							}
 							// If this user already has an account on another site in the network, add them to this site.
 							if ( is_multisite() ) {
 								add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
