@@ -1078,6 +1078,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Note: only try to update if the system has the php_openssl extension;
 			// otherwise the file_get_contents() call will fail (Unable to find the
 			// socket transport "ssl").
+			$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
 			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
 			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
 			$time_90_days_ago = time() - $time_90_days;
@@ -1085,30 +1086,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				extension_loaded( 'openssl' ) &&
 				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago )
 			) {
-				$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
-
-				// If this WordPress install is behind a proxy, use it to retrieve the updated certs.
-				if ( defined( 'WP_PROXY_HOST' ) && defined( 'WP_PROXY_PORT' ) ) {
-					$context = stream_context_create( array(
-						'http' => array(
-							'proxy' => 'tcp://' . WP_PROXY_HOST . ':' . WP_PROXY_PORT,
-						),
-						'ssl' => array(
-							'SNI_enabled' => true,
-							'SNI_server_name' => parse_url( $cacert_url, PHP_URL_HOST ),
-						),
-					));
-					$cacert_contents = file_get_contents( $cacert_url, false, $context );
-				} else {
-					$cacert_contents = file_get_contents( $cacert_url );
+				// Get new cacert.pem file from https://curl.haxx.se/ca/cacert.pem.
+				$response = wp_safe_remote_get( $cacert_url );
+				if (
+					is_wp_error( $response ) ||
+					200 !== wp_remote_retrieve_response_code( $response ) ||
+					! array_key_exists( 'body', $response )
+				) {
+					new WP_Error( 'cannot_update_cacert', __( 'Unable to update outdated server certificates from https://curl.haxx.se/ca/cacert.pem.', 'authorizer' ) );
 				}
+				$cacert_contents = $response['body'];
 
 				// Write out the updated certs to the plugin directory.
-				if ( $cacert_contents !== false ) {
-					file_put_contents( $cacert_path, $cacert_contents );
-				} else {
-					return new WP_Error( 'cannot_update_cacert', __( 'Unable to update outdated server certificates from http://curl.haxx.se/ca/cacert.pem.', 'authorizer' ) );
-				}
+				file_put_contents( $cacert_path, $cacert_contents );
 			}
 			phpCAS::setCasServerCACert( $cacert_path );
 
