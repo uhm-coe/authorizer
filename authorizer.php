@@ -1074,14 +1074,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 			// Update server certificate bundle if it doesn't exist or is older
-			// than 3 months, then use it to ensure CAS server is legitimate.
-			// Note: only try to update if the system has the php_openssl extension;
-			// otherwise the file_get_contents() call will fail (Unable to find the
-			// socket transport "ssl").
+			// than 6 months, then use it to ensure CAS server is legitimate.
+			// Note: only try to update if the system has the php_openssl extension.
 			$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
 			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
-			$time_90_days = 90 * 24 * 60 * 60; // days * hours * minutes * seconds
-			$time_90_days_ago = time() - $time_90_days;
+			$time_180_days = 180 * 24 * 60 * 60; // days * hours * minutes * seconds
+			$time_180_days_ago = time() - $time_180_days;
 			if (
 				extension_loaded( 'openssl' ) &&
 				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago )
