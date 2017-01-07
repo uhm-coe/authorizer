@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
-Tested up to: 4.6.1
+Tested up to: 4.7
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -15,7 +15,7 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* requires the following:
 
-* **CAS server** (2.x, 3.x, or 4.x) or **LDAP server** (plugin needs the URL)
+* **CAS server** (2.x, 3.x, 4.x, or 5.x) or **LDAP server** (plugin needs the URL)
 * PHP extentions: php5-mcrypt, php5-ldap, php5-curl
 
 *Authorizer* provides the following options:
@@ -59,6 +59,18 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.6.4 =
+* Use wp_safe_remote_get() instead of file_get_contents() to update cacert.pem. Props @kriswme2!
+* Fix error message shown when login form is first shown and LDAP is enabled. Props @akompanas!
+* Fix for lengthy timeout if ldap_start_tls() fails when connecting to an LDAP server. Props @TJuberg!
+* Fix a bug preventing first-time login of an approved user when a WordPress user already existed with the same username (but a different email address).
+* Remove the spinner overlay when logging in via Google (user could accidentally close the Google sign-in popup, and the spinner prevented them from reopening it by clicking on the "Sign In with Google" button).
+* Clean up plugin files (rename 'inc' directory to 'vendor').
+* Fix for CAS version option being selectable when it's been multisite overridden.
+* Fix for missing translatable string (anonymous access message in bootstrap dismissible alert).
+* Show all roles in all sites on the Approved Users role dropdown in network admin.
+* Make sure role is updated on all sites when approving a new multisite user that already exists in WordPress.
 
 = 2.6.3 =
 * Feature: Add user to authorizer approved list when added from the Users screen.
