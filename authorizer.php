@@ -2059,7 +2059,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $auth_settings['cas'] === '1' ) :
 				// Check if provided CAS URL is accessible.
 				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ) ) ? 'http' : 'https';
-				if ( ! $this->url_is_accessible( $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'] ) ) :
+				$cas_url = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
+				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint
+				if ( ! $this->url_is_accessible( $cas_url ) ) :
 					$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?><div class='notice notice-warning is-dismissible'>
 						<p><?php _e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo $authorizer_options_url; ?>&tab=external'><?php _e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php _e( 'if you intend to use it.', 'authorizer' ); ?></p>
