@@ -1082,7 +1082,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$time_180_days_ago = time() - $time_180_days;
 			if (
 				extension_loaded( 'openssl' ) &&
-				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_90_days_ago )
+				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_180_days_ago )
 			) {
 				// Get new cacert.pem file from https://curl.haxx.se/ca/cacert.pem.
 				$response = wp_safe_remote_get( $cacert_url );
