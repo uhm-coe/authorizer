@@ -5537,23 +5537,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return boolean     Whether the URL is publicly reachable
 		 */
 		function url_is_accessible( $url ) {
-			// Make sure php5-curl extension is installed on server.
-			if ( ! function_exists( 'curl_init' ) ) {
-				// Note: This will silently fail, saying url is not accessible.
-				// Warn user elsewhere that they should install curl.
-				return false;
-			}
-
-			// Use curl to retrieve the URL.
-			$handle = curl_init( $url );
-			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
-			curl_setopt( $handle, CURLOPT_CAINFO, $cacert_path );
-			curl_setopt( $handle, CURLOPT_RETURNTRANSFER, TRUE );
-			curl_setopt( $handle, CURLOPT_SSL_VERIFYPEER, FALSE );
-			curl_setopt( $handle, CURLOPT_CONNECTTIMEOUT, 5 );
-			$response = curl_exec( $handle );
-			$http_code = curl_getinfo( $handle, CURLINFO_HTTP_CODE );
-			curl_close( $handle );
+			// Use wp_remote_retrieve_response_code() to retrieve the URL.
+			$response = wp_remote_get( $url );
+			$response_code = wp_remote_retrieve_response_code( $response );
 
 			// Return true if the document has loaded successfully without any redirection or error
 			return $http_code >= 200 && $http_code < 400;
