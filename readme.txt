@@ -60,6 +60,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.5 =
+* Use wp_remote_get() instead of curl to check CAS server availability. php-curl is no longer a dependency.
+* Fix for error introduced in last version with cacert.pem updating.
+
 = 2.6.4 =
 * Use wp_safe_remote_get() instead of file_get_contents() to update cacert.pem. Props @kriswme2!
 * Fix error message shown when login form is first shown and LDAP is enabled. Props @akompanas!
