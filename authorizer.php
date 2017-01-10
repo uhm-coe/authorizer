@@ -5531,7 +5531,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$response_code = wp_remote_retrieve_response_code( $response );
 
 			// Return true if the document has loaded successfully without any redirection or error
-			return $http_code >= 200 && $http_code < 400;
+			return $response_code >= 200 && $response_code < 300;
 		}
 
 
