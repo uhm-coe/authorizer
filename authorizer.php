@@ -5215,7 +5215,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param string $notify Type of notification that should happen. See wp_send_new_user_notifications()
 		 *                       for more information on possible values.
 		 */
-		function add_new_user_to_authorizer_when_created_single_Site( $user_id, $notify ) {
+		function add_new_user_to_authorizer_when_created_single_site( $user_id, $notify ) {
 			$user = get_user_by( 'id', $user_id );
 			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
 		}
