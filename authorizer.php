@@ -566,8 +566,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$allow_login = apply_filters( 'authorizer_allow_login', true, $user_data );
 
 			// Check our externally authenticated user against the block list.
-			// If they are blocked, set the relevant user meta field, and show
-			// them an error screen.
+			// If any of their email addresses are blocked, set the relevant user
+			// meta field, and show them an error screen.
 			foreach ( $user_emails as $user_email ) {
 				if ( ! $allow_login || $this->is_email_in_list( $user_email, 'blocked' ) ) {
 
@@ -626,6 +626,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			reset( $user_emails );
 			foreach ( $user_emails as $user_email ) {
 				$is_newly_approved_user = false;
+
+				// If this externally authenticated user is an existing administrator
+				// (administrator in single site mode, or super admin in network mode),
+				// and is not in the blocked list, let them in.
+				if ( $user && is_super_admin( $user->ID ) ) {
+					return;
+				}
 
 				// If this externally authenticated user isn't in the approved list
 				// and login access is set to "All authenticated users," add them
@@ -822,11 +829,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					return $user;
-
-				} elseif ( $user && in_array( 'administrator', $user->roles ) ) {
-					// User has a WordPress account, but is not in the blocked or approved
-					// list. If they are an administrator, let them in.
-					return;
 
 				// Note: only do this for the last email address we are checking (we need
 				// to iterate through them all to make sure one of them isn't approved).
