@@ -194,6 +194,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Single site: edit_user_created_user action fired when adding a new user to the site (with or without email notification).
 			add_action( 'edit_user_created_user', array( $this, 'add_new_user_to_authorizer_when_created_single_site' ), 10, 2 );
 
+			// Add user to network approved users (and remove from individual sites)
+			// when user is elevated to super admin status.
+			add_action( 'grant_super_admin', array( $this, 'grant_super_admin__add_to_network_approved' ) );
+			// Remove user from network approved users (and add them to the approved
+			// list on sites they are already on) when super admin status is removed.
+			add_action( 'revoke_super_admin', array( $this, 'revoke_super_admin__remove_from_network_approved' ) );
+
 		}
 
 
@@ -5153,6 +5160,38 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
+		 * Helper: Add multisite user to a specific site's approved list.
+		 */
+		function add_network_user_to_site( $user_id, $blog_id ) {
+			// Switch to blog.
+			switch_to_blog( $blog_id );
+
+			// Get user details and role.
+			$access_default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
+			$user = get_user_by( 'id', $user_id );
+			$user_email = $user->user_email;
+			$user_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $access_default_role;
+
+			// Add user to approved list if not already there and not in blocked list.
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) && ! $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
+				$approved_user = array(
+					'email' => $user_email,
+					'role' => $user_role,
+					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+					'local_user' => true,
+				);
+				array_push( $auth_settings_access_users_approved, $approved_user );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			}
+
+			// Restore original blog.
+			restore_current_blog();
+		}
+
+
+		/**
 		 * Multisite:
 		 * When an existing user is invited to the current site (or a new user is created),
 		 * add them to the authorizer approved list. This action fires when the admin
@@ -5273,6 +5312,83 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 		}
 
+
+		/**
+		 * Multisite:
+		 * When a user is granted super admin status (checkbox on network user edit
+		 * screen), add them to the authorizer network approved list. Also remove
+		 * them from pending/approved list on any individual sites.
+		 *
+		 * @action grant_super_admin
+		 *
+		 * @param int $user_id The user's ID.
+		 */
+		function grant_super_admin__add_to_network_approved( $user_id ) {
+			$user = get_user_by( 'id', $user_id );
+			$user_email = $user->user_email;
+
+			// Add user to multisite approved user list (if not already there).
+			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+				$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+			);
+			if ( ! $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
+				$multisite_approved_user = array(
+					'email' => $user_email,
+					'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
+					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+					'local_user' => true,
+				);
+				array_push( $auth_multisite_settings_access_users_approved, $multisite_approved_user );
+				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			}
+
+			// Go through all pending/approved lists on individual sites and remove this user from them.
+			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+			foreach ( $sites as $site ) {
+				$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+				$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
+			}
+
+		}
+
+		/**
+		 * Multisite:
+		 * When a user's super admin status is revoked (checkbox on network user edit
+		 * screen), remove them from the authorizer network approved list. Also add
+		 * them to approved list on any individual sites they are already a part of.
+		 *
+		 * @action revoke_super_admin
+		 *
+		 * @param int $user_id The user's ID.
+		 */
+		function revoke_super_admin__remove_from_network_approved( $user_id ) {
+			$user = get_user_by( 'id', $user_id );
+			$revoked_email = $user->user_email;
+
+			// Go through multisite approved user list and remove this user.
+			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+				$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+			);
+			$list_changed = false;
+			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
+				if ( $revoked_email === $existing_user['email'] ) {
+					$list_changed = true;
+					unset( $auth_multisite_settings_access_users_approved[$key] );
+				}
+			}
+			if ( $list_changed ) {
+				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			}
+
+			// Go through this user's current sites and add them to the approved list
+			// (since they are no longer on the network approved list).
+			$sites_of_user = get_blogs_of_user( $user_id );
+			foreach ( $sites_of_user as $site ) {
+				$blog_id = $site->userblog_id;
+				$this->add_network_user_to_site( $user_id, $blog_id );
+			}
+
+		}
 
 		private function maybe_email_welcome_message( $email ) {
 			// Get option for whether to email welcome messages.
