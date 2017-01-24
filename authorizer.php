@@ -5073,8 +5073,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: delete_user
 		 */
 		function remove_user_from_authorizer_when_deleted( $user_id ) {
-			$userdata = get_userdata( $user_id );
-			$deleted_email = $userdata->user_email;
+			$user = get_user_by( 'id', $user_id );
+			$deleted_email = $user->user_email;
 
 			// Remove user from pending/approved lists and save.
 			$list_names = array( 'access_users_pending', 'access_users_approved' );
@@ -5099,8 +5099,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: wpmu_delete_user
 		 */
 		function remove_network_user_from_authorizer_when_deleted( $user_id ) {
-			$userdata = get_userdata( $user_id );
-			$deleted_email = $userdata->user_email;
+			$user = get_user_by( 'id', $user_id );
+			$deleted_email = $user->user_email;
 
 			// Go through multisite approved user list and remove this user.
 			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
@@ -5132,8 +5132,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: remove_user_from_blog
 		 */
 		function remove_network_user_from_site_when_removed( $user_id, $blog_id ) {
-			$userdata = get_userdata( $user_id );
-			$deleted_email = $userdata->user_email;
+			$user = get_user_by( 'id', $user_id );
+			$deleted_email = $user->user_email;
 
 			$list_names = array( 'access_users_pending', 'access_users_approved' );
 			foreach ( $list_names as $list_name ) {
