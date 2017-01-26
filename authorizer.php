@@ -3643,13 +3643,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$option = 'cas';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
+			// Make sure php5-curl extension is installed on server.
+			$curl_installed_message = ! function_exists( 'curl_init' ) ? __( '<a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is not installed', 'authorizer' ) : '';
+
 			// Make sure php_openssl extension is installed on server.
 			$openssl_installed_message = ! extension_loaded( 'openssl' ) ? __( '<a href="http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working" target="_blank" style="color: red;">PHP openssl extension</a> is not installed', 'authorizer' ) : '';
 
 			// Build error message string.
 			$error_message = '';
-			if ( strlen( $openssl_installed_message ) > 0 ) {
-				$error_message = '<span style="color: red;">(' . __( 'Warning', 'authorizer' ) . ': ' . $openssl_installed_message . ')</span>';
+			if ( strlen( $curl_installed_message ) > 0 || strlen( $openssl_installed_message ) > 0 ) {
+				$error_message = '<span style="color: red;">(' .
+					__( 'Warning', 'authorizer' ) . ': ' .
+					$curl_installed_message .
+					( strlen( $curl_installed_message ) > 0 && strlen( $openssl_installed_message ) > 0 ? '; ' : '' ) .
+					$openssl_installed_message .
+					')</span>';
 			}
 
 			// Print option elements.
