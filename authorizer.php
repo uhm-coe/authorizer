@@ -855,24 +855,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$site_url = get_bloginfo( 'url' );
 						$authorizer_options_url = $auth_settings['advanced_admin_menu'] === 'settings' ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 
-						// Notify instructor about new pending user if that option is set.
-						foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
-							wp_mail(
-								$user_recipient->user_email,
-								sprintf(
-									/* TRANSLATORS: 1: User email 2: Name of site */
-									__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
-									$pending_user['email'],
-									$site_name
-								),
-								sprintf(
-									/* TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer */
-									__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
-									$site_name,
-									$site_url,
-									$authorizer_options_url
-								)
-							);
+						// Notify users with the role specified in "Which role should
+						// receive email notifications about pending users?".
+						if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 ) {
+							foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
+								wp_mail(
+									$user_recipient->user_email,
+									sprintf(
+										/* TRANSLATORS: 1: User email 2: Name of site */
+										__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
+										$pending_user['email'],
+										$site_name
+									),
+									sprintf(
+										/* TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer */
+										__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
+										$site_name,
+										$site_url,
+										$authorizer_options_url
+									)
+								);
+							}
 						}
 					}
 
