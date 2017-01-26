@@ -2825,6 +2825,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
+
+			return $auth_settings;
 		}
 
 
@@ -4996,9 +4998,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings (skip if in MULTISITE_ADMIN mode).
 			$auth_settings = $admin_mode === MULTISITE_ADMIN ? array() : get_option( 'auth_settings' );
 
-			// Initialize to empty array if the plugin option doesn't exist.
+			// Initialize to default values if the plugin option doesn't exist.
 			if ( $auth_settings === FALSE ) {
-				$auth_settings = array();
+				$auth_settings = $this->set_default_options();
 			}
 
 			// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
