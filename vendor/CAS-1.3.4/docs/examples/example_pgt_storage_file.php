@@ -1,18 +1,18 @@
 <?php
 
 /**
-*  Example that changes the storage of the pgt tickets to file
-*
-* PHP Version 5
-*
-* @file     example_pgt_storage_db.php
-* @category Authentication
-* @package  PhpCAS
-* @author   Joachim Fritschi <jfritschi@freenet.de>
-* @author   Adam Franco <afranco@middlebury.edu>
-* @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
-* @link     https://wiki.jasig.org/display/CASC/phpCAS
-*/
+ * Example that changes the storage of the pgt tickets to file
+ *
+ * PHP Version 5
+ *
+ * @file     example_pgt_storage_db.php
+ * @category Authentication
+ * @package  PhpCAS
+ * @author   Joachim Fritschi <jfritschi@freenet.de>
+ * @author   Adam Franco <afranco@middlebury.edu>
+ * @license  http://www.apache.org/licenses/LICENSE-2.0  Apache License 2.0
+ * @link     https://wiki.jasig.org/display/CASC/phpCAS
+ */
 
 // Load the settings from the central config file
 require_once 'config.php';

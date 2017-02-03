@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Example that changes the storage of the pgt tickets
+ * Example that changes the storage of the pgt tickets
  *
  * PHP Version 5
  *

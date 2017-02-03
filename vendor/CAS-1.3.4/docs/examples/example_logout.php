@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Example for handling logout requests
+ * Example for handling logout requests
  *
  * PHP Version 5
  *

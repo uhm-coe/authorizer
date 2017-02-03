@@ -1,7 +1,7 @@
 <?php
 
 /**
- *   Example for diabling SSL CN valdiation
+ * Example for diabling SSL CN valdiation
  *
  * PHP Version 5
  *
