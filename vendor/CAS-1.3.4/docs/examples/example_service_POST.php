@@ -1,7 +1,7 @@
 <?php
 
 /**
- *   Example for proxied service with session support and POST support
+ * Example for proxied service with session support and POST support
  *
  * PHP Version 5
  *

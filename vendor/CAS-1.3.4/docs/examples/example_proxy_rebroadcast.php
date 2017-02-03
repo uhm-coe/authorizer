@@ -1,8 +1,8 @@
 <?php
 
 /**
- *  Example for a proxy that rebroadcasts all PGTs to different servers in the
- *  cluster
+ * Example for a proxy that rebroadcasts all PGTs to different servers in the
+ * cluster
  *
  * PHP Version 5
  *

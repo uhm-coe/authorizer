@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Example for a proxied proxy
+ * Example for a proxied proxy
  *
  * PHP Version 5
  *

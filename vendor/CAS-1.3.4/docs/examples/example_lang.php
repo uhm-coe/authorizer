@@ -1,7 +1,7 @@
 <?php
 
 /**
- *  Example that changes language of phpcas pages
+ * Example that changes language of phpcas pages
  *
  * PHP Version 5
  *
