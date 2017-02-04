@@ -60,6 +60,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.6 =
+* Fix for mixed line endings in phpCAS library, causing warnings when running PHP Compatibility Checker plugin. Props @wpgirl369/@eshannon3 for the pull request!
+* Fix: Never block access to super admins (or admins in single site mode). Props @eizzumdm and @nreljin!
+* Add user to network approved list when they are granted super admin privileges on the Edit User screen outside of Authorizer. Remove user from network approved list when this is revoked (and readd them to the approved list on any site they are currently a member of).
+* Fix for notification emails sent to all site users if plugin wasn't correctly activated.
+* Handle CAS servers that return an email address in response to phpCAS::getUser()
+
 = 2.6.5 =
 * Use wp_remote_get() instead of curl to check CAS server availability. php-curl is no longer a dependency.
 * Fix for error introduced in last version with cacert.pem updating.
