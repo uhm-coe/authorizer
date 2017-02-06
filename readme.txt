@@ -16,7 +16,7 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 *Authorizer* requires the following:
 
 * **CAS server** (2.x, 3.x, 4.x, or 5.x) or **LDAP server** (plugin needs the URL)
-* PHP extentions: php5-mcrypt, php5-ldap, php5-curl
+* PHP extensions: php5-mcrypt, php5-ldap, php5-curl
 
 *Authorizer* provides the following options:
 
