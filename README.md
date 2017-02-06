@@ -8,7 +8,7 @@
 *Authorizer* requires the following:
 
 * **CAS server** or **LDAP server** (plugin needs the URL)
-* PHP extentions: php5-mcrypt, php5-ldap, php5-curl
+* PHP extensions: php5-mcrypt, php5-ldap, php5-curl
 
 *Authorizer* provides the following options:
 
