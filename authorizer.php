@@ -1114,10 +1114,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Authenticate against CAS
 			try {
-				if ( ! phpCAS::isAuthenticated() ) {
-					phpCAS::forceAuthentication();
-					die();
-				}
+				phpCAS::forceAuthentication();
 			} catch ( CAS_AuthenticationException $e ) {
 				// CAS server threw an error in isAuthenticated(), potentially because
 				// the cached ticket is outdated. Try renewing the authentication.
