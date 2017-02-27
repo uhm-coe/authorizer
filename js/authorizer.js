@@ -11,7 +11,7 @@ function choose_tab( list_name, delay ) {
 	delay = typeof delay !== 'undefined' ? delay : 0;
 
 	// default to the access list tab
-	list_name = typeof list_name !== 'undefined' ? list_name : 'access_list';
+	list_name = typeof list_name !== 'undefined' ? list_name : 'access_lists';
 
 	// Hide all tab content, then show selected tab content
 	$( 'div.section_info, div.section_info + table' ).hide();
