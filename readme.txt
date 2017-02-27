@@ -13,6 +13,8 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
+View or contribute to the plugin source on Github: [https://github.com/uhm-coe/authorizer](https://github.com/uhm-coe/authorizer)
+
 *Authorizer* requires the following:
 
 * **CAS server** (2.x, 3.x, 4.x, or 5.x) or **LDAP server** (plugin needs the URL)
