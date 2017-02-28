@@ -1249,8 +1249,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$last_name = '';
 			$email = '';
 
+			// Construct LDAP connection parameters. ldap_connect() takes either a
+			// hostname or a full LDAP URI as its first parameter (works with OpenLDAP
+			// 2.x.x or later). If it's an LDAP URI, the second parameter, $port, is
+			// ignored, and port must be specified in the full URI. An LDAP URI is of
+			// the form ldap://hostname:port or ldaps://hostname:port.
+			$ldap_host = $auth_settings['ldap_host'];
+			$ldap_port = intval( $auth_settings['ldap_port'] );
+			$parsed_host = parse_url( $ldap_host );
+			// Fail (fall back to WordPress auth) if invalid host is specified.
+			if ( $parsed_host === false ) {
+				return null;
+			}
+			// If a scheme is in the LDAP host, use full LDAP URI instead of just hostname.
+			if ( array_key_exists( 'scheme', $parsed_host ) ) {
+				// If the port isn't in the LDAP URI, use the one in the LDAP port field.
+				if ( ! array_key_exists( 'port', $parsed_host ) ) {
+					$parsed_host['port'] = $ldap_port;
+				}
+				$ldap_host = $this->build_url( $parsed_host );
+			}
+
 			// Establish LDAP connection.
-			$ldap = ldap_connect( $auth_settings['ldap_host'], $auth_settings['ldap_port'] );
+			$ldap = ldap_connect( $ldap_host, $ldap_port );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			if ( $auth_settings['ldap_tls'] == 1 ) {
 				if( ! ldap_start_tls( $ldap ) ) {
@@ -5664,6 +5685,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Return true if the document has loaded successfully without any redirection or error
 			return $response_code >= 200 && $response_code < 300;
+		}
+
+
+		/**
+		 * Helper function to reconstruct a URL split using parse_url().
+		 * @param  array  $parts Array returned from parse_url().
+		 * @return string URL.
+		 */
+		function build_url( $parts = array() ) {
+			return
+				( isset( $parts['scheme'] ) ? "{$parts['scheme']}:" : '' ) .
+				( ( isset( $parts['user'] ) || isset( $parts['host'] ) ) ? '//' : '' ) .
+				( isset( $parts['user'] ) ? "{$parts['user']}" : '' ) .
+				( isset( $parts['pass'] ) ? ":{$parts['pass']}" : '' ) .
+				( isset( $parts['user'] ) ? '@' : '' ) .
+				( isset( $parts['host'] ) ? "{$parts['host']}" : '' ) .
+				( isset( $parts['port'] ) ? ":{$parts['port']}" : '' ) .
+				( isset( $parts['path'] ) ? "{$parts['path']}" : '' ) .
+				( isset( $parts['query'] ) ? "?{$parts['query']}" : '' ) .
+				( isset( $parts['fragment'] ) ? "#{$parts['fragment']}" : '' );
 		}
 
 
