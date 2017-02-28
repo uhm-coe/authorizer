@@ -62,6 +62,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.7 =
+* Support LDAP URI in hostname field (e.g., ldaps://ldap.example.edu:636). Props @timkite for your contribution!
+* Update translatable strings.
+* Simplify CAS login routine.
+
 = 2.6.6 =
 * Fix for mixed line endings in phpCAS library, causing warnings when running PHP Compatibility Checker plugin. Props @wpgirl369/@eshannon3 for the pull request!
 * Fix: Never block access to super admins (or admins in single site mode). Props @eizzumdm and @nreljin!
