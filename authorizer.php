@@ -2354,6 +2354,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_external' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_ldap_tls', // HTML element ID
+				__( 'Secure Connection (TLS)', 'authorizer' ), // HTML element Title
+				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_external' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_ldap_search_base', // HTML element ID
 				__( 'LDAP Search Base', 'authorizer' ), // HTML element Title
 				array( $this, 'print_text_ldap_search_base' ), // Callback (echos form element)
@@ -2385,13 +2392,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_ldap_password', // HTML element ID
 				__( 'LDAP Directory User Password', 'authorizer' ), // HTML element Title
 				array( $this, 'print_password_ldap_password' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
-			);
-			add_settings_field(
-				'auth_settings_ldap_tls', // HTML element ID
-				__( 'Secure Connection (TLS)', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
 			);
@@ -2625,6 +2625,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'ldap_port', $auth_settings ) ) {
 				$auth_settings['ldap_port'] = '389';
 			}
+			if ( ! array_key_exists( 'ldap_tls', $auth_settings ) ) {
+				$auth_settings['ldap_tls'] = '1';
+			}
 			if ( ! array_key_exists( 'ldap_search_base', $auth_settings ) ) {
 				$auth_settings['ldap_search_base'] = '';
 			}
@@ -2639,9 +2642,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			if ( ! array_key_exists( 'ldap_password', $auth_settings ) ) {
 				$auth_settings['ldap_password'] = '';
-			}
-			if ( ! array_key_exists( 'ldap_tls', $auth_settings ) ) {
-				$auth_settings['ldap_tls'] = '1';
 			}
 			if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_settings ) ) {
 				$auth_settings['ldap_lostpassword_url'] = '';
@@ -2777,6 +2777,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'ldap_port', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_port'] = '389';
 				}
+				if ( ! array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['ldap_tls'] = '1';
+				}
 				if ( ! array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_search_base'] = '';
 				}
@@ -2791,9 +2794,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				if ( ! array_key_exists( 'ldap_password', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_password'] = '';
-				}
-				if ( ! array_key_exists( 'ldap_tls', $auth_multisite_settings ) ) {
-					$auth_multisite_settings['ldap_tls'] = '1';
 				}
 				if ( ! array_key_exists( 'ldap_lostpassword_url', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_lostpassword_url'] = '';
@@ -2920,11 +2920,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Sanitize LDAP Port (int)
 			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
 
-			// Sanitize LDAP attributes (basically make sure they don't have any parentheses)
-			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
-
 			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string)
 			$auth_settings['ldap_tls'] = array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ? '1' : '';
+
+			// Sanitize LDAP attributes (basically make sure they don't have any parentheses)
+			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
 
 			// Sanitize LDAP Lost Password URL
 			$auth_settings['ldap_lostpassword_url'] = filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_SANITIZE_URL );
@@ -3801,6 +3801,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="389" style="width:50px;" /><?php
+
+
+		function print_checkbox_ldap_tls( $args = '' ) {
+			// Get plugin option.
+			$option = 'ldap_tls';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -3853,16 +3862,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
 			<input type="password" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $this->decrypt( base64_decode( $auth_settings_option ) ); ?>" autocomplete="off" /><?php
-		}
-
-
-		function print_checkbox_ldap_tls( $args = '' ) {
-			// Get plugin option.
-			$option = 'ldap_tls';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4340,6 +4339,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_ldap_port( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'Secure Connection (TLS)', 'authorizer' ); ?></th>
+								<td><?php $this->print_checkbox_ldap_tls( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'LDAP Search Base', 'authorizer' ); ?></th>
 								<td><?php $this->print_text_ldap_search_base( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
@@ -4358,10 +4361,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<tr>
 								<th scope="row"><?php _e( 'LDAP Directory User Password', 'authorizer' ); ?></th>
 								<td><?php $this->print_password_ldap_password( array( MULTISITE_ADMIN => true ) ); ?></td>
-							</tr>
-							<tr>
-								<th scope="row"><?php _e( 'Secure Connection (TLS)', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_ldap_tls( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php _e( 'Custom lost password URL', 'authorizer' ); ?></th>
@@ -4456,12 +4455,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap',
 				'ldap_host',
 				'ldap_port',
+				'ldap_tls',
 				'ldap_search_base',
 				'ldap_uid',
 				'ldap_attr_email',
 				'ldap_user',
 				'ldap_password',
-				'ldap_tls',
 				'ldap_lostpassword_url',
 				'ldap_attr_first_name',
 				'ldap_attr_last_name',
@@ -5058,12 +5057,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap'] = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host'] = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port'] = $auth_multisite_settings['ldap_port'];
+					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
 					$auth_settings['ldap_search_base'] = $auth_multisite_settings['ldap_search_base'];
 					$auth_settings['ldap_uid'] = $auth_multisite_settings['ldap_uid'];
 					$auth_settings['ldap_attr_email'] = $auth_multisite_settings['ldap_attr_email'];
 					$auth_settings['ldap_user'] = $auth_multisite_settings['ldap_user'];
 					$auth_settings['ldap_password'] = $auth_multisite_settings['ldap_password'];
-					$auth_settings['ldap_tls'] = $auth_multisite_settings['ldap_tls'];
 					$auth_settings['ldap_lostpassword_url'] = $auth_multisite_settings['ldap_lostpassword_url'];
 					$auth_settings['ldap_attr_first_name'] = $auth_multisite_settings['ldap_attr_first_name'];
 					$auth_settings['ldap_attr_last_name'] = $auth_multisite_settings['ldap_attr_last_name'];
