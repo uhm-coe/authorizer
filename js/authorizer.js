@@ -187,7 +187,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 	var next_id = 1 + Math.max.apply(
 		null,
 		$( '#list_auth_settings_access_users_' + list + ' li .auth-email' ).map( function ( el, index ) {
-			return parseInt( this.id.replace( 'auth_multisite_settings_access_users_approved_', '' ).replace( 'auth_settings_access_users_approved_', '' ) );
+			return parseInt( this.id.replace( 'auth_multisite_settings_access_users_' + list + '_', '' ).replace( 'auth_settings_access_users_' + list + '_', '' ) );
 		})
 	);
 
@@ -233,7 +233,7 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 				</select> \
 				<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
 				' + ban_button + ' \
-				<a class="button" id="ignore_user_' + next_id + '" onclick="' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
+				<a class="button" id="ignore_user_' + next_id + '" onclick="' + auth_js_prefix + 'ignore_user( this, \'' + list + '\' );" title="' + auth_L10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
 				' + local_icon + ' \
 				<span class="spinner is-active"></span> \
 			</li> \
