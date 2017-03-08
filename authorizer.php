@@ -137,6 +137,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 9 );
+			add_action( 'init', array( $this, 'init__maybe_add_network_approved_user' ) );
 
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_update_auth_user', array( $this, 'ajax_update_auth_user' ) );
@@ -1611,6 +1612,49 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Sanity check: we should never get here
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
+		}
+
+
+		/**
+		 * On an admin page load, check for edge case (network-approved user who has
+		 * not yet been added to this particular blog in a multisite). Note: we do
+		 * this because check_user_access() runs on the parse_request hook, which
+		 * does not fire on wp-admin pages.
+		 *
+		 * Hook: admin_menu
+		 */
+		public function init__maybe_add_network_approved_user() {
+			global $current_user;
+
+			// If this is a multisite install and we have a logged in user that's not
+			// a member of this blog, but is (network) approved, add them to this blog.
+			if (
+				is_admin() &&
+				is_multisite() &&
+				is_user_logged_in() &&
+				! is_user_member_of_blog() &&
+				$this->is_email_in_list( $current_user->user_email, 'approved' )
+			) {
+				// Get all approved users.
+				$auth_settings_access_users_approved = $this->sanitize_user_list(
+					array_merge(
+						$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+					)
+				);
+
+				// Get user info (we need user role).
+				$user_info = $this->get_user_info_from_list(
+					$current_user->user_email,
+					$auth_settings_access_users_approved
+				);
+
+				// Add user to blog.
+				add_user_to_blog( get_current_blog_id(), $current_user->ID, $user_info['role'] );
+
+				// Refresh user permissions.
+				$current_user = new WP_User( $current_user->ID );
+			}
 		}
 
 
