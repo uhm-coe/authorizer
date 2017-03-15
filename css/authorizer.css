@@ -515,3 +515,11 @@ html.busy, html.busy * {
 .dropdown-menu > li > a {
 	text-decoration: none;
 }
+
+/**
+ * Help text styling.
+ */
+.helper {
+	font-style: italic;
+	font-size: 0.8em;
+}
