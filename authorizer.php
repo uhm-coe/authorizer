@@ -568,19 +568,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * Filter whether to block the currently logging in user based on any of
 			 * their user attributes.
 			 *
-			 * @param bool $user_is_blocked Whether to block the currently logging in user.
+			 * @param bool $allow_login Whether to block the currently logging in user.
 			 * @param array $user_data User data returned from external service.
 			 */
 			$allow_login = apply_filters( 'authorizer_allow_login', true, $user_data );
+			$blocked_by_filter = ! $allow_login; // Use this for better readability.
 
 			// Check our externally authenticated user against the block list.
 			// If any of their email addresses are blocked, set the relevant user
 			// meta field, and show them an error screen.
 			foreach ( $user_emails as $user_email ) {
-				if ( ! $allow_login || $this->is_email_in_list( $user_email, 'blocked' ) ) {
+				if ( $blocked_by_filter || $this->is_email_in_list( $user_email, 'blocked' ) ) {
 
 					// Add user to blocked list if it was blocked via the filter.
-					if ( ! $allow_login && ! $this->is_email_in_list( $user_email, 'blocked' ) ) {
+					if ( $blocked_by_filter && ! $this->is_email_in_list( $user_email, 'blocked' ) ) {
 						$auth_settings_access_users_blocked = $this->sanitize_user_list(
 							$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 						);
