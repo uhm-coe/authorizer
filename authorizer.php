@@ -629,6 +629,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 */
 			$approved_role = apply_filters( 'authorizer_custom_role', $default_role, $user_data );
 
+			/**
+			 * Filter whether to automatically approve the currently logging in user
+			 * based on any of their user attributes.
+			 *
+			 * @param bool  $automatically_approve_login
+			 *   Whether to automatically approve the currently logging in user.
+			 * @param array $user_data User data returned from external service.
+			 */
+			$automatically_approve_login = apply_filters( 'authorizer_automatically_approve_login', false, $user_data );
+
 			// Iterate through each of the email addresses provided by the external
 			// service and determine if any of them have access.
 			$last_email = end( $user_emails );
@@ -644,10 +654,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// If this externally authenticated user isn't in the approved list
-				// and login access is set to "All authenticated users," add them
-				// to the approved list (they'll get an account created below if
-				// they don't have one yet).
-				if ( ! $this->is_email_in_list( $user_email, 'approved' ) && $auth_settings['access_who_can_login'] === 'external_users' ) {
+				// and login access is set to "All authenticated users," or if they were
+				// automatically approved in the "authorizer_approve_login" filter
+				// above, then add them to the approved list (they'll get an account
+				// created below if they don't have one yet).
+				if ( (
+					! $this->is_email_in_list( $user_email, 'approved' ) &&
+					$auth_settings['access_who_can_login'] === 'external_users'
+				) || (
+					$automatically_approve_login
+				)	) {
 					$is_newly_approved_user = true;
 
 					// If this user happens to be in the pending list (rare),
