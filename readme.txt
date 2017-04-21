@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.9 =
+* Fix for LDAP logins failing if the user password contained a single quote, double quote, or a backslash. Props @alxbr for the research!
+
 = 2.6.8 =
 * Fix for edge case where a network approved user wouldn't be allowed to visit wp-admin on a site they had not been added to yet.
 * Fix for quotation marks in LDAP password causing LDAP bind to fail.
