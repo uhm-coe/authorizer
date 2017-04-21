@@ -1362,7 +1362,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			$result = @ldap_bind( $ldap, $ldap_user_dn, $password );
+			$result = @ldap_bind( $ldap, $ldap_user_dn, html_entity_decode( $password ) );
 			if ( ! $result ) {
 				// We have a real ldap user, but an invalid password. Pass
 				// through to wp authentication after failing LDAP (since
