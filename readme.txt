@@ -123,7 +123,8 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Fix for mcrypt key length error in php 5.6 and higher.
 * Fix for broken newlines in notification emails (also update translations).
 * Feature: Customize user roles based on CAS or LDAP attributes. Example:
-`/**
+```
+/**
  * Filter the default role of the currently logging in user based on any of
  * their user attributes.
  *
@@ -140,7 +141,8 @@ function my_authorizer_custom_role( $default_role, $user_data ) {
   }
   return $default_role;
 }
-add_filter( 'authorizer_custom_role', 'my_authorizer_custom_role', 10, 2 );`
+add_filter( 'authorizer_custom_role', 'my_authorizer_custom_role', 10, 2 );
+```
 
 = 2.5.1 =
 * Updated Spanish translations. Props @elarequi.
@@ -156,7 +158,8 @@ add_filter( 'authorizer_custom_role', 'my_authorizer_custom_role', 10, 2 );`
 * Translations: Props @jojaba for providing French translations.
 * Feature: Allow 404 pages to be shown publicly on restricted sites.
 * Feature: Add filter to inspect CAS attributes and deny access based on any values there. Props @jojaba for the suggestion. Example:
-`/**
+```
+/**
  * Filter whether to block the currently logging in user based on any of their
  * user attributes.
  *
@@ -173,7 +176,9 @@ function check_cas_attributes( $allow_login, $user_data ) {
   }
   return $allow_login;
 }
-add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );`
+add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );
+```
+
 * Feature: Add action for inspecting attributes returned from CAS.
 * Fix: Users deleted in WordPress will be removed from Authorizer lists. Props @jojaba for catching that.
 * Fix: Some plugin options were getting reset when switching between multisite and single site modes. Props @jojaba for finding it.
