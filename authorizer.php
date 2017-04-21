@@ -1581,9 +1581,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check to see if the requested category is public. If so, show it.
 			$current_category_name = property_exists( $wp, 'query_vars' ) && array_key_exists( 'category_name', $wp->query_vars ) && strlen( $wp->query_vars['category_name'] ) > 0 ? $wp->query_vars['category_name'] : '';
-			if ($current_category_name) {
-				$current_category_name_array = explode( '/', $current_category_name );
-				$current_category_name = end($current_category_name_array);
+			if ( $current_category_name ) {
+				$current_category_name = end( explode( '/', $current_category_name ) );
 				if ( in_array( 'cat_' . $current_category_name, $auth_settings['access_public_pages'] ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
@@ -1593,7 +1592,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					return $wp;
 				}
 			}
-			
+
 			// User is denied access, so show them the error message. Render as JSON
 			// if this is a REST API call; otherwise, show the error message via
 			// wp_die() (rendered html), or redirect to the login URL.
@@ -3623,12 +3622,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</optgroup>
 				<?php endforeach; ?>
 				<optgroup label="<?php _e( 'Categories', 'authorizer' ); ?>">
-				
-					<?php global $sitepress;
-						remove_filter('terms_clauses', array($sitepress, 'terms_clauses'));
-						$options	= get_categories("hide_empty=0");
-						add_filter('terms_clauses', array($sitepress, 'terms_clauses'));
-						foreach ( $options as $category ) : ?>
+					<?php
+					// If sitepress-multilingual-cms plugin is enabled, temporarily disable
+					// its terms_clauses filter since it conflicts with the category handling.
+					if ( array_key_exists( 'sitepress', $GLOBALS ) && is_object( $GLOBALS['sitepress'] ) ) {
+						remove_filter( 'terms_clauses', array( $GLOBALS['sitepress'], 'terms_clauses' ) );
+						$categories = get_categories( array( 'hide_empty' => false ) );
+						add_filter( 'terms_clauses', array( $GLOBALS['sitepress'], 'terms_clauses' ) );
+					} else {
+						$categories = get_categories( array( 'hide_empty' => false ) );
+					}
+					foreach ( $categories as $category ) : ?>
 						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
 					<?php endforeach; ?>
 				</optgroup>
