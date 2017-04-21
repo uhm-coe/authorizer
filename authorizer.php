@@ -1306,7 +1306,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Attempt LDAP bind.
-			$result = @ldap_bind( $ldap, $bind_rdn, $bind_password );
+			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) );
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				return null;
@@ -1362,7 +1362,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			$result = @ldap_bind( $ldap, $ldap_user_dn, html_entity_decode( $password ) );
+			$result = @ldap_bind( $ldap, $ldap_user_dn, stripslashes( $password ) );
 			if ( ! $result ) {
 				// We have a real ldap user, but an invalid password. Pass
 				// through to wp authentication after failing LDAP (since
