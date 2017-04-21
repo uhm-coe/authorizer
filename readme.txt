@@ -62,6 +62,36 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.8 =
+* Fix for edge case where a network approved user wouldn't be allowed to visit wp-admin on a site they had not been added to yet.
+* Fix for quotation marks in LDAP password causing LDAP bind to fail.
+* Fix for issues with marking translated (via WPML) categories public. Props @mafoti for the pull request!
+* Fix for placeholder text for plugin option fields being mistaken for actual values. Props @pkarjala for the pull request!
+* Fix for blocked flag in usermeta not getting removed when unblocking a user.
+* Feature: Add filter to inspect CAS attributes and automatically approve a user based on any values there. Example:
+```
+/**
+ * Filter whether to automatically approve the currently logging in user
+ * based on any of their user attributes.
+ *
+ * @param bool  $automatically_approve_login
+ *   Whether to automatically approve the currently logging in user.
+ * @param array $user_data User data returned from external service.
+ */
+function approve_all_faculty_logins( $automatically_approve_login, $user_data ) {
+  // Automatically approve logins for all faculty members.
+  if (
+    isset( $user_data['cas_attributes']['eduPersonAffiliation'] ) &&
+    'faculty' === $user_data['cas_attributes']['eduPersonAffiliation']
+  ) {
+    $automatically_approve_login = true;
+  }
+  return $automatically_approve_login;
+}
+add_filter( 'authorizer_automatically_approve_login', 'approve_all_faculty_logins', 10, 2 );
+```
+
+
 = 2.6.7 =
 * Support LDAP URI in hostname field (e.g., ldaps://ldap.example.edu:636). Props @timkite for your contribution!
 * Update translatable strings.
