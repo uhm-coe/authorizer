@@ -1129,7 +1129,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				file_put_contents( $cacert_path, $cacert_contents );
 			}
 			phpCAS::setCasServerCACert( $cacert_path );
-
+			phpCAS::setFixedServiceURL(site_url() . '/wp-login.php?external=cas');
 			// Authenticate against CAS
 			try {
 				phpCAS::forceAuthentication();
