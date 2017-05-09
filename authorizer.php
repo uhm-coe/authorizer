@@ -133,7 +133,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Redirect to CAS login when visiting login page (only if option is
 			// enabled, CAS is the only service, and WordPress logins are hidden).
-			add_action( 'login_head', array( $this, 'login_head_maybe_redirect_to_cas' ) );
+			// Note: hook into wp_login_errors filter so this fires after the
+			// authenticate hook (where the redirect to CAS happens), but before html
+			// output is started (so the redirect header doesn't complain about data
+			// already being sent).
+			add_filter( 'wp_login_errors', array( $this, 'wp_login_errors__maybe_redirect_to_cas' ), 10, 2 );
 
 			// Verify current user has access to page they are visiting
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 9 );
@@ -1908,8 +1912,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Redirect to CAS login when visiting login page (only if option is
 		 * enabled, CAS is the only service, and WordPress logins are hidden).
+		 * Note: hook into wp_login_errors filter so this fires after the
+		 * authenticate hook (where the redirect to CAS happens), but before html
+		 * output is started (so the redirect header doesn't complain about data
+		 * already being sent).
 		 */
-		function login_head_maybe_redirect_to_cas() {
+		function wp_login_errors__maybe_redirect_to_cas( $errors, $redirect_to ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -1925,6 +1933,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				wp_redirect( $this->modify_current_url_for_cas_login() );
 				exit;
 			}
+
+			return $errors;
 		}
 
 
