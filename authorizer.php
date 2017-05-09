@@ -1343,22 +1343,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$ldap_user_dn = $ldap_entries[$i]['dn'];
 
 				// Get user first name and last name.
-				if ( array_key_exists( 'ldap_attr_first_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_first_name'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_first_name']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_first_name']][0] ) > 0 ) {
-					$first_name = $ldap_entries[$i][$auth_settings['ldap_attr_first_name']][0];
+				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? strtolower( $auth_settings['ldap_attr_first_name'] ) : '';
+				if ( strlen( $ldap_attr_first_name ) > 0 && array_key_exists( $ldap_attr_first_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_first_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_first_name][0] ) > 0 ) {
+					$first_name = $ldap_entries[$i][$ldap_attr_first_name][0];
 				}
-				if ( array_key_exists( 'ldap_attr_last_name', $auth_settings ) && strlen( $auth_settings['ldap_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['ldap_attr_last_name'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_last_name']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0] ) > 0 ) {
-					$last_name = $ldap_entries[$i][$auth_settings['ldap_attr_last_name']][0];
+				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? strtolower( $auth_settings['ldap_attr_last_name'] ) : '';
+				if ( strlen( $ldap_attr_last_name ) > 0 && array_key_exists( $ldap_attr_last_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_last_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_last_name][0] ) > 0 ) {
+					$last_name = $ldap_entries[$i][$ldap_attr_last_name][0];
 				}
 				// Get user email if it is specified in another field.
-				if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 ) {
+				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? strtolower( $auth_settings['ldap_attr_email'] ) : '';
+				if ( strlen( $ldap_attr_email ) > 0 ) {
 					// If the email attribute starts with an at symbol (@), assume that the
 					// email domain is manually entered there (instead of a reference to an
 					// LDAP attribute), and combine that with the username to create the email.
 					// Otherwise, look up the LDAP attribute for email.
-					if ( substr( $auth_settings['ldap_attr_email'], 0, 1 ) === '@' ) {
-						$email = strtolower( $username . $auth_settings['ldap_attr_email'] );
-					} elseif ( array_key_exists( $auth_settings['ldap_attr_email'], $ldap_entries[$i] ) && $ldap_entries[$i][$auth_settings['ldap_attr_email']]['count'] > 0 && strlen( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] ) > 0 ) {
-						$email = strtolower( $ldap_entries[$i][$auth_settings['ldap_attr_email']][0] );
+					if ( substr( $ldap_attr_email, 0, 1 ) === '@' ) {
+						$email = strtolower( $username . $ldap_attr_email );
+					} elseif ( array_key_exists( $ldap_attr_email, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_email]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_email][0] ) > 0 ) {
+						$email = strtolower( $ldap_entries[$i][$ldap_attr_email][0] );
 					}
 				}
 			}
