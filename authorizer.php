@@ -143,11 +143,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 9 );
 			add_action( 'init', array( $this, 'init__maybe_add_network_approved_user' ) );
 
+			// ajax load paged user lists (pending, approved, blocked)
+			add_action( 'wp_ajax_get_users', array( $this, 'ajax_get_users' ) );
+
 			// ajax save options from dashboard widget
 			add_action( 'wp_ajax_update_auth_user', array( $this, 'ajax_update_auth_user' ) );
 
 			// ajax save options from multisite options page
-			add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
+			// add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
 
 			// ajax save usermeta from options page
 			add_action( 'wp_ajax_update_auth_usermeta', array( $this, 'ajax_update_auth_usermeta' ) );
@@ -3171,10 +3174,76 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><ul id="list_auth_settings_access_users_pending" style="margin:0;">
-				<?php if ( count( $auth_settings_option ) > 0 ) : ?>
-					<?php foreach ( $auth_settings_option as $key => $pending_user ): ?>
-						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
-						<?php $pending_user['is_wp_user'] = false; ?>
+				<?php if ( count( $auth_settings_option ) < 1 ) : ?>
+					<li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li>
+				<?php endif; ?>
+				<?php foreach ( $auth_settings_option as $key => $pending_user ) : ?>
+					<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
+					<li>
+						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
+						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
+							<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
+						</select>
+						<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php _e( 'Approve', 'authorizer' ); ?></a>
+						<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php _e( 'Block', 'authorizer' ); ?></a>
+						<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php _e( 'Ignore', 'authorizer' ); ?></a>
+					</li>
+				<?php endforeach; ?>
+			</ul><?php
+		}
+
+
+		function ajax_get_users() {
+			// Nonce check.
+			$nonce = $_REQUEST['nonce'];
+			if ( ! wp_verify_nonce( $nonce, 'save_auth_settings' ) ) {
+				die( __( 'Busted.', 'authorizer' ) );
+			}
+
+			// Default response.
+			$success = true;
+			$message = 'User list retrieved.';
+
+			// Fail if required parameters don't exist.
+			if ( empty( $_REQUEST['list'] ) ) {
+				$success = false;
+				$message = 'Missing list parameter (pending, approved, or blocked).';
+			}
+
+			if ( $success ) {
+
+				// Get page to display (default: 1).
+				$page = 1;
+				if ( ! empty( $_REQUEST['page'] ) && intval( $_REQUEST['page'] ) > 0 ) {
+					$page = intval( $_REQUEST['page'] );
+				}
+
+				// Get users to display per page.
+				$users_per_page = 10;
+				if ( ! empty( $_REQUEST['users_per_page'] ) && intval( $_REQUEST['users_per_page'] ) > 0 ) {
+					$users_per_page = intval( $_REQUEST['users_per_page'] );
+				}
+
+				// Get list to display.
+				$list = 'approved';
+				if ( in_array( $_REQUEST['list'], array( 'pending', 'approved', 'blocked' ) ) ) {
+					$list = $_REQUEST['list'];
+				}
+
+				// Generate li elements for users.
+				ob_start();
+
+				// Get user list option.
+				$option = 'access_users_' . 'approved';//$list;
+				$auth_settings_option = $this->get_plugin_option( $option );
+				$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
+
+				if ( count( $auth_settings_option ) < 1 ) :
+					?><li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li><?php
+				else :
+					foreach ( $auth_settings_option as $key => $pending_user ) :
+						if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue;
+						$pending_user['is_wp_user'] = false; ?>
 						<li>
 							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
 							<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
@@ -3184,12 +3253,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php _e( 'Block', 'authorizer' ); ?></a>
 							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php _e( 'Ignore', 'authorizer' ); ?></a>
 						</li>
-					<?php endforeach; ?>
-				<?php else: ?>
-						<li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li>
-				<?php endif; ?>
-			</ul>
-			<?php
+					<?php endforeach;
+				endif;
+			}
+
+			$response = json_encode( array(
+				'success' => $success,
+				'message' => $message,
+				'html' => ob_get_clean(),
+			));
+
+			header( 'content-type: application/json' );
+			echo $response;
+			exit;
 		}
 
 
@@ -3224,6 +3300,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
 			$multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
+			// This element is populated via an ajax call in choose_tab( 'access_lists' );
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;">
 				<?php if ( ! $multisite_admin_page ) :
 					foreach ( $auth_settings_option_multisite as $key => $approved_user ) :

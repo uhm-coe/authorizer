@@ -31,6 +31,27 @@ function choose_tab( list_name, delay ) {
 	// Save user's active tab to sessionStorage (so we can restore it on reload).
 	// Note: session storage persists until the browser tab is closed.
 	sessionStorage.setItem( 'tab', list_name );
+
+	// Populate the user lists if we're switching to the access_list tab and they are empty.
+	if ( list_name === 'access_lists' ) {
+		var nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+		var $access_users_approved = $( '#list_auth_settings_access_users_approved' );
+
+		if ( $access_users_approved.is( ':empty' ) ) {
+			$.post( ajaxurl, {
+				'action': 'get_users',
+				'nonce': nonce_save_auth_settings,
+				'list': 'approved',
+				'page': 1,
+				'users_per_page': 10,
+			}, function ( response ) {
+console.log(response);
+				$access_users_approved.html( response.html );
+			}).fail ( function ( response ) {
+				$access_users_approved.html( response.html );
+			});
+		}
+	}
 }
 
 // Update user's usermeta field.
