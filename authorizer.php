@@ -5618,14 +5618,28 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Basic encryption using a public (not secret!) key. Used for general
 		 * database obfuscation of passwords.
+		 * @param  $text String to encrypt.
+		 * @param  $library Encryption lib to use (openssl).
+		 * @return Encrypted string
 		 */
 		private static $key = "8QxnrvjdtweisvCBKEY!+0\0\0";
-		function encrypt( $text ) {
+		private static $iv = "R_O2D]jPn]1[fhJl!-P1.oe";
+		function encrypt( $text, $library = 'openssl' ) {
 			$result = '';
 
-			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
-			if ( function_exists( 'mcrypt_encrypt' ) ) {
+			// Use openssl library (better) if it is enabled.
+			if ( function_exists( 'openssl_encrypt' ) && $library === 'openssl' ) {
+				$result = base64_encode( openssl_encrypt(
+					$text,
+					'AES-256-CBC',
+					hash( 'sha256', self::$key ),
+					0,
+					substr( hash( 'sha256', self::$iv ), 0, 16 )
+				) );
+			// Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			} else if ( function_exists( 'mcrypt_encrypt' ) ) {
 				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
+			// Fall back to basic obfuscation.
 			} else {
 				for ( $i = 0; $i < strlen( $text ); $i++ ) {
 					$char = substr( $text, $i, 1 );
@@ -5640,13 +5654,30 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		function decrypt( $secret ) {
+		/**
+		 * Basic decryption using a public (not secret!) key. Used for general
+		 * database obfuscation of passwords.
+		 * @param  $text String to encrypt.
+		 * @param  $library Encryption lib to use (openssl).
+		 * @return Decrypted string
+		 */
+		function decrypt( $secret, $library = 'openssl' ) {
 			$result = '';
 
-			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
-			if ( function_exists( 'mcrypt_decrypt' ) ) {
+			// Use openssl library (better) if it is enabled.
+			if ( function_exists( 'openssl_decrypt' ) && $library === 'openssl' ) {
+				$result = openssl_decrypt(
+					base64_decode( $secret ),
+					'AES-256-CBC',
+					hash( 'sha256', self::$key ),
+					0,
+					substr( hash( 'sha256', self::$iv ), 0, 16 )
+				);
+			// Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			} else if ( function_exists( 'mcrypt_decrypt' ) ) {
 				$secret = base64_decode( $secret );
 				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
+			// Fall back to basic obfuscation.
 			} else {
 				$secret = base64_decode( $secret );
 				for ( $i = 0; $i < strlen( $secret ); $i++ ) {
@@ -6071,6 +6102,36 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				} else {
 					// Set meaningful defaults for this site.
 					$this->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Migrate LDAP passwords encrypted with mcrypt since mcrypt is
+			// deprecated as of PHP 7.1. Use openssl library instead.
+			$update_if_older_than = 20170510;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				if ( is_multisite() ) {
+					// Reencrypt LDAP passwords in each site in the network.
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						$auth_settings = get_blog_option( $blog_id, 'auth_settings', array() );
+						if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
+							$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ), 'mcrypt' );
+							$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+							update_blog_option( $blog_id, 'auth_settings', $auth_settings );
+						}
+					}
+				} else {
+					// Reencrypt LDAP password on this single-site install.
+					$auth_settings = get_option( 'auth_settings', array() );
+					if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
+						$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ), 'mcrypt' );
+						$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+						update_option( 'auth_settings', $auth_settings );
+					}
 				}
 				// Update version to reflect this change has been made.
 				$auth_version = $update_if_older_than;
