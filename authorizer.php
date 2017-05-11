@@ -5991,30 +5991,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Plugin Update Routines.
 		 */
 		function auth_update_check() {
-			// Update: Set default values for newly added options (forgot to do
-			// this, so some users are getting debug log notices about undefined
-			// indexes in $auth_settings).
-			$update_if_older_than = 20160831;
-			$auth_version = get_option( 'auth_version' );
-			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
-				// Provide default values for any $auth_settings options that don't exist.
-				if ( is_multisite() ) {
-					// Get all blog ids
-					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
-					foreach ( $sites as $site ) {
-						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
-						switch_to_blog( $blog_id );
-						// Set meaningful defaults for other sites in the network.
-						$this->set_default_options();
-						// Switch back to original blog. See: https://codex.wordpress.org/Function_Reference/restore_current_blog
-						restore_current_blog();
-					}
-				} else {
-					// Set meaningful defaults for this site.
-					$this->set_default_options();
-				}
-				// Update version to reflect this change has been made.
-				update_option( 'auth_version', $update_if_older_than );
+			// Get current version.
+			$needs_updating = false;
+			if ( is_multisite() ) {
+				$auth_version = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_version' );
+			} else {
+				$auth_version = get_option( 'auth_version' );
 			}
 
 			// Update: migrate user lists to own options (addresses concurrency
@@ -6026,7 +6008,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// changes them from the multisite panel, the dashboard widget, or
 			// the plugin options page.
 			$update_if_older_than = 20140709;
-			$auth_version = get_option( 'auth_version' );
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Copy single site user lists to new options (if they exist).
 				$auth_settings = get_option( 'auth_settings' );
@@ -6065,16 +6046,57 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 				}
 				// Update version to reflect this change has been made.
-				update_option( 'auth_version', $update_if_older_than );
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Set default values for newly added options (forgot to do
+			// this, so some users are getting debug log notices about undefined
+			// indexes in $auth_settings).
+			$update_if_older_than = 20160831;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					// Get all blog ids
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
+						// Set meaningful defaults for other sites in the network.
+						$this->set_default_options();
+						// Switch back to original blog. See: https://codex.wordpress.org/Function_Reference/restore_current_blog
+						restore_current_blog();
+					}
+				} else {
+					// Set meaningful defaults for this site.
+					$this->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
 			}
 
 			// // Update: TEMPLATE
 			// $update_if_older_than = YYYYMMDD;
-			// $auth_version = get_option( 'auth_version' );
 			// if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
-			//  UPDATE CODE HERE
-			//  update_option( 'auth_version', $update_if_older_than );
+			// 	UPDATE CODE HERE
+			// 	// Update version to reflect this change has been made.
+			// 	$auth_version = $update_if_older_than;
+			// 	$needs_updating = true;
 			// }
+
+			// Save new version number if we performed any updates.
+			if ( $needs_updating ) {
+				if ( is_multisite() ) {
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						update_blog_option( $blog_id, 'auth_version', $auth_version );
+					}
+				} else {
+					update_option( 'auth_version', $auth_version );
+				}
+			}
 		}
 
 	}
