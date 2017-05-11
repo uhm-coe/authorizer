@@ -963,9 +963,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setRedirectUri( 'postmessage' );
 
 			// If the hosted domain parameter is set, restrict logins to that domain.
-			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
-				$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
-			}
+			// Note: Will have to upgrade to google-api-php-client v2 or higher for
+			// this to function server-side; it's not complete in v1, so this check
+			// is performed manually below.
+			// if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			// 	$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
+			// 	$google_hosteddomain = trim( $google_hosteddomains[0] );
+			// 	$client->setHostedDomain( $google_hosteddomain );
+			// }
 
 			// Get one time use token (if it doesn't exist, we'll create one below)
 			session_start();
@@ -1027,9 +1032,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setRedirectUri( 'postmessage' );
 
 			// If the hosted domain parameter is set, restrict logins to that domain.
-			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
-				$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
-			}
+			// Note: Will have to upgrade to google-api-php-client v2 or higher for
+			// this to function server-side; it's not complete in v1, so this check
+			// is performed manually below.
+			// if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			// 	$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
+			// 	$google_hosteddomain = trim( $google_hosteddomains[0] );
+			// 	$client->setHostedDomain( $google_hosteddomain );
+			// }
 
 			// Verify this is a successful Google authentication
 			try {
@@ -1057,15 +1067,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Note: Will have to upgrade to google-api-php-client v2 or higher for
 			// this to function server-side; it's not complete in v1, so this check
 			// is only performed here.
-			if (
-				array_key_exists( 'google_hosteddomain', $auth_settings ) &&
-				strlen( $auth_settings['google_hosteddomain'] ) > 0 &&
-				$email_domain !== $auth_settings['google_hosteddomain']
-			) {
-				$this->custom_logout();
-				return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) . ' (' . $auth_settings['google_hosteddomain'] . ').' );
+			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+				// Allow multiple whitelisted domains.
+				$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
+				if ( ! in_array( $email_domain, $google_hosteddomains ) ) {
+					$this->custom_logout();
+					return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) . ' (' . implode( ', ', $google_hosteddomains ) . ').' );
+				}
 			}
-
 
 			return array(
 				'email' => $email,
@@ -1455,11 +1464,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$client->setClientId( $auth_settings['google_clientid'] );
 				$client->setClientSecret( $auth_settings['google_clientsecret'] );
 				$client->setRedirectUri( 'postmessage' );
-
-				// If the hosted domain parameter is set, restrict logins to that domain.
-				if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
-					$client->setHostedDomain( $auth_settings['google_hosteddomain'] );
-				}
 
 				// Revoke the token
 				$client->revokeToken( $token );
@@ -3753,8 +3757,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:220px;" />
-			<br /><small><?php _e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?></small>
+			?><textarea id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" placeholder="" style="width:220px;"><?php echo $auth_settings_option; ?></textarea>
+			<br /><small><?php _e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?><br /><?php _e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></small>
 			<?php
 		}
 
