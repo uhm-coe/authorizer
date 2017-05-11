@@ -1307,7 +1307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$bind_password = NULL;
 			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
 				$bind_rdn = $auth_settings['ldap_user'];
-				$bind_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ) );
+				$bind_password = $this->decrypt( $auth_settings['ldap_password'] );
 			}
 
 			// Attempt LDAP bind.
@@ -3042,7 +3042,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Obfuscate LDAP directory user password
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
 				// encrypt the directory user password for some minor obfuscation in the database.
-				$auth_settings['ldap_password'] = base64_encode( $this->encrypt( $auth_settings['ldap_password'] ) );
+				$auth_settings['ldap_password'] = $this->encrypt( $auth_settings['ldap_password'] );
 			}
 
 			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string)
@@ -3997,7 +3997,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $this->decrypt( base64_decode( $auth_settings_option ) ); ?>" autocomplete="off" /><?php
+			<input type="password" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $this->decrypt( $auth_settings_option ); ?>" autocomplete="off" /><?php
 		}
 
 
@@ -5625,7 +5625,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
 			if ( function_exists( 'mcrypt_encrypt' ) ) {
-				$result = mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' );
+				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
 			} else {
 				for ( $i = 0; $i < strlen( $text ); $i++ ) {
 					$char = substr( $text, $i, 1 );
@@ -5645,6 +5645,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Use mcrypt library (better) if php5-mcrypt extension is enabled.
 			if ( function_exists( 'mcrypt_decrypt' ) ) {
+				$secret = base64_decode( $secret );
 				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
 			} else {
 				$secret = base64_decode( $secret );
