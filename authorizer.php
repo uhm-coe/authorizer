@@ -6119,7 +6119,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 						$auth_settings = get_blog_option( $blog_id, 'auth_settings', array() );
 						if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
-							$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ), 'mcrypt' );
+							$plaintext_ldap_password = $this->decrypt( $auth_settings['ldap_password'], 'mcrypt' );
 							$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
 							update_blog_option( $blog_id, 'auth_settings', $auth_settings );
 						}
@@ -6128,7 +6128,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Reencrypt LDAP password on this single-site install.
 					$auth_settings = get_option( 'auth_settings', array() );
 					if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
-						$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_settings['ldap_password'] ), 'mcrypt' );
+						$plaintext_ldap_password = $this->decrypt( $auth_settings['ldap_password'], 'mcrypt' );
 						$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
 						update_option( 'auth_settings', $auth_settings );
 					}
@@ -6147,7 +6147,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Reencrypt LDAP password in network (multisite) options.
 					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
 					if ( array_key_exists( 'ldap_password', $auth_multisite_settings ) && strlen( $auth_multisite_settings['ldap_password'] ) > 0 ) {
-						$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_multisite_settings['ldap_password'] ), 'mcrypt' );
+						$plaintext_ldap_password = $this->decrypt( $auth_multisite_settings['ldap_password'], 'mcrypt' );
 						$auth_multisite_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
 						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 					}
