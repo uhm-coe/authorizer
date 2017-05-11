@@ -6138,6 +6138,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$needs_updating = true;
 			}
 
+			// Update: Migrate LDAP passwords encrypted with mcrypt since mcrypt is
+			// deprecated as of PHP 7.1. Use openssl library instead.
+			// Note: Forgot to update the auth_multisite_settings ldap password! Do it here.
+			$update_if_older_than = 20170511;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				if ( is_multisite() ) {
+					// Reencrypt LDAP password in network (multisite) options.
+					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+					if ( array_key_exists( 'ldap_password', $auth_multisite_settings ) && strlen( $auth_multisite_settings['ldap_password'] ) > 0 ) {
+						$plaintext_ldap_password = $this->decrypt( base64_decode( $auth_multisite_settings['ldap_password'] ), 'mcrypt' );
+						$auth_multisite_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+					}
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
 			// // Update: TEMPLATE
 			// $update_if_older_than = YYYYMMDD;
 			// if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
