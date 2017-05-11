@@ -1072,7 +1072,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
 				if ( ! in_array( $email_domain, $google_hosteddomains ) ) {
 					$this->custom_logout();
-					return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) . ' (' . implode( ', ', $google_hosteddomains ) . ').' );
+					return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
 				}
 			}
 
