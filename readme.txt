@@ -62,6 +62,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.10 =
+* Allow multiple whitelisted domains under Google Hosted Domain. Props Michael K. for the suggestion!
+* Drop php-mcrypt library dependency (use openssl library instead since mcrypt is deprecated as of PHP 7.1).
+* Fix for some CAS servers redirecting to improper WordPress destination. Props @asithade for the [pull request](https://github.com/uhm-coe/authorizer/pull/29)!
+* Fix for mixed-case LDAP attribute names (first name, last name, email) not being recognized because ldap_get_entries() returns attirbute names in lowercase. Props @yatesconsulting for the [report](https://github.com/uhm-coe/authorizer/issues/27)!
+* Fix for immediate CAS redirect hook firing after content was sent to browser, triggering a PHP warning if output buffering isn't enabled on the web server. Props @steven1350 for reporting the bug!
+
 = 2.6.9 =
 * Fix for LDAP logins failing if the user password contained a single quote, double quote, or a backslash. Props @alxbr for the research!
 
