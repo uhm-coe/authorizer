@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.11 =
+* Fix for CAS logins redirecting to the redirect_to param of wp-login.php.
+* Fix for redirect after CAS logout on some CAS servers requiring whitelisted services (add a trailing slash to the logout service param).
+
 = 2.6.10 =
 * Allow multiple whitelisted domains under Google Hosted Domain. Props Michael K. for the suggestion!
 * Drop php-mcrypt library dependency (use openssl library instead since mcrypt is deprecated as of PHP 7.1).
