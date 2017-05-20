@@ -1157,17 +1157,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} catch ( CAS_AuthenticationException $e ) {
 				// CAS server threw an error in isAuthenticated(), potentially because
 				// the cached ticket is outdated. Try renewing the authentication.
-				try {
-					phpCAS::renewAuthentication();
-				} catch ( CAS_AuthenticationException $e ) {
-					error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) );
-					error_log( print_r( $e, true ) );
+				error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) );
+				error_log( print_r( $e, true ) );
 
-					// CAS server is throwing errors on this login, so try logging the
-					// user out of CAS and redirecting them to the login page.
-					phpCAS::logoutWithRedirectService( wp_login_url() );
-					die();
-				}
+				// CAS server is throwing errors on this login, so try logging the
+				// user out of CAS and redirecting them to the login page.
+				phpCAS::logoutWithRedirectService( wp_login_url() );
+				die();
 			}
 
 			// Get username (as specified by the CAS server).
