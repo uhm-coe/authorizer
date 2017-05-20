@@ -1449,7 +1449,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 				}
 				if ( phpCAS::isAuthenticated() ) {
-					phpCAS::logoutWithRedirectService( get_option( 'siteurl' ) );
+					phpCAS::logoutWithRedirectService( site_url( '/' ) );
 				}
 			}
 
