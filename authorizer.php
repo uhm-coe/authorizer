@@ -1142,7 +1142,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				file_put_contents( $cacert_path, $cacert_contents );
 			}
 			phpCAS::setCasServerCACert( $cacert_path );
-			phpCAS::setFixedServiceURL( site_url( '/wp-login.php?external=cas' ) );
+
+			// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
+			$cas_service_url = site_url( '/wp-login.php?external=cas' );
+			$login_querystring = array(); parse_str( $_SERVER['QUERY_STRING'], $login_querystring );
+			if ( isset( $login_querystring['redirect_to'] ) ) {
+				$cas_service_url .= '&redirect_to=' . urlencode( $login_querystring['redirect_to'] );
+			}
+			phpCAS::setFixedServiceURL( $cas_service_url );
 
 			// Authenticate against CAS
 			try {
