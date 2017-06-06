@@ -1572,7 +1572,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$current_page_name = $wp->query_vars['pagename'];
 				}
 			}
-			$current_page_id = empty( $wp->request ) ? 'home' : $this->get_id_from_pagename( $current_page_name );
+			$current_page_id = '';
+			if ( empty( $wp->request ) ) {
+				$current_page_id = 'home';
+			} else {
+				$current_page = get_page_by_path( $current_page_name );
+				if ( is_object( $current_page ) && isset( $current_page->ID ) ) {
+					$current_page_id = $current_page->ID;
+				}
+			}
 			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
@@ -5810,19 +5818,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return false;
-		}
-
-
-		/**
-		 * Helper function to get a WordPress page ID from the pagename.
-		 *
-		 * @param string  $pagename Page Slug
-		 * @return int            Page/Post ID
-		 */
-		function get_id_from_pagename( $pagename = '' ) {
-			global $wpdb;
-			$page_id = $wpdb->get_var( "SELECT ID FROM $wpdb->posts WHERE post_name = '" . sanitize_title_for_query( $pagename ) . "'" );
-			return $page_id;
 		}
 
 
