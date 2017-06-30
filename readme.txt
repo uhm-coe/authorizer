@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.13 =
+* Respect redirect_to param on CAS logout (if param exists). Props @dgoldber for finding that!
+
 = 2.6.12 =
 * Better detection of fuzzy permalink matches for private pages. Applies if site is restricted but 404 pages are marked as public; if this was the case, anonymous visitors to malformed permalinks (e.g., “example.com/sample page” or “example.com/sample%20page” instead of “example.com/sample-page”) were able to see the restricted page. Props @6hogan for finding that!
 
