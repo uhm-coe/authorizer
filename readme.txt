@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.14 =
+* Move nonce cookie creation to the first time it is needed (for Google logins). Props @emsearcy for the pull request!
+
 = 2.6.13 =
 * Respect redirect_to param on CAS logout (if param exists). Props @dgoldber for finding that!
 
