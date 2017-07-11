@@ -176,11 +176,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
 			}
 
-			// Create login cookie (used by google login)
-			if ( ! isset( $_COOKIE['login_unique'] ) ) {
-				setcookie( 'login_unique', $this->get_cookie_value(), time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
-			}
-
 			// Remove user from authorizer lists when that user is deleted in WordPress.
 			add_action( 'delete_user', array( $this, 'remove_user_from_authorizer_when_deleted' ) );
 			if ( is_multisite() ) {
@@ -5630,6 +5625,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$this->cookie_value = $_COOKIE['login_unique'];
 				} else {
 					$this->cookie_value = md5( rand() );
+					setcookie( 'login_unique', $this->cookie_value, time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
 				}
 			}
 			return $this->cookie_value;
