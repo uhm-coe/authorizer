@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.15 =
+* Fix for duplicate users in approved list (users added via authorizer_automatically_approve_login filter were re-added to approved list each time they logged in).
+
 = 2.6.14 =
 * Move nonce cookie creation to the first time it is needed (for Google logins). Props @emsearcy for the pull request!
 
