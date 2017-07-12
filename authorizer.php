@@ -657,12 +657,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// automatically approved in the "authorizer_approve_login" filter
 				// above, then add them to the approved list (they'll get an account
 				// created below if they don't have one yet).
-				if ( (
+				if (
 					! $this->is_email_in_list( $user_email, 'approved' ) &&
-					$auth_settings['access_who_can_login'] === 'external_users'
-				) || (
-					$automatically_approve_login
-				)	) {
+					(	$auth_settings['access_who_can_login'] === 'external_users' || $automatically_approve_login	)
+				) {
 					$is_newly_approved_user = true;
 
 					// If this user happens to be in the pending list (rare),
