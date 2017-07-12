@@ -6159,6 +6159,75 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$needs_updating = true;
 			}
 
+			// Update: Remove duplicates from approved list caused by authorizer_automatically_approve_login
+			// filter not respecting users who are already in the approved list
+			// (causing them to get re-added each time they logged in).
+			$update_if_older_than = 20170711;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Remove duplicates from approved user lists.
+				if ( is_multisite() ) {
+					// Remove duplicates from each site in the multisite
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						$auth_settings_access_users_approved = get_blog_option( $blog_id, 'auth_settings_access_users_approved', array() );
+						if ( is_array( $auth_settings_access_users_approved ) ) {
+							$should_update = false;
+							$distinct_emails = array();
+							foreach ( $auth_settings_access_users_approved as $key => $user ) {
+								if ( in_array( $user['email'], $distinct_emails ) ) {
+									$should_update = true;
+									unset( $auth_settings_access_users_approved[$key] );
+								} else {
+									$distinct_emails[] = $user['email'];
+								}
+							}
+							if ( $should_update ) {
+								update_blog_option( $blog_id, 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							}
+						}
+					}
+					// Remove duplicates from multisite approved user list.
+					$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+					if ( is_array( $auth_multisite_settings_access_users_approved ) ) {
+						$should_update = false;
+						$distinct_emails = array();
+						foreach ( $auth_multisite_settings_access_users_approved as $key => $user ) {
+							if ( in_array( $user['email'], $distinct_emails ) ) {
+								$should_update = true;
+								unset( $auth_multisite_settings_access_users_approved[$key] );
+							} else {
+								$distinct_emails[] = $user['email'];
+							}
+						}
+						if ( $should_update ) {
+							update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+						}
+					}
+				} else {
+					// Remove duplicates from single site approved user list.
+					$auth_settings_access_users_approved = get_option( 'auth_settings_access_users_approved' );
+					if ( is_array( $auth_settings_access_users_approved ) ) {
+						$should_update = false;
+						$distinct_emails = array();
+						foreach ( $auth_settings_access_users_approved as $key => $user ) {
+							if ( in_array( $user['email'], $distinct_emails ) ) {
+								$should_update = true;
+								unset( $auth_settings_access_users_approved[$key] );
+							} else {
+								$distinct_emails[] = $user['email'];
+							}
+						}
+						if ( $should_update ) {
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+						}
+					}
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
 			// // Update: TEMPLATE
 			// $update_if_older_than = YYYYMMDD;
 			// if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
