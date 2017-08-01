@@ -616,7 +616,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// Get the default role for this new user.
+			// Get the default role for this user (or their current role, if they
+			// already have an account).
 			$default_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
 			/**
 			 * Filter the role of the user currently logging in. The role will be
@@ -4937,7 +4938,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
-					// Remove user from approved list and save
+					// Remove user from approved list and save (also remove their role if they have a WordPress account)
 					} elseif ( $approved_user['edit_action'] === 'remove' ) {
 						if ( $approved_user['multisite_user'] !== 'false' ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
@@ -4959,6 +4960,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
+										// Remove role of the associated WordPress user (but don't delete the user).
+										$user = get_user_by( 'email', $approved_user['email'] );
+										if ( $user !== false ) {
+											$user->set_role( '' );
+										}
+										// Remove entry from Approved Users list.
 										unset( $auth_settings_access_users_approved[$key] );
 										break;
 									}
