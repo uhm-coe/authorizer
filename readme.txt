@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.16 =
+* Fix: Remove user's role when removing them from the approved list. This is a security feature, in case a removed user is presumed deleted from the site. Since Authorizer does not delete users (to avoid the issue of reassigning or deleting that user’s content), removing their role removes all capabilities from the site until they are re-added to the approved list.
+
 = 2.6.15 =
 * Fix for duplicate users in approved list (users added via authorizer_automatically_approve_login filter were re-added to approved list each time they logged in).
 
