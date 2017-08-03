@@ -44,7 +44,7 @@ define( 'SINGLE_ADMIN', 'single_admin' );
 // Add phpCAS library if it's not included.
 // @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/CAS-1.3.4/CAS.php';
+	require_once dirname( __FILE__ ) . '/vendor/CAS-1.3.5/CAS.php';
 }
 
 
