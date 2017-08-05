@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.17 =
+* Fix for approved list roles not updating if changed on the fly in authorizer_custom_role hook.
+* Update phpCAS from 1.3.4 to 1.3.5. See [changelog](https://github.com/Jasig/phpCAS/blob/master/docs/ChangeLog).
+
 = 2.6.16 =
 * Fix: Remove user's role when removing them from the approved list. This is a security feature, in case a removed user is presumed deleted from the site. Since Authorizer does not delete users (to avoid the issue of reassigning or deleting that user’s content), removing their role removes all capabilities from the site until they are re-added to the approved list.
 
