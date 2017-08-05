@@ -556,10 +556,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users_pending = $this->sanitize_user_list(
 				$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
 			);
+			$auth_settings_access_users_approved_single = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+			$auth_settings_access_users_approved_multi = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
 			$auth_settings_access_users_approved = $this->sanitize_user_list(
 				array_merge(
-					$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
-					$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+					$auth_settings_access_users_approved_single,
+					$auth_settings_access_users_approved_multi
 				)
 			);
 
@@ -683,7 +685,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'date_added' => date( "Y-m-d H:i:s" ),
 					);
 					array_push( $auth_settings_access_users_approved, $approved_user );
-					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+					array_push( $auth_settings_access_users_approved_single, $approved_user );
+					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
 				}
 
 				// Check our externally authenticated user against the approved
@@ -827,10 +830,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// Update this user's role if it was modified in the
 						// authorizer_custom_role filter.
 						if ( $default_role !== $approved_role ) {
-							wp_update_user( array(
-								'ID' => $user->ID,
-								'role' => $approved_role,
-							));
+							// Update user's role in WordPress.
+							$user->set_role( $approved_role );
+
+							// Update user's role in this site's approved list and save.
+							foreach ( $auth_settings_access_users_approved_single as $key => $existing_user ) {
+								if ( $user->user_email == $existing_user['email'] ) {
+									$auth_settings_access_users_approved[$key]['role'] = $approved_role;
+									break;
+								}
+							}
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
 						}
 					}
 
