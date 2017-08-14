@@ -4957,6 +4957,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 									if ( $approved_user['email'] == $existing_user['email'] ) {
+										// Remove role of the associated WordPress user from all blogs (but don't delete the user).
+										$user = get_user_by( 'email', $approved_user['email'] );
+										if ( $user !== false ) {
+											// Loop through all of the blogs this user is a member of and remove their capabilities.
+											foreach ( get_blogs_of_user( $user->ID ) as $blog ) {
+												remove_user_from_blog( $user->ID, $blog->userblog_id, '' );
+											}
+										}
+										// Remove entry from Approved Users list.
 										unset( $auth_multisite_settings_access_users_approved[$key] );
 										break;
 									}
