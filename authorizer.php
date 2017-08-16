@@ -840,7 +840,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									break;
 								}
 							}
-							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 						}
 					}
 
