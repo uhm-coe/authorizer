@@ -836,11 +836,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							// Update user's role in this site's approved list and save.
 							foreach ( $auth_settings_access_users_approved_single as $key => $existing_user ) {
 								if ( $user->user_email == $existing_user['email'] ) {
-									$auth_settings_access_users_approved[$key]['role'] = $approved_role;
+									$auth_settings_access_users_approved_single[$key]['role'] = $approved_role;
 									break;
 								}
 							}
-							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
 						}
 					}
 
