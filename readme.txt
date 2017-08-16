@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.18 =
+* Fix for issue with approved list roles not updating correctly when changed using the authorizer_custom_role hook.  Thank you to @mmcglynn for extensive help in testing.
+* Fix for issue with removing user's roles when removing them from a multisite WordPress install.
+
 = 2.6.17 =
 * Fix for approved list roles not updating if changed on the fly in authorizer_custom_role hook.
 * Update phpCAS from 1.3.4 to 1.3.5. See [changelog](https://github.com/Jasig/phpCAS/blob/master/docs/ChangeLog).
