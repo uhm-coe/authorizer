@@ -281,7 +281,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				// Remove from pending list if there.
 				foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-					if ( 0 == strcasecmp( $pending_user['email'], $user->user_email ) ) {
+					if ( 0 === strcasecmp( $pending_user['email'], $user->user_email ) ) {
 						unset( $auth_settings_access_users_pending[$key] );
 						$updated = true;
 					}
@@ -670,7 +670,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// remove them from pending before adding them to approved.
 					if ( $this->is_email_in_list( $user_email, 'pending' ) ) {
 						foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-							if ( 0 == strcasecmp( $pending_user['email'], $user_email ) ) {
+							if ( 0 === strcasecmp( $pending_user['email'], $user_email ) ) {
 								unset( $auth_settings_access_users_pending[ $key ] );
 								update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 								break;
@@ -835,7 +835,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 							// Update user's role in this site's approved list and save.
 							foreach ( $auth_settings_access_users_approved_single as $key => $existing_user ) {
-								if ( 0 == strcasecmp( $user->user_email, $existing_user['email'] ) ) {
+								if ( 0 === strcasecmp( $user->user_email, $existing_user['email'] ) ) {
 									$auth_settings_access_users_approved_single[$key]['role'] = $approved_role;
 									break;
 								}
@@ -865,7 +865,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Note: only do this for the last email address we are checking (we need
 				// to iterate through them all to make sure one of them isn't approved).
-				} elseif ( 0 == strcasecmp( $user_email, $last_email ) ) {
+				} elseif ( 0 === strcasecmp( $user_email, $last_email ) ) {
 					// User isn't an admin, is not blocked, and is not approved.
 					// Add them to the pending list and notify them and their instructor.
 					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
@@ -3119,7 +3119,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ) );
 				// Find approved user and sync with the corresponding WP_User.
 				foreach ( $auth_settings_access_users_approved as $key => $user ) {
-					if ( 0 == strcasecmp( $user['email'], $wp_user->user_email ) ) {
+					if ( 0 === strcasecmp( $user['email'], $wp_user->user_email ) ) {
 						// Sync user role.
 						if ( array_key_exists( 'role', $_REQUEST ) ) {
 							$auth_settings_access_users_approved[$key]['role'] = $_REQUEST['role'];
@@ -4714,7 +4714,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
 				$should_update_auth_multisite_settings_access_users_approved = false;
 				foreach ( $auth_multisite_settings_access_users_approved as $index => $approved_user ) {
-					if ( 0 == strcasecmp( $email, $approved_user['email'] ) ) {
+					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
 						if ( ! is_array( $auth_multisite_settings_access_users_approved[$index]['usermeta'] ) ) {
 							// Initialize the array of usermeta for each blog this user belongs to.
 							$auth_multisite_settings_access_users_approved[$index]['usermeta'] = array();
@@ -4750,7 +4750,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				$should_update_auth_settings_access_users_approved = false;
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
-					if ( 0 == strcasecmp( $email, $approved_user['email'] ) ) {
+					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
 						$auth_settings_access_users_approved[$index]['usermeta'] = array(
 							'meta_key' => $meta_key,
 							'meta_value' => $meta_value,
@@ -4825,7 +4825,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
 							);
 							foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
-								if ( 0 == strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
+								if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
 									unset( $auth_settings_access_users_pending[$key] );
 									break;
 								}
@@ -4936,7 +4936,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$user_list = get_blog_option( $blog_id, 'auth_settings_' . $list_name, array() );
 									$list_changed = false;
 									foreach ( $user_list as $key => $user ) {
-										if ( 0 == strcasecmp( $user['email'], $approved_user['email'] ) ) {
+										if ( 0 === strcasecmp( $user['email'], $approved_user['email'] ) ) {
 											unset( $user_list[$key] );
 											$list_changed = true;
 										}
@@ -4956,7 +4956,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 == strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
+									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 										// Remove role of the associated WordPress user from all blogs (but don't delete the user).
 										$user = get_user_by( 'email', $approved_user['email'] );
 										if ( $user !== false ) {
@@ -4978,7 +4978,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 == strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
+									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 										// Remove role of the associated WordPress user (but don't delete the user).
 										$user = get_user_by( 'email', $approved_user['email'] );
 										if ( $user !== false ) {
@@ -5012,7 +5012,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 == strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
+									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 										$auth_multisite_settings_access_users_approved[$key]['role'] = $approved_user['role'];
 										break;
 									}
@@ -5026,7 +5026,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 == strcasecmp( $approved_user['email'],  $existing_user['email'] ) ) {
+									if ( 0 === strcasecmp( $approved_user['email'],  $existing_user['email'] ) ) {
 										$auth_settings_access_users_approved[$key]['role'] = $approved_user['role'];
 										break;
 									}
@@ -5082,7 +5082,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 							);
 							foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
-								if ( 0 == strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
+								if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
 									unset( $auth_settings_access_users_blocked[$key] );
 									break;
 								}
@@ -5279,7 +5279,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user_list = $this->sanitize_user_list( $this->get_plugin_option( $list_name, SINGLE_ADMIN ) );
 				$list_changed = false;
 				foreach ( $user_list as $key => $existing_user ) {
-					if ( 0 == strcasecmp( $deleted_email, $existing_user['email'] ) ) {
+					if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 						$list_changed = true;
 						unset( $user_list[$key] );
 					}
@@ -5305,7 +5305,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			$list_changed = false;
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
-				if ( 0 == strcasecmp( $deleted_email, $existing_user['email'] ) ) {
+				if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 					$list_changed = true;
 					unset( $auth_multisite_settings_access_users_approved[$key] );
 				}
@@ -5337,7 +5337,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user_list = get_blog_option( $blog_id, 'auth_settings_' . $list_name, array() );
 				$list_changed = false;
 				foreach ( $user_list as $key => $existing_user ) {
-					if ( 0 == strcasecmp( $deleted_email, $existing_user['email'] ) ) {
+					if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 						$list_changed = true;
 						unset( $user_list[$key] );
 					}
@@ -5475,7 +5475,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			// Remove from pending list if there.
 			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
-				if ( 0 == strcasecmp( $pending_user['email'], $user_email ) ) {
+				if ( 0 === strcasecmp( $pending_user['email'], $user_email ) ) {
 					unset( $auth_settings_access_users_pending[$key] );
 					$updated = true;
 				}
@@ -5561,7 +5561,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			$list_changed = false;
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
-				if ( 0 == strcasecmp( $revoked_email, $existing_user['email'] ) ) {
+				if ( 0 === strcasecmp( $revoked_email, $existing_user['email'] ) ) {
 					$list_changed = true;
 					unset( $auth_multisite_settings_access_users_approved[$key] );
 				}
@@ -5948,7 +5948,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		//  array( 'email' => '', 'role' => '', 'date_added' => '', ['usermeta' => [''|array()]] );
 		function get_user_info_from_list( $email, $list ) {
 			foreach ( $list as $user_info ) {
-				if ( 0 == strcasecmp( $user_info['email'], $email ) ) {
+				if ( 0 === strcasecmp( $user_info['email'], $email ) ) {
 					return $user_info;
 				}
 			}
