@@ -128,6 +128,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'login_enqueue_scripts', array( $this, 'login_enqueue_scripts_and_styles' ) );
 			add_action( 'login_footer', array( $this, 'load_login_footer_js' ) );
 
+			// Create google nonce cookie when loading wp-login.php if Google is enabled.
+			add_action( 'login_init', array( $this, 'login_init__maybe_set_google_nonce_cookie' ) );
+
 			// Modify login page with external auth links (if enabled; e.g., google or cas)
 			add_action( 'login_form', array( $this, 'login_form_add_external_service_links' ) );
 
@@ -1960,6 +1963,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return $errors;
+		}
+
+
+		/**
+		 * Set a unique cookie to add to Google auth nonce to avoid CSRF detection.
+		 * Note: hook into login_init so this fires at the start of the visit to
+		 * wp-login.php, but before any html output is started (so setting the
+		 * cookie header doesn't complain about data already being sent).
+		 */
+		function login_init__maybe_set_google_nonce_cookie() {
+			// Grab plugin settings.
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
+
+			// If Google logins are enabled, make sure the cookie is set.
+			if ( array_key_exists( 'google', $auth_settings ) && $auth_settings['google'] === '1' ) {
+				if ( ! isset( $_COOKIE['login_unique'] ) ) {
+					$this->cookie_value = md5( rand() );
+					setcookie( 'login_unique', $this->cookie_value, time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
+					$_COOKIE['login_unique'] = $this->cookie_value;
+				}
+			}
 		}
 
 
@@ -5649,7 +5673,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$this->cookie_value = $_COOKIE['login_unique'];
 				} else {
 					$this->cookie_value = md5( rand() );
-					setcookie( 'login_unique', $this->cookie_value, time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
 				}
 			}
 			return $this->cookie_value;
