@@ -1210,7 +1210,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						)
 					)
 				) {
-					$externally_authenticated_email = mb_strtolower( $cas_attributes[$auth_settings['cas_attr_email']] );
+					// Each of the emails in the array needs to be set to lowercase.
+					$externally_authenticated_email = array();
+					foreach ( $cas_attributes[$auth_settings['cas_attr_email']] as $external_email ) {
+							$externally_authenticated_email[] = mb_strtolower( $external_email );
+					}
 				}
 			}
 
