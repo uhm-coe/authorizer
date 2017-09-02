@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.20 =
+* Fix for issue with incorrect parsing of an array of email addresses to be converted to lowercase.
+* Fix for nonce cookie issue on google logins where cookie was being sent after headers, resulting in an error message.
+
 = 2.6.19 =
 * Fix for issue with case sensitivity checks on user emails affecting role assignments, user deletions, and user updates in Authorizer.  All existing uppercase emails in Authorizer will migrate to lowercase as users log in.  Thank you again to @mmcglynn for continued extensive help in testing.
 * Update CAS server connection check to accept 300 response codes as valid presence of a CAS server.  It is the administrator's duty to ensure that a redirect on their CAS url is acceptable.

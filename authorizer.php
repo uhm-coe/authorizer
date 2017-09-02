@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: https://github.com/uhm-coe/authorizer
 Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.6.19
+Version: 2.6.20
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 Text Domain: authorizer
@@ -1213,7 +1213,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Each of the emails in the array needs to be set to lowercase.
 					$externally_authenticated_email = array();
 					foreach ( $cas_attributes[$auth_settings['cas_attr_email']] as $external_email ) {
-							$externally_authenticated_email[] = mb_strtolower( $external_email );
+						$externally_authenticated_email[] = mb_strtolower( $external_email );
 					}
 				}
 			}
