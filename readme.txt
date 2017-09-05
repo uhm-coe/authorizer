@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.21 =
+* Fix broken logins caused by regression on previous fix for multivalued email attribute
+
 = 2.6.20 =
 * Fix for issue with incorrect parsing of an array of email addresses to be converted to lowercase.
 * Fix for nonce cookie issue on google logins where cookie was being sent after headers, resulting in an error message.
