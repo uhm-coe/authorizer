@@ -227,7 +227,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Add to approved list if not there.
 					if ( ! $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 						$approved_user = array(
-							'email' => mb_strtolower( $user->user_email ),
+							'email' => $this->lowercase( $user->user_email ),
 							'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 							'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 							'local_user' => true,
@@ -296,7 +296,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Add to approved list if not there.
 				if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
 					$approved_user = array(
-						'email' => mb_strtolower( $user->user_email ),
+						'email' => $this->lowercase( $user->user_email ),
 						'role' => count( $user->roles ) > 0 ? $user->roles[0] : '',
 						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
@@ -506,7 +506,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get the external user's WordPress account by email address.
 			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
-				$user = get_user_by( 'email', mb_strtolower( $externally_authenticated_email ) );
+				$user = get_user_by( 'email', $this->lowercase( $externally_authenticated_email ) );
 
 				// If we've already found a WordPress user associated with one
 				// of the supplied email addresses, don't keep examining other
@@ -590,7 +590,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 						);
 						array_push( $auth_settings_access_users_blocked, array(
-							'email' => mb_strtolower( $user_email ),
+							'email' => $this->lowercase( $user_email ),
 							'date_added' => date( 'M Y' ),
 						));
 						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
@@ -683,7 +683,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Add this user to the approved list.
 					$approved_user = array(
-						'email' => mb_strtolower( $user_email ),
+						'email' => $this->lowercase( $user_email ),
 						'role' => $approved_role,
 						'date_added' => date( "Y-m-d H:i:s" ),
 					);
@@ -726,7 +726,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								'user_pass' => wp_generate_password(), // random password
 								'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
 								'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
-								'user_email' => mb_strtolower( $user_info['email'] ),
+								'user_email' => $this->lowercase( $user_info['email'] ),
 								'user_registered' => date( 'Y-m-d H:i:s' ),
 								'role' => $user_info['role'],
 							)
@@ -873,7 +873,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Add them to the pending list and notify them and their instructor.
 					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 						$pending_user = array();
-						$pending_user['email'] = mb_strtolower( $user_email );
+						$pending_user['email'] = $this->lowercase( $user_email );
 						$pending_user['role'] = $approved_role;
 						$pending_user['date_added'] = '';
 						array_push( $auth_settings_access_users_pending, $pending_user );
@@ -1063,7 +1063,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get email address
 			$attributes = $ticket->getAttributes();
-			$email = mb_strtolower( $attributes['payload']['email'] );
+			$email = $this->lowercase( $attributes['payload']['email'] );
 			$email_domain = substr( strrchr( $email, '@' ), 1 );
 			$username = current( explode( '@', $email ) );
 
@@ -1183,7 +1183,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// try to guess the domain from the CAS server hostname. This will only
 				// be used if we can't discover the email address from CAS attributes.
 				$domain_guess = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
-				$externally_authenticated_email = mb_strtolower( $username ) . '@' . $domain_guess;
+				$externally_authenticated_email = $this->lowercase( $username ) . '@' . $domain_guess;
 			}
 
 			// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
@@ -1196,7 +1196,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// CAS attribute), and combine that with the username to create the email.
 				// Otherwise, look up the CAS attribute for email.
 				if ( substr( $auth_settings['cas_attr_email'], 0, 1 ) === '@' ) {
-					$externally_authenticated_email = mb_strtolower( $username . $auth_settings['cas_attr_email'] );
+					$externally_authenticated_email = $this->lowercase( $username . $auth_settings['cas_attr_email'] );
 				} elseif (
 					// If a CAS attribute has been specified as containing the email address, use that instead.
 					// Email attribute can be a string or an array of strings.
@@ -1214,10 +1214,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) ) {
 						$externally_authenticated_email = array();
 						foreach ( $cas_attributes[$auth_settings['cas_attr_email']] as $external_email ) {
-							$externally_authenticated_email[] = mb_strtolower( $external_email );
+							$externally_authenticated_email[] = $this->lowercase( $external_email );
 						}
 					} else {
-						$externally_authenticated_email = mb_strtolower( $cas_attributes[$auth_settings['cas_attr_email']] );
+						$externally_authenticated_email = $this->lowercase( $cas_attributes[$auth_settings['cas_attr_email']] );
 					}
 				}
 			}
@@ -1354,7 +1354,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_last_name'] );
 			}
 			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && substr( $auth_settings['ldap_attr_email'], 0, 1 ) !== '@' ) {
-				array_push( $ldap_attributes_to_retrieve, mb_strtolower( $auth_settings['ldap_attr_email'] ) );
+				array_push( $ldap_attributes_to_retrieve, $this->lowercase( $auth_settings['ldap_attr_email'] ) );
 			}
 			$ldap_search = ldap_search(
 				$ldap,
@@ -1374,25 +1374,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$ldap_user_dn = $ldap_entries[$i]['dn'];
 
 				// Get user first name and last name.
-				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? mb_strtolower( $auth_settings['ldap_attr_first_name'] ) : '';
+				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_first_name'] ) : '';
 				if ( strlen( $ldap_attr_first_name ) > 0 && array_key_exists( $ldap_attr_first_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_first_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_first_name][0] ) > 0 ) {
 					$first_name = $ldap_entries[$i][$ldap_attr_first_name][0];
 				}
-				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? mb_strtolower( $auth_settings['ldap_attr_last_name'] ) : '';
+				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_last_name'] ) : '';
 				if ( strlen( $ldap_attr_last_name ) > 0 && array_key_exists( $ldap_attr_last_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_last_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_last_name][0] ) > 0 ) {
 					$last_name = $ldap_entries[$i][$ldap_attr_last_name][0];
 				}
 				// Get user email if it is specified in another field.
-				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? mb_strtolower( $auth_settings['ldap_attr_email'] ) : '';
+				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_email'] ) : '';
 				if ( strlen( $ldap_attr_email ) > 0 ) {
 					// If the email attribute starts with an at symbol (@), assume that the
 					// email domain is manually entered there (instead of a reference to an
 					// LDAP attribute), and combine that with the username to create the email.
 					// Otherwise, look up the LDAP attribute for email.
 					if ( substr( $ldap_attr_email, 0, 1 ) === '@' ) {
-						$email = mb_strtolower( $username . $ldap_attr_email );
+						$email = $this->lowercase( $username . $ldap_attr_email );
 					} elseif ( array_key_exists( $ldap_attr_email, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_email]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_email][0] ) > 0 ) {
-						$email = mb_strtolower( $ldap_entries[$i][$ldap_attr_email][0] );
+						$email = $this->lowercase( $ldap_entries[$i][$ldap_attr_email][0] );
 					}
 				}
 			}
@@ -1407,11 +1407,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
-			$externally_authenticated_email = mb_strtolower( $username . '@' . $domain );
+			$externally_authenticated_email = $this->lowercase( $username . '@' . $domain );
 
 			// If an LDAP attribute has been specified as containing the email address, use that instead.
 			if ( strlen( $email ) > 0 ) {
-				$externally_authenticated_email = mb_strtolower( $email );
+				$externally_authenticated_email = $this->lowercase( $email );
 			}
 
 			return array(
@@ -3158,7 +3158,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 						// Sync email address.
 						if ( array_key_exists( 'email', $_REQUEST ) ) {
-							$auth_settings_access_users_approved[$key]['email'] = mb_strtolower( $_REQUEST['email'] );
+							$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $_REQUEST['email'] );
 						}
 					}
 				}
@@ -4904,13 +4904,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$username = explode( '@', $approved_user['email'] );
 							$username = $username[0];
 							if ( get_user_by( 'login', $username ) !== false ) {
-								$username = mb_strtolower( $approved_user['email'] );
+								$username = $this->lowercase( $approved_user['email'] );
 							}
 							if ( $approved_user['multisite_user'] !== 'false' ) {
 								$result = wpmu_create_user(
 									strtolower( $username ),
 									$plaintext_password,
-									mb_strtolower( $approved_user['email'] )
+									$this->lowercase( $approved_user['email'] )
 								);
 							} else {
 								$result = wp_insert_user(
@@ -4919,7 +4919,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 										'user_pass' => $plaintext_password,
 										'first_name' => '',
 										'last_name' => '',
-										'user_email' => mb_strtolower( $approved_user['email'] ),
+										'user_email' => $this->lowercase( $approved_user['email'] ),
 										'user_registered' => date( 'Y-m-d H:i:s' ),
 										'role' => $approved_user['role'],
 									)
@@ -5399,7 +5399,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
 			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) && ! $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
 				$approved_user = array(
-					'email' => mb_strtolower( $user_email ),
+					'email' => $this->lowercase( $user_email ),
 					'role' => $user_role,
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
@@ -5519,7 +5519,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add to approved list if not there.
 			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
 				$approved_user = array(
-					'email' => mb_strtolower( $user_email ),
+					'email' => $this->lowercase( $user_email ),
 					'role' => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
 					'date_added' => date( 'M Y', strtotime( $date_registered ) ),
 					'local_user' => true,
@@ -5555,7 +5555,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			if ( ! $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
 				$multisite_approved_user = array(
-					'email' => mb_strtolower( $user_email ),
+					'email' => $this->lowercase( $user_email ),
 					'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
@@ -5984,6 +5984,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			return false;
+		}
+
+		// Helper function to convert a string to lowercase.  Prefers to use mb_strtolower,
+		// but will fall back to strtolower if the former is not available.
+		// Returns:  string in lowercase
+		function lowercase( $string ) {
+			return function_exists( "mb_strtolower" ) ?  mb_strtolower( $string ) : strtolower( $string );
 		}
 
 
