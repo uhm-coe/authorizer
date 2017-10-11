@@ -1586,21 +1586,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Check to see if the requested page is public. If so, show it.
-			$current_page_name = property_exists( $wp, 'query_vars' ) && array_key_exists( 'name', $wp->query_vars ) && strlen( $wp->query_vars['name'] ) > 0 ? $wp->query_vars['name'] : '';
-			if ( ! $current_page_name ) {
-				// Different WordPress versions store the page slug in different places; look for it elsewhere.
-				if ( property_exists( $wp, 'query_vars' ) && array_key_exists( 'pagename', $wp->query_vars ) && strlen( $wp->query_vars['pagename'] ) > 0 ) {
-					$current_page_name = $wp->query_vars['pagename'];
-				}
-			}
-			$current_page_id = '';
 			if ( empty( $wp->request ) ) {
 				$current_page_id = 'home';
 			} else {
-				$current_page = get_page_by_path( $current_page_name );
-				if ( is_object( $current_page ) && isset( $current_page->ID ) ) {
-					$current_page_id = $current_page->ID;
-				}
+				$request_query = isset( $wp->query_vars ) ? new WP_Query( $wp->query_vars ) : null;
+				$current_page_id = isset( $request_query->post_count ) && $request_query->post_count > 0 ? $request_query->post->ID : '';
 			}
 			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
@@ -1628,7 +1618,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Check to see if this page can't be found. If so, allow showing the 404 page.
-			if ( strlen( $current_page_name ) > 0 && strlen( $current_page_id ) < 1 ) {
+			if ( strlen( $current_page_id ) < 1 ) {
 				if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'] ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
@@ -1637,7 +1627,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 					return $wp;
 				}
-
 			}
 
 			// Check to see if the requested category is public. If so, show it.
