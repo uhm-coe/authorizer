@@ -62,6 +62,12 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+* 2.6.22 =
+* Fix for regression showing certain private posts. Props @InvisibleMass for finding the bug!
+* Fix for users without the php-mbstring extension installed.
+* Update jQuery multi-select plugin from 0.9.8 to 0.9.12.
+* Fix for bug in syncing user roles during login. Props @dsusco for the pull request!
+
 = 2.6.21 =
 * Fix broken logins caused by regression on previous fix for multivalued email attribute
 
