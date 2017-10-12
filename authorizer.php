@@ -858,10 +858,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Ensure user has the same role as their entry in the approved list.
-					// (This is just a precaution, the role should already be set when
-					// saving admin options in the sanitizing function.)
 					if ( $user_info && ! in_array( $user_info['role'], $user->roles ) ) {
-						$user->add_role( $user_info['role'] );
+						$user->set_role( $user_info['role'] );
 					}
 
 					return $user;
