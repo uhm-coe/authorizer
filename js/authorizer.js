@@ -464,6 +464,7 @@ function save_auth_multisite_settings( caller ) {
 		'reset_duration': $( '#auth_settings_advanced_lockouts_reset_duration' ).val()
 	};
 	var advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
+	var advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
 
 	$.post( ajaxurl, {
 		action: 'save_auth_multisite_settings',
@@ -503,6 +504,7 @@ function save_auth_multisite_settings( caller ) {
 		'ldap_attr_update_on_login': ldap_attr_update_on_login,
 		'advanced_lockouts': advanced_lockouts,
 		'advanced_hide_wp_login': advanced_hide_wp_login,
+		'advanced_widget_enabled': advanced_widget_enabled,
 	}, function( response ) {
 		var succeeded = response === 'success';
 		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';

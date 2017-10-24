@@ -2620,6 +2620,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_advanced' // Section this setting is shown on
 			);
+			add_settings_field(
+				'auth_settings_advanced_widget_enabled', // HTML element ID
+				__( 'Show dashboard widget to admin users', 'authorizer' ), // HTML element Title
+				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
 			// On multisite installs, add an option to override all multisite settings on individual sites.
 			if ( is_multisite() ) {
 				add_settings_field(
@@ -2832,6 +2839,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'advanced_usermeta', $auth_settings ) ) {
 				$auth_settings['advanced_usermeta'] = '';
 			}
+			if ( ! array_key_exists( 'advanced_widget_enabled', $auth_settings ) ) {
+				$auth_settings['advanced_widget_enabled'] = '1';
+			}
 			if ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) ) {
 				$auth_settings['advanced_override_multisite'] = '';
 			}
@@ -2974,6 +2984,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_hide_wp_login'] = '';
 				}
+				if ( ! array_key_exists( 'advanced_widget_enabled', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_widget_enabled'] = '1';
+				}
 				// Save default network options to database.
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
 				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
@@ -3107,6 +3120,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string)
 			$auth_settings['advanced_hide_wp_login'] = array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ? '1' : '';
+
+			// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string)
+			$auth_settings['advanced_widget_enabled'] = array_key_exists( 'advanced_widget_enabled', $auth_settings ) && strlen( $auth_settings['advanced_widget_enabled'] ) > 0 ? '1' : '';
 
 			// Sanitize Override multisite options (checkbox: value can only be '1' or empty string)
 			$auth_settings['advanced_override_multisite'] = array_key_exists( 'advanced_override_multisite', $auth_settings ) && strlen( $auth_settings['advanced_override_multisite'] ) > 0 ? '1' : '';
@@ -4250,6 +4266,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_widget_enabled';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
+			<p><small><?php _e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ) ?></small></p><?php
+		}
+
+
 		function print_checkbox_auth_advanced_override_multisite( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_override_multisite';
@@ -4573,6 +4600,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<th scope="row"><?php _e( 'Hide WordPress Logins', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
+							<tr>
+								<th scope="row"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></th>
+								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
 						</tbody></table>
 
 						<br class="clear" />
@@ -4650,6 +4681,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_attr_update_on_login',
 				'advanced_lockouts',
 				'advanced_hide_wp_login',
+				'advanced_widget_enabled',
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
@@ -4671,8 +4703,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		function add_dashboard_widgets() {
-			// Only users who can edit can see the authorizer dashboard widget
-			if ( current_user_can( 'create_users' ) ) {
+			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled' ) === '1';
+
+			// Load authorizer dashboard widget if it's enabled and user has permission.
+			if ( current_user_can( 'create_users' ) && $widget_enabled ) {
 				// Add dashboard widget for adding/editing users with access
 				wp_add_dashboard_widget( 'auth_dashboard_widget', __( 'Authorizer Settings', 'authorizer' ), array( $this, 'add_auth_dashboard_widget' ) );
 			}
@@ -5278,6 +5312,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Override Hide WordPress login
 					$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
+
+					// Override Show Dashboard Widget
+					$auth_settings['advanced_widget_enabled'] = $auth_multisite_settings['advanced_widget_enabled'];
 				}
 			}
 			return $auth_settings;
@@ -6273,6 +6310,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 						}
 					}
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Set default value for newly added option advanced_widget_enabled.
+			$update_if_older_than = 20171023;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
+						$this->set_default_options();
+						restore_current_blog();
+					}
+				} else {
+					$this->set_default_options();
 				}
 				// Update version to reflect this change has been made.
 				$auth_version = $update_if_older_than;
