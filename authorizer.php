@@ -5205,7 +5205,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$id = "auth_settings_$option"; ?>
 				<div id="overlay-hide-auth_settings_<?php echo $option; ?>" class="auth_multisite_override_overlay">
 					<span class="overlay-note">
-						<?php _e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo network_admin_url( 'admin.php?page=authorizer&tab=external' ); ?>"><?php _e( 'multisite option', 'authorizer' ); ?></a>.
+						<?php _e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo network_admin_url( 'admin.php?page=authorizer' ); ?>"><?php _e( 'multisite option', 'authorizer' ); ?></a>.
 					</span>
 				</div>
 				<?php
