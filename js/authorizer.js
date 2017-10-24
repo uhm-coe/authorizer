@@ -743,7 +743,7 @@ jQuery( document ).ready( function( $ ) {
 	$( 'th, td', auth_settings_external_ldap_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 
 	// If we're viewing the dashboard widget, reset a couple of the relevant
-	// option variables (since they're aren't nested in table rows).
+	// option variables (since they aren't nested in table rows).
 	if ( $( '#auth_dashboard_widget' ).length ) {
 		auth_settings_access_users_pending = $( '#list_auth_settings_access_users_pending' ).closest( 'div' );
 		auth_settings_access_users_approved = $( '#list_auth_settings_access_users_approved' ).closest( 'div' );
@@ -754,6 +754,14 @@ jQuery( document ).ready( function( $ ) {
 
 		// Remove the helper link, since there are no tabs on the dashboard widget
 		$( '#dashboard_link_approved_users' ).contents().unwrap();
+	}
+
+	// Hide settings unless "Only approved users" is checked
+	if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {
+		animate_option( 'hide_immediately', auth_settings_access_role_receive_pending_emails );
+		animate_option( 'hide_immediately', auth_settings_access_pending_redirect_to_message );
+		animate_option( 'hide_immediately', auth_settings_access_blocked_redirect_to_message );
+		animate_option( 'hide_immediately', auth_settings_access_should_email_approved_users );
 	}
 
 	// Hide Welcome email body/subject options if "Send welcome email" is off.
@@ -809,12 +817,13 @@ jQuery( document ).ready( function( $ ) {
 
 	// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
 	$( 'input[name="auth_settings[access_who_can_login]"]' ).change( function() {
-		// Hide user whitelist unless "Only specific students below" is checked
+		// Hide settings unless "Only approved users" is checked
 		var action = $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ? 'show' : 'hide';
 		animate_option( action, auth_settings_access_role_receive_pending_emails );
 		animate_option( action, auth_settings_access_pending_redirect_to_message );
 		animate_option( action, auth_settings_access_blocked_redirect_to_message );
 		animate_option( action, auth_settings_access_should_email_approved_users );
+		action = action === 'show' && $( '#auth_settings_access_should_email_approved_users' ).is( ':checked' ) ? 'show' : 'hide_immediately';
 		animate_option( action, auth_settings_access_email_approved_users_subject );
 		animate_option( action, auth_settings_access_email_approved_users_body );
 	});
