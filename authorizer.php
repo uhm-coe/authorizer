@@ -4703,7 +4703,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		function add_dashboard_widgets() {
-			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled' ) === '1';
+			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled', SINGLE_ADMIN, 'allow override' ) === '1';
 
 			// Load authorizer dashboard widget if it's enabled and user has permission.
 			if ( current_user_can( 'create_users' ) && $widget_enabled ) {
