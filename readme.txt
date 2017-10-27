@@ -62,6 +62,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.6.23 =
+* Added ability to disable the dashboard widget (useful on sites with many users until paged user lists are implemented).
+* Fix for the multisite option override link always going to the External Services tab.
+* Fix for hide/show of Login Access options when certain options are selected.
+
 = 2.6.22 =
 * Fix for regression showing certain private posts. Props @InvisibleMass for finding the bug!
 * Fix for users without the php-mbstring extension installed.
