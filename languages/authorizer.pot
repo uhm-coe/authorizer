@@ -291,7 +291,7 @@ msgid "LDAP Port"
 msgstr ""
 
 #: authorizer.php:2423 authorizer.php:4426
-msgid "Secure Connection (TLS)"
+msgid "Use TLS"
 msgstr ""
 
 #: authorizer.php:2430 authorizer.php:4430
