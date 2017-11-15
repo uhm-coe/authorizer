@@ -2509,7 +2509,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_ldap_tls', // HTML element ID
-				__( 'Secure Connection (TLS)', 'authorizer' ), // HTML element Title
+				__( 'Use TLS', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -4370,7 +4370,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li>' . __( "<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.", 'authorizer' ) . '</li>
-					<li>' . __( "<strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>Use TLS</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
@@ -4550,7 +4550,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_ldap_port( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row"><?php _e( 'Secure Connection (TLS)', 'authorizer' ); ?></th>
+								<th scope="row"><?php _e( 'Use TLS', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_ldap_tls( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
