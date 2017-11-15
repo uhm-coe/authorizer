@@ -1473,15 +1473,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Restrict logout request origin to the CAS server only (prevent DDOS).
 					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 				}
-				if ( phpCAS::isAuthenticated() ) {
-					// Redirect to home page, or specified page if it's been provided.
-					$redirect_to = site_url( '/' );
-					if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( $_REQUEST['redirect_to'], FILTER_VALIDATE_URL ) !== false ) {
-						$redirect_to = $_REQUEST['redirect_to'];
-					}
 
-					phpCAS::logoutWithRedirectService( $redirect_to );
+				// Redirect to home page, or specified page if it's been provided.
+				$redirect_to = site_url( '/' );
+				if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( $_REQUEST['redirect_to'], FILTER_VALIDATE_URL ) !== false ) {
+					$redirect_to = $_REQUEST['redirect_to'];
 				}
+
+				phpCAS::logoutWithRedirectService( $redirect_to );
 			}
 
 			// If session token set, log out of Google.
