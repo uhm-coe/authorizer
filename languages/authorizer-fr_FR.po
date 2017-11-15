@@ -338,10 +338,6 @@ msgstr "Utilisateur d'annuaire LDAP"
 msgid "LDAP Directory User Password"
 msgstr "Mot de passe de l'utilisateur d'annuaire LDAP "
 
-#: authorizer.php:2140 authorizer.php:4008
-msgid "Secure Connection (TLS)"
-msgstr "Connexion sécurisée (TLS)"
-
 #: authorizer.php:2147 authorizer.php:4012
 msgid "Custom lost password URL"
 msgstr "URL personnalisée pour mot de passe perdu"
@@ -1201,10 +1197,10 @@ msgstr ""
 
 #: authorizer.php:3817
 msgid ""
-"<strong>Secure Connection (TLS)</strong>: Select whether all communication "
+"<strong>Use TLS</strong>: Select whether all communication "
 "with the LDAP server should be performed over a TLS-secured connection."
 msgstr ""
-"<strong>Connexion sécurisée (TLS)</strong> : Indiquez si toute communication "
+"<strong>Utiliser TLS</strong>: Indiquez si toute communication "
 "avec le serveur LDAP devra passer par une connexion TLS sécurisée."
 
 #: authorizer.php:3818

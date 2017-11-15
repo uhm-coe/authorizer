@@ -290,10 +290,6 @@ msgstr ""
 msgid "LDAP Port"
 msgstr ""
 
-#: authorizer.php:2423 authorizer.php:4426
-msgid "Secure Connection (TLS)"
-msgstr ""
-
 #: authorizer.php:2430 authorizer.php:4430
 msgid "LDAP Search Base"
 msgstr ""
@@ -1098,7 +1094,7 @@ msgstr ""
 
 #: authorizer.php:4246
 msgid ""
-"<strong>Secure Connection (TLS)</strong>: Select whether all communication "
+"<strong>Use TLS</strong>: Select whether all communication "
 "with the LDAP server should be performed over a TLS-secured connection."
 msgstr ""
 
