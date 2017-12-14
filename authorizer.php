@@ -3,7 +3,7 @@
 Plugin Name: Authorizer
 Plugin URI: https://github.com/uhm-coe/authorizer
 Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.6.22
+Version: 2.6.23
 Author: Paul Ryan
 Author URI: http://www.linkedin.com/in/paulrryan/
 Text Domain: authorizer
@@ -60,11 +60,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	 */
 	class WP_Plugin_Authorizer {
 
+		/**
+		 * Properties.
+		 */
+		public $current_site_blog_id = 1;
 
 		/**
 		 * Constructor.
 		 */
 		public function __construct() {
+			// Save reference to current blog id in the network (support deprecated
+			// constant BLOGID_CURRENT_SITE).
+			if ( defined( 'BLOG_ID_CURRENT_SITE' ) ) {
+				$this->current_site_blog_id = BLOG_ID_CURRENT_SITE;
+			} elseif ( defined( 'BLOGID_CURRENT_SITE' ) ) { // deprecated.
+				$this->current_site->blog_id = BLOGID_CURRENT_SITE;
+			}
+
 			// Installation and uninstallation hooks.
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
@@ -220,7 +232,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( is_multisite() && isset( $_GET['networkwide'] ) && $_GET['networkwide'] == 1 ) {
 
 				// Add super admins to the multisite approved list.
-				$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+				$auth_multisite_settings_access_users_approved = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() );
 				$should_update_auth_multisite_settings_access_users_approved = false;
 				foreach ( get_super_admins() as $super_admin ) {
 					$user = get_user_by( 'login', $super_admin );
@@ -237,7 +249,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 				}
 				if ( $should_update_auth_multisite_settings_access_users_approved ) {
-					update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+					update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 				}
 
 				// Run plugin activation on each site in the network.
@@ -272,7 +284,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function add_wp_users_to_approved_list() {
 			// Add current WordPress users to the approved list.
-			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
@@ -1461,7 +1473,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Restrict logout request origin to the CAS server only (prevent DDOS).
 					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 				}
-				if ( phpCAS::isAuthenticated() ) {
+				if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 					// Redirect to home page, or specified page if it's been provided.
 					$redirect_to = site_url( '/' );
 					if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( $_REQUEST['redirect_to'], FILTER_VALIDATE_URL ) !== false ) {
@@ -2509,7 +2521,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			add_settings_field(
 				'auth_settings_ldap_tls', // HTML element ID
-				__( 'Secure Connection (TLS)', 'authorizer' ), // HTML element Title
+				__( 'Use TLS', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
 				'authorizer', // Page this setting is shown on (slug)
 				'auth_settings_external' // Section this setting is shown on
@@ -2854,7 +2866,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Multisite defaults.
 			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 
 				if ( $auth_multisite_settings === FALSE ) {
 					$auth_multisite_settings = array();
@@ -2864,7 +2876,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['multisite_override'] = '';
 				}
 				// Access Lists Defaults.
-				$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved' );
+				$auth_multisite_settings_access_users_approved = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved' );
 				if ( $auth_multisite_settings_access_users_approved === FALSE ) {
 					$auth_multisite_settings_access_users_approved = array();
 				}
@@ -2988,8 +3000,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_multisite_settings['advanced_widget_enabled'] = '1';
 				}
 				// Save default network options to database.
-				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
-				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			return $auth_settings;
@@ -3987,7 +3999,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label>
+			<br /><small><?php _e( "If ldaps is used, this should be unchecked", 'authorizer' ); ?></small><?php
 		}
 
 
@@ -4355,7 +4368,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<li>' . __( "<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.", 'authorizer' ) . '</li>
-					<li>' . __( "<strong>Secure Connection (TLS)</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.", 'authorizer' ) . '</li>
+					<li>' . __( "<strong>Use TLS</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
 					<li>' . __( "<strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
@@ -4422,7 +4435,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! current_user_can( 'manage_network_options' ) ) {
 				wp_die( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ) );
 			}
-			$auth_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() ); ?>
+			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() ); ?>
 			<div class="wrap">
 				<form method="post" action="" autocomplete="off">
 					<h2><?php _e( 'Authorizer Settings', 'authorizer' ); ?></h2>
@@ -4535,7 +4548,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_ldap_port( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row"><?php _e( 'Secure Connection (TLS)', 'authorizer' ); ?></th>
+								<th scope="row"><?php _e( 'Use TLS', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_ldap_tls( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
@@ -4626,7 +4639,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Get multisite settings.
-			$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 
 			// Sanitize settings
 			$auth_multisite_settings = $this->sanitize_options( $_POST );
@@ -4672,7 +4685,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
 			// Update multisite settings in database.
-			update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 
 			// Return 'success' value to AJAX call.
 			die( 'success' );
@@ -4750,7 +4763,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! ( $wp_user = get_user_by( 'email', $email ) ) ) {
 				// Look through multisite approved users and add a usermeta
 				// reference for the current blog if the user is found.
-				$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+				$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 				$should_update_auth_multisite_settings_access_users_approved = false;
 				foreach ( $auth_multisite_settings_access_users_approved as $index => $approved_user ) {
 					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
@@ -4780,7 +4793,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 				}
 				if ( $should_update_auth_multisite_settings_access_users_approved ) {
-					update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+					update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 				}
 
 				// Look through the approved users (of the current blog in a
@@ -4951,7 +4964,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 								$approved_user['date_added'] = date( 'M Y' );
 								array_push( $auth_multisite_settings_access_users_approved, $approved_user );
-								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 							}
 						} else {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
@@ -5009,7 +5022,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 										break;
 									}
 								}
-								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 							}
 						} else {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
@@ -5056,7 +5069,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 										break;
 									}
 								}
-								update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 							}
 						} else {
 							// Update user's role in approved list and save.
@@ -5160,7 +5173,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
 				$list = $admin_mode === MULTISITE_ADMIN ? array() : get_option( 'auth_settings_' . $option );
 				if ( is_multisite() && $admin_mode === MULTISITE_ADMIN ) {
-					$list = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_' . $option, array() );
+					$list = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_' . $option, array() );
 				}
 				return $list;
 			}
@@ -5230,7 +5243,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
 			if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || $auth_settings['advanced_override_multisite'] != '1' ) ) {
 				// Get multisite options.
-				$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+				$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 
 				// Return the multisite options if we're viewing the network admin options page.
 				// Otherwise override options with their multisite equivalents.
@@ -5353,7 +5366,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			if ( $list_changed ) {
-				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
@@ -5497,7 +5510,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * user is created), add them to the authorizer approved list.
 		 */
 		private function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
-			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() ) : array();
+			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 			$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
@@ -5571,7 +5584,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'local_user' => true,
 				);
 				array_push( $auth_multisite_settings_access_users_approved, $multisite_approved_user );
-				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
@@ -5609,7 +5622,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 			if ( $list_changed ) {
-				update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Go through this user's current sites and add them to the approved list
@@ -6113,7 +6126,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get current version.
 			$needs_updating = false;
 			if ( is_multisite() ) {
-				$auth_version = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_version' );
+				$auth_version = get_blog_option( $this->current_site_blog_id, 'auth_version' );
 			} else {
 				$auth_version = get_option( 'auth_version' );
 			}
@@ -6147,21 +6160,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				// Copy multisite user lists to new options (if they exist).
 				if ( is_multisite() ) {
-					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+					$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 					if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_pending', $auth_multisite_settings ) ) {
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
 						unset( $auth_multisite_settings['access_users_pending'] );
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 					if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
 						unset( $auth_multisite_settings['access_users_approved'] );
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 					if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_blocked', $auth_multisite_settings ) ) {
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
 						unset( $auth_multisite_settings['access_users_blocked'] );
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 				}
 				// Update version to reflect this change has been made.
@@ -6232,11 +6245,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				if ( is_multisite() ) {
 					// Reencrypt LDAP password in network (multisite) options.
-					$auth_multisite_settings = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', array() );
+					$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 					if ( array_key_exists( 'ldap_password', $auth_multisite_settings ) && strlen( $auth_multisite_settings['ldap_password'] ) > 0 ) {
 						$plaintext_ldap_password = $this->decrypt( $auth_multisite_settings['ldap_password'], 'mcrypt' );
 						$auth_multisite_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
-						update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings', $auth_multisite_settings );
+						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 				}
 				// Update version to reflect this change has been made.
@@ -6273,7 +6286,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 					}
 					// Remove duplicates from multisite approved user list.
-					$auth_multisite_settings_access_users_approved = get_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', array() );
+					$auth_multisite_settings_access_users_approved = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() );
 					if ( is_array( $auth_multisite_settings_access_users_approved ) ) {
 						$should_update = false;
 						$distinct_emails = array();
@@ -6286,7 +6299,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 						if ( $should_update ) {
-							update_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 						}
 					}
 				} else {

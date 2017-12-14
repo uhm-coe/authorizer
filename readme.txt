@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 3.8
-Tested up to: 4.8.2
+Tested up to: 4.9
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -61,6 +61,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.6.23 =
+* Added ability to disable the dashboard widget (useful on sites with many users until paged user lists are implemented).
+* Fix for the multisite option override link always going to the External Services tab.
+* Fix for hide/show of Login Access options when certain options are selected.
 
 = 2.6.22 =
 * Fix for regression showing certain private posts. Props @InvisibleMass for finding the bug!
