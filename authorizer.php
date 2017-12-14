@@ -3307,7 +3307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						continue;
 					endif;
 
-					$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] && $approved_user['local_user'] !== 'false';
+					$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true';
 					$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && $approved_user['multisite_user'] === true;
 					$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 					$option_id = $option_prefix . $option . '_' . $key;
