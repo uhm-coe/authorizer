@@ -3286,7 +3286,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
 				// Add multisite users to the beginning of the main user array.
 				foreach ( array_reverse( $auth_settings_option_multisite ) as $approved_user ) {
-					$approved_user['is_multisite_user'] = true;
+					$approved_user['multisite_user'] = true;
 					array_unshift( $auth_settings_option, $approved_user );
 				}
 			}
@@ -3307,11 +3307,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						continue;
 					endif;
 
-					$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true';
-					$is_multisite_user = array_key_exists( 'is_multisite_user', $approved_user ) && $approved_user['is_multisite_user'] === true;
+					$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] && $approved_user['local_user'] !== 'false';
+					$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && $approved_user['multisite_user'] === true;
 					$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 					$option_id = $option_prefix . $option . '_' . $key;
 					$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
+					$is_current_user = $approved_wp_user && $approved_wp_user->ID === get_current_user_id();
 
 					if ( ! $approved_wp_user ) :
 						$approved_user['is_wp_user'] = false;
@@ -3320,7 +3321,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$approved_user['email'] = $approved_wp_user->user_email;
 						$approved_user['role'] = $is_multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
 						$approved_user['date_added'] = $approved_wp_user->user_registered;
-						$is_current_user = $approved_wp_user->ID === get_current_user_id();
 
 						// Get usermeta field from the WordPress user's real usermeta.
 						if ( strlen( $advanced_usermeta ) > 0 ) :
@@ -4914,7 +4914,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							if ( is_multisite() ) {
 								add_user_to_blog( get_current_blog_id(), $new_user->ID, $approved_user['role'] );
 							}
-						} elseif ( $approved_user['local_user'] === 'true' ) {
+						} elseif ( $approved_user['local_user'] && $approved_user['local_user'] !== 'false' ) {
 							// Create a WP account for this new *local* user and email the password.
 							$plaintext_password = wp_generate_password(); // random password
 							// If there's already a user with this username (e.g.,
