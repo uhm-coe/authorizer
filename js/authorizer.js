@@ -885,7 +885,7 @@ jQuery( document ).ready( function( $ ) {
 	});
 
 	// Show save button if usermeta field is modified.
-	$( 'form input.auth-usermeta' ).bind( 'keyup', function ( event ) {
+	$( 'form input.auth-usermeta' ).on( 'keyup', function ( event ) {
 		// Don't do anything if tab or arrow keys were pressed.
 		if ( event.which === 9 || event.which === 37 || event.which === 38 || event.which === 39 || event.which === 40 ) {
 			return;
@@ -895,7 +895,7 @@ jQuery( document ).ready( function( $ ) {
 
 	// List management function: pressing enter in the new approved or new
 	// blocked user (email or role field) adds the user to the list.
-	$( '#new_approved_user_email, #new_approved_user_role, #new_blocked_user_email' ).bind( 'keyup', function( e ) {
+	$( '#new_approved_user_email, #new_approved_user_role, #new_blocked_user_email' ).on( 'keyup', function( e ) {
 		if ( e.which == 13 ) { // Enter key
 			$( this ).parent().find( 'a' ).trigger( 'click' );
 			return false;
@@ -903,7 +903,7 @@ jQuery( document ).ready( function( $ ) {
 	});
 
 	// Don't submit form (i.e., save options) when hitting enter in any user list field.
-	$( 'input.auth-email, select.auth-role, input.auth-date-added, input.auth-usermeta' ).bind( 'keydown', function( e ) {
+	$( 'input.auth-email, select.auth-role, input.auth-date-added, input.auth-usermeta' ).on( 'keydown', function( e ) {
 		if ( e.which == 13 ) { // Enter key
 			e.preventDefault();
 			return false;
