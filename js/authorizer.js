@@ -33,6 +33,93 @@ function choose_tab( list_name, delay ) {
 	sessionStorage.setItem( 'tab', list_name );
 }
 
+// Switch between pages in the Approved User list.
+function refresh_approved_user_list( currentPage ) {
+	var $ = jQuery;
+	var $list = $( '#list_auth_settings_access_users_approved' );
+	var $spinner = $( '<span class="spinner is-active"></span>' ).css({
+		'position': 'relative',
+		'top': '45%',
+		'left': '15em',
+	});
+	var $overlay = $( '<div id="list_auth_settings_access_users_approved_overlay"></div>' ).css({
+		'background-color': '#f1f1f1',
+		'z-index': 1,
+		'opacity': 0.8,
+		'position': 'absolute',
+		'top': $list.position().top,
+		'left': $list.position().left,
+		'width': $list.width(),
+		'height': $list.height(),
+	});
+	$overlay.append( $spinner );
+
+	// Show overlay and wait cursor.
+	$list.after( $overlay );
+	$( 'html' ).addClass( 'busy' );
+
+	$.post( ajaxurl, {
+		'action': 'refresh_approved_user_list',
+		'nonce_save_auth_settings': $( '#nonce_save_auth_settings' ).val(),
+		'paged': currentPage,
+	}, function( response ) {
+		if ( response.success ) {
+			$( '#list_auth_settings_access_users_approved' ).html( response.html );
+		}
+		// Remove overlay and wait cursor.
+		$overlay.remove();
+		$( 'html' ).removeClass( 'busy' );
+	}).fail( function() {
+		// Remove overlay and wait cursor.
+		$overlay.remove();
+		$( 'html' ).removeClass( 'busy' );
+	});
+}
+
+// Update the pager elements when changing pages.
+function refresh_approved_user_pager( currentPage ) {
+	var $ = jQuery;
+	var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
+
+	// Update current page text input.
+	$( '#current-page-selector' ).val( currentPage );
+
+	// Update current page span.
+	$( '#table-paging .current-page-text' ).text( currentPage );
+
+	// Update first page button.
+	var $first = $( '.first-page' );
+	if ( $first.is( 'a' ) && currentPage <= 1 ) {
+		$first.replaceWith( '<span class="first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>' );
+	} else if ( $first.is( 'span' ) && currentPage > 1 ) {
+		$first.replaceWith( '<a class="first-page" href="' + updateQueryStringParameter( window.location.href, 'paged', '1' ) + '"><span class="screen-reader-text">' + auth_L10n.first_page + '</span><span aria-hidden="true">&laquo;</span></a>' );
+	}
+
+	// Update prev page button.
+	var $prev = $( '.prev-page' );
+	if ( $prev.is( 'a' ) && currentPage <= 1 ) {
+		$prev.replaceWith( '<span class="prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>' );
+	} else if ( currentPage > 1 ) {
+		$prev.replaceWith( '<a class="prev-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage - 1 ) + '"><span class="screen-reader-text">' + auth_L10n.prev_page + '</span><span aria-hidden="true">&lsaquo;</span></a>' );
+	}
+
+	// Update next button.
+	var $next = $( '.next-page' );
+	if ( $next.is( 'a' ) && currentPage >= totalPages ) {
+		$next.replaceWith( '<span class="next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>' );
+	} else if ( currentPage < totalPages ) {
+		$next.replaceWith( '<a class="next-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage + 1 ) + '"><span class="screen-reader-text">' + auth_L10n.next_page + '</span><span aria-hidden="true">&rsaquo;</span></a>' );
+	}
+
+	// Update last button.
+	var $last = $( '.last-page' );
+	if ( $last.is( 'a' ) && currentPage >= totalPages ) {
+		$last.replaceWith( '<span class="last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>' );
+	} else if ( $last.is( 'span' ) && currentPage < totalPages ) {
+		$last.replaceWith( '<a class="last-page" href="' + updateQueryStringParameter( window.location.href, 'paged', totalPages ) + '"><span class="screen-reader-text">' + auth_L10n.next_page + '</span><span aria-hidden="true">&raquo;</span></a>' );
+	}
+}
+
 // Update user's usermeta field.
 function auth_update_usermeta( caller ) {
 	var $ = jQuery,
@@ -656,6 +743,17 @@ function valid_email( email ) {
 	return re.test( email );
 }
 
+// Helper function to set or update a querystring value.
+function updateQueryStringParameter( uri, key, value ) {
+	var re = new RegExp( "([?&])" + key + "=.*?(&|$)", "i" );
+	var separator = uri.indexOf( '?' ) !== -1 ? "&" : "?";
+	if ( uri.match( re ) ) {
+		return uri.replace( re, '$1' + key + "=" + value + '$2' );
+	} else {
+		return uri + separator + key + "=" + value;
+	}
+}
+
 
 jQuery( document ).ready( function( $ ) {
 	// Grab references to form elements that we will show/hide on page load
@@ -934,6 +1032,64 @@ jQuery( document ).ready( function( $ ) {
 		hide_multisite_settings_if_disabled();
 	});
 	hide_multisite_settings_if_disabled();
+
+	// Wire up pager events on Approved User list (first/last/next/previous
+	// buttons, go to page text input, etc.
+	$( '#current-page-selector' ).on( 'keydown', function ( e ) {
+		if ( e.which == 13 ) { // Enter key
+			var currentPage = parseInt( $( this ).val() ) || 1;
+			var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
+
+			// Make sure current page is between 1 and max pages.
+			if ( currentPage < 1 ) {
+				currentPage = 1;
+			} else if ( currentPage > totalPages ) {
+				currentPage = totalPages;
+			}
+
+			// Update user list with users on next page.
+			refresh_approved_user_list( currentPage );
+
+			// Update pager elements.
+			refresh_approved_user_pager( currentPage );
+
+			// Update querystring with new paged param value (but don't reload the page).
+			if ( history.pushState ) {
+				var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
+				window.history.pushState( { path: url }, '', url );
+			}
+
+			// Prevent default behavior.
+			e.preventDefault();
+			return false;
+		}
+	});
+	$( '.pagination-links' ).on( 'click', 'a', function ( e ) {
+		var currentPage = parseInt( getParameterByName( 'paged', $( this ).attr( 'href' ) ) ) || 1;
+		var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
+		if ( currentPage > totalPages ) {
+			currentPage = totalPages;
+		}
+
+		// Update user list with users on next page.
+		refresh_approved_user_list( currentPage );
+
+		// Update pager elements.
+		refresh_approved_user_pager( currentPage );
+
+		// Update querystring with new paged param value (but don't reload the page).
+		if ( history.pushState ) {
+			var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
+			window.history.pushState( { path: url }, '', url );
+		}
+
+		// Remove focus from clicked element.
+		$( this ).blur();
+
+		// Prevent default behavior.
+		e.preventDefault();
+		return false;
+	});
 
 });
 

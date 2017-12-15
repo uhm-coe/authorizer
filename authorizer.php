@@ -171,6 +171,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'wp_ajax_process_google_login', array( $this, 'ajax_process_google_login' ) );
 			add_action( 'wp_ajax_nopriv_process_google_login', array( $this, 'ajax_process_google_login' ) );
 
+			// ajax refresh approved user list
+			add_action( 'wp_ajax_refresh_approved_user_list', array( $this, 'ajax_refresh_approved_user_list' ) );
+
 			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
@@ -2173,7 +2176,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.3.2', true
+				array( 'jquery-effects-shake' ), '2.6.24', true
 			);
 			wp_localize_script( 'authorizer', 'auth_L10n', array(
 				'baseurl' => get_bloginfo( 'url' ),
@@ -2186,6 +2189,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'save_changes' => esc_html__( 'Save Changes', 'authorizer' ),
 				'private_pages' => esc_html__( 'Private Pages', 'authorizer' ),
 				'public_pages' => esc_html__( 'Public Pages', 'authorizer' ),
+				'first_page' => esc_html__( 'First page' ),
+				'previous_page' => esc_html__( 'Previous page' ),
+				'next_page' => esc_html__( 'Next page' ),
+				'last_page' => esc_html__( 'Last page' ),
 			));
 
 			wp_enqueue_script(
@@ -3305,6 +3312,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$total_users = count( $auth_settings_option );
 			$users_per_page = 10; // TODO get from authorizer settings options
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
+			$total_pages = ceil( $total_users / $users_per_page );
+
+			// Make sure current_page is between 1 and max pages.
+			if ( $current_page < 1 ) {
+				$current_page = 1;
+			} else if ( $current_page > $total_pages ) {
+				$current_page = $total_pages;
+			}
 
 			// Render pager.
 			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
@@ -3320,9 +3335,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
 				endfor; ?>
 			</ul><?php
-
-			// Render pager.
-			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
 
 			?><div id="new_auth_settings_<?php echo $option; ?>">
 				<input type="text" id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
@@ -3341,6 +3353,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</div>
 			</div>
 			<?php
+
+			// Render pager.
+			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
 		}
 
 
@@ -3360,7 +3375,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$disable_first = $current_page <= 1;
 			$disable_prev = $current_page <= 1;
 			$disable_next = $current_page >= $total_pages;
-			$disable_last = $current_page >= $total_pages - 1;
+			$disable_last = $current_page >= $total_pages;
 
 			$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
 			$current_url = remove_query_arg( $removable_query_args, $current_url );
@@ -3371,7 +3386,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$total_pages_after  = '</span></span>';
 
 			if ( $disable_first ) {
-				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&laquo;</span>';
+				$page_links[] = '<span class="first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>';
 			} else {
 				$page_links[] = sprintf( "<a class='first-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( remove_query_arg( 'paged', $current_url ) ),
@@ -3381,7 +3396,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			if ( $disable_prev ) {
-				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>';
+				$page_links[] = '<span class="prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>';
 			} else {
 				$page_links[] = sprintf( "<a class='prev-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', max( 1, $current_page - 1 ), $current_url ) ),
@@ -3391,7 +3406,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			if ( 'bottom' === $which ) {
-				$html_current_page  = $current_page;
+				$html_current_page  = '<span class="current-page-text">' . $current_page . '</span>';
 				$total_pages_before = '<span class="screen-reader-text">' . __( 'Current Page' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
 			} else {
 				$html_current_page = sprintf( "%s<input class='current-page' id='current-page-selector' type='text' name='paged' value='%s' size='%d' aria-describedby='table-paging' /><span class='tablenav-paging-text'>",
@@ -3404,7 +3419,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
 
 			if ( $disable_next ) {
-				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
+				$page_links[] = '<span class="next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
 			} else {
 				$page_links[] = sprintf( "<a class='next-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', min( $total_pages, $current_page + 1 ), $current_url ) ),
@@ -3414,7 +3429,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			if ( $disable_last ) {
-				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&raquo;</span>';
+				$page_links[] = '<span class="last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>';
 			} else {
 				$page_links[] = sprintf( "<a class='last-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
@@ -4852,6 +4867,101 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</div>
 				<br class="clear" />
 			</form><?php
+		}
+
+
+
+		/**
+		 * ***************************
+		 * AJAX Actions
+		 * ***************************
+		 */
+
+
+
+		// Re-render the Approved User list (usually triggered if pager params have
+		// changed, e.g., current page, search term, sort order).
+		function ajax_refresh_approved_user_list() {
+			// Fail silently if current user doesn't have permissions.
+			if ( ! current_user_can( 'create_users' ) ) {
+				die( '' );
+			}
+
+			// Nonce check.
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+				die( '' );
+			}
+
+			// Fail if required post data doesn't exist.
+			if ( ! array_key_exists( 'paged', $_REQUEST ) ) {
+				die( '' );
+			}
+
+			// Get defaults.
+			$success = true;
+			$message = '';
+
+			// Get user list.
+			$option = 'access_users_approved';
+			$admin_mode = SINGLE_ADMIN;
+			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'no override' );
+			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
+
+			// Get multisite approved users (will be added to top of list, greyed out).
+			$auth_override_multisite = $this->get_plugin_option( 'advanced_override_multisite' );
+			$auth_multisite_settings = $this->get_plugin_options( MULTISITE_ADMIN );
+			$auth_settings_option_multisite = array();
+			if (
+				is_multisite() &&
+				$auth_override_multisite != '1' &&
+				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
+				$auth_multisite_settings['multisite_override'] === '1'
+			) {
+				$auth_settings_option_multisite = $this->get_plugin_option( $option, MULTISITE_ADMIN, 'allow override' );
+				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
+				// Add multisite users to the beginning of the main user array.
+				foreach ( array_reverse( $auth_settings_option_multisite ) as $approved_user ) {
+					$approved_user['multisite_user'] = true;
+					array_unshift( $auth_settings_option, $approved_user );
+				}
+			}
+
+			// Get custom usermeta field to show.
+			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
+
+			// Get pager params.
+			$total_users = count( $auth_settings_option );
+			$users_per_page = 10; // TODO get from authorizer settings options
+			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
+			$total_pages = ceil( $total_users / $users_per_page );
+
+			// Make sure current_page is between 1 and max pages.
+			if ( $current_page < 1 ) {
+				$current_page = 1;
+			} else if ( $current_page > $total_pages ) {
+				$current_page = $total_pages;
+			}
+
+			// Render user list.
+			ob_start();
+			$offset = ( $current_page - 1 ) * $users_per_page;
+			for ( $key = $offset; $key < $offset + $users_per_page; $key++ ) :
+				$approved_user = $auth_settings_option[$key];
+				if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
+					continue;
+				endif;
+				$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
+			endfor;
+
+			// Send response to client.
+			$response = array(
+				'success' => $success,
+				'message' => $message,
+				'html' => ob_get_clean(),
+			);
+			header( 'content-type: application/json' );
+			echo json_encode( $response );
+			exit;
 		}
 
 
