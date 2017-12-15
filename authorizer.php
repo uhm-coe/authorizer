@@ -3317,7 +3317,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
-					$this->render_user_element( $approved_user, $key, $option );
+					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
 				endfor; ?>
 			</ul><?php
 
@@ -3445,13 +3445,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $option List user is in (e.g., 'access_users_approved').
 		 * @return null
 		 */
-		function render_user_element( $approved_user, $key, $option ) {
+		function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
 			$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true';
 			$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && $approved_user['multisite_user'] === true;
 			$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 			$option_id = $option_prefix . $option . '_' . $key;
 			$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
 			$is_current_user = $approved_wp_user && $approved_wp_user->ID === get_current_user_id();
+
+			// Adjust javascript function prefixes if multisite.
+			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
+			$is_multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
 			if ( ! $approved_wp_user ) :
 				$approved_user['is_wp_user'] = false;
