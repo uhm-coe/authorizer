@@ -121,6 +121,11 @@ body.settings_page_authorizer .spinner .spinner-text,
 	margin-left: 22px;
 }
 
+body.toplevel_page_authorizer .tablenav .tablenav-pages,
+body.settings_page_authorizer .tablenav .tablenav-pages {
+	float: none;
+}
+
 div.section_info, div.section_info ~ table {
 	display: none;
 }

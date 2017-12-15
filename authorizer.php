@@ -2194,7 +2194,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.3.2' );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.6.24' );
 			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
@@ -3301,115 +3301,30 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
 			$is_multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
+			// Get pager params.
+			$total_users = count( $auth_settings_option );
+			$users_per_page = 10; // TODO get from authorizer settings options
+			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
+
+			// Render pager.
+			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
+
+			// Render user list.
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;"><?php
-				foreach ( $auth_settings_option as $key => $approved_user ):
+				$offset = ( $current_page - 1 ) * $users_per_page;
+				for ( $key = $offset; $key < $offset + $users_per_page; $key++ ) :
+					$approved_user = $auth_settings_option[$key];
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
+					$this->render_user_element( $approved_user, $key, $option );
+				endfor; ?>
+			</ul><?php
 
-					$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true';
-					$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && $approved_user['multisite_user'] === true;
-					$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
-					$option_id = $option_prefix . $option . '_' . $key;
-					$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
-					$is_current_user = $approved_wp_user && $approved_wp_user->ID === get_current_user_id();
+			// Render pager.
+			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
 
-					if ( ! $approved_wp_user ) :
-						$approved_user['is_wp_user'] = false;
-					else :
-						$approved_user['is_wp_user'] = true;
-						$approved_user['email'] = $approved_wp_user->user_email;
-						$approved_user['role'] = $is_multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
-						$approved_user['date_added'] = $approved_wp_user->user_registered;
-
-						// Get usermeta field from the WordPress user's real usermeta.
-						if ( strlen( $advanced_usermeta ) > 0 ) :
-							if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
-								// Get ACF Field value for the user
-								$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
-							else :
-								// Get regular usermeta value for the user.
-								$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
-							endif;
-							if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
-								$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
-							endif;
-						endif;
-					endif;
-					if ( ! array_key_exists( 'usermeta', $approved_user ) ) :
-						$approved_user['usermeta'] = '';
-					endif; ?>
-					<li>
-						<input
-							type="text"
-							id="<?php echo $option_id; ?>"
-							value="<?php echo $approved_user['email']; ?>"
-							readonly="true"
-							class="<?php echo $this->create_class_name( 'email', $is_multisite_user ); ?>"
-						/>
-						<select
-							id="<?php echo $option_id; ?>_role"
-							class="<?php echo $this->create_class_name( 'role', $is_multisite_user ); ?>"
-							onchange="<?php echo $js_function_prefix; ?>change_role( this );"
-							<?php if ( $is_multisite_user ) : ?>
-								disabled="disabled"
-							<?php endif; ?>
-						>
-							<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
-							<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input, $admin_mode ); ?>
-						</select>
-						<input
-							type="text"
-							id="<?php echo $option_id; ?>_date_added"
-							value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>"
-							readonly="true"
-							class="<?php echo $this->create_class_name( 'date-added', $is_multisite_user ); ?>"
-						/>
-						<?php if ( strlen( $advanced_usermeta ) > 0 ) :
-							$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
-							if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
-								$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
-								if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
-									$should_show_usermeta_in_text_field = false; ?>
-									<select
-										id="<?php echo $option_id; ?>_usermeta"
-										class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
-										onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
-									>
-										<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
-										<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-											<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
-										<?php endforeach; ?>
-									</select>
-								<?php endif; ?>
-							<?php endif; ?>
-							<?php if ( $should_show_usermeta_in_text_field ) : ?>
-								<input
-									type="text"
-									id="<?php echo $option_id; ?>_usermeta"
-									value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"
-									class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
-								/>
-								<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
-							<?php endif; ?>
-						<?php endif; ?>
-						<?php if ( ! $is_current_user && ! $is_multisite_user ): ?>
-							<?php if ( ! $is_multisite_admin_page ) : ?>
-								<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="<?php _e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
-							<?php endif; ?>
-							<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
-						<?php endif; ?>
-						<?php if ( $is_local_user ) : ?>
-							&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
-						<?php endif; ?>
-						<?php if ( $is_multisite_user ) : ?>
-							&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
-						<?php endif; ?>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-
-			<div id="new_auth_settings_<?php echo $option; ?>">
+			?><div id="new_auth_settings_<?php echo $option; ?>">
 				<input type="text" id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
 				<select id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
@@ -3426,6 +3341,210 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</div>
 			</div>
 			<?php
+		}
+
+
+		/**
+		 * Renders the html elements for the pager above and below the Approved User list.
+		 * @param  integer $current_page Which page we are currently viewing.
+		 * @param  integer $users_per_page How many users to show per page.
+		 * @param  integer $total_users Total count of users in list.
+		 * @param  string $which Where to render the pager ('top' or 'bottom').
+		 * @return null
+		 */
+		function render_user_pager( $current_page = 1, $users_per_page = 10, $total_users = 0, $which = 'top' ) {
+			$total_pages = ceil( $total_users / $users_per_page );
+
+			$output = '<span class="displaying-num">' . sprintf( _n( '%s item', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ) . '</span>';
+
+			$disable_first = $current_page <= 1;
+			$disable_prev = $current_page <= 1;
+			$disable_next = $current_page >= $total_pages;
+			$disable_last = $current_page >= $total_pages - 1;
+
+			$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+			$current_url = remove_query_arg( $removable_query_args, $current_url );
+
+			$page_links = array();
+
+			$total_pages_before = '<span class="paging-input">';
+			$total_pages_after  = '</span></span>';
+
+			if ( $disable_first ) {
+				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&laquo;</span>';
+			} else {
+				$page_links[] = sprintf( "<a class='first-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					esc_url( remove_query_arg( 'paged', $current_url ) ),
+					__( 'First page' ),
+					'&laquo;'
+				);
+			}
+
+			if ( $disable_prev ) {
+				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>';
+			} else {
+				$page_links[] = sprintf( "<a class='prev-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					esc_url( add_query_arg( 'paged', max( 1, $current_page - 1 ), $current_url ) ),
+					__( 'Previous page' ),
+					'&lsaquo;'
+				);
+			}
+
+			if ( 'bottom' === $which ) {
+				$html_current_page  = $current_page;
+				$total_pages_before = '<span class="screen-reader-text">' . __( 'Current Page' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
+			} else {
+				$html_current_page = sprintf( "%s<input class='current-page' id='current-page-selector' type='text' name='paged' value='%s' size='%d' aria-describedby='table-paging' /><span class='tablenav-paging-text'>",
+					'<label for="current-page-selector" class="screen-reader-text">' . __( 'Current Page' ) . '</label>',
+					$current_page,
+					strlen( $total_pages )
+				);
+			}
+			$html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
+			$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
+
+			if ( $disable_next ) {
+				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
+			} else {
+				$page_links[] = sprintf( "<a class='next-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					esc_url( add_query_arg( 'paged', min( $total_pages, $current_page + 1 ), $current_url ) ),
+					__( 'Next page' ),
+					'&rsaquo;'
+				);
+			}
+
+			if ( $disable_last ) {
+				$page_links[] = '<span class="tablenav-pages-navspan" aria-hidden="true">&raquo;</span>';
+			} else {
+				$page_links[] = sprintf( "<a class='last-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
+					__( 'Last page' ),
+					'&raquo;'
+				);
+			}
+
+			$pagination_links_class = 'pagination-links';
+			$output .= "\n<span class='$pagination_links_class'>" . join( "\n", $page_links ) . '</span>';
+
+			if ( $total_pages ) {
+				$page_class = $total_pages < 2 ? ' one-page' : '';
+			} else {
+				$page_class = ' no-pages';
+			}
+
+			$output = "<div class='tablenav-pages{$page_class}'>$output</div>";
+
+			?><div class="tablenav top"><?php echo $output; ?></div><?php
+		}
+
+
+		/**
+		 * Renders the html <li> element for a given user in a list.
+		 * @param  array $approved_user User array to render.
+		 * @param  int $key Index of user in list of users.
+		 * @param  string $option List user is in (e.g., 'access_users_approved').
+		 * @return null
+		 */
+		function render_user_element( $approved_user, $key, $option ) {
+			$is_local_user = array_key_exists( 'local_user', $approved_user ) && $approved_user['local_user'] === 'true';
+			$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && $approved_user['multisite_user'] === true;
+			$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
+			$option_id = $option_prefix . $option . '_' . $key;
+			$approved_wp_user = get_user_by( 'email', $approved_user['email'] );
+			$is_current_user = $approved_wp_user && $approved_wp_user->ID === get_current_user_id();
+
+			if ( ! $approved_wp_user ) :
+				$approved_user['is_wp_user'] = false;
+			else :
+				$approved_user['is_wp_user'] = true;
+				$approved_user['email'] = $approved_wp_user->user_email;
+				$approved_user['role'] = $is_multisite_admin_page || count( $approved_wp_user->roles ) === 0 ? $approved_user['role'] : array_shift( $approved_wp_user->roles );
+				$approved_user['date_added'] = $approved_wp_user->user_registered;
+
+				// Get usermeta field from the WordPress user's real usermeta.
+				if ( strlen( $advanced_usermeta ) > 0 ) :
+					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+						// Get ACF Field value for the user
+						$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
+					else :
+						// Get regular usermeta value for the user.
+						$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
+					endif;
+					if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
+						$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+					endif;
+				endif;
+			endif;
+			if ( ! array_key_exists( 'usermeta', $approved_user ) ) :
+				$approved_user['usermeta'] = '';
+			endif; ?>
+			<li>
+				<input
+					type="text"
+					id="<?php echo $option_id; ?>"
+					value="<?php echo $approved_user['email']; ?>"
+					readonly="true"
+					class="<?php echo $this->create_class_name( 'email', $is_multisite_user ); ?>"
+				/>
+				<select
+					id="<?php echo $option_id; ?>_role"
+					class="<?php echo $this->create_class_name( 'role', $is_multisite_user ); ?>"
+					onchange="<?php echo $js_function_prefix; ?>change_role( this );"
+					<?php if ( $is_multisite_user ) : ?>
+						disabled="disabled"
+					<?php endif; ?>
+				>
+					<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
+					<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input, $admin_mode ); ?>
+				</select>
+				<input
+					type="text"
+					id="<?php echo $option_id; ?>_date_added"
+					value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>"
+					readonly="true"
+					class="<?php echo $this->create_class_name( 'date-added', $is_multisite_user ); ?>"
+				/>
+				<?php if ( strlen( $advanced_usermeta ) > 0 ) :
+					$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
+					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
+						$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
+						if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && $field_object['type'] === 'select' ) :
+							$should_show_usermeta_in_text_field = false; ?>
+							<select
+								id="<?php echo $option_id; ?>_usermeta"
+								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
+								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
+							>
+								<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
+								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
+									<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
+								<?php endforeach; ?>
+							</select>
+						<?php endif; ?>
+					<?php endif; ?>
+					<?php if ( $should_show_usermeta_in_text_field ) : ?>
+						<input
+							type="text"
+							id="<?php echo $option_id; ?>_usermeta"
+							value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"
+							class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
+						/>
+						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+					<?php endif; ?>
+				<?php endif; ?>
+				<?php if ( ! $is_current_user && ! $is_multisite_user ): ?>
+					<?php if ( ! $is_multisite_admin_page ) : ?>
+						<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="<?php _e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
+					<?php endif; ?>
+					<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+				<?php endif; ?>
+				<?php if ( $is_local_user ) : ?>
+					&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
+				<?php endif; ?>
+				<?php if ( $is_multisite_user ) : ?>
+					&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
+				<?php endif; ?>
+			</li><?php
 		}
 
 
