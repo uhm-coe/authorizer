@@ -552,6 +552,7 @@ function save_auth_multisite_settings( caller ) {
 	};
 	var advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
 	var advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
+	var advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
 
 	$.post( ajaxurl, {
 		action: 'save_auth_multisite_settings',
@@ -591,6 +592,7 @@ function save_auth_multisite_settings( caller ) {
 		'ldap_attr_update_on_login': ldap_attr_update_on_login,
 		'advanced_lockouts': advanced_lockouts,
 		'advanced_hide_wp_login': advanced_hide_wp_login,
+		'advanced_users_per_page': advanced_users_per_page,
 		'advanced_widget_enabled': advanced_widget_enabled,
 	}, function( response ) {
 		var succeeded = response === 'success';

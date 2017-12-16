@@ -2640,6 +2640,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_advanced_users_per_page', // HTML element ID
+				__( 'Number of users per page', 'authorizer' ), // HTML element Title
+				array( $this, 'print_text_auth_advanced_users_per_page' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_advanced_widget_enabled', // HTML element ID
 				__( 'Show dashboard widget to admin users', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ), // Callback (echos form element)
@@ -2858,6 +2865,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'advanced_usermeta', $auth_settings ) ) {
 				$auth_settings['advanced_usermeta'] = '';
 			}
+			if ( ! array_key_exists( 'advanced_users_per_page', $auth_settings ) ) {
+				$auth_settings['advanced_users_per_page'] = 20;
+			}
 			if ( ! array_key_exists( 'advanced_widget_enabled', $auth_settings ) ) {
 				$auth_settings['advanced_widget_enabled'] = '1';
 			}
@@ -3003,6 +3013,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_hide_wp_login'] = '';
 				}
+				if ( ! array_key_exists( 'advanced_users_per_page', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_users_per_page'] = 20;
+				}
 				if ( ! array_key_exists( 'advanced_widget_enabled', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_widget_enabled'] = '1';
 				}
@@ -3139,6 +3152,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string)
 			$auth_settings['advanced_hide_wp_login'] = array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ? '1' : '';
+
+			// Sanitize Users per page (text: value can only int from 1 to MAX_INT)
+			$auth_settings['advanced_users_per_page'] = array_key_exists( 'advanced_users_per_page', $auth_settings ) && intval( $auth_settings['advanced_users_per_page'] ) > 0 ? intval( $auth_settings['advanced_users_per_page'] ) : 1;
 
 			// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string)
 			$auth_settings['advanced_widget_enabled'] = array_key_exists( 'advanced_widget_enabled', $auth_settings ) && strlen( $auth_settings['advanced_widget_enabled'] ) > 0 ? '1' : '';
@@ -3310,7 +3326,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
-			$users_per_page = 10; // TODO get from authorizer settings options
+			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages = ceil( $total_users / $users_per_page );
 
@@ -3322,7 +3338,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Render pager.
-			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
+			if ( $total_users > $users_per_page ) {
+				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
+			}
 
 			// Render user list.
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;"><?php
@@ -3355,7 +3373,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php
 
 			// Render pager.
-			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
+			if ( $total_users > $users_per_page ) {
+				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
+			}
 		}
 
 
@@ -3367,7 +3387,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $which Where to render the pager ('top' or 'bottom').
 		 * @return null
 		 */
-		function render_user_pager( $current_page = 1, $users_per_page = 10, $total_users = 0, $which = 'top' ) {
+		function render_user_pager( $current_page = 1, $users_per_page = 20, $total_users = 0, $which = 'top' ) {
 			$total_pages = ceil( $total_users / $users_per_page );
 
 			$output = '<span class="displaying-num">' . sprintf( _n( '%s item', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ) . '</span>';
@@ -4403,6 +4423,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		function print_text_auth_advanced_users_per_page( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_users_per_page';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" size="4" /><?php
+		}
+
+
 		function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_widget_enabled';
@@ -4738,6 +4768,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'Number of users per page', 'authorizer' ); ?></th>
+								<td><?php $this->print_text_auth_advanced_users_per_page( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
@@ -4818,6 +4852,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'ldap_attr_update_on_login',
 				'advanced_lockouts',
 				'advanced_hide_wp_login',
+				'advanced_users_per_page',
 				'advanced_widget_enabled',
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
@@ -4931,7 +4966,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
-			$users_per_page = 10; // TODO get from authorizer settings options
+			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages = ceil( $total_users / $users_per_page );
 
@@ -5544,6 +5579,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Override Hide WordPress login
 					$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
+
+					// Override Users per page
+					$auth_settings['advanced_users_per_page'] = $auth_multisite_settings['advanced_users_per_page'];
 
 					// Override Show Dashboard Widget
 					$auth_settings['advanced_widget_enabled'] = $auth_multisite_settings['advanced_widget_enabled'];
@@ -6561,6 +6599,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update: Set default value for newly added option advanced_widget_enabled.
 			$update_if_older_than = 20171023;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
+						$this->set_default_options();
+						restore_current_blog();
+					}
+				} else {
+					$this->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Set default value for newly added option advanced_users_per_page.
+			$update_if_older_than = 20171215;
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
