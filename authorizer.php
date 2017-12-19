@@ -2647,6 +2647,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_advanced' // Section this setting is shown on
 			);
 			add_settings_field(
+				'auth_settings_advanced_users_sort_by', // HTML element ID
+				__( 'Approved users sort method', 'authorizer' ), // HTML element Title
+				array( $this, 'print_select_auth_advanced_users_sort_by' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
+			add_settings_field(
+				'auth_settings_advanced_users_sort_order', // HTML element ID
+				__( 'Approved users sort order', 'authorizer' ), // HTML element Title
+				array( $this, 'print_select_auth_advanced_users_sort_order' ), // Callback (echos form element)
+				'authorizer', // Page this setting is shown on (slug)
+				'auth_settings_advanced' // Section this setting is shown on
+			);
+			add_settings_field(
 				'auth_settings_advanced_widget_enabled', // HTML element ID
 				__( 'Show dashboard widget to admin users', 'authorizer' ), // HTML element Title
 				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ), // Callback (echos form element)
@@ -2868,6 +2882,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'advanced_users_per_page', $auth_settings ) ) {
 				$auth_settings['advanced_users_per_page'] = 20;
 			}
+			if ( ! array_key_exists( 'advanced_users_sort_by', $auth_settings ) ) {
+				$auth_settings['advanced_users_sort_by'] = 'created';
+			}
+			if ( ! array_key_exists( 'advanced_users_sort_order', $auth_settings ) ) {
+				$auth_settings['advanced_users_sort_order'] = 'asc';
+			}
 			if ( ! array_key_exists( 'advanced_widget_enabled', $auth_settings ) ) {
 				$auth_settings['advanced_widget_enabled'] = '1';
 			}
@@ -3016,6 +3036,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'advanced_users_per_page', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_users_per_page'] = 20;
 				}
+				if ( ! array_key_exists( 'advanced_users_sort_by', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_users_sort_by'] = 'created';
+				}
+				if ( ! array_key_exists( 'advanced_users_sort_order', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['advanced_users_sort_order'] = 'asc';
+				}
 				if ( ! array_key_exists( 'advanced_widget_enabled', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_widget_enabled'] = '1';
 				}
@@ -3155,6 +3181,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Sanitize Users per page (text: value can only int from 1 to MAX_INT)
 			$auth_settings['advanced_users_per_page'] = array_key_exists( 'advanced_users_per_page', $auth_settings ) && intval( $auth_settings['advanced_users_per_page'] ) > 0 ? intval( $auth_settings['advanced_users_per_page'] ) : 1;
+
+			// Sanitize Sort users by (select: value can be 'email', 'role', 'date_added', 'created')
+			if ( ! isset( $auth_settings['advanced_users_sort_by'] ) || ! in_array( $auth_settings['advanced_users_sort_by'], array( 'email', 'role', 'date_added', 'created' ) ) ) {
+				$auth_settings['advanced_users_sort_by'] = 'created';
+			}
+
+			// Sanitize Sort users order (select: value can be 'asc', 'desc')
+			if ( ! isset( $auth_settings['advanced_users_sort_order'] ) || ! in_array( $auth_settings['advanced_users_sort_order'], array( 'asc', 'desc' ) ) ) {
+				$auth_settings['advanced_users_sort_order'] = 'asc';
+			}
 
 			// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string)
 			$auth_settings['advanced_widget_enabled'] = array_key_exists( 'advanced_widget_enabled', $auth_settings ) && strlen( $auth_settings['advanced_widget_enabled'] ) > 0 ? '1' : '';
@@ -3340,6 +3376,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Render pager.
 			if ( $total_users > $users_per_page ) {
 				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
+			}
+
+			// Sort user list.
+			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
+			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
+			$sort_dimension = array();
+			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
+				foreach ( $auth_settings_option as $key => $user ) {
+					if ( $sort_by === 'date_added' ) {
+						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
+					} else {
+						$sort_dimension[$key] = strtolower( $user[$sort_by] );
+					}
+				}
+				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
+				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
 			}
 
 			// Render user list.
@@ -4433,6 +4485,34 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
+		function print_select_auth_advanced_users_sort_by( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_users_sort_by';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
+				<option value="created" <?php selected( $auth_settings_option, 'created' ); ?>><?php _e( 'Date approved', 'authorizer' ); ?></option>
+				<option value="email" <?php selected( $auth_settings_option, 'email' ); ?>><?php _e( 'Email', 'authorizer' ); ?></option>
+				<option value="role" <?php selected( $auth_settings_option, 'role' ); ?>><?php _e( 'Role', 'authorizer' ); ?></option>
+				<option value="date_added" <?php selected( $auth_settings_option, 'date_added' ); ?>><?php _e( 'Date registered', 'authorizer' ); ?></option>
+			</select><?php
+		}
+
+
+		function print_select_auth_advanced_users_sort_order( $args = '' ) {
+			// Get plugin option.
+			$option = 'advanced_users_sort_order';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
+				<option value="asc" <?php selected( $auth_settings_option, 'asc' ); ?>><?php _e( 'Ascending', 'authorizer' ); ?></option>
+				<option value="desc" <?php selected( $auth_settings_option, 'desc' ); ?>><?php _e( 'Descending', 'authorizer' ); ?></option>
+			</select><?php
+		}
+
+
 		function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_widget_enabled';
@@ -4772,6 +4852,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<td><?php $this->print_text_auth_advanced_users_per_page( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php _e( 'Approved users sort method', 'authorizer' ); ?></th>
+								<td><?php $this->print_select_auth_advanced_users_sort_by( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
+								<th scope="row"><?php _e( 'Approved users sort order', 'authorizer' ); ?></th>
+								<td><?php $this->print_select_auth_advanced_users_sort_order( array( MULTISITE_ADMIN => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( MULTISITE_ADMIN => true ) ); ?></td>
 							</tr>
@@ -4853,6 +4941,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'advanced_lockouts',
 				'advanced_hide_wp_login',
 				'advanced_users_per_page',
+				'advanced_users_sort_by',
+				'advanced_users_sort_order',
 				'advanced_widget_enabled',
 			);
 			$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
@@ -4975,6 +5065,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$current_page = 1;
 			} else if ( $current_page > $total_pages ) {
 				$current_page = $total_pages;
+			}
+
+			// Sort user list.
+			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
+			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
+			$sort_dimension = array();
+			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
+				foreach ( $auth_settings_option as $key => $user ) {
+					if ( $sort_by === 'date_added' ) {
+						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
+					} else {
+						$sort_dimension[$key] = strtolower( $user[$sort_by] );
+					}
+				}
+				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
+				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
 			}
 
 			// Render user list.
@@ -5582,6 +5688,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Override Users per page
 					$auth_settings['advanced_users_per_page'] = $auth_multisite_settings['advanced_users_per_page'];
+
+					// Override Sort users by
+					$auth_settings['advanced_users_sort_by'] = $auth_multisite_settings['advanced_users_sort_by'];
+
+					// Override Sort users order
+					$auth_settings['advanced_users_sort_order'] = $auth_multisite_settings['advanced_users_sort_order'];
 
 					// Override Show Dashboard Widget
 					$auth_settings['advanced_widget_enabled'] = $auth_multisite_settings['advanced_widget_enabled'];
@@ -6619,6 +6731,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Update: Set default value for newly added option advanced_users_per_page.
 			$update_if_older_than = 20171215;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
+						$this->set_default_options();
+						restore_current_blog();
+					}
+				} else {
+					$this->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Set default value for newly added options advanced_users_sort_by and advanced_users_sort_order.
+			$update_if_older_than = 20171219;
 			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
