@@ -3360,6 +3360,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
 			$is_multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
+			// Sort user list.
+			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
+			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
+			$sort_dimension = array();
+			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
+				foreach ( $auth_settings_option as $key => $user ) {
+					if ( $sort_by === 'date_added' ) {
+						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
+					} else {
+						$sort_dimension[$key] = strtolower( $user[$sort_by] );
+					}
+				}
+				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
+				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
+			}
+
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
 			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
@@ -3376,22 +3392,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Render pager.
 			if ( $total_users > $users_per_page ) {
 				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
-			}
-
-			// Sort user list.
-			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
-			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
-			$sort_dimension = array();
-			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
-				foreach ( $auth_settings_option as $key => $user ) {
-					if ( $sort_by === 'date_added' ) {
-						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
-					} else {
-						$sort_dimension[$key] = strtolower( $user[$sort_by] );
-					}
-				}
-				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
-				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
 			}
 
 			// Render user list.
@@ -5054,19 +5054,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get custom usermeta field to show.
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
-			// Get pager params.
-			$total_users = count( $auth_settings_option );
-			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
-			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
-			$total_pages = ceil( $total_users / $users_per_page );
-
-			// Make sure current_page is between 1 and max pages.
-			if ( $current_page < 1 ) {
-				$current_page = 1;
-			} else if ( $current_page > $total_pages ) {
-				$current_page = $total_pages;
-			}
-
 			// Sort user list.
 			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
 			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
@@ -5081,6 +5068,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
+			}
+
+			// Get pager params.
+			$total_users = count( $auth_settings_option );
+			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
+			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
+			$total_pages = ceil( $total_users / $users_per_page );
+
+			// Make sure current_page is between 1 and max pages.
+			if ( $current_page < 1 ) {
+				$current_page = 1;
+			} else if ( $current_page > $total_pages ) {
+				$current_page = $total_pages;
 			}
 
 			// Render user list.
