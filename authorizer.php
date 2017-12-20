@@ -3406,7 +3406,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
 
 			// Render user list.
-			?><ul id="list_auth_settings_access_users_approved" style="margin:0;"><?php
+			?><ul id="list_auth_settings_access_users_approved" class="<?php echo strlen( $advanced_usermeta ) > 0 ? 'has-usermeta' : ''; ?>"><?php
 				$offset = ( $current_page - 1 ) * $users_per_page;
 				for ( $key = $offset; $key < $offset + $users_per_page; $key++ ) :
 					$approved_user = $auth_settings_option[$key];
