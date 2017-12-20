@@ -3528,7 +3528,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$search_form = array();
 			if ( 'top' === $which ) {
 				$search_term = isset( $_REQUEST['search'] ) ? $_REQUEST['search'] : '';
-				$search_form[] = '<div class="actions search-box">';
+				$search_form[] = '<div class="search-box">';
 				$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';
 				$search_form[] = '<input type="search" size="14" id="user-search-input" name="search" value="' . $search_term . '">';
 				$search_form[] = '<input type="button" id="search-submit" class="button" value="' .  __( 'Search', 'authorizer' ) . '">';
