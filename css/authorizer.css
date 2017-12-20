@@ -143,12 +143,35 @@ div.section_info, div.section_info ~ table {
 }
 
 .auth-email {
-	width: 160px;
+	width: 190px;
+}
+
+.auth-role {
+	width: 120px;
+}
+
+.auth-usermeta {
+	width: 140px;
+}
 }
 
 .auth-date-added {
 	width: 80px;
 }
+
+/* Grow email and role fields on large sizes */
+@media only screen and (min-width: 1200px) {
+	.auth-email {
+		width: 240px;
+	}
+	.auth-role {
+		width: 170px;
+	}
+	textarea#new_approved_user_email {
+		width: 241px;
+	}
+}
+
 
 .auth-multisite-username,
 .auth-multisite-email,
@@ -214,6 +237,18 @@ div.section_info, div.section_info ~ table {
 #list_auth_settings_access_users_pending .auth-role {
 	border-color: #ECF195;
 	background-color: #F5F8C4;
+}
+
+#list_auth_settings_access_users_approved {
+	margin: 0;
+}
+
+/* Use left sidebar space when usermeta field is present */
+#list_auth_settings_access_users_approved.has-usermeta {
+	margin-left: -200px;
+}
+#list_auth_settings_access_users_approved.has-usermeta ~ #new_auth_settings_access_users_approved {
+	margin-left: -200px;
 }
 
 #list_auth_settings_access_users_approved .auth-email,
