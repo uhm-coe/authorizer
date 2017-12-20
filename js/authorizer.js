@@ -794,9 +794,6 @@ function updateQueryStringParameter( uri, key, value ) {
 
 jQuery( document ).ready( function( $ ) {
 	// Grab references to form elements that we will show/hide on page load
-	var auth_settings_access_users_pending = $( '#list_auth_settings_access_users_pending' ).closest( 'tr' );
-	var auth_settings_access_users_approved = $( '#list_auth_settings_access_users_approved' ).closest( 'tr' );
-	var auth_settings_access_users_blocked = $( '#list_auth_settings_access_users_blocked' ).closest( 'tr' );
 	var auth_settings_access_role_receive_pending_emails = $( '#auth_settings_access_role_receive_pending_emails' ).closest( 'tr' );
 	var auth_settings_access_pending_redirect_to_message = $( '#wp-auth_settings_access_pending_redirect_to_message-wrap' ).closest( 'tr' );
 	var auth_settings_access_blocked_redirect_to_message = $( '#wp-auth_settings_access_blocked_redirect_to_message-wrap' ).closest( 'tr' );
@@ -838,9 +835,6 @@ jQuery( document ).ready( function( $ ) {
 	var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
 
 	// Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
-	$( 'th, td', auth_settings_access_users_pending ).wrapInner( '<div class="animated_wrapper" />' );
-	$( 'th, td', auth_settings_access_users_approved ).wrapInner( '<div class="animated_wrapper" />' );
-	$( 'th, td', auth_settings_access_users_blocked ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_role_receive_pending_emails ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_pending_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
 	$( 'th, td', auth_settings_access_blocked_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
@@ -880,13 +874,6 @@ jQuery( document ).ready( function( $ ) {
 	// If we're viewing the dashboard widget, reset a couple of the relevant
 	// option variables (since they aren't nested in table rows).
 	if ( $( '#auth_dashboard_widget' ).length ) {
-		auth_settings_access_users_pending = $( '#list_auth_settings_access_users_pending' ).closest( 'div' );
-		auth_settings_access_users_approved = $( '#list_auth_settings_access_users_approved' ).closest( 'div' );
-		auth_settings_access_users_blocked = $( '#list_auth_settings_access_users_blocked' ).closest( 'div' );
-		$( auth_settings_access_users_pending ).wrapInner( '<div class="animated_wrapper" />' );
-		$( auth_settings_access_users_approved ).wrapInner( '<div class="animated_wrapper" />' );
-		$( auth_settings_access_users_blocked ).wrapInner( '<div class="animated_wrapper" />' );
-
 		// Remove the helper link, since there are no tabs on the dashboard widget
 		$( '#dashboard_link_approved_users' ).contents().unwrap();
 	}
