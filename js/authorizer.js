@@ -34,7 +34,7 @@ function choose_tab( list_name, delay ) {
 }
 
 // Switch between pages in the Approved User list.
-function refresh_approved_user_list( currentPage ) {
+function refresh_approved_user_list( currentPage, searchTerm ) {
 	var $ = jQuery;
 	var $list = $( '#list_auth_settings_access_users_approved' );
 	var $spinner = $( '<span class="spinner is-active"></span>' ).css({
@@ -62,9 +62,28 @@ function refresh_approved_user_list( currentPage ) {
 		'action': 'refresh_approved_user_list',
 		'nonce_save_auth_settings': $( '#nonce_save_auth_settings' ).val(),
 		'paged': currentPage,
+		'search': searchTerm,
 	}, function( response ) {
 		if ( response.success ) {
+			// Update user list and total user and page count.
 			$( '#list_auth_settings_access_users_approved' ).html( response.html );
+			$( '.displaying-num' ).html( response.total_users_html );
+			$( '.total-pages' ).html( response.total_pages_html );
+
+			// Adjust our current page if the query changed the total page count.
+			if ( currentPage > response.total_pages ) {
+				currentPage = response.total_pages;
+			}
+
+			// Update pager elements.
+			refresh_approved_user_pager( currentPage );
+
+			// Update querystring with new paged param value (but don't reload the page).
+			if ( history.pushState ) {
+				var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
+				var url = updateQueryStringParameter( window.location.href, 'search', searchTerm );
+				window.history.pushState( { path: url }, '', url );
+			}
 		}
 		// Remove overlay and wait cursor.
 		$overlay.remove();
@@ -80,6 +99,18 @@ function refresh_approved_user_list( currentPage ) {
 function refresh_approved_user_pager( currentPage ) {
 	var $ = jQuery;
 	var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
+
+	// If total number of pages changed (because a search filter reduced it), make
+	// sure current page is not larger than it.
+	if ( currentPage > totalPages ) {
+		currentPage = totalPages;
+	}
+	if ( currentPage < 1 ) {
+		currentPage = 1;
+	}
+	if ( totalPages < 1 ) {
+		totalPages = 1;
+	}
 
 	// Update current page text input.
 	$( '#current-page-selector' ).val( currentPage );
@@ -1040,9 +1071,10 @@ jQuery( document ).ready( function( $ ) {
 	hide_multisite_settings_if_disabled();
 
 	// Wire up pager events on Approved User list (first/last/next/previous
-	// buttons, go to page text input, etc.
-	$( '#current-page-selector' ).on( 'keydown', function ( e ) {
+	// buttons, go to page text input, and search.
+	$( '#current-page-selector, #user-search-input' ).on( 'keydown', function ( e ) {
 		if ( e.which == 13 ) { // Enter key
+			var searchTerm = $( '#user-search-input' ).val();
 			var currentPage = parseInt( $( this ).val() ) || 1;
 			var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
 
@@ -1054,23 +1086,15 @@ jQuery( document ).ready( function( $ ) {
 			}
 
 			// Update user list with users on next page.
-			refresh_approved_user_list( currentPage );
-
-			// Update pager elements.
-			refresh_approved_user_pager( currentPage );
-
-			// Update querystring with new paged param value (but don't reload the page).
-			if ( history.pushState ) {
-				var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
-				window.history.pushState( { path: url }, '', url );
-			}
+			refresh_approved_user_list( currentPage, searchTerm );
 
 			// Prevent default behavior.
 			e.preventDefault();
 			return false;
 		}
 	});
-	$( '.pagination-links' ).on( 'click', 'a', function ( e ) {
+	$( '.tablenav' ).on( 'click', '.pagination-links a, #search-submit', function ( e ) {
+		var searchTerm = $( '#user-search-input' ).val();
 		var currentPage = parseInt( getParameterByName( 'paged', $( this ).attr( 'href' ) ) ) || 1;
 		var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ) ) || 1;
 		if ( currentPage > totalPages ) {
@@ -1078,16 +1102,7 @@ jQuery( document ).ready( function( $ ) {
 		}
 
 		// Update user list with users on next page.
-		refresh_approved_user_list( currentPage );
-
-		// Update pager elements.
-		refresh_approved_user_pager( currentPage );
-
-		// Update querystring with new paged param value (but don't reload the page).
-		if ( history.pushState ) {
-			var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
-			window.history.pushState( { path: url }, '', url );
-		}
+		refresh_approved_user_list( currentPage, searchTerm );
 
 		// Remove focus from clicked element.
 		$( this ).blur();

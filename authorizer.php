@@ -3360,6 +3360,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$js_function_prefix = $admin_mode === MULTISITE_ADMIN ? 'auth_multisite_' : 'auth_';
 			$is_multisite_admin_page = $admin_mode === MULTISITE_ADMIN;
 
+			// Filter user list to search terms.
+			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
+				$search_term = $_REQUEST['search'];
+				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+					return stripos( $user['email'], $search_term ) !== FALSE ||
+						stripos( $user['role'], $search_term ) !== FALSE ||
+						stripos( $user['date_added'], $search_term ) !== FALSE;
+				} );
+			}
+
 			// Sort user list.
 			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
 			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
@@ -3381,6 +3391,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages = ceil( $total_users / $users_per_page );
+			if ( $total_pages < 1 ) {
+				$total_pages = 1;
+			}
 
 			// Make sure current_page is between 1 and max pages.
 			if ( $current_page < 1 ) {
@@ -3390,9 +3403,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Render pager.
-			if ( $total_users > $users_per_page ) {
-				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
-			}
+			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
 
 			// Render user list.
 			?><ul id="list_auth_settings_access_users_approved" style="margin:0;"><?php
@@ -3425,9 +3436,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<?php
 
 			// Render pager.
-			if ( $total_users > $users_per_page ) {
-				$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
-			}
+			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
 		}
 
 
@@ -3441,8 +3450,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function render_user_pager( $current_page = 1, $users_per_page = 20, $total_users = 0, $which = 'top' ) {
 			$total_pages = ceil( $total_users / $users_per_page );
+			if ( $total_pages < 1 ) {
+				$total_pages = 1;
+			}
 
-			$output = '<span class="displaying-num">' . sprintf( _n( '%s item', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ) . '</span>';
+			$output = ' <span class="displaying-num">' . sprintf( _n( '%s user', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ) . '</span>';
 
 			$disable_first = $current_page <= 1;
 			$disable_prev = $current_page <= 1;
@@ -3513,15 +3525,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$pagination_links_class = 'pagination-links';
 			$output .= "\n<span class='$pagination_links_class'>" . join( "\n", $page_links ) . '</span>';
 
-			if ( $total_pages ) {
-				$page_class = $total_pages < 2 ? ' one-page' : '';
-			} else {
-				$page_class = ' no-pages';
+			$search_form = array();
+			if ( 'top' === $which ) {
+				$search_term = isset( $_REQUEST['search'] ) ? $_REQUEST['search'] : '';
+				$search_form[] = '<div class="actions search-box">';
+				$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';
+				$search_form[] = '<input type="search" size="14" id="user-search-input" name="search" value="' . $search_term . '">';
+				$search_form[] = '<input type="button" id="search-submit" class="button" value="' .  __( 'Search', 'authorizer' ) . '">';
+				$search_form[] = '</div>';
 			}
+			$search_form = join( "\n", $search_form );
 
-			$output = "<div class='tablenav-pages{$page_class}'>$output</div>";
+			$output = "<div class='tablenav-pages'>$output</div>";
 
-			?><div class="tablenav top"><?php echo $output; ?></div><?php
+			?><div class="tablenav top">
+				<?php echo $output; ?>
+				<?php echo $search_form; ?>
+			</div><?php
 		}
 
 
@@ -5054,6 +5074,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get custom usermeta field to show.
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
+			// Filter user list to search terms.
+			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
+				$search_term = $_REQUEST['search'];
+				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+					return stripos( $user['email'], $search_term ) !== FALSE ||
+						stripos( $user['role'], $search_term ) !== FALSE ||
+						stripos( $user['date_added'], $search_term ) !== FALSE;
+				} );
+			}
+
 			// Sort user list.
 			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
 			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
@@ -5075,6 +5105,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages = ceil( $total_users / $users_per_page );
+			if ( $total_pages < 1 ) {
+				$total_pages = 1;
+			}
 
 			// Make sure current_page is between 1 and max pages.
 			if ( $current_page < 1 ) {
@@ -5099,6 +5132,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'success' => $success,
 				'message' => $message,
 				'html' => ob_get_clean(),
+				'total_users_html' => sprintf( _n( '%s user', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ),
+				'total_pages_html' => number_format_i18n( $total_pages ),
+				'total_pages' => $total_pages,
 			);
 			header( 'content-type: application/json' );
 			echo json_encode( $response );
