@@ -185,6 +185,17 @@ div.section_info, div.section_info ~ table {
 	width: 70px;
 }
 
+/* Make sure pager fits in dashboard widget */
+#auth_dashboard_widget .tablenav {
+	height: auto;
+}
+#auth_dashboard_widget .tablenav-pages {
+	float: none;
+	width: 100%;
+	margin-bottom: 4px;
+}
+
+
 /* Shrink dashboard widget elements on small sizes */
 @media only screen and (max-width: 1090px) {
 	#auth_dashboard_widget #list_auth_settings_access_users_pending .auth-email,
