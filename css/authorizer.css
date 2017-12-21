@@ -153,6 +153,10 @@ div.section_info, div.section_info ~ table {
 .auth-usermeta {
 	width: 140px;
 }
+
+textarea#new_approved_user_email {
+	vertical-align: top;
+	width: 191px;
 }
 
 .auth-date-added {
@@ -187,7 +191,9 @@ div.section_info, div.section_info ~ table {
 	margin-top: 0;
 }
 
-#auth_dashboard_widget input[type="text"], #auth_dashboard_widget select {
+#auth_dashboard_widget input[type="text"],
+#auth_dashboard_widget select,
+#auth_dashboard_widget textarea {
 	font-size: 90%;
 	width: 14%;
 }

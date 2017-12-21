@@ -2181,6 +2181,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_localize_script( 'authorizer', 'auth_L10n', array(
 				'baseurl' => get_bloginfo( 'url' ),
 				'saved' => esc_html__( 'Saved', 'authorizer' ),
+				'duplicate' => esc_html__( 'Duplicate', 'authorizer' ),
 				'failed' => esc_html__( 'Failed', 'authorizer' ),
 				'local_wordpress_user' => esc_html__( 'Local WordPress user', 'authorizer' ),
 				'block_ban_user' => esc_html__( 'Block/Ban user', 'authorizer' ),
@@ -2194,6 +2195,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'next_page' => esc_html__( 'Next page' ),
 				'last_page' => esc_html__( 'Last page' ),
 			));
+
+			wp_enqueue_script(
+				'jquery-autogrow-textarea',
+				plugins_url( 'vendor/jquery.autogrow-textarea/jquery.autogrow-textarea.js', __FILE__ ),
+				array( 'jquery' ), '2.7.0', true
+			);
 
 			wp_enqueue_script(
 				'jquery.multi-select',
@@ -3418,7 +3425,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			</ul><?php
 
 			?><div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
+				<textarea id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
 				<select id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 				</select>
@@ -5257,6 +5264,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die( '' );
 			}
 
+			// Track any emails that couldn't be added (used when adding approved users).
+			$invalid_emails = array();
+
 			// Editing a pending list entry.
 			if ( $_POST['setting'] === 'access_users_pending' ) {
 				// Initialize posted data if empty.
@@ -5308,6 +5318,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Deal with each modified user (add, remove, or change_role).
 				foreach ( $_POST['access_users_approved'] as $approved_user ) {
+					// Skip blank entries.
+					if ( strlen( $approved_user['email'] ) < 1 ) {
+						continue;
+					}
 
 					// New user (create user, or add existing user to current site in multisite).
 					if ( $approved_user['edit_action'] === 'add' ) {
@@ -5375,6 +5389,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$approved_user['date_added'] = date( 'M Y' );
 								array_push( $auth_multisite_settings_access_users_approved, $approved_user );
 								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							} else {
+								$invalid_emails[] = $approved_user['email'];
 							}
 						} else {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
@@ -5384,6 +5400,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$approved_user['date_added'] = date( 'M Y' );
 								array_push( $auth_settings_access_users_approved, $approved_user );
 								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							} else {
+								$invalid_emails[] = $approved_user['email'];
 							}
 						}
 
@@ -5556,8 +5574,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			// Return 'success' value to AJAX call.
-			die( 'success' );
+			// Send response to client.
+			$response = array(
+				'success' => true,
+				'invalid_emails' => $invalid_emails,
+			);
+			header( 'content-type: application/json' );
+			echo json_encode( $response );
+			exit;
 		}
 
 

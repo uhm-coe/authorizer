@@ -292,60 +292,53 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		buttons = $( caller ).parent().children();
 	}
 
-	var user = {
-		'email': $.trim( email.val() ).replace( 'mailto:', '' ),
-		'role': role.val(),
-		'date_added': date_added.val(),
-		'edit_action': 'add',
-		'local_user': create_local_account,
-		'multisite_user': is_multisite,
-	};
+	// Support a single email address, or multiple (separated by newlines, commas, semicolons, or spaces).
+	var emails = $.trim( email.val() ).replace( /mailto:/g, '' ).split( /[\s,;]+/ );
 
-	// Get next highest user ID.
-	var next_id = 1 + Math.max.apply(
-		null,
-		$( '#list_auth_settings_access_users_' + list + ' li .auth-email' ).map( function ( el, index ) {
-			return parseInt( this.id.replace( 'auth_multisite_settings_access_users_' + list + '_', '' ).replace( 'auth_settings_access_users_' + list + '_', '' ) );
-		})
-	);
+	// Remove any invalid email addresses.
+	if ( ! skip_validation ) {
+		// Check if the email(s) being added is well-formed.
+		emails = emails.filter( function ( email ) {
+			return valid_email( email );
+		});
+		// Remove any duplicates in the list of emails to add.
+		emails = remove_duplicates_from_array_of_strings( emails );
+	}
 
-	var validated = true;
-
-	if ( user.email === '' ) {
+	// Shake and quit if no valid email addresses exist.
+	if ( emails.length < 1 ) {
+		$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
 		return false;
 	}
 
 	$( buttons ).attr( 'disabled', 'disabled' );
 
-	// Check if the name being added already exists in any list.
-	if ( ! skip_validation && validated ) {
-		$( 'li > input.auth-email' ).each( function() {
-			if ( this.value == user.email ) {
-				validated = false;
-				email.parent().effect( 'shake', shake_speed );
-				$( this ).parent().effect( 'shake', shake_speed );
-				$( buttons ).removeAttr( 'disabled' );
-				return false;
-			}
-		});
-	}
+	var users = [];
+	for ( var i = 0; i < emails.length; i++ ) {
+		var user = {
+			'email': emails[i],
+			'role': role.val(),
+			'date_added': date_added.val(),
+			'edit_action': 'add',
+			'local_user': create_local_account,
+			'multisite_user': is_multisite,
+		};
+		users.push( user );
 
-	// Check if the user being added has a valid email address.
-	if ( ! skip_validation && validated ) {
-		if ( ! valid_email( user.email ) ) {
-			validated = false;
-			$( '#new_' + list + '_user_email' ).parent().effect( 'shake', shake_speed );
-			$( buttons ).removeAttr( 'disabled' );
-		}
-	}
+		// Get next highest user ID.
+		var next_id = 1 + Math.max.apply(
+			null,
+			$( '#list_auth_settings_access_users_' + list + ' li .auth-email' ).map( function ( el, index ) {
+				return parseInt( this.id.replace( 'auth_multisite_settings_access_users_' + list + '_', '' ).replace( 'auth_settings_access_users_' + list + '_', '' ) );
+			})
+		);
 
-	if ( validated ) {
 		// Add the new item.
 		var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
 		var local_icon = create_local_account ? '&nbsp;<a title="' + auth_L10n.local_wordpress_user + '" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
 		var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" id="block_user_' + next_id + '" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + auth_L10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 		$( ' \
-			<li id="new_user_' + next_id + '" style="display: none;"> \
+			<li id="new_user_' + next_id + '" class="new-user" style="display: none;"> \
 				<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
 				<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + auth_js_prefix + 'change_role( this );"> \
 				</select> \
@@ -361,23 +354,22 @@ function auth_add_user( caller, list, create_local_account, is_multisite ) {
 		// save selected state on select elements, set that too.
 		$( 'option', role ).clone().appendTo( '#new_user_' + next_id + ' .auth-role' );
 		$( '#new_user_' + next_id + ' .auth-role' ).val( role.val() );
-
-		// Remove the 'empty list' item if it exists.
-		$( '#list_auth_settings_access_users_' + list + ' li.auth-empty' ).remove();
-
-		// Update the options in the database with this change.
-		update_auth_user( buttons, 'access_users_' + list, user );
-
-		// Reset the new user textboxes
-		if ( email.hasClass( 'new' ) ) {
-			email.val( '' );
-		}
-
-		// Re-enable the action buttons now that we're done saving.
-		$( buttons ).removeAttr( 'disabled' );
-
-		return true;
 	}
+
+	// Remove the 'empty list' item if it exists.
+	$( '#list_auth_settings_access_users_' + list + ' li.auth-empty' ).remove();
+
+	// Update the options in the database with this change.
+	update_auth_user( buttons, 'access_users_' + list, users );
+
+	// Reset the new user textboxes
+	if ( email.hasClass( 'new' ) ) {
+		email.val( '' ).keydown();
+	}
+
+	// Re-enable the action buttons now that we're done saving.
+	$( buttons ).removeAttr( 'disabled' );
+	return true;
 }
 
 // Remove user from list (multisite options page).
@@ -426,7 +418,7 @@ function auth_ignore_user( caller, list_name, is_multisite ) {
 
 
 // Make changes to one of the user lists (pending, approved, blocked) via ajax.
-function update_auth_user( caller, setting, user_to_edit ) {
+function update_auth_user( caller, setting, users_to_edit ) {
 	var $ = jQuery,
 		access_users_pending = [],
 		access_users_approved = [],
@@ -435,16 +427,25 @@ function update_auth_user( caller, setting, user_to_edit ) {
 
 	// Defaults:
 	// setting = 'access_users_pending' or 'access_users_approved' or 'access_users_blocked',
-	// user_to_edit = {
-	//   email: 'johndoe@example.com',
-	//   role: 'subscriber',
-	//   date_added: 'Jun 2014',
-	//   edit_action: 'add' or 'remove' or 'change_role',
-	//   local_user: true or false,
-	//   multisite_user: true or false,
-	// }
+	// users_to_edit = [
+	// 	{
+	//    email: 'johndoe@example.com',
+	//    role: 'subscriber',
+	//    date_added: 'Jun 2014',
+	//    edit_action: 'add' or 'remove' or 'change_role',
+	//    local_user: true or false,
+	//    multisite_user: true or false,
+	//  }, {
+	//   ...
+	//  }
+	// ]
 	setting = typeof setting !== 'undefined' ? setting : 'none';
-	user_to_edit = typeof user_to_edit !== 'undefined' ? user_to_edit : {};
+
+	// If we are only editing a single user, make that user the only item in the array.
+	users_to_edit = typeof users_to_edit !== 'undefined' ? users_to_edit : [];
+	if ( ! Array.isArray( users_to_edit ) ) {
+		users_to_edit = [ users_to_edit ];
+	}
 
 	// Enable wait cursor.
 	$( 'html' ).addClass( 'busy' );
@@ -462,11 +463,11 @@ function update_auth_user( caller, setting, user_to_edit ) {
 
 	// Grab the value of the setting we are saving.
 	if ( setting === 'access_users_pending' ) {
-		access_users_pending.push( user_to_edit );
+		access_users_pending = users_to_edit;
 	} else if ( setting === 'access_users_approved' ) {
-		access_users_approved.push( user_to_edit );
+		access_users_approved = users_to_edit;
 	} else if ( setting === 'access_users_blocked' ) {
-		access_users_blocked.push( user_to_edit );
+		access_users_blocked = users_to_edit;
 	}
 
 	$.post( ajaxurl, {
@@ -477,11 +478,23 @@ function update_auth_user( caller, setting, user_to_edit ) {
 		'access_users_blocked': access_users_blocked,
 		'nonce_save_auth_settings': nonce_save_auth_settings,
 	}, function( response ) {
-		// Server responded, but if response isn't 'success' it failed to save.
-		var succeeded = response === 'success';
+		// Server responded, but if success isn't true it failed to save.
+		var succeeded = response.success;
 		var spinner_text = succeeded ? auth_L10n.saved + '.' : '<span style="color: red;">' + auth_L10n.failed + '.</span>';
 		var spinner_wait = succeeded ? 500 : 2000;
-		$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
+
+		// Remove any new user entries that were rejected by the server.
+		if ( response.invalid_emails.length > 0 ) {
+			for ( var i = 0; i < response.invalid_emails.length; i++ ) {
+				var duplicate_email = response.invalid_emails[i];
+				$( 'li.new-user .auth-email[value="' + duplicate_email + '"]' )
+					.siblings( '.spinner' ).addClass( 'duplicate' ).append( '<span class="spinner-text" style="color: red;">' +  auth_L10n.duplicate + '.</span>' )
+					.parent().fadeOut( spinner_wait, function () { $( this ).remove(); });
+			}
+		}
+
+		// Show message ('Saved', 'Failed', or 'Saved, removing duplicates').
+		$( 'form .spinner:not(:has(.spinner-text)):not(.duplicate)' ).append( '<span class="spinner-text">' +  spinner_text + '</span>' ).delay( spinner_wait ).hide( animation_speed, function() {
 			$( this ).remove();
 		});
 		$( caller ).removeAttr( 'disabled' );
@@ -708,6 +721,14 @@ function hide_multisite_overridden_options() {
 
 
 
+// Helper function to remove duplicate entries from an array of strings.
+function remove_duplicates_from_array_of_strings( a ) {
+	var seen = {};
+	return a.filter( function ( item ) {
+		return seen.hasOwnProperty( item ) ? false : ( seen[item] = true );
+	});
+}
+
 // Helper function to hide/show wordpress option
 function animate_option( action, option ) {
 	var $ = jQuery;
@@ -777,7 +798,7 @@ function querystring( key ) {
 // Helper function to check if an email address is valid.
 function valid_email( email ) {
 	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-	return re.test( email );
+	return email.length > 0 && re.test( email );
 }
 
 // Helper function to set or update a querystring value.
@@ -1018,9 +1039,14 @@ jQuery( document ).ready( function( $ ) {
 	// List management function: pressing enter in the new approved or new
 	// blocked user (email or role field) adds the user to the list.
 	$( '#new_approved_user_email, #new_approved_user_role, #new_blocked_user_email' ).on( 'keyup', function( e ) {
-		if ( e.which == 13 ) { // Enter key
+		// For textareas, make ctrl-enter add the user; for inputs, make enter add the user.
+		if ( $( this ).is( 'textarea' ) ) {
+			if ( e.which == 13 && ( e.ctrlKey || e.altKey ) ) { // Enter key (without Ctrl modifier)
+				$( this ).parent().find( 'a' ).trigger( 'click' );
+			}
+		} else if ( e.which == 13 ) { // Enter key on input[type="text"]
 			$( this ).parent().find( 'a' ).trigger( 'click' );
-			return false;
+			e.preventDefault();
 		}
 	});
 
@@ -1098,6 +1124,9 @@ jQuery( document ).ready( function( $ ) {
 		e.preventDefault();
 		return false;
 	});
+
+	// Enable growable textarea for new user field.
+	$( 'textarea#new_approved_user_email' ).autogrow();
 
 });
 
