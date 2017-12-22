@@ -80,8 +80,9 @@ function refresh_approved_user_list( currentPage, searchTerm ) {
 
 			// Update querystring with new paged param value (but don't reload the page).
 			if ( history.pushState ) {
-				var url = updateQueryStringParameter( window.location.href, 'paged', currentPage );
-				var url = updateQueryStringParameter( window.location.href, 'search', searchTerm );
+				var url = window.location.href;
+				url = updateQueryStringParameter( url, 'paged', currentPage );
+				url = updateQueryStringParameter( url, 'search', searchTerm );
 				window.history.pushState( { path: url }, '', url );
 			}
 		}
