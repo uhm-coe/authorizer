@@ -3370,11 +3370,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Filter user list to search terms.
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
-				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option = array_values( array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== FALSE ||
 						stripos( $user['role'], $search_term ) !== FALSE ||
 						stripos( $user['date_added'], $search_term ) !== FALSE;
-				} );
+				} ) );
 			}
 
 			// Sort user list.
@@ -5084,11 +5084,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Filter user list to search terms.
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
-				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option = array_values( array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== FALSE ||
 						stripos( $user['role'], $search_term ) !== FALSE ||
 						stripos( $user['date_added'], $search_term ) !== FALSE;
-				} );
+				} ) );
 			}
 
 			// Sort user list.
