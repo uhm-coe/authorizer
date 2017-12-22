@@ -121,6 +121,11 @@ body.settings_page_authorizer .spinner .spinner-text,
 	margin-left: 22px;
 }
 
+body.toplevel_page_authorizer .wrapper_access_users_approved,
+body.settings_page_authorizer .wrapper_access_users_approved {
+	width: fit-content;
+}
+
 body.toplevel_page_authorizer .tablenav .tablenav-pages,
 body.settings_page_authorizer .tablenav .tablenav-pages {
 	float: right;
