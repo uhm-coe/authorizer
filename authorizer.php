@@ -3370,11 +3370,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Filter user list to search terms.
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
-				$auth_settings_option = array_values( array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== FALSE ||
 						stripos( $user['role'], $search_term ) !== FALSE ||
 						stripos( $user['date_added'], $search_term ) !== FALSE;
-				} ) );
+				} );
 			}
 
 			// Sort user list.
@@ -3392,6 +3392,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
 			}
+
+			// Ensure array keys run from 0..max (keys in database will be the original,
+			// index, and removing users will not reorder the array keys of other users).
+			$auth_settings_option = array_values( $auth_settings_option );
 
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
@@ -5084,11 +5088,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Filter user list to search terms.
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
-				$auth_settings_option = array_values( array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== FALSE ||
 						stripos( $user['role'], $search_term ) !== FALSE ||
 						stripos( $user['date_added'], $search_term ) !== FALSE;
-				} ) );
+				} );
 			}
 
 			// Sort user list.
@@ -5106,6 +5110,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
 			}
+
+			// Ensure array keys run from 0..max (keys in database will be the original,
+			// index, and removing users will not reorder the array keys of other users).
+			$auth_settings_option = array_values( $auth_settings_option );
 
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
