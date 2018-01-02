@@ -127,8 +127,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
 			// Update user role in approved list if it's changed in the WordPress edit user page.
-			add_action( 'edit_user_profile_update', array( $this, 'edit_user_profile_update_role' ) );
-			add_action( 'personal_options_update', array( $this, 'edit_user_profile_update_role' ) );
+			add_action( 'user_profile_update_errors', array( $this, 'edit_user_profile_update_role_and_email' ) );
 
 			// Enqueue javascript and css on the plugin's options page, the
 			// dashboard (for the widget), and the network admin.
@@ -3213,26 +3212,32 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Keep authorizer approved users' roles in sync with WordPress roles
 		 * if someone changes the role via the WordPress Edit User options page.
 		 *
-		 * @action edit_user_profile_update
-		 * @ref https://codex.wordpress.org/Plugin_API/Action_Reference/edit_user_profile_update
-		 * @param int     $user_id The user ID of the user being edited
-
-		 * @action personal_options_update
-		 * @ref https://codex.wordpress.org/Plugin_API/Action_Reference/personal_options_update
-		 * @param int     $user_id The user ID of the user being edited
+		 * @action user_profile_update_errors
+		 * @ref https://codex.wordpress.org/Plugin_API/Action_Reference/user_profile_update_errors
+		 * @param object	&$errors Errors object to add any custome errors to
+		 * @param bool		$update True if updating existing user, false if saving a new one
+		 * @param object	&$user User object for user being edited
+		 *
 		 */
-		function edit_user_profile_update_role( $user_id ) {
-			if ( ! current_user_can( 'edit_user', $user_id ) ) {
+		function edit_user_profile_update_role_and_email( &$errors, $update, &$user ) {
+			// Safety check; will likely not fire if we reach this function.
+			if ( ! current_user_can( 'edit_user', $user->ID ) ) {
+				return;
+			}
+			// Don't perform Authorizer updates if we have a WordPress error that has been thrown.
+			if ( !empty( $errors->get_error_codes() ) ) {
+				// Uncomment this to test if Authorizer is catching WordPress errors.
+				// $errors->add( 'authozier_update_error', __( 'Authorizer has not updated due to a user update error.' ) );
 				return;
 			}
 
 			// If user is in approved list, update his/her associated role.
-			$wp_user = get_user_by( 'id', $user_id );
-			if ( $this->is_email_in_list( $wp_user->get( 'user_email' ), 'approved' ) ) {
+			if ( $this->is_email_in_list( $user->user_email, 'approved' ) ) {
 				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ) );
 				// Find approved user and sync with the corresponding WP_User.
-				foreach ( $auth_settings_access_users_approved as $key => $user ) {
-					if ( 0 === strcasecmp( $user['email'], $wp_user->user_email ) ) {
+				// NOTE:  If there are multiple users who match, we delete the (first?  last?  how do we determine change?)
+				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
+					if ( 0 === strcasecmp( $check_user['email'], $user->user_email ) ) {
 						// Sync user role.
 						if ( array_key_exists( 'role', $_REQUEST ) ) {
 							$auth_settings_access_users_approved[$key]['role'] = $_REQUEST['role'];
