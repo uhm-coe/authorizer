@@ -61,6 +61,7 @@ function refresh_approved_user_list( currentPage, searchTerm ) {
 	$.post( ajaxurl, {
 		'action': 'refresh_approved_user_list',
 		'nonce_save_auth_settings': $( '#nonce_save_auth_settings' ).val(),
+		'is_network_admin': auth_L10n.is_network_admin,
 		'paged': currentPage,
 		'search': searchTerm,
 	}, function( response ) {

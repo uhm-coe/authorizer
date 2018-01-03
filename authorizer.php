@@ -2193,6 +2193,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'previous_page' => esc_html__( 'Previous page' ),
 				'next_page' => esc_html__( 'Next page' ),
 				'last_page' => esc_html__( 'Last page' ),
+				'is_network_admin' => is_network_admin(),
 			));
 
 			wp_enqueue_script(
@@ -3349,6 +3350,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
+				! is_network_admin() &&
 				$auth_override_multisite != '1' &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				$auth_multisite_settings['multisite_override'] === '1'
@@ -5067,6 +5069,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get defaults.
 			$success = true;
 			$message = '';
+			$is_network_admin = isset( $_REQUEST['is_network_admin'] ) && $_REQUEST['is_network_admin'];
 
 			// Get user list.
 			$option = 'access_users_approved';
@@ -5080,6 +5083,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
+				! $is_network_admin &&
 				$auth_override_multisite != '1' &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				$auth_multisite_settings['multisite_override'] === '1'
