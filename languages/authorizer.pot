@@ -125,6 +125,10 @@ msgstr ""
 msgid "Saved"
 msgstr ""
 
+#: authorizer.php:2183
+msgid "Duplicate"
+msgstr ""
+
 #: authorizer.php:2184
 msgid "Failed"
 msgstr ""
@@ -156,6 +160,22 @@ msgstr ""
 
 #: authorizer.php:2191
 msgid "Public Pages"
+msgstr ""
+
+#: authorizer.php:2192 authorizer.php:3501
+msgid "First page"
+msgstr ""
+
+#: authorizer.php:2193 authorizer.php:3511
+msgid "Previous page"
+msgstr ""
+
+#: authorizer.php:2194 authorizer.php:3534
+msgid "Next page"
+msgstr ""
+
+#: authorizer.php:2195 authorizer.php:3544
+msgid "Last page"
 msgstr ""
 
 #: authorizer.php:2258
@@ -350,6 +370,18 @@ msgstr ""
 msgid "Show custom usermeta in user list"
 msgstr ""
 
+#: authorizer.php:2651 authorizer.php:4895
+msgid "Number of users per page"
+msgstr ""
+
+#: authorizer.php:2658 authorizer.php:4899
+msgid "Approved users sort method"
+msgstr ""
+
+#: authorizer.php:2665 authorizer.php:4903
+msgid "Approved users sort order"
+msgstr ""
+
 #: authorizer.php:2672
 msgid "Show dashboard widget to admin users"
 msgstr ""
@@ -475,6 +507,35 @@ msgstr ""
 msgid ""
 "Create a local WordPress <br />account instead, and email <br />the user "
 "their password."
+msgstr ""
+
+#: authorizer.php:3481 authorizer.php:5166
+#, php-format
+msgid "%s user"
+msgid_plural "%s users"
+msgstr[0] ""
+msgstr[1] ""
+
+#: authorizer.php:3518 authorizer.php:3521
+msgid "Current Page"
+msgstr ""
+
+#: authorizer.php:3527
+#, php-format
+msgctxt "paging"
+msgid "%1$s of %2$s"
+msgstr ""
+
+#: authorizer.php:3556
+msgid "Search Users"
+msgstr ""
+
+#: authorizer.php:3558
+msgid "Search"
+msgstr ""
+
+#: authorizer.php:3653 authorizer.php:4464
+msgid "-- None --"
 msgstr ""
 
 #: authorizer.php:3731
@@ -850,6 +911,30 @@ msgstr ""
 
 #: authorizer.php:4513
 msgid "All Usermeta:"
+msgstr ""
+
+#: authorizer.php:4539
+msgid "Date approved"
+msgstr ""
+
+#: authorizer.php:4540
+msgid "Email"
+msgstr ""
+
+#: authorizer.php:4541
+msgid "Role"
+msgstr ""
+
+#: authorizer.php:4542
+msgid "Date registered"
+msgstr ""
+
+#: authorizer.php:4554
+msgid "Ascending"
+msgstr ""
+
+#: authorizer.php:4555
+msgid "Descending"
 msgstr ""
 
 #: authorizer.php:4566 authorizer.php:4907
