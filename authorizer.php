@@ -3484,7 +3484,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$disable_last = $current_page >= $total_pages;
 
 			$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
-			$current_url = remove_query_arg( $removable_query_args, $current_url );
+			$current_url = remove_query_arg( wp_removable_query_args(), $current_url );
 
 			$page_links = array();
 
