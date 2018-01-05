@@ -185,11 +185,9 @@ textarea#new_approved_user_email {
 .auth-multisite-username,
 .auth-multisite-email,
 .auth-multisite-role,
+.auth-multisite-usermeta,
 .auth-multisite-date-added {
 	opacity: 0.5;
-}
-.auth-multisite-usermeta[disabled="disabled"] {
-	opacity: 0;
 }
 
 #auth_dashboard_widget > .inside {
