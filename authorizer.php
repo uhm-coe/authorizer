@@ -3283,7 +3283,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 					// If new user email is already in approved list, remove that entry.
 					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-						unset( $auth_settings_access_users_approved[$key];
+						unset( $auth_settings_access_users_approved[$key] );
 					}
 				}
 				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
