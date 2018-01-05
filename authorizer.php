@@ -127,10 +127,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
 			// Update user role in approved list if it's changed in the WordPress edit user page.
-			add_action( 'user_profile_update_errors', array( $this, 'edit_user_profile_update_role' ) );
+			add_action( 'user_profile_update_errors', array( $this, 'edit_user_profile_update_role' ), 10, 3 );
 
 			// Update user email in approved list if it's changed in the WordPress edit user page.
-			add_filter( 'send_email_change_email', array( $this, 'edit_user_profile_update_email' ) );
+			add_filter( 'send_email_change_email', array( $this, 'edit_user_profile_update_email' ), 10, 3 );
 
 			// Enqueue javascript and css on the plugin's options page, the
 			// dashboard (for the widget), and the network admin.
