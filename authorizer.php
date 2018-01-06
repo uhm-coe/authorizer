@@ -3289,6 +3289,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 			}
 
+			// Also look for user in multisite approved users (if we're in a multisite).
+			if ( $this->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
+				$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+					$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+				);
+				foreach ( $auth_multisite_settings_access_users_approved as $key => $check_user ) {
+					// Update old user email in approved list to the new email.
+					if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+						$auth_multisite_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+					}
+					// If new user email is already in approved list, remove that entry.
+					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+						unset( $auth_multisite_settings_access_users_approved[$key] );
+					}
+				}
+				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			}
+
 			// We're hooking into this filter merely for its location in the codebase,
 			// so make sure to return the filter value unmodified.
 			return $send;
