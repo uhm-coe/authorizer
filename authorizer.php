@@ -3273,38 +3273,72 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array $userdata The updated user array.
 		 */
 		function edit_user_profile_update_email( $send, $user, $userdata ) {
-			// Find old user email in approved list and update the email.
-			if ( $this->is_email_in_list( $user['user_email'], 'approved' ) ) {
-				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ) );
-				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
-					// Update old user email in approved list to the new email.
-					if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-						$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+			// If we're in multisite, update the email on all sites in the network
+			// (and remove from any subsites if it's a network-approved user).
+			if ( is_multisite() ) {
+				// If it's a multisite approved user, sync the email there.
+				$changed_user_is_multisite_user = false;
+				if ( $this->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
+					$changed_user_is_multisite_user = true;
+					$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
+						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+					);
+					foreach ( $auth_multisite_settings_access_users_approved as $key => $check_user ) {
+						// Update old user email in approved list to the new email.
+						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+							$auth_multisite_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+						}
+						// If new user email is already in approved list, remove that entry.
+						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+							unset( $auth_multisite_settings_access_users_approved[$key] );
+						}
 					}
-					// If new user email is already in approved list, remove that entry.
-					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-						unset( $auth_settings_access_users_approved[$key] );
-					}
+					update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 				}
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-			}
 
-			// Also look for user in multisite approved users (if we're in a multisite).
-			if ( $this->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
-				$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-					$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
-				);
-				foreach ( $auth_multisite_settings_access_users_approved as $key => $check_user ) {
-					// Update old user email in approved list to the new email.
-					if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-						$auth_multisite_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+				// Go through all approved lists on individual sites and sync this user there.
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+				foreach ( $sites as $site ) {
+					$updated = false;
+					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					$auth_settings_access_users_approved = get_blog_option( $blog_id, 'auth_settings_access_users_approved', array() );
+					foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
+						// Update old user email in approved list to the new email.
+						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+							// But if the user is already a multisite user, just remove the entry in the subsite.
+							if ( $changed_user_is_multisite_user ) {
+								unset( $auth_settings_access_users_approved[$key] );
+							} else {
+								$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+							}
+							$updated = true;
+						}
+						// If new user email is already in approved list, remove that entry.
+						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+							unset( $auth_settings_access_users_approved[$key] );
+							$updated = true;
+						}
 					}
-					// If new user email is already in approved list, remove that entry.
-					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-						unset( $auth_multisite_settings_access_users_approved[$key] );
+					if ( $updated ) {
+						update_blog_option( $blog_id, 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 					}
 				}
-				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			} else {
+				// In a single site environment, just find the old user in the approved list and update the email.
+				if ( $this->is_email_in_list( $user['user_email'], 'approved' ) ) {
+					$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ) );
+					foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
+						// Update old user email in approved list to the new email.
+						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+							$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+						}
+						// If new user email is already in approved list, remove that entry.
+						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+							unset( $auth_settings_access_users_approved[$key] );
+						}
+					}
+					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				}
 			}
 
 			// We're hooking into this filter merely for its location in the codebase,
