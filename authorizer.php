@@ -3371,6 +3371,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
+			// Render wrapper div (for aligning pager to width of content).
+			?><div class="wrapper_<?php echo $option; ?>"><?php
+
 			// Print option elements.
 			?><ul id="list_auth_settings_access_users_pending" style="margin:0;">
 				<?php if ( count( $auth_settings_option ) > 0 ) : ?>
@@ -3391,6 +3394,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li>
 				<?php endif; ?>
 			</ul>
+			</div>
 			<?php
 		}
 
@@ -3750,6 +3754,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get default role for new blocked user dropdown.
 			$access_default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 
+			// Render wrapper div (for aligning pager to width of content).
+			?><div class="wrapper_<?php echo $option; ?>"><?php
+
 			// Print option elements.
 			?><ul id="list_auth_settings_<?php echo $option; ?>" style="margin:0;">
 				<?php foreach ( $auth_settings_option as $key => $blocked_user ): ?>
@@ -3778,6 +3785,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
 				</select>
 				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user(this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php _e( 'Block', 'authorizer' ); ?></a>
+			</div>
 			</div>
 			<?php
 		}
