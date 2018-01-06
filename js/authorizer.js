@@ -40,7 +40,7 @@ function refresh_approved_user_list( currentPage, searchTerm ) {
 	var $spinner = $( '<span class="spinner is-active"></span>' ).css({
 		'position': 'relative',
 		'top': '45%',
-		'left': '15em',
+		'left': '-240px',
 	});
 	var $overlay = $( '<div id="list_auth_settings_access_users_approved_overlay"></div>' ).css({
 		'background-color': '#f1f1f1',
@@ -170,7 +170,13 @@ function auth_update_usermeta( caller ) {
 	// Disable inputs, show spinner.
 	$caller.attr( 'disabled', 'disabled' );
 	$usermeta.attr( 'disabled', 'disabled' );
-	$usermeta.after( '<span class="spinner is-active"></span>' );
+	var $row = $usermeta.closest( 'li' );
+	var $spinner = $( '<span class="spinner is-active"></span>' ).css({
+		'position': 'absolute',
+		'top': $row.position().top,
+		'left': $row.position().left + $row.width(),
+	});
+	$usermeta.after( $spinner );
 	$( 'html' ).addClass( 'busy' );
 
 	// Call ajax save function.
@@ -452,16 +458,19 @@ function update_auth_user( caller, setting, users_to_edit ) {
 	// Enable wait cursor.
 	$( 'html' ).addClass( 'busy' );
 
-	// Enable spinner by element that triggered this event (caller).
+	// Disable button (prevent duplicate clicks).
 	$( caller ).attr( 'disabled', 'disabled' );
-	if ( $( caller ).val() === auth_L10n.save_changes ) {
-		$( caller ).last().after( '<span class="spinner is-active"></span>' );
-	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
-		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
-	} else {
-		$( caller ).last().next().after( '<span class="spinner is-active"></span>' );
+
+	// Enable spinner by element that triggered this event (caller).
+	var $row = $( caller ).closest( 'li' );
+	if ( $row.length > 0 ) {
+		var $spinner = $( '<span class="spinner is-active"></span>' ).css({
+			'position': 'absolute',
+			'top': $row.position().top,
+			'left': $row.position().left + $row.width(),
+		});
+		$row.append( $spinner );
 	}
-	$( 'form .spinner' ).show();
 
 	// Grab the value of the setting we are saving.
 	if ( setting === 'access_users_pending' ) {
@@ -526,15 +535,16 @@ function save_auth_multisite_settings( caller ) {
 	// Enable wait cursor.
 	$( 'html' ).addClass( 'busy' );
 
+	// Disable button (prevent duplicate clicks).
 	$( caller ).attr( 'disabled', 'disabled' );
-	if ( $( caller ).val() === auth_L10n.save_changes ) {
-		$( caller ).last().after( '<span class="spinner is-active"></span>' );
-	} else if ( $( caller ).hasClass( 'auth-role' ) ) {
-		$( caller ).last().next().next().after( '<span class="spinner is-active"></span>' );
-	} else {
-		$( caller ).last().next().after( '<span class="spinner is-active"></span>' );
-	}
-	$( 'form .spinner' ).show();
+
+	// Enable spinner by element that triggered this event (caller).
+	var $spinner = $( '<span class="spinner is-active"></span>' ).css({
+		'position': 'absolute',
+		'top': $( caller ).position().top,
+		'left': $( caller ).position().left + $( caller ).width() + 20,
+	});
+	$( caller ).after( $spinner );
 
 	// Get form elements to save
 

@@ -104,13 +104,6 @@ body.settings_page_authorizer .ms-container ul.ms-list {
 }
 
 body.toplevel_page_authorizer .spinner,
-body.settings_page_authorizer .spinner,
-#auth_dashboard_widget .spinner {
-	display: inline-block;
-	float: none;
-	vertical-align: text-bottom;
-}
-body.toplevel_page_authorizer .spinner,
 body.settings_page_authorizer .spinner {
 	margin: 4px 5px 0 5px;
 }
@@ -119,10 +112,15 @@ body.settings_page_authorizer .spinner .spinner-text,
 #auth_dashboard_widget .spinner .spinner-text {
 	color: green;
 	margin-left: 22px;
+	vertical-align: middle;
 }
 
+body.toplevel_page_authorizer .wrapper_access_users_pending,
+body.settings_page_authorizer .wrapper_access_users_pending,
 body.toplevel_page_authorizer .wrapper_access_users_approved,
-body.settings_page_authorizer .wrapper_access_users_approved {
+body.settings_page_authorizer .wrapper_access_users_approved,
+body.toplevel_page_authorizer .wrapper_access_users_blocked,
+body.settings_page_authorizer .wrapper_access_users_blocked {
 	width: fit-content;
 }
 
