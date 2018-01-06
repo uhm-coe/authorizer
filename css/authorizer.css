@@ -252,14 +252,6 @@ textarea#new_approved_user_email {
 	margin: 0;
 }
 
-/* Use left sidebar space when usermeta field is present */
-#list_auth_settings_access_users_approved.has-usermeta {
-	margin-left: -200px;
-}
-#list_auth_settings_access_users_approved.has-usermeta ~ #new_auth_settings_access_users_approved {
-	margin-left: -200px;
-}
-
 #list_auth_settings_access_users_approved .auth-email,
 #list_auth_settings_access_users_approved .auth-role,
 #list_auth_settings_access_users_approved .auth-date-added,
