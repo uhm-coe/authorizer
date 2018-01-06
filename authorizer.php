@@ -5346,7 +5346,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				die( '' );
 			}
 
-			// Track any emails that couldn't be added (used when adding approved users).
+			// Track any emails that couldn't be added (used when adding users).
 			$invalid_emails = array();
 
 			// Editing a pending list entry.
@@ -5628,6 +5628,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$blocked_user['date_added'] = date( 'M Y' );
 							array_push( $auth_settings_access_users_blocked, $blocked_user );
 							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+						} else {
+							$invalid_emails[] = $blocked_user['email'];
 						}
 
 					} elseif ( $blocked_user['edit_action'] === 'remove' ) {
