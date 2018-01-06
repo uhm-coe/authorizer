@@ -3710,7 +3710,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							>
 								<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-									<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( is_array( $approved_user['usermeta'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
+									<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
 							</select>
 						<?php endif; ?>
