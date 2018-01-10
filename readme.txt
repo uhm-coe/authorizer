@@ -62,6 +62,15 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.7.0 =
+* Feature: Approve multiple users at once (by pasting their email addresses into the new approved user field, separated by newlines, spaces, commas, or semicolons).
+* Feature: Paging, sorting, and searching in the Approved User list for sites with many users (finally!).
+* Update LDAP TLS option for clarity. Props @Scriptkiddi for the pull request!
+* Support deprecated multisite constant BLOGID_CURRENT_SITE in addition to BLOG_ID_CURRENT_SITE. Props @er2576 for tracking that down!
+* Fix for CAS logouts not working in some situations (remove CAS isAuthenticated() check before CAS logout).
+* Fix for updating approved list entry when an email address change is made on the WordPress user profile page in a multisite environment.
+* Fix for role not getting set when creating and adding a new user to a blog in multisite. Props @julienlusson for the report and @pkarjala for the fix!
+
 = 2.6.23 =
 * Added ability to disable the dashboard widget (useful on sites with many users until paged user lists are implemented).
 * Fix for the multisite option override link always going to the External Services tab.
