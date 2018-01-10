@@ -2058,7 +2058,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return null
 		 */
 		function ensure_wordpress_user_in_approved_list_on_login( $user_login, $user ) {
-			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
 
 
@@ -6020,7 +6020,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function add_existing_user_to_authorizer_when_created( $user_id, $role = array(), $newuser_key = '' ) {
 			$user = get_user_by( 'id', $user_id );
-			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles, $role );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles, $role );
 		}
 
 
@@ -6037,7 +6037,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function add_existing_user_to_authorizer_when_created_noconfirmation( $user_id, $result ) {
 			$user = get_user_by( 'id', $user_id );
-			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
 
 
@@ -6072,7 +6072,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function add_new_user_to_authorizer_when_created_single_site( $user_id, $notify ) {
 			$user = get_user_by( 'id', $user_id );
-			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->user_roles );
+			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
 
 
