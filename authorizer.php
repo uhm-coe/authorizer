@@ -6050,10 +6050,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param string $user User's requested login name.
 		 * @param string $user_email User's email address.
 		 * @param string $key User's activation key.
-		 * @param array $meta Additional signup meta.
+		 * @param array $meta Additional signup meta, including initially set roles.
 		 */
 		function add_new_user_to_authorizer_when_created( $user, $user_email, $key, $meta ) {
-			$this->add_user_to_authorizer_when_created( $user_email, time() );
+			$user_roles = isset( $meta['new_role'] ) ? array( $meta['new_role'] ) : array();
+			$this->add_user_to_authorizer_when_created( $user_email, time(), $user_roles );
 		}
 
 
