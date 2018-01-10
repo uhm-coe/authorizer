@@ -3235,7 +3235,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Don't perform Authorizer updates if we have a WordPress error.
-			if ( ! empty( $errors->get_error_codes() ) ) {
+			$errors_on_user_update = $errors->get_error_codes();
+			if ( ! empty( $errors_on_user_update ) ) {
 				return;
 			}
 
