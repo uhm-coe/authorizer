@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.7.1 =
+* Compatibility fix for PHP < 5.5. Props @klausdk for the report!
+* Additional fix for role not getting set when adding an existing user to a site in multisite. Props @julienlusson for the fix!
+
 = 2.7.0 =
 * Feature: Approve multiple users at once (by pasting their email addresses into the new approved user field, separated by newlines, spaces, commas, or semicolons).
 * Feature: Paging, sorting, and searching in the Approved User list for sites with many users (finally!).
