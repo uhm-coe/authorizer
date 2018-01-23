@@ -3495,6 +3495,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
+			} else if ( $sort_by === 'created' && $sort_order !== 'asc' ) {
+				// If default sort method and reverse order, just reverse the array.
+				$auth_settings_option = array_reverse( $auth_settings_option );
 			}
 
 			// Ensure array keys run from 0..max (keys in database will be the original,
@@ -5225,6 +5228,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = $sort_order == 'asc' ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
+			} else if ( $sort_by === 'created' && $sort_order !== 'asc' ) {
+				// If default sort method and reverse order, just reverse the array.
+				$auth_settings_option = array_reverse( $auth_settings_option );
 			}
 
 			// Ensure array keys run from 0..max (keys in database will be the original,
