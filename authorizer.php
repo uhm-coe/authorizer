@@ -1264,9 +1264,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                       or null if skipping LDAP auth and falling back to WP auth.
 		 */
 		private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
-			// Get the FQDN from the LDAP search base domain components (dc). For
+			// Get LDAP search base(s).
+			$search_bases = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_search_base'] ) ) );
+
+			// Fail silently (fall back to WordPress authentication) if no search base specified.
+			if ( count( $search_bases ) < 1 ) {
+				return null;
+			}
+
+			// Get the FQDN from the first LDAP search base domain components (dc). For
 			// example, ou=people,dc=example,dc=edu,dc=uk would yield user@example.edu.uk
-			$search_base_components = explode( ',', trim( $auth_settings['ldap_search_base'] ) );
+			$search_base_components = explode( ',', trim( $search_bases[0] ) );
 			$domain = array();
 			foreach ( $search_base_components as $search_base_component ) {
 				$component = explode( '=', $search_base_component );
@@ -1371,13 +1379,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && substr( $auth_settings['ldap_attr_email'], 0, 1 ) !== '@' ) {
 				array_push( $ldap_attributes_to_retrieve, $this->lowercase( $auth_settings['ldap_attr_email'] ) );
 			}
-			$ldap_search = ldap_search(
-				$ldap,
-				$auth_settings['ldap_search_base'],
-				"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
-				$ldap_attributes_to_retrieve
-			);
-			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+
+			// Multiple search bases can be provided, so iterate through them until a match is found.
+			foreach ( $search_bases as $search_base ) {
+				$ldap_search = ldap_search(
+					$ldap,
+					$search_base,
+					"(" . $auth_settings['ldap_uid'] . "=" . $username . ")",
+					$ldap_attributes_to_retrieve
+				);
+				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+				if ( $ldap_entries['count'] > 0 ) {
+					break;
+				}
+			}
 
 			// If we didn't find any users in ldap, fall back to WordPress authentication.
 			if ( $ldap_entries['count'] < 1 ) {
@@ -4368,8 +4383,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:330px;" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer'); ?></label><?php
+			?><textarea id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" placeholder="" style="width:330px;"><?php echo $auth_settings_option; ?></textarea>
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer'); ?></label>
+			<br /><small><?php _e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
+			<?php
 		}
 
 
