@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.7.2 =
+* Fix Approved User list sort when set to Date approved / Descending (was still showing as ascending).
+* Support multiple LDAP search bases. Props @jmutsaerts for the feature request.
+
 = 2.7.1 =
 * Compatibility fix for PHP < 5.5. Props @klausdk for the report!
 * Additional fix for role not getting set when adding an existing user to a site in multisite. Props @julienlusson for the fix!
