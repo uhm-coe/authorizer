@@ -2193,7 +2193,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.7.0', true
+				array( 'jquery-effects-shake' ), '2.7.2', true
 			);
 			wp_localize_script( 'authorizer', 'auth_L10n', array(
 				'baseurl' => get_bloginfo( 'url' ),

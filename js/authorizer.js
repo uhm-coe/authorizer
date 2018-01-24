@@ -1157,6 +1157,10 @@ jQuery( document ).ready( function( $ ) {
 	// Enable growable textarea for new user field.
 	$( 'textarea#new_approved_user_email' ).autogrow();
 
+	// Enable growable textarea for config fields.
+	$( 'textarea#auth_settings_ldap_search_base' ).autogrow();
+	$( 'textarea#auth_settings_google_hosteddomain' ).autogrow();
+
 });
 
 
