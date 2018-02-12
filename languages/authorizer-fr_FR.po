@@ -593,7 +593,7 @@ msgstr "Seulement"
 
 #: authorizer.php:3758
 msgid "approved users"
-msgstr "les utilisaterus approuvés"
+msgstr "les utilisateurs approuvés"
 
 #: authorizer.php:3758
 msgid "(Approved external users and all WordPress users)"
@@ -1251,7 +1251,7 @@ msgid ""
 "use TLS) to enable Google Logins."
 msgstr ""
 "<strong>Activer la connexion LDAP</strong> : indiquez si vous souhaitez "
-"autoriser les utilisaterus à se connecter avec leurs idenifiants LDAP "
+"autoriser les utilisateurs à se connecter avec leurs idenifiants LDAP "
 "(Lightweight Directory Access Protocol). Vous devrez saisir des détails à "
 "propos de votre serveur LDAP (hôte, port, base de recherche, attribut uid, "
 "utilisateur d'annuaire, mot de passe utilisateur et s'il faut utliser TLS)."
