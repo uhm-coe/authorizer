@@ -583,7 +583,7 @@ msgstr "Recherche"
 
 #: authorizer.php:3653 authorizer.php:4464
 msgid "-- None --"
-msgstr "-- Rien --"
+msgstr "-- Aucun --"
 
 #: authorizer.php:3731
 msgid "Choose who is able to log into this site below."

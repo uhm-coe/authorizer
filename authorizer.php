@@ -4126,6 +4126,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
+				<option value=""<?php if ( $auth_settings_option == "" ) { echo 'selected="selected"'; } ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 			</select><?php
 		}
 
