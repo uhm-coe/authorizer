@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;_ex:1,2c;"
@@ -66,6 +66,11 @@ msgid ""
 "Please log in to approve or deny their request:\n"
 "%3$s\n"
 msgstr ""
+"A new user has tried to access the %1$s site you manage at:\n"
+"%2$s\n"
+"\n"
+"Please log in to approve or deny their request:\n"
+"%3$s\n"
 
 #: authorizer.php:939
 msgid "Invalid login attempted."
@@ -158,7 +163,7 @@ msgstr "Supprimer l'utilisateur"
 
 #: authorizer.php:2188
 msgid "No users in"
-msgstr "0 utilisateurs en"
+msgstr "Aucun utilisateur en"
 
 #: authorizer.php:2189 authorizer.php:4914
 msgid "Save Changes"
@@ -272,7 +277,7 @@ msgstr "ID client Google"
 
 #: authorizer.php:2426 authorizer.php:4779
 msgid "Google Client Secret"
-msgstr "Secret client Google"
+msgstr "Secret Google Client"
 
 #: authorizer.php:2433 authorizer.php:4783
 msgid "Google Hosted Domain"
@@ -404,7 +409,7 @@ msgstr "L’ordre de tri des utilisateurs"
 
 #: authorizer.php:2672
 msgid "Show dashboard widget to admin users"
-msgstr "Afficher le widget dashboard pour les utilisateurs admin"
+msgstr "Afficher le widget du tableau de bord pour les administrateurs"
 
 #: authorizer.php:2681
 msgid "Override multisite options"
@@ -444,6 +449,10 @@ msgid ""
 "visit us here:\n"
 "%3$s\n"
 msgstr ""
+"Bonjour  %1$s,\n"
+"Bienvenue sur %2$s! Vous avez désormais à tout le contenu du site. Venez-"
+"nous rendre visite ici :\n"
+"%3$s\n"
 
 #: authorizer.php:2763
 msgid ""
@@ -459,7 +468,7 @@ msgstr "Listes d'accès"
 
 #: authorizer.php:3265 authorizer.php:3273 authorizer.php:4673
 msgid "External Service"
-msgstr "Services externes"
+msgstr "Service externe"
 
 #: authorizer.php:3266 authorizer.php:3274 authorizer.php:4687
 msgid "Advanced"
@@ -574,7 +583,7 @@ msgstr "Recherche"
 
 #: authorizer.php:3653 authorizer.php:4464
 msgid "-- None --"
-msgstr "-- Rien --"
+msgstr "-- Aucun --"
 
 #: authorizer.php:3731
 msgid "Choose who is able to log into this site below."
@@ -598,7 +607,7 @@ msgstr "les utilisateurs approuvés"
 #: authorizer.php:3758
 msgid "(Approved external users and all WordPress users)"
 msgstr ""
-"(les utilisateurs approuvés des services externes et tous les utilisateurs "
+"(Les utilisateurs approuvés des services externes et tous les utilisateurs "
 "WordPress)"
 
 #: authorizer.php:3769
@@ -695,7 +704,7 @@ msgid ""
 "google.com/console\" target=\"_blank\">Google Developers Console</a>. You "
 "can name it whatever you want."
 msgstr ""
-"Cliquer sur <strong>Créer un projet</strong> sur <a href=\"https://cloud."
+"Cliquez sur <strong>Créer un projet</strong> sur <a href=\"https://cloud."
 "google.com/console\" target=\"_blank\">Google Developers Console</a>. Vous "
 "pouvez le nommer comme vous le souhaitez."
 
@@ -744,6 +753,9 @@ msgid ""
 "<a href=\"https://developers.google.com/identity/sign-in/web/devconsole-"
 "project\" target=\"_blank\">developer documentation</a>."
 msgstr ""
+"Note : Google dispose peut-être d'une version plus récente de ces "
+"instructions dans leur <a href=\"https://developers.google.com/identity/sign-"
+"in/web/devconsole-project\" target=\"_blank\">documentation développeur</a>."
 
 #: authorizer.php:4047
 msgid ""
@@ -762,18 +774,21 @@ msgid ""
 "Restrict Google logins to a specific Google Apps hosted domain (for example, "
 "mycollege.edu). Leave blank to allow all Google sign-ins."
 msgstr ""
+"Restreindre les identifications Google à un domaine spécifique Google Apps "
+"(ex : mycollege.edu). Laissez vide pour autoriser toutes les connexions "
+"Google."
 
 #: authorizer.php:4069
 msgid "If restricting to multiple domains, add one domain per line."
-msgstr "Si limiter à plusieurs domaines, ajouter un domaine par ligne."
+msgstr "Si limitation à plusieurs domaines, ajoutez un domaine par ligne."
 
 #: authorizer.php:4080
 msgid ""
 "<a href=\"http://www.php.net//manual/en/curl.installation.php\" target="
 "\"_blank\" style=\"color: red;\">PHP CURL extension</a> is not installed"
 msgstr ""
-"<a href=\"http://www.php.net//manual/en/curl.installation.php\" target="
-"\"_blank\" style=\"color: red;\">Extension PHP CURL</a> n’est pas installé"
+"L'<a href=\"http://www.php.net//manual/en/curl.installation.php\" target="
+"\"_blank\" style=\"color: red;\">extension PHP CURL</a> n’est pas installée"
 
 #: authorizer.php:4083
 msgid ""
@@ -781,6 +796,9 @@ msgid ""
 "working\" target=\"_blank\" style=\"color: red;\">PHP openssl extension</a> "
 "is not installed"
 msgstr ""
+"L'<a href=\"http://stackoverflow.com/questions/23424459/enable-php-openssl-"
+"not-working\" target=\"_blank\" style=\"color: red;\">extension PHP openssl</"
+"a> n'est pas installée"
 
 #: authorizer.php:4089
 msgid "Warning"
@@ -887,6 +905,8 @@ msgid ""
 "Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI "
 "(for example, ldaps://ldap.example.edu:636)."
 msgstr ""
+"Spécifiez le nom d'hôte (ex : ldap.example.edu) ou une URI LDAP complète "
+"(ex : ldaps://ldap.example.edu:636)."
 
 #: authorizer.php:4245
 msgid "Example:  389"
@@ -902,7 +922,7 @@ msgstr ""
 
 #: authorizer.php:4257
 msgid "If ldaps is used, this should be unchecked"
-msgstr ""
+msgstr "Si ldaps est utilisé, cela doit être décoché"
 
 #: authorizer.php:4268
 msgid "Example:  ou=people,dc=example,dc=edu"
@@ -1048,6 +1068,8 @@ msgid ""
 "Note: Only users with the create_users capability will be able to see the "
 "dashboard widget."
 msgstr ""
+"Note : Seuls les utilisateurs avec la capacité create_users seront capable "
+"de voir le widget du tableau de bord."
 
 #: authorizer.php:4577
 msgid ""
@@ -1610,6 +1632,9 @@ msgid ""
 "Authorizer limits login attempts, restricts access to specified users, and "
 "authenticates against external sources (e.g., Google, LDAP, or CAS)."
 msgstr ""
+"Authorizer limite les tentatives d'identification, restreint les accès à des "
+"utilisateurs spécifiques, et permet l'authentification via des sources "
+"externes (Google, LDAP, ou CAS)."
 
 #. Author of the plugin/theme
 msgid "Paul Ryan"
