@@ -1910,15 +1910,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					function signInCallback( authResult ) {
 						var $ = jQuery;
-						if ( authResult['status'] && authResult['status']['signed_in'] ) {
+						if ( authResult.status && authResult.status.signed_in ) {
 							// Hide the sign-in button now that the user is authorized, for example:
 							$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
 							// Send the code to the server
 							var ajaxurl = '<?php echo admin_url( "admin-ajax.php" ); ?>';
 							$.post(ajaxurl, {
-								action: 'process_google_login',
-								'code': authResult['code'],
+								'action': 'process_google_login',
+								'code': authResult.code,
 								'nonce': $('#nonce_google_auth-<?php echo $this->get_cookie_value(); ?>' ).val(),
 							}, function( response ) {
 								// Handle or verify the server response if necessary.
@@ -1941,7 +1941,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							//console.log('Sign-in state: ' + authResult['error']);
 
 							// If user denies access, reload the login page.
-							if ( authResult['error'] === 'access_denied' || authResult['error'] === 'user_signed_out' ) {
+							if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
 								window.location.reload();
 							}
 						}
