@@ -773,7 +773,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 
 								// Skip if user is already added to this site.
-								if ( in_array( $blog_id, $site_ids_of_user ) ) {
+								if ( in_array( $blog_id, $site_ids_of_user, true ) ) {
 									continue;
 								}
 
@@ -875,7 +875,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Ensure user has the same role as their entry in the approved list.
-					if ( $user_info && ! in_array( $user_info['role'], $user->roles ) ) {
+					if ( $user_info && ! in_array( $user_info['role'], $user->roles, true ) ) {
 						$user->set_role( $user_info['role'] );
 					}
 
@@ -1092,7 +1092,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
 				// Allow multiple whitelisted domains.
 				$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-				if ( ! in_array( $email_domain, $google_hosteddomains ) ) {
+				if ( ! in_array( $email_domain, $google_hosteddomains, true ) ) {
 					$this->custom_logout();
 					return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
 				}
@@ -1625,7 +1625,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
-			if ( in_array( $current_page_id, $auth_settings['access_public_pages'] ) ) {
+			if ( in_array( $current_page_id, $auth_settings['access_public_pages'], true ) ) {
 				if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 					update_option( 'auth_settings_advanced_public_notice', false );
 				} else {
@@ -1637,7 +1637,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check to see if any category assigned to the requested page is public. If so, show it.
 			$current_page_categories = wp_get_post_categories( $current_page_id, array( 'fields' => 'slugs' ) );
 			foreach( $current_page_categories as $current_page_category ) {
-				if ( in_array( 'cat_' . $current_page_category, $auth_settings['access_public_pages'] ) ) {
+				if ( in_array( 'cat_' . $current_page_category, $auth_settings['access_public_pages'], true ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
 					} else {
@@ -1649,7 +1649,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check to see if this page can't be found. If so, allow showing the 404 page.
 			if ( strlen( $current_page_id ) < 1 ) {
-				if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'] ) ) {
+				if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'], true ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
 					} else {
@@ -1663,7 +1663,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_category_name = property_exists( $wp, 'query_vars' ) && array_key_exists( 'category_name', $wp->query_vars ) && strlen( $wp->query_vars['category_name'] ) > 0 ? $wp->query_vars['category_name'] : '';
 			if ( $current_category_name ) {
 				$current_category_name = end( explode( '/', $current_category_name ) );
-				if ( in_array( 'cat_' . $current_category_name, $auth_settings['access_public_pages'] ) ) {
+				if ( in_array( 'cat_' . $current_category_name, $auth_settings['access_public_pages'], true ) ) {
 					if ( $auth_settings['access_public_warning'] === 'no_warning' ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
 					} else {
@@ -2267,7 +2267,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( $auth_settings['cas'] === '1' ) :
 				// Check if provided CAS URL is accessible.
-				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ) ) ? 'http' : 'https';
+				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ), true ) ? 'http' : 'https';
 				$cas_url = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
 				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint
 				if ( ! $this->url_is_accessible( $cas_url ) ) :
@@ -3117,26 +3117,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function sanitize_options( $auth_settings ) {
 			// Default to "Approved Users" login access restriction.
-			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'external_users', 'approved_users' ) ) ) {
+			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'external_users', 'approved_users' ), true ) ) {
 				$auth_settings['access_who_can_login'] = 'approved_users';
 			}
 
 			// Default to "Everyone" view access restriction.
-			if ( ! in_array( $auth_settings['access_who_can_view'], array( 'everyone', 'logged_in_users' ) ) ) {
+			if ( ! in_array( $auth_settings['access_who_can_view'], array( 'everyone', 'logged_in_users' ), true ) ) {
 				$auth_settings['access_who_can_view'] = 'everyone';
 			}
 
 			// Default to WordPress login access redirect.
 			// Note: this option doesn't exist in multisite options, so we first
 			// check to see if it exists.
-			if ( array_key_exists( 'access_redirect', $auth_settings ) && ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ) ) ) {
+			if ( array_key_exists( 'access_redirect', $auth_settings ) && ! in_array( $auth_settings['access_redirect'], array( 'login', 'page', 'message' ), true ) ) {
 				$auth_settings['access_redirect'] = 'login';
 			}
 
 			// Default to warning message for anonymous users on public pages.
 			// Note: this option doesn't exist in multisite options, so we first
 			// check to see if it exists.
-			if ( array_key_exists( 'access_public_warning', $auth_settings ) && ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ) ) ) {
+			if ( array_key_exists( 'access_public_warning', $auth_settings ) && ! in_array( $auth_settings['access_public_warning'], array( 'no_warning', 'warning' ), true ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 
@@ -3208,12 +3208,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings['advanced_users_per_page'] = array_key_exists( 'advanced_users_per_page', $auth_settings ) && intval( $auth_settings['advanced_users_per_page'] ) > 0 ? intval( $auth_settings['advanced_users_per_page'] ) : 1;
 
 			// Sanitize Sort users by (select: value can be 'email', 'role', 'date_added', 'created')
-			if ( ! isset( $auth_settings['advanced_users_sort_by'] ) || ! in_array( $auth_settings['advanced_users_sort_by'], array( 'email', 'role', 'date_added', 'created' ) ) ) {
+			if ( ! isset( $auth_settings['advanced_users_sort_by'] ) || ! in_array( $auth_settings['advanced_users_sort_by'], array( 'email', 'role', 'date_added', 'created' ), true ) ) {
 				$auth_settings['advanced_users_sort_by'] = 'created';
 			}
 
 			// Sanitize Sort users order (select: value can be 'asc', 'desc')
-			if ( ! isset( $auth_settings['advanced_users_sort_order'] ) || ! in_array( $auth_settings['advanced_users_sort_order'], array( 'asc', 'desc' ) ) ) {
+			if ( ! isset( $auth_settings['advanced_users_sort_order'] ) || ! in_array( $auth_settings['advanced_users_sort_order'], array( 'asc', 'desc' ), true ) ) {
 				$auth_settings['advanced_users_sort_order'] = 'asc';
 			}
 
@@ -3500,7 +3500,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
 			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
 			$sort_dimension = array();
-			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
+			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
 					if ( $sort_by === 'date_added' ) {
 						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
@@ -4071,15 +4071,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
 				<optgroup label="<?php _e( 'Home', 'authorizer' ); ?>">
-					<option value="home" <?php echo in_array( 'home', $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php _e( 'Home Page', 'authorizer' ); ?></option>
-					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
+					<option value="home" <?php echo in_array( 'home', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Home Page', 'authorizer' ); ?></option>
+					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ): ?>
 					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
 					<?php $pages = get_posts( array( 'post_type' => $post_type, 'posts_per_page' => -1 ) ); ?>
 					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
 					<?php foreach ( $pages as $page ): ?>
-						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
+						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
@@ -4095,7 +4095,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$categories = get_categories( array( 'hide_empty' => false ) );
 					}
 					foreach ( $categories as $category ) : ?>
-						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
+						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
 					<?php endforeach; ?>
 				</optgroup>
 			</select><?php
@@ -5236,7 +5236,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
 			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
 			$sort_dimension = array();
-			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ) ) ) {
+			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
 					if ( $sort_by === 'date_added' ) {
 						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
@@ -5409,7 +5409,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Fail if requesting a change to an invalid setting.
-			if ( ! in_array( $_POST['setting'], array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
+			if ( ! in_array( $_POST['setting'], array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
 				die( '' );
 			}
 
@@ -5755,7 +5755,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function get_plugin_option( $option, $admin_mode = SINGLE_ADMIN, $override_mode = 'no override', $print_mode = 'no overlay' ) {
 			// Special case for user lists (they are saved seperately to prevent concurrency issues).
-			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ) ) ) {
+			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
 				$list = $admin_mode === MULTISITE_ADMIN ? array() : get_option( 'auth_settings_' . $option );
 				if ( is_multisite() && $admin_mode === MULTISITE_ADMIN ) {
 					$list = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_' . $option, array() );
@@ -6868,7 +6868,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$should_update = false;
 							$distinct_emails = array();
 							foreach ( $auth_settings_access_users_approved as $key => $user ) {
-								if ( in_array( $user['email'], $distinct_emails ) ) {
+								if ( in_array( $user['email'], $distinct_emails, true ) ) {
 									$should_update = true;
 									unset( $auth_settings_access_users_approved[$key] );
 								} else {
@@ -6886,7 +6886,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$should_update = false;
 						$distinct_emails = array();
 						foreach ( $auth_multisite_settings_access_users_approved as $key => $user ) {
-							if ( in_array( $user['email'], $distinct_emails ) ) {
+							if ( in_array( $user['email'], $distinct_emails, true ) ) {
 								$should_update = true;
 								unset( $auth_multisite_settings_access_users_approved[$key] );
 							} else {
@@ -6904,7 +6904,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$should_update = false;
 						$distinct_emails = array();
 						foreach ( $auth_settings_access_users_approved as $key => $user ) {
-							if ( in_array( $user['email'], $distinct_emails ) ) {
+							if ( in_array( $user['email'], $distinct_emails, true ) ) {
 								$should_update = true;
 								unset( $auth_settings_access_users_approved[$key] );
 							} else {
