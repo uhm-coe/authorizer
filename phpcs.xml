@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<ruleset name="DCDC_WordPress">
+	<description>WordPress Coding Standards</description>
+
+	<!-- Use WordPress as a base -->
+	<rule ref="WordPress">
+		<exclude name="WordPress.Arrays.MultipleStatementAlignment" />
+		<exclude name="Generic.Formatting.MultipleStatementAlignment" />
+		<exclude name="WordPress.VIP.SlowDBQuery" />
+		<exclude name="WordPress.VIP.RestrictedFunctions" />
+
+		<!-- Allow opening and closing braces for functions and classes to be on the same line -->
+		<exclude name="Squiz.PHP.EmbeddedPhp.ContentAfterOpen"/>
+		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+		<exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+		<exclude name="Squiz.WhiteSpace.ScopeClosingBrace"/>
+
+		<!-- Disable newline after opening brace -->
+		<exclude name="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace"/>
+
+		<!-- Allow multiple PHP statements in the same line (usually in template files) -->
+		<exclude name="Generic.Formatting.DisallowMultipleStatements.SameLine"/>
+
+		<!-- Disable PSR-2 indentation rules that are buggy with 2 spaces -->
+		<exclude name="PSR2.ControlStructures.SwitchDeclaration.BreakIndent"/>
+		<exclude name="PSR2.Methods.FunctionCallSignature.Indent"/>
+
+	</rule>
+</ruleset>
