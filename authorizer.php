@@ -1978,11 +1978,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ): ?>
 					<style type="text/css">
-						#loginform {
-							padding-bottom: 8px !important;
+						body.login-action-login form {
+							padding-bottom: 8px;
 						}
-						#loginform p>label, #loginform p.forgetmenot, #loginform p.submit, p#nav {
-							display: none !important;
+						body.login-action-login form p > label,
+						body.login-action-login form .forgetmenot,
+						body.login-action-login form .submit,
+						body.login-action-login #nav {
+							display: none;
 						}
 					</style>
 				<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ): ?>
