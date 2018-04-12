@@ -1,16 +1,16 @@
 <?php
-/*
-Plugin Name: Authorizer
-Plugin URI: https://github.com/uhm-coe/authorizer
-Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
-Version: 2.7.2
-Author: Paul Ryan
-Author URI: http://www.linkedin.com/in/paulrryan/
-Text Domain: authorizer
-Domain Path: /languages
-License: GPL2
-*/
-
+/**
+ * Plugin Name: Authorizer
+ * Plugin URI: https://github.com/uhm-coe/authorizer
+ * Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
+ * Version: 2.7.2
+ * Author: Paul Ryan
+ * Text Domain: authorizer
+ * Domain Path: /languages
+ * License: GPL2
+ *
+ * @package authorizer
+ */
 
 /*
 Copyright 2014  Paul Ryan  (email: prar@hawaii.edu)
@@ -41,8 +41,11 @@ define( 'MULTISITE_ADMIN', 'multisite_admin' );
 define( 'SINGLE_ADMIN', 'single_admin' );
 
 
-// Add phpCAS library if it's not included.
-// @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
+/**
+ * Add phpCAS library if it's not included.
+ *
+ * @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
+ */
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
 	require_once dirname( __FILE__ ) . '/vendor/CAS-1.3.5/CAS.php';
 }
@@ -61,7 +64,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	class WP_Plugin_Authorizer {
 
 		/**
-		 * Properties.
+		 * Current site ID (Multisite).
+		 *
+		 * @var string
 		 */
 		public $current_site_blog_id = 1;
 
@@ -81,7 +86,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			register_activation_hook( __FILE__, array( $this, 'activate' ) );
 			register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
 
-			// Register filters.
+			/**
+			 * Register filters.
+			 */
 
 			// Custom wp authentication routine using external service.
 			add_filter( 'authenticate', array( $this, 'custom_authenticate' ), 1, 3 );
@@ -89,11 +96,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Custom logout action using external service.
 			add_action( 'wp_logout', array( $this, 'custom_logout' ) );
 
-			// Removing this bypasses Wordpress authentication (so if external auth fails,
-			// no one can log in); with it enabled, it will run if external auth fails.
 			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3);
+			// Removing this bypasses WordPress authentication (so if external auth fails,
+			// no one can log in); with it enabled, it will run if external auth fails.
 
-			// Create settings link on Plugins page
+			// Create settings link on Plugins page.
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
 			add_filter( 'network_admin_plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'network_admin_plugin_settings_link' ) );
 
@@ -106,7 +113,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_filter( 'login_errors', array( $this, 'show_advanced_login_error' ) );
 			}
 
-			// Register actions.
+			/**
+			 * Register actions.
+			 */
 
 			// Enable localization. Translation files stored in /languages.
 			add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
@@ -120,10 +129,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add users who successfully login to the approved list.
 			add_action( 'wp_login', array( $this, 'ensure_wordpress_user_in_approved_list_on_login' ), 10, 2 );
 
-			// Create menu item in Settings
+			// Create menu item in Settings.
 			add_action( 'admin_menu', array( $this, 'add_plugin_page' ) );
 
-			// Create options page
+			// Create options page.
 			add_action( 'admin_init', array( $this, 'page_init' ) );
 
 			// Update user role in approved list if it's changed in the WordPress edit user page.
@@ -138,14 +147,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			add_action( 'admin_head-index.php', array( $this, 'load_options_page' ) );
 			add_action( 'load-toplevel_page_authorizer', array( $this, 'load_options_page' ) );
 
-			// Add custom css and js to wp-login.php
+			// Add custom css and js to wp-login.php.
 			add_action( 'login_enqueue_scripts', array( $this, 'login_enqueue_scripts_and_styles' ) );
 			add_action( 'login_footer', array( $this, 'load_login_footer_js' ) );
 
 			// Create google nonce cookie when loading wp-login.php if Google is enabled.
 			add_action( 'login_init', array( $this, 'login_init__maybe_set_google_nonce_cookie' ) );
 
-			// Modify login page with external auth links (if enabled; e.g., google or cas)
+			// Modify login page with external auth links (if enabled; e.g., google or cas).
 			add_action( 'login_form', array( $this, 'login_form_add_external_service_links' ) );
 
 			// Redirect to CAS login when visiting login page (only if option is
@@ -156,24 +165,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// already being sent).
 			add_filter( 'wp_login_errors', array( $this, 'wp_login_errors__maybe_redirect_to_cas' ), 10, 2 );
 
-			// Verify current user has access to page they are visiting
+			// Verify current user has access to page they are visiting.
 			add_action( 'parse_request', array( $this, 'restrict_access' ), 9 );
 			add_action( 'init', array( $this, 'init__maybe_add_network_approved_user' ) );
 
-			// ajax save options from dashboard widget
+			// AJAX: Save options from dashboard widget.
 			add_action( 'wp_ajax_update_auth_user', array( $this, 'ajax_update_auth_user' ) );
 
-			// ajax save options from multisite options page
+			// AJAX: Save options from multisite options page.
 			add_action( 'wp_ajax_save_auth_multisite_settings', array( $this, 'ajax_save_auth_multisite_settings' ) );
 
-			// ajax save usermeta from options page
+			// AJAX: Save usermeta from options page.
 			add_action( 'wp_ajax_update_auth_usermeta', array( $this, 'ajax_update_auth_usermeta' ) );
 
-			// ajax verify google login
+			// AJAX: Verify google login.
 			add_action( 'wp_ajax_process_google_login', array( $this, 'ajax_process_google_login' ) );
 			add_action( 'wp_ajax_nopriv_process_google_login', array( $this, 'ajax_process_google_login' ) );
 
-			// ajax refresh approved user list
+			// AJAX: Refresh approved user list.
 			add_action( 'wp_ajax_refresh_approved_user_list', array( $this, 'ajax_refresh_approved_user_list' ) );
 
 			// Add dashboard widget so instructors can add/edit users with access.
@@ -192,7 +201,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Multisite-specific actions.
 			if ( is_multisite() ) {
-				// Add network admin options page (global settings for all sites)
+				// Add network admin options page (global settings for all sites).
 				add_action( 'network_admin_menu', array( $this, 'network_admin_menu' ) );
 			}
 
@@ -302,7 +311,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Remove from pending list if there.
 				foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
 					if ( 0 === strcasecmp( $pending_user['email'], $user->user_email ) ) {
-						unset( $auth_settings_access_users_pending[$key] );
+						unset( $auth_settings_access_users_pending[ $key ] );
 						$updated = true;
 					}
 				}
@@ -351,7 +360,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Authenticate against an external service.
 		 *
-		 * @param WP_User $user     user to authenticate
+		 * @param WP_User $user     user to authenticate.
 		 * @param string  $username optional username to authenticate.
 		 * @param string  $password optional password to authenticate.
 		 *
@@ -365,7 +374,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$user = null;
 			}
 
-			// If username and password are blank, this isn't a log in attempt
+			// If username and password are blank, this isn't a log in attempt.
 			$is_login_attempt = strlen( $username ) > 0 && strlen( $password ) > 0;
 
 			// Check to make sure that $username is not locked out due to too
@@ -376,7 +385,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( $is_login_attempt && $unauthenticated_user !== false ) {
 				$last_attempt = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 				$num_attempts = get_user_meta( $unauthenticated_user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
-				// Also check the auth_blocked user_meta flag (users in blocked list will get this flag)
+				// Also check the auth_blocked user_meta flag (users in blocked list will get this flag).
 				$unauthenticated_user_is_blocked = get_user_meta( $unauthenticated_user->ID, 'auth_blocked', true ) === 'yes';
 			} else {
 				$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
@@ -402,13 +411,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Create semantic lockout variables.
 			$lockouts = $auth_settings['advanced_lockouts'];
 			$time_since_last_fail = time() - $last_attempt;
-			$reset_duration = $lockouts['reset_duration'] * 60; // minutes to seconds
+			$reset_duration = $lockouts['reset_duration'] * 60; // minutes to seconds.
 			$num_attempts_long_lockout = $lockouts['attempts_1'] + $lockouts['attempts_2'];
 			$num_attempts_short_lockout = $lockouts['attempts_1'];
 			$seconds_remaining_long_lockout = $lockouts['duration_2'] * 60 - $time_since_last_fail;
 			$seconds_remaining_short_lockout = $lockouts['duration_1'] * 60 - $time_since_last_fail;
 
-			// Check if we need to institute a lockout delay
+			// Check if we need to institute a lockout delay.
 			if ( $is_login_attempt && $time_since_last_fail > $reset_duration ) {
 				// Enough time has passed since the last invalid attempt and
 				// now that we can reset the failed attempt count, and let this
@@ -516,10 +525,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Remove duplicate and blank emails, if any.
 			$externally_authenticated_emails = array_filter( array_unique( $externally_authenticated_emails ) );
 
-			// If we've made it this far, we should have an externally
-			// authenticated user. The following should be set:
-			//   $externally_authenticated_emails
-			//   $authenticated_by
+			/**
+			 * If we've made it this far, we should have an externally
+			 * authenticated user. The following should be set:
+			 *   $externally_authenticated_emails
+			 *   $authenticated_by
+			 */
 
 			// Get the external user's WordPress account by email address.
 			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
@@ -534,7 +545,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Check this external user's access against the access lists
-			// (pending, approved, blocked)
+			// (pending, approved, blocked).
 			$result = $this->check_user_access( $user, $externally_authenticated_emails, $result );
 
 			// Fail with message if there was an error creating/adding the user.
@@ -561,9 +572,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * This function will fail with a wp_die() message to the user if they
 		 * don't have access.
 		 *
-		 * @param WP_User $user       User to check
-		 * @param [type]  $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account)
-		 * @param [type]  $user_data Array of keys for email, username, first_name, last_name,
+		 * @param WP_User $user        User to check.
+		 * @param [type]  $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
+		 * @param [type]  $user_data   Array of keys for email, username, first_name, last_name,
 		 *    authenticated_by, google_attributes, cas_attributes, ldap_attributes.
 		 * @return  WP_Error if there was an error on user creation / adding user to blog
 		 *    wp_die() if user does not have access
@@ -646,6 +657,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * set to the default (specified in Authorizer options) for new users,
 			 * or the user's current role for existing users. This filter allows
 			 * changing user roles based on custom CAS/LDAP attributes.
+			 *
 			 * @param bool $role Role of the user currently logging in.
 			 * @param array $user_data User data returned from external service.
 			 */
@@ -702,7 +714,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$approved_user = array(
 						'email' => $this->lowercase( $user_email ),
 						'role' => $approved_role,
-						'date_added' => date( "Y-m-d H:i:s" ),
+						'date_added' => date( 'Y-m-d H:i:s' ),
 					);
 					array_push( $auth_settings_access_users_approved, $approved_user );
 					array_push( $auth_settings_access_users_approved_single, $approved_user );
@@ -722,7 +734,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$user_info['role'] = $approved_role;
 					}
 
-					// If the approved external user does not have a WordPress account, create it
+					// If the approved external user does not have a WordPress account, create it.
 					if ( ! $user ) {
 						// If there's already a user with this username (e.g.,
 						// johndoe/johndoe@gmail.com exists, and we're trying to add
@@ -740,7 +752,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$result = wp_insert_user(
 							array(
 								'user_login' => strtolower( $username ),
-								'user_pass' => wp_generate_password(), // random password
+								'user_pass' => wp_generate_password(), // random password.
 								'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
 								'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
 								'user_email' => $this->lowercase( $user_info['email'] ),
@@ -764,7 +776,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// site individually to get access.
 						if ( is_multisite() ) {
 							$site_ids_of_user = array_map(
-								function ( $site_of_user ) { return $site_of_user->userblog_id; },
+								function ( $site_of_user ) {
+									return $site_of_user->userblog_id;
+								},
 								get_blogs_of_user( $user->ID )
 							);
 
@@ -801,7 +815,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									// Update user's usermeta value for usermeta key stored in authorizer options.
 									if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
 										// We have an ACF field value, so use the ACF function to update it.
-										update_field( str_replace('acf___', '', $meta_key ), $user_info['usermeta']['meta_value'], 'user_' . $user->ID );
+										update_field( str_replace( 'acf___', '', $meta_key ), $user_info['usermeta']['meta_value'], 'user_' . $user->ID );
 									} else {
 										// We have a normal usermeta value, so just update it via the WordPress function.
 										update_user_meta( $user->ID, $meta_key, $user_info['usermeta']['meta_value'] );
@@ -819,7 +833,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 										// Update user's usermeta value for usermeta key stored in authorizer options.
 										if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
 											// We have an ACF field value, so use the ACF function to update it.
-											update_field( str_replace('acf___', '', $meta_key ), $usermeta['meta_value'], 'user_' . $user->ID );
+											update_field( str_replace( 'acf___', '', $meta_key ), $usermeta['meta_value'], 'user_' . $user->ID );
 										} else {
 											// We have a normal usermeta value, so just update it via the WordPress function.
 											update_user_meta( $user->ID, $meta_key, $usermeta['meta_value'] );
@@ -856,7 +870,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							// Update user's role in this site's approved list and save.
 							foreach ( $auth_settings_access_users_approved_single as $key => $existing_user ) {
 								if ( 0 === strcasecmp( $user->user_email, $existing_user['email'] ) ) {
-									$auth_settings_access_users_approved_single[$key]['role'] = $approved_role;
+									$auth_settings_access_users_approved_single[ $key ]['role'] = $approved_role;
 									break;
 								}
 							}
@@ -881,9 +895,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					return $user;
 
-				// Note: only do this for the last email address we are checking (we need
-				// to iterate through them all to make sure one of them isn't approved).
 				} elseif ( 0 === strcasecmp( $user_email, $last_email ) ) {
+					/**
+					 * Note: only do this for the last email address we are checking (we need
+					 * to iterate through them all to make sure one of them isn't approved).
+					 */
+
 					// User isn't an admin, is not blocked, and is not approved.
 					// Add them to the pending list and notify them and their instructor.
 					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
@@ -984,17 +1001,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
 			$client->setRedirectUri( 'postmessage' );
 
-			// If the hosted domain parameter is set, restrict logins to that domain.
-			// Note: Will have to upgrade to google-api-php-client v2 or higher for
-			// this to function server-side; it's not complete in v1, so this check
-			// is performed manually below.
-			// if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
-			// 	$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-			// 	$google_hosteddomain = trim( $google_hosteddomains[0] );
-			// 	$client->setHostedDomain( $google_hosteddomain );
-			// }
+			/**
+			 * If the hosted domain parameter is set, restrict logins to that domain.
+			 * Note: Will have to upgrade to google-api-php-client v2 or higher for
+			 * this to function server-side; it's not complete in v1, so this check
+			 * is performed manually below.
+			 *
+			 * if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			 *   $google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
+			 *   $google_hosteddomain = trim( $google_hosteddomains[0] );
+			 *   $client->setHostedDomain( $google_hosteddomain );
+			 * }
+			 */
 
-			// Get one time use token (if it doesn't exist, we'll create one below)
+			// Get one time use token (if it doesn't exist, we'll create one below).
 			session_start();
 			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
 
@@ -1020,7 +1040,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Validate this user's credentials against Google.
 		 *
-		 * @param array   $auth_settings Plugin settings
+		 * @param array   $auth_settings Plugin settings.
 		 * @return [mixed] Array containing email, authenticated_by,
 		 *                       first_name, last_name, and username
 		 *                       strings for the successfully authenticated
@@ -1033,7 +1053,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// Get one time use token
+			// Get one time use token.
 			session_start();
 			$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
 
@@ -1042,8 +1062,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// Add Google API PHP Client.
-			// @see https://github.com/google/google-api-php-client branch:v1-master
+			/**
+			 * Add Google API PHP Client.
+			 *
+			 * @see https://github.com/google/google-api-php-client branch:v1-master
+			 */
 			require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 			// Build the Google Client.
@@ -1053,17 +1076,20 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
 			$client->setRedirectUri( 'postmessage' );
 
-			// If the hosted domain parameter is set, restrict logins to that domain.
-			// Note: Will have to upgrade to google-api-php-client v2 or higher for
-			// this to function server-side; it's not complete in v1, so this check
-			// is performed manually below.
-			// if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
-			// 	$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-			// 	$google_hosteddomain = trim( $google_hosteddomains[0] );
-			// 	$client->setHostedDomain( $google_hosteddomain );
-			// }
+			/**
+			 * If the hosted domain parameter is set, restrict logins to that domain.
+			 * Note: Will have to upgrade to google-api-php-client v2 or higher for
+			 * this to function server-side; it's not complete in v1, so this check
+			 * is performed manually below.
+			 *
+			 * if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			 *   $google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
+			 *   $google_hosteddomain = trim( $google_hosteddomains[0] );
+			 *   $client->setHostedDomain( $google_hosteddomain );
+			 * }
+			 */
 
-			// Verify this is a successful Google authentication
+			// Verify this is a successful Google authentication.
 			try {
 				$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
 			} catch ( Google_Auth_Exception $e ) {
@@ -1076,19 +1102,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 			}
 
-			// Get email address
+			// Get email address.
 			$attributes = $ticket->getAttributes();
 			$email = $this->lowercase( $attributes['payload']['email'] );
 			$email_domain = substr( strrchr( $email, '@' ), 1 );
 			$username = current( explode( '@', $email ) );
 
-			// Fail if hd param is set and the logging in user's email address doesn't
-			// match the allowed hosted domain.
-			// See: https://developers.google.com/identity/protocols/OpenIDConnect#hd-param
-			// See: https://github.com/google/google-api-php-client/blob/v1-master/src/Google/Client.php#L407-L416
-			// Note: Will have to upgrade to google-api-php-client v2 or higher for
-			// this to function server-side; it's not complete in v1, so this check
-			// is only performed here.
+			/**
+			 * Fail if hd param is set and the logging in user's email address doesn't
+			 * match the allowed hosted domain.
+			 *
+			 * See: https://developers.google.com/identity/protocols/OpenIDConnect#hd-param
+			 * See: https://github.com/google/google-api-php-client/blob/v1-master/src/Google/Client.php#L407-L416
+			 *
+			 * Note: Will have to upgrade to google-api-php-client v2 or higher for
+			 * this to function server-side; it's not complete in v1, so this check
+			 * is only performed here.
+			 */
 			if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
 				// Allow multiple whitelisted domains.
 				$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
@@ -1112,7 +1142,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Validate this user's credentials against CAS.
 		 *
-		 * @param array   $auth_settings Plugin settings
+		 * @param array   $auth_settings Plugin settings.
 		 * @return [mixed] Array containing 'email' and 'authenticated_by'
 		 *                       strings for the successfully authenticated
 		 *                       user, or WP_Error() object on failure,
@@ -1135,7 +1165,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$cas_version = CAS_VERSION_1_0;
 			}
 
-			// Set the CAS client configuration
+			// Set the CAS client configuration.
 			phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 			// Update server certificate bundle if it doesn't exist or is older
@@ -6624,7 +6654,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			// specifically handle zero
-			if ( $secs == 0 ) return "0 seconds";
+			if ( 0 == $secs ) {
+				return '0 seconds';
+			}
 
 			$s = "";
 
@@ -6981,14 +7013,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$needs_updating = true;
 			}
 
-			// // Update: TEMPLATE
-			// $update_if_older_than = YYYYMMDD;
-			// if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
-			// 	UPDATE CODE HERE
-			// 	// Update version to reflect this change has been made.
-			// 	$auth_version = $update_if_older_than;
-			// 	$needs_updating = true;
-			// }
+			/*
+			// Update: TEMPLATE
+			$update_if_older_than = YYYYMMDD;
+			if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+				UPDATE CODE HERE
+				// Update version to reflect this change has been made.
+				$auth_version = $update_if_older_than;
+				$needs_updating = true;
+			}
+			*/
 
 			// Save new version number if we performed any updates.
 			if ( $needs_updating ) {
