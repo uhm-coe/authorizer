@@ -96,10 +96,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Custom logout action using external service.
 			add_action( 'wp_logout', array( $this, 'custom_logout' ) );
 
-			//remove_filter('authenticate', 'wp_authenticate_username_password', 20, 3);
-			// Removing this bypasses WordPress authentication (so if external auth fails,
-			// no one can log in); with it enabled, it will run if external auth fails.
-
 			// Create settings link on Plugins page.
 			add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_settings_link' ) );
 			add_filter( 'network_admin_plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'network_admin_plugin_settings_link' ) );
@@ -766,7 +762,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							return $result;
 						}
 
-						// Authenticate as new user
+						// Authenticate as new user.
 						$user = new WP_User( $result );
 
 						// If multisite, iterate through all sites in the network and add the user
@@ -990,8 +986,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
-			// Add Google API PHP Client.
-			// @see https://github.com/google/google-api-php-client branch:v1-master
+			/**
+			 * Add Google API PHP Client.
+			 *
+			 * @see https://github.com/google/google-api-php-client branch:v1-master
+			 */
 			require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 			// Build the Google Client.
@@ -1154,8 +1153,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			// Get the CAS server version (default to SAML_VERSION_1_1).
-			// See: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+			/**
+			 * Get the CAS server version (default to SAML_VERSION_1_1).
+			 *
+			 * @see: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+			 */
 			$cas_version = SAML_VERSION_1_1;
 			if ( 'CAS_VERSION_3_0' === $auth_settings['cas_version'] ) {
 				$cas_version = CAS_VERSION_3_0;
@@ -1173,7 +1175,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Note: only try to update if the system has the php_openssl extension.
 			$cacert_url = 'https://curl.haxx.se/ca/cacert.pem';
 			$cacert_path = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
-			$time_180_days = 180 * 24 * 60 * 60; // days * hours * minutes * seconds
+			$time_180_days = 180 * 24 * 60 * 60; // days * hours * minutes * seconds.
 			$time_180_days_ago = time() - $time_180_days;
 			if (
 				extension_loaded( 'openssl' ) &&
@@ -1203,7 +1205,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			phpCAS::setFixedServiceURL( $cas_service_url );
 
-			// Authenticate against CAS
+			// Authenticate against CAS.
 			try {
 				phpCAS::forceAuthentication();
 			} catch ( CAS_AuthenticationException $e ) {
@@ -1303,7 +1305,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Get the FQDN from the first LDAP search base domain components (dc). For
-			// example, ou=people,dc=example,dc=edu,dc=uk would yield user@example.edu.uk
+			// example, ou=people,dc=example,dc=edu,dc=uk would yield user@example.edu.uk.
 			$search_base_components = explode( ',', trim( $search_bases[0] ) );
 			$domain = array();
 			foreach ( $search_base_components as $search_base_component ) {
@@ -1321,7 +1323,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$domain = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
 			}
 
-			// remove @domain if it exists in the username (i.e., if user entered their email)
+			// remove @domain if it exists in the username (i.e., if user entered their email).
 			$username = str_replace( '@' . $domain, '', $username );
 
 			// Fail silently (fall back to WordPress authentication) if both username
@@ -1507,8 +1509,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( 'cas' === $current_user_authenticated_by && '1' === $auth_settings['cas'] ) {
 				if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 
-					// Get the CAS server version (default to SAML_VERSION_1_1).
-					// See: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+					/**
+					 * Get the CAS server version (default to SAML_VERSION_1_1).
+					 *
+					 * @see: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+					 */
 					$cas_version = SAML_VERSION_1_1;
 					if ( 'CAS_VERSION_3_0' === $auth_settings['cas_version'] ) {
 						$cas_version = CAS_VERSION_3_0;
@@ -1538,8 +1543,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( 'google' === $current_user_authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 				$token = json_decode( $_SESSION['token'] )->access_token;
 
-				// Add Google API PHP Client.
-				// @see https://github.com/google/google-api-php-client branch:v1-master
+				/**
+				 * Add Google API PHP Client.
+				 *
+				 * @see https://github.com/google/google-api-php-client branch:v1-master
+				 */
 				require_once dirname( __FILE__ ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 
 				// Build the Google Client.
@@ -1549,7 +1557,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$client->setClientSecret( $auth_settings['google_clientsecret'] );
 				$client->setRedirectUri( 'postmessage' );
 
-				// Revoke the token
+				// Revoke the token.
 				$client->revokeToken( $token );
 
 				// Remove the credentials from the user's session.
@@ -1584,19 +1592,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_user = wp_get_current_user();
 
 			$has_access = (
-				// Always allow access if WordPress is installing
+				// Always allow access if WordPress is installing.
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
-				// Always allow access to admins
+				// Always allow access to admins.
 				( current_user_can( 'create_users' ) ) ||
-				// Allow access if option is set to 'everyone'
+				// Allow access if option is set to 'everyone'.
 				( 'everyone' === $auth_settings['access_who_can_view'] ) ||
-				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'
+				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'.
 				( 'logged_in_users' === $auth_settings['access_who_can_view'] && $this->is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
-				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API
+				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API.
 				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, "rest_oauth1=" ) === 0 ) ||
-				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them
+				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them.
 				( property_exists( $wp, 'matched_query' ) && 0 === stripos( $wp->matched_query, "rest_route=" ) && 'GET' !== $_SERVER['REQUEST_METHOD'] ) ||
-				// Allow access for GET requests to /wp-json/ (root), since REST API discovery calls rely on this
+				// Allow access for GET requests to /wp-json/ (root), since REST API discovery calls rely on this.
 				( property_exists( $wp, 'matched_query' ) && 'rest_route=/' === $wp->matched_query )
 				// Note that GET requests to a rest endpoint will be restricted by authorizer. In that case, error messages will be returned as JSON.
 			);
@@ -1621,7 +1629,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 *   add_filter( 'authorizer_has_access', 'my_rsa_feed_access_override' );
 			 */
 			if ( apply_filters( 'authorizer_has_access', $has_access, $wp ) === true ) {
-				// Turn off the public notice about browsing anonymously
+				// Turn off the public notice about browsing anonymously.
 				update_option( 'auth_settings_advanced_public_notice', false );
 
 				// We've determined that the current user has access, so simply return to grant access.
@@ -1633,7 +1641,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return $wp;
 			}
 
-			// We've determined that the current user doesn't have access, so we deal with them now.
+			/* We've determined that the current user doesn't have access, so we deal with them now. */
 
 			// Fringe case: In a multisite, a user of a different blog can successfully
 			// log in, but they aren't on the 'approved' whitelist for this blog.
@@ -1729,12 +1737,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					__( 'Log In', 'authorizer' ) .
 					'</a></p>';
 				wp_die( $error_message, $page_title );
-			} else { // if ( $auth_settings['access_redirect'] === 'login' ) {
+			} else { // 'login' === $auth_settings['access_redirect'].
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
 			}
 
-			// Sanity check: we should never get here
+			// Sanity check: we should never get here.
 			wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
 		}
 
@@ -1807,7 +1815,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Load external resources for the public-facing site.
 		 */
 		function auth_public_scripts() {
-			// Load (and localize) public scripts
+			// Load (and localize) public scripts.
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
@@ -1817,9 +1825,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'log_in' => esc_html__( 'Log In', 'authorizer' ),
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
-			//update_option( 'auth_settings_advanced_public_notice', false);
 
-			// Load public css
+			// Load public css.
 			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ), array(), '2.3.2' );
 			wp_enqueue_style( 'authorizer-public-css' );
 		}
@@ -1861,7 +1868,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$branding_options = array();
 			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
 			foreach ( $branding_options as $branding_option ) {
-				// Make sure the custom brands have the required values
+				// Make sure the custom brands have the required values.
 				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'css_url', $branding_option ) && array_key_exists( 'js_url', $branding_option ) ) ) {
 					continue;
 				}
@@ -2080,7 +2087,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Reset the failed attempt count if the time since the last
 			// failed attempt is greater than the reset duration.
 			$time_since_last_fail = time() - $last_attempt;
-			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds
+			$reset_duration = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds.
 			if ( $time_since_last_fail > $reset_duration ) {
 				$num_attempts = 0;
 			}
@@ -2178,22 +2185,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( 'settings' === $admin_menu ) {
 				// @see http://codex.wordpress.org/Function_Reference/add_options_page
 				add_options_page(
-					'Authorizer', // Page title
-					'Authorizer', // Menu title
-					'create_users', // Capability
-					'authorizer', // Menu slug
-					array( $this, 'create_admin_page' ) // function
+					'Authorizer',
+					'Authorizer',
+					'create_users',
+					'authorizer',
+					array( $this, 'create_admin_page' )
 				);
 			} else {
 				// @see http://codex.wordpress.org/Function_Reference/add_menu_page
 				add_menu_page(
-					'Authorizer', // Page title
-					'Authorizer', // Menu title
-					'create_users', // Capability
-					'authorizer', // Menu slug
-					array( $this, 'create_admin_page' ), // callback
-					'dashicons-groups', // icon
-					'99.0018465' // position (decimal is to make overlap with other plugins less likely)
+					'Authorizer',
+					'Authorizer',
+					'create_users',
+					'authorizer',
+					array( $this, 'create_admin_page' ),
+					'dashicons-groups',
+					'99.0018465' // position (decimal is to make overlap with other plugins less likely).
 				);
 			}
 		}
@@ -2206,11 +2213,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<div class="wrap">
 				<h2><?php _e( 'Authorizer Settings', 'authorizer' ); ?></h2>
 				<form method="post" action="options.php" autocomplete="off"><?php
-					// This prints out all hidden settings fields
-					// @see http://codex.wordpress.org/Function_Reference/settings_fields
+					// This prints out all hidden settings fields.
 					settings_fields( 'auth_settings_group' );
-					// This prints out all the sections
-					// @see http://codex.wordpress.org/Function_Reference/do_settings_sections
+					// This prints out all the sections.
 					do_settings_sections( 'authorizer' );
 					submit_button(); ?>
 				</form>
@@ -2220,7 +2225,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Load external resources on this plugin's options page.
-		 * Run on action hooks: load-settings_page_authorizer, load-toplevel_page_authorizer, admin_head-index.php
+		 * Run on action hooks: load-settings_page_authorizer, load-toplevel_page_authorizer, admin_head-index.php.
 		 */
 		public function load_options_page() {
 			wp_enqueue_script(
@@ -2302,7 +2307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Check if provided CAS URL is accessible.
 				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ), true ) ? 'http' : 'https';
 				$cas_url = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
-				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint
+				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint.
 				if ( ! $this->url_is_accessible( $cas_url ) ) :
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?><div class='notice notice-warning is-dismissible'>
@@ -2318,421 +2323,424 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Run on action hook: admin_init
 		 */
 		public function page_init() {
-			// Create one setting that holds all the options (array)
-			// @see http://codex.wordpress.org/Function_Reference/register_setting
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_section
-			// @see http://codex.wordpress.org/Function_Reference/add_settings_field
+			/**
+			 * Create one setting that holds all the options (array).
+			 *
+			 * @see http://codex.wordpress.org/Function_Reference/register_setting
+			 * @see http://codex.wordpress.org/Function_Reference/add_settings_section
+			 * @see http://codex.wordpress.org/Function_Reference/add_settings_field
+			 */
 			register_setting(
-				'auth_settings_group', // Option group
-				'auth_settings', // Option name
-				array( $this, 'sanitize_options' ) // Sanitize callback
+				'auth_settings_group',
+				'auth_settings',
+				array( $this, 'sanitize_options' )
 			);
 
 			add_settings_section(
-				'auth_settings_tabs', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_tabs' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_tabs',
+				'',
+				array( $this, 'print_section_info_tabs' ),
+				'authorizer'
 			);
 
-			// Create Access Lists section
+			// Create Access Lists section.
 			add_settings_section(
-				'auth_settings_lists', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_access_lists' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_lists',
+				'',
+				array( $this, 'print_section_info_access_lists' ),
+				'authorizer'
 			);
 
-			// Create Login Access section
+			// Create Login Access section.
 			add_settings_section(
-				'auth_settings_access_login', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_access_login' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_access_login',
+				'',
+				array( $this, 'print_section_info_access_login' ),
+				'authorizer'
 			);
 			add_settings_field(
-				'auth_settings_access_who_can_login', // HTML element ID
-				__( 'Who can log into the site?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_access_who_can_login' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_who_can_login',
+				__( 'Who can log into the site?', 'authorizer' ),
+				array( $this, 'print_radio_auth_access_who_can_login' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_role_receive_pending_emails', // HTML element ID
-				__( 'Which role should receive email notifications about pending users?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_select_auth_access_role_receive_pending_emails' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_role_receive_pending_emails',
+				__( 'Which role should receive email notifications about pending users?', 'authorizer' ),
+				array( $this, 'print_select_auth_access_role_receive_pending_emails' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_pending_redirect_to_message', // HTML element ID
-				__( 'What message should pending users see after attempting to log in?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_wysiwyg_auth_access_pending_redirect_to_message' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_pending_redirect_to_message',
+				__( 'What message should pending users see after attempting to log in?', 'authorizer' ),
+				array( $this, 'print_wysiwyg_auth_access_pending_redirect_to_message' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_blocked_redirect_to_message', // HTML element ID
-				__( 'What message should blocked users see after attempting to log in?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_wysiwyg_auth_access_blocked_redirect_to_message' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_blocked_redirect_to_message',
+				__( 'What message should blocked users see after attempting to log in?', 'authorizer' ),
+				array( $this, 'print_wysiwyg_auth_access_blocked_redirect_to_message' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_should_email_approved_users', // HTML element ID
-				__( 'Send welcome email to new approved users?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_access_should_email_approved_users' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_should_email_approved_users',
+				__( 'Send welcome email to new approved users?', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_access_should_email_approved_users' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_email_approved_users_subject', // HTML element ID
-				__( 'Welcome email subject', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_auth_access_email_approved_users_subject' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_email_approved_users_subject',
+				__( 'Welcome email subject', 'authorizer' ),
+				array( $this, 'print_text_auth_access_email_approved_users_subject' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 			add_settings_field(
-				'auth_settings_access_email_approved_users_body', // HTML element ID
-				__( 'Welcome email body', 'authorizer' ), // HTML element Title
-				array( $this, 'print_wysiwyg_auth_access_email_approved_users_body' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_login' // Section this setting is shown on
+				'auth_settings_access_email_approved_users_body',
+				__( 'Welcome email body', 'authorizer' ),
+				array( $this, 'print_wysiwyg_auth_access_email_approved_users_body' ),
+				'authorizer',
+				'auth_settings_access_login'
 			);
 
 
-			// Create Public Access section
+			// Create Public Access section.
 			add_settings_section(
-				'auth_settings_access_public', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_access_public' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_access_public',
+				'',
+				array( $this, 'print_section_info_access_public' ),
+				'authorizer'
 			);
 			add_settings_field(
-				'auth_settings_access_who_can_view', // HTML element ID
-				__( 'Who can view the site?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_access_who_can_view' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_public' // Section this setting is shown on
+				'auth_settings_access_who_can_view',
+				__( 'Who can view the site?', 'authorizer' ),
+				array( $this, 'print_radio_auth_access_who_can_view' ),
+				'authorizer',
+				'auth_settings_access_public'
 			);
 			add_settings_field(
-				'auth_settings_access_public_pages', // HTML element ID
-				__( 'What pages (if any) should be available to everyone?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_multiselect_auth_access_public_pages' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_public' // Section this setting is shown on
+				'auth_settings_access_public_pages',
+				__( 'What pages (if any) should be available to everyone?', 'authorizer' ),
+				array( $this, 'print_multiselect_auth_access_public_pages' ),
+				'authorizer',
+				'auth_settings_access_public'
 			);
 			add_settings_field(
-				'auth_settings_access_redirect', // HTML element ID
-				__( 'What happens to people without access when they visit a private page?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_access_redirect' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_public' // Section this setting is shown on
+				'auth_settings_access_redirect',
+				__( 'What happens to people without access when they visit a private page?', 'authorizer' ),
+				array( $this, 'print_radio_auth_access_redirect' ),
+				'authorizer',
+				'auth_settings_access_public'
 			);
 			add_settings_field(
-				'auth_settings_access_public_warning', // HTML element ID
-				__( 'What happens to people without access when they visit a public page?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_access_public_warning' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_public' // Section this setting is shown on
+				'auth_settings_access_public_warning',
+				__( 'What happens to people without access when they visit a public page?', 'authorizer' ),
+				array( $this, 'print_radio_auth_access_public_warning' ),
+				'authorizer',
+				'auth_settings_access_public'
 			);
 			add_settings_field(
-				'auth_settings_access_redirect_to_message', // HTML element ID
-				__( 'What message should people without access see?', 'authorizer' ), // HTML element Title
-				array( $this, 'print_wysiwyg_auth_access_redirect_to_message' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_access_public' // Section this setting is shown on
+				'auth_settings_access_redirect_to_message',
+				__( 'What message should people without access see?', 'authorizer' ),
+				array( $this, 'print_wysiwyg_auth_access_redirect_to_message' ),
+				'authorizer',
+				'auth_settings_access_public'
 			);
 
-			// Create External Service Settings section
+			// Create External Service Settings section.
 			add_settings_section(
-				'auth_settings_external', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_external' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_external',
+				'',
+				array( $this, 'print_section_info_external' ),
+				'authorizer'
 			);
 			add_settings_field(
-				'auth_settings_access_default_role', // HTML element ID
-				__( 'Default role for new users', 'authorizer' ), // HTML element Title
-				array( $this, 'print_select_auth_access_default_role' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_access_default_role',
+				__( 'Default role for new users', 'authorizer' ),
+				array( $this, 'print_select_auth_access_default_role' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_external_google', // HTML element ID
-				__( 'Google Logins', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_external_google' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_external_google',
+				__( 'Google Logins', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_external_google' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_google_clientid', // HTML element ID
-				__( 'Google Client ID', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_google_clientid' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_google_clientid',
+				__( 'Google Client ID', 'authorizer' ),
+				array( $this, 'print_text_google_clientid' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_google_clientsecret', // HTML element ID
-				__( 'Google Client Secret', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_google_clientsecret' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_google_clientsecret',
+				__( 'Google Client Secret', 'authorizer' ),
+				array( $this, 'print_text_google_clientsecret' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_google_hosteddomain', // HTML element ID
-				__( 'Google Hosted Domain', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_google_hosteddomain' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_google_hosteddomain',
+				__( 'Google Hosted Domain', 'authorizer' ),
+				array( $this, 'print_text_google_hosteddomain' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_external_cas', // HTML element ID
-				__( 'CAS Logins', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_external_cas' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_external_cas',
+				__( 'CAS Logins', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_external_cas' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_custom_label', // HTML element ID
-				__( 'CAS custom label', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_custom_label' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_custom_label',
+				__( 'CAS custom label', 'authorizer' ),
+				array( $this, 'print_text_cas_custom_label' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_host', // HTML element ID
-				__( 'CAS server hostname', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_host' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_host',
+				__( 'CAS server hostname', 'authorizer' ),
+				array( $this, 'print_text_cas_host' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_port', // HTML element ID
-				__( 'CAS server port', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_port' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_port',
+				__( 'CAS server port', 'authorizer' ),
+				array( $this, 'print_text_cas_port' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_path', // HTML element ID
-				__( 'CAS server path/context', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_path' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_path',
+				__( 'CAS server path/context', 'authorizer' ),
+				array( $this, 'print_text_cas_path' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_version', // HTML element ID
-				'CAS server version', // HTML element Title
-				array( $this, 'print_select_cas_version' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_version',
+				'CAS server version',
+				array( $this, 'print_select_cas_version' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_attr_email', // HTML element ID
-				__( 'CAS attribute containing email address', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_attr_email' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_attr_email',
+				__( 'CAS attribute containing email address', 'authorizer' ),
+				array( $this, 'print_text_cas_attr_email' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_attr_first_name', // HTML element ID
-				__( 'CAS attribute containing first name', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_attr_first_name' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_attr_first_name',
+				__( 'CAS attribute containing first name', 'authorizer' ),
+				array( $this, 'print_text_cas_attr_first_name' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_attr_last_name', // HTML element ID
-				__( 'CAS attribute containing last name', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_cas_attr_last_name' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_attr_last_name',
+				__( 'CAS attribute containing last name', 'authorizer' ),
+				array( $this, 'print_text_cas_attr_last_name' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_attr_update_on_login', // HTML element ID
-				__( 'CAS attribute update', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_cas_attr_update_on_login' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_attr_update_on_login',
+				__( 'CAS attribute update', 'authorizer' ),
+				array( $this, 'print_checkbox_cas_attr_update_on_login' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_cas_auto_login', // HTML element ID
-				__( 'CAS automatic login', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_cas_auto_login' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_cas_auto_login',
+				__( 'CAS automatic login', 'authorizer' ),
+				array( $this, 'print_checkbox_cas_auto_login' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_external_ldap', // HTML element ID
-				__( 'LDAP Logins', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_external_ldap' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_external_ldap',
+				__( 'LDAP Logins', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_external_ldap' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_host', // HTML element ID
-				__( 'LDAP Host', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_host' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_host',
+				__( 'LDAP Host', 'authorizer' ),
+				array( $this, 'print_text_ldap_host' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_port', // HTML element ID
-				__( 'LDAP Port', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_port' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_port',
+				__( 'LDAP Port', 'authorizer' ),
+				array( $this, 'print_text_ldap_port' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_tls', // HTML element ID
-				__( 'Use TLS', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_ldap_tls' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_tls',
+				__( 'Use TLS', 'authorizer' ),
+				array( $this, 'print_checkbox_ldap_tls' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_search_base', // HTML element ID
-				__( 'LDAP Search Base', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_search_base' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_search_base',
+				__( 'LDAP Search Base', 'authorizer' ),
+				array( $this, 'print_text_ldap_search_base' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_uid', // HTML element ID
-				__( 'LDAP attribute containing username', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_uid' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_uid',
+				__( 'LDAP attribute containing username', 'authorizer' ),
+				array( $this, 'print_text_ldap_uid' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_attr_email', // HTML element ID
-				__( 'LDAP attribute containing email address', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_attr_email' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_attr_email',
+				__( 'LDAP attribute containing email address', 'authorizer' ),
+				array( $this, 'print_text_ldap_attr_email' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_user', // HTML element ID
-				__( 'LDAP Directory User', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_user' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_user',
+				__( 'LDAP Directory User', 'authorizer' ),
+				array( $this, 'print_text_ldap_user' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_password', // HTML element ID
-				__( 'LDAP Directory User Password', 'authorizer' ), // HTML element Title
-				array( $this, 'print_password_ldap_password' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_password',
+				__( 'LDAP Directory User Password', 'authorizer' ),
+				array( $this, 'print_password_ldap_password' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_lostpassword_url', // HTML element ID
-				__( 'Custom lost password URL', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_lostpassword_url' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_lostpassword_url',
+				__( 'Custom lost password URL', 'authorizer' ),
+				array( $this, 'print_text_ldap_lostpassword_url' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_attr_first_name', // HTML element ID
-				__( 'LDAP attribute containing first name', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_attr_first_name' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_attr_first_name',
+				__( 'LDAP attribute containing first name', 'authorizer' ),
+				array( $this, 'print_text_ldap_attr_first_name' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_attr_last_name', // HTML element ID
-				__( 'LDAP attribute containing last name', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_ldap_attr_last_name' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_attr_last_name',
+				__( 'LDAP attribute containing last name', 'authorizer' ),
+				array( $this, 'print_text_ldap_attr_last_name' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 			add_settings_field(
-				'auth_settings_ldap_attr_update_on_login', // HTML element ID
-				__( 'LDAP attribute update', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_ldap_attr_update_on_login' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_external' // Section this setting is shown on
+				'auth_settings_ldap_attr_update_on_login',
+				__( 'LDAP attribute update', 'authorizer' ),
+				array( $this, 'print_checkbox_ldap_attr_update_on_login' ),
+				'authorizer',
+				'auth_settings_external'
 			);
 
-			// Create Advanced Settings section
+			// Create Advanced Settings section.
 			add_settings_section(
-				'auth_settings_advanced', // HTML element ID
-				'', // HTML element Title
-				array( $this, 'print_section_info_advanced' ), // Callback (echos section content)
-				'authorizer' // Page this section is shown on (slug)
+				'auth_settings_advanced',
+				'',
+				array( $this, 'print_section_info_advanced' ),
+				'authorizer'
 			);
 			add_settings_field(
-				'auth_settings_advanced_lockouts', // HTML element ID
-				__( 'Limit invalid login attempts', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_auth_advanced_lockouts' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_lockouts',
+				__( 'Limit invalid login attempts', 'authorizer' ),
+				array( $this, 'print_text_auth_advanced_lockouts' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_hide_wp_login', // HTML element ID
-				__( 'Hide WordPress Login', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_advanced_hide_wp_login' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_hide_wp_login',
+				__( 'Hide WordPress Login', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_advanced_hide_wp_login' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_branding', // HTML element ID
-				__( 'Custom WordPress login branding', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_advanced_branding' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_branding',
+				__( 'Custom WordPress login branding', 'authorizer' ),
+				array( $this, 'print_radio_auth_advanced_branding' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_admin_menu', // HTML element ID
-				__( 'Authorizer admin menu item location', 'authorizer' ), // HTML element Title
-				array( $this, 'print_radio_auth_advanced_admin_menu' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_admin_menu',
+				__( 'Authorizer admin menu item location', 'authorizer' ),
+				array( $this, 'print_radio_auth_advanced_admin_menu' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_usermeta', // HTML element ID
-				__( 'Show custom usermeta in user list', 'authorizer' ), // HTML element Title
-				array( $this, 'print_select_auth_advanced_usermeta' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_usermeta',
+				__( 'Show custom usermeta in user list', 'authorizer' ),
+				array( $this, 'print_select_auth_advanced_usermeta' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_users_per_page', // HTML element ID
-				__( 'Number of users per page', 'authorizer' ), // HTML element Title
-				array( $this, 'print_text_auth_advanced_users_per_page' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_users_per_page',
+				__( 'Number of users per page', 'authorizer' ),
+				array( $this, 'print_text_auth_advanced_users_per_page' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_users_sort_by', // HTML element ID
-				__( 'Approved users sort method', 'authorizer' ), // HTML element Title
-				array( $this, 'print_select_auth_advanced_users_sort_by' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_users_sort_by',
+				__( 'Approved users sort method', 'authorizer' ),
+				array( $this, 'print_select_auth_advanced_users_sort_by' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_users_sort_order', // HTML element ID
-				__( 'Approved users sort order', 'authorizer' ), // HTML element Title
-				array( $this, 'print_select_auth_advanced_users_sort_order' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_users_sort_order',
+				__( 'Approved users sort order', 'authorizer' ),
+				array( $this, 'print_select_auth_advanced_users_sort_order' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			add_settings_field(
-				'auth_settings_advanced_widget_enabled', // HTML element ID
-				__( 'Show dashboard widget to admin users', 'authorizer' ), // HTML element Title
-				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ), // Callback (echos form element)
-				'authorizer', // Page this setting is shown on (slug)
-				'auth_settings_advanced' // Section this setting is shown on
+				'auth_settings_advanced_widget_enabled',
+				__( 'Show dashboard widget to admin users', 'authorizer' ),
+				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ),
+				'authorizer',
+				'auth_settings_advanced'
 			);
 			// On multisite installs, add an option to override all multisite settings on individual sites.
 			if ( is_multisite() ) {
 				add_settings_field(
-					'auth_settings_advanced_override_multisite', // HTML element ID
-					__( 'Override multisite options', 'authorizer' ), // HTML element Title
-					array( $this, 'print_checkbox_auth_advanced_override_multisite' ), // Callback (echos form element)
-					'authorizer', // Page this setting is shown on (slug)
-					'auth_settings_advanced' // Section this setting is shown on
+					'auth_settings_advanced_override_multisite',
+					__( 'Override multisite options', 'authorizer' ),
+					array( $this, 'print_checkbox_auth_advanced_override_multisite' ),
+					'authorizer',
+					'auth_settings_advanced'
 				);
 			}
 		}
@@ -3124,7 +3132,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 			foreach ( $list as $key => $user_info ) {
 				if ( strlen( $user_info['email'] ) < 1 ) {
-					// Make sure there are no empty entries in the list
+					// Make sure there are no empty entries in the list.
 					unset( $list[$key] );
 				} elseif ( 'update roles' === $side_effect ) {
 					// Make sure the WordPress user accounts have the same role
@@ -3173,55 +3181,55 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['access_public_warning'] = 'no_warning';
 			}
 
-			// Sanitize Send welcome email (checkbox: value can only be '1' or empty string)
+			// Sanitize Send welcome email (checkbox: value can only be '1' or empty string).
 			$auth_settings['access_should_email_approved_users'] = array_key_exists( 'access_should_email_approved_users', $auth_settings ) && strlen( $auth_settings['access_should_email_approved_users'] ) > 0 ? '1' : '';
 
-			// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string)
+			// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string).
 			$auth_settings['google'] = array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ? '1' : '';
 
-			// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string)
+			// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string).
 			$auth_settings['cas'] = array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ? '1' : '';
 
-			// Sanitize CAS Host setting
+			// Sanitize CAS Host setting.
 			$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
 
-			// Sanitize CAS Port (int)
+			// Sanitize CAS Port (int).
 			$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
-			// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string)
+			// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string).
 			$auth_settings['cas_attr_update_on_login'] = array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ? '1' : '';
 
-			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string)
+			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
 			$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
 
-			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string)
+			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string).
 			$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
 
-			// Sanitize LDAP Host setting
+			// Sanitize LDAP Host setting.
 			$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
 
-			// Sanitize LDAP Port (int)
+			// Sanitize LDAP Port (int).
 			$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
 
-			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string)
+			// Sanitize LDAP TLS (checkbox: value can only be '1' or empty string).
 			$auth_settings['ldap_tls'] = array_key_exists( 'ldap_tls', $auth_settings ) && strlen( $auth_settings['ldap_tls'] ) > 0 ? '1' : '';
 
-			// Sanitize LDAP attributes (basically make sure they don't have any parentheses)
+			// Sanitize LDAP attributes (basically make sure they don't have any parentheses).
 			$auth_settings['ldap_uid'] = filter_var( $auth_settings['ldap_uid'], FILTER_SANITIZE_EMAIL );
 
-			// Sanitize LDAP Lost Password URL
+			// Sanitize LDAP Lost Password URL.
 			$auth_settings['ldap_lostpassword_url'] = filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_SANITIZE_URL );
 
-			// Obfuscate LDAP directory user password
+			// Obfuscate LDAP directory user password.
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
 				// encrypt the directory user password for some minor obfuscation in the database.
 				$auth_settings['ldap_password'] = $this->encrypt( $auth_settings['ldap_password'] );
 			}
 
-			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string)
+			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string).
 			$auth_settings['ldap_attr_update_on_login'] = array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ? '1' : '';
 
-			// Make sure public pages is an empty array if it's empty
+			// Make sure public pages is an empty array if it's empty.
 			// Note: this option doesn't exist in multisite options, so we first
 			// check to see if it exists.
 			if ( array_key_exists( 'access_public_pages', $auth_settings ) && ! is_array( $auth_settings['access_public_pages'] ) ) {
@@ -3234,26 +3242,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings['advanced_lockouts'][$key] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
 			}
 
-			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string)
+			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string).
 			$auth_settings['advanced_hide_wp_login'] = array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ? '1' : '';
 
-			// Sanitize Users per page (text: value can only int from 1 to MAX_INT)
+			// Sanitize Users per page (text: value can only int from 1 to MAX_INT).
 			$auth_settings['advanced_users_per_page'] = array_key_exists( 'advanced_users_per_page', $auth_settings ) && intval( $auth_settings['advanced_users_per_page'] ) > 0 ? intval( $auth_settings['advanced_users_per_page'] ) : 1;
 
-			// Sanitize Sort users by (select: value can be 'email', 'role', 'date_added', 'created')
+			// Sanitize Sort users by (select: value can be 'email', 'role', 'date_added', 'created').
 			if ( ! isset( $auth_settings['advanced_users_sort_by'] ) || ! in_array( $auth_settings['advanced_users_sort_by'], array( 'email', 'role', 'date_added', 'created' ), true ) ) {
 				$auth_settings['advanced_users_sort_by'] = 'created';
 			}
 
-			// Sanitize Sort users order (select: value can be 'asc', 'desc')
+			// Sanitize Sort users order (select: value can be 'asc', 'desc').
 			if ( ! isset( $auth_settings['advanced_users_sort_order'] ) || ! in_array( $auth_settings['advanced_users_sort_order'], array( 'asc', 'desc' ), true ) ) {
 				$auth_settings['advanced_users_sort_order'] = 'asc';
 			}
 
-			// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string)
+			// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string).
 			$auth_settings['advanced_widget_enabled'] = array_key_exists( 'advanced_widget_enabled', $auth_settings ) && strlen( $auth_settings['advanced_widget_enabled'] ) > 0 ? '1' : '';
 
-			// Sanitize Override multisite options (checkbox: value can only be '1' or empty string)
+			// Sanitize Override multisite options (checkbox: value can only be '1' or empty string).
 			$auth_settings['advanced_override_multisite'] = array_key_exists( 'advanced_override_multisite', $auth_settings ) && strlen( $auth_settings['advanced_override_multisite'] ) > 0 ? '1' : '';
 
 			return $auth_settings;
@@ -3530,8 +3538,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sort user list.
-			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
-			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
+			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved).
+			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc.
 			$sort_dimension = array();
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
@@ -3747,7 +3755,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Get usermeta field from the WordPress user's real usermeta.
 				if ( strlen( $advanced_usermeta ) > 0 ) :
 					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
-						// Get ACF Field value for the user
+						// Get ACF Field value for the user.
 						$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
 					else :
 						// Get regular usermeta value for the user.
@@ -4583,7 +4591,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$branding_options = array();
 			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
 			foreach ( $branding_options as $branding_option ) {
-				// Make sure the custom brands have the required values
+				// Make sure the custom brands have the required values.
 				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
 					continue;
 				}
@@ -4741,7 +4749,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function admin_head() {
 			$screen = get_current_screen();
 
-			// Add help tab for Access Lists Settings
+			// Add help tab for Access Lists Settings.
 			$help_auth_settings_access_lists_content = '
 				<p>' . __( "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) .'</p>
 				<p>' . __( "<strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.", 'authorizer' ) . '</p>
@@ -4756,7 +4764,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for Login Access Settings
+			// Add help tab for Login Access Settings.
 			$help_auth_settings_access_login_content = '
 				<p>' . __( "<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.", 'authorizer' ) . '</p>
 				<p>' . __( "<strong>Which role should receive email notifications about pending users?</strong>: If you've restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.", 'authorizer' ) . '</p>
@@ -4770,7 +4778,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for Public Access Settings
+			// Add help tab for Public Access Settings.
 			$help_auth_settings_access_public_content = '
 				<p>' . __( "<strong>Who can view the site?</strong>: You can restrict the site's visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site's privacy using the settings below.", 'authorizer' ) . '</p>
 				<p>' . __( "<strong>What pages (if any) should be available to everyone?</strong>: If you'd like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages here. These pages will always be available no matter what access restrictions exist.", 'authorizer' ) . '</p>
@@ -4786,7 +4794,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for External Service (CAS, LDAP) Settings
+			// Add help tab for External Service (CAS, LDAP) Settings.
 			$help_auth_settings_external_content = '
 				<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
 				<p>' . __( "<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.", 'authorizer' ) . '</p>
@@ -4830,7 +4838,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				)
 			);
 
-			// Add help tab for Advanced Settings
+			// Add help tab for Advanced Settings.
 			$help_auth_settings_advanced_content = '
 				<p>' . __( "<strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.", 'authorizer' ) . '</p>
 				<p>' . __( "<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:", 'authorizer' ) . ' <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
@@ -4864,19 +4872,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function network_admin_menu() {
 			// @see http://codex.wordpress.org/Function_Reference/add_menu_page
 			add_menu_page(
-				'Authorizer', // Page title
-				'Authorizer', // Menu title
-				'manage_network_options', // Capability
-				'authorizer', // Menu slug
+				'Authorizer',
+				'Authorizer',
+				'manage_network_options',
+				'authorizer',
 				array( $this, 'create_network_admin_page' ),
-				'dashicons-groups', // Icon URL
-				89 // Position
+				'dashicons-groups',
+				89 // Position.
 			);
 		}
 
 
 		/**
-		 * Output the HTML for the options page
+		 * Output the HTML for the options page.
 		 */
 		public function create_network_admin_page() {
 			if ( ! current_user_can( 'manage_network_options' ) ) {
@@ -4897,7 +4905,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 
-						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked) ?>
+						<?php // Custom access lists (for network, we only really want approved list, not pending or blocked). ?>
 						<div id="section_info_access_lists" class="section_info">
 							<p><?php _e( 'Manage who has access to all sites in the network.', 'authorizer' ); ?></p>
 						</div>
@@ -5100,10 +5108,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get multisite settings.
 			$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 
-			// Sanitize settings
+			// Sanitize settings.
 			$auth_multisite_settings = $this->sanitize_options( $_POST );
 
-			// Filter options to only the allowed values (multisite options are a subset of all options)
+			// Filter options to only the allowed values (multisite options are a subset of all options).
 			$allowed = array(
 				'multisite_override',
 				'access_who_can_login',
@@ -5168,7 +5176,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Load authorizer dashboard widget if it's enabled and user has permission.
 			if ( current_user_can( 'create_users' ) && $widget_enabled ) {
-				// Add dashboard widget for adding/editing users with access
+				// Add dashboard widget for adding/editing users with access.
 				wp_add_dashboard_widget( 'auth_dashboard_widget', __( 'Authorizer Settings', 'authorizer' ), array( $this, 'add_auth_dashboard_widget' ) );
 			}
 		}
@@ -5266,8 +5274,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Sort user list.
-			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved)
-			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc
+			$sort_by = $this->get_plugin_option( 'advanced_users_sort_by', SINGLE_ADMIN, 'allow override' ); // email, role, date_added (registered), created (date approved).
+			$sort_order = $this->get_plugin_option( 'advanced_users_sort_order', SINGLE_ADMIN, 'allow override' ); // asc or desc.
 			$sort_dimension = array();
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
@@ -5473,7 +5481,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					} elseif ( 'remove' === $pending_user['edit_action'] ) {
 
-						// Remove user from pending list and save
+						// Remove user from pending list and save.
 						if ( $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
 							$auth_settings_access_users_pending = $this->sanitize_user_list(
 								$this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN )
@@ -5610,7 +5618,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
-					// Remove user from approved list and save (also remove their role if they have a WordPress account)
+					// Remove user from approved list and save (also remove their role if they have a WordPress account).
 					} elseif ( 'remove' === $approved_user['edit_action'] ) {
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
@@ -5655,7 +5663,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
-					//  Update user's role in WordPress
+					// Update user's role in WordPress.
 					} elseif ( 'change_role' === $approved_user['edit_action'] ) {
 						$changed_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $changed_user ) {
@@ -5740,7 +5748,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							delete_user_meta( $unblocked_user->ID, 'auth_blocked', 'yes' );
 						}
 
-						// Remove user from blocked list and save
+						// Remove user from blocked list and save.
 						if ( $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
 							$auth_settings_access_users_blocked = $this->sanitize_user_list(
 								$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
@@ -5816,8 +5824,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			) {
 				// Get original plugin options (not overridden value). We'll
 				// show this old value behind the disabled overlay.
-				//$auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
-
+				// $auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
+				// (This feature is disabled).
+				//
 				$name = "auth_settings[$option]";
 				$id = "auth_settings_$option"; ?>
 				<div id="overlay-hide-auth_settings_<?php echo $option; ?>" class="auth_multisite_override_overlay">
@@ -5875,19 +5884,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Keep track of the multisite override selection.
 					$auth_settings['multisite_override'] = $auth_multisite_settings['multisite_override'];
 
-					// Note: the options below should be the complete list of
-					// overridden options. It is *not* the complete list of all
-					// options (some options don't have a multisite equivalent)
+					/**
+					 * Note: the options below should be the complete list of overridden
+					 * options. It is *not* the complete list of all options (some options
+					 * don't have a multisite equivalent).
+					 */
 
-					// Note: access_users_approved, access_users_pending, and
-					// access_users_blocked do not get overridden. However,
-					// since access_users_approved has a multisite equivalent,
-					// you must retrieve them both seperately. This is done
-					// because the two lists should be treated differently.
-					// $approved_users    = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
-					// $ms_approved_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
+					/**
+					 * Note: access_users_approved, access_users_pending, and
+					 * access_users_blocked do not get overridden. However, since
+					 * access_users_approved has a multisite equivalent, you must retrieve
+					 * them both seperately. This is done because the two lists should be
+					 * treated differently.
+					 *
+					 * $approved_users    = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+					 * $ms_approved_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
+					 */
 
-					// Override external services (google, cas, or ldap) and associated options
+					// Override external services (google, cas, or ldap) and associated options.
 					$auth_settings['google'] = $auth_multisite_settings['google'];
 					$auth_settings['google_clientid'] = $auth_multisite_settings['google_clientid'];
 					$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
@@ -5917,29 +5931,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					$auth_settings['ldap_attr_last_name'] = $auth_multisite_settings['ldap_attr_last_name'];
 					$auth_settings['ldap_attr_update_on_login'] = $auth_multisite_settings['ldap_attr_update_on_login'];
 
-					// Override access_who_can_login and access_who_can_view
+					// Override access_who_can_login and access_who_can_view.
 					$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 					$auth_settings['access_who_can_view'] = $auth_multisite_settings['access_who_can_view'];
 
-					// Override access_default_role
+					// Override access_default_role.
 					$auth_settings['access_default_role'] = $auth_multisite_settings['access_default_role'];
 
-					// Override lockouts
+					// Override lockouts.
 					$auth_settings['advanced_lockouts'] = $auth_multisite_settings['advanced_lockouts'];
 
-					// Override Hide WordPress login
+					// Override Hide WordPress login.
 					$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
 
-					// Override Users per page
+					// Override Users per page.
 					$auth_settings['advanced_users_per_page'] = $auth_multisite_settings['advanced_users_per_page'];
 
-					// Override Sort users by
+					// Override Sort users by.
 					$auth_settings['advanced_users_sort_by'] = $auth_multisite_settings['advanced_users_sort_by'];
 
-					// Override Sort users order
+					// Override Sort users order.
 					$auth_settings['advanced_users_sort_order'] = $auth_multisite_settings['advanced_users_sort_order'];
 
-					// Override Show Dashboard Widget
+					// Override Show Dashboard Widget.
 					$auth_settings['advanced_widget_enabled'] = $auth_multisite_settings['advanced_widget_enabled'];
 				}
 			}
@@ -6296,7 +6310,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			update_option( 'auth_settings_recently_sent_emails', $recently_sent_emails );
 
-			// Get welcome email subject and body text
+			// Get welcome email subject and body text.
 			$subject = $this->get_plugin_option( 'access_email_approved_users_subject' );
 			$body = apply_filters( 'the_content', $this->get_plugin_option( 'access_email_approved_users_body' ) );
 
@@ -6540,7 +6554,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$response = wp_remote_get( $url );
 			$response_code = wp_remote_retrieve_response_code( $response );
 
-			// Return true if the document has loaded successfully without any redirection or error
+			// Return true if the document has loaded successfully without any redirection or error.
 			return $response_code >= 200 && $response_code < 400;
 		}
 
@@ -6602,7 +6616,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $roles as $name => $role ) {
 				$selected = $selected_role === $name ? ' selected="selected"' : '';
 
-				// Don't let a user change their own role
+				// Don't let a user change their own role.
 				$disabled = $selected_role !== $name && 'disabled' === $disable_input ? ' disabled="disabled"' : '';
 
 				// But network admins can always change their role.
@@ -6624,10 +6638,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		}
 
 
-		// Helper function to get a single user info array from one of the
-		// access control lists (pending, approved, or blocked).
-		// Returns: false if not found; otherwise
-		//  array( 'email' => '', 'role' => '', 'date_added' => '', ['usermeta' => [''|array()]] );
+		/**
+		 * Helper function to get a single user info array from one of the access
+		 * control lists (pending, approved, or blocked).
+		 *
+		 * @param  string $email Email address to retrieve info for.
+		 * @param  string $list  List to get info from.
+		 * @return mixed         false if not found, otherwise:
+		 *    array( 'email' => '', 'role' => '', 'date_added' => '', ['usermeta' => [''|array()]] );
+		 */
 		function get_user_info_from_list( $email, $list ) {
 			foreach ( $list as $user_info ) {
 				if ( 0 === strcasecmp( $user_info['email'], $email ) ) {
@@ -6637,16 +6656,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			return false;
 		}
 
-		// Helper function to convert a string to lowercase.  Prefers to use mb_strtolower,
-		// but will fall back to strtolower if the former is not available.
-		// Returns:  string in lowercase
+		/**
+		 * Helper function to convert a string to lowercase.  Prefers to use mb_strtolower,
+		 * but will fall back to strtolower if the former is not available.
+		 *
+		 * @param  string $string String to convert to lowercase.
+		 * @return string         Input in lowercase.
+		 */
 		function lowercase( $string ) {
 			return function_exists( "mb_strtolower" ) ?  mb_strtolower( $string ) : strtolower( $string );
 		}
 
 
-		// Helper function to convert seconds to human readable text.
-		// Source: http://csl.name/php-secs-to-human-text/
+		/**
+		 * Helper function to convert seconds to human readable text.
+		 *
+		 * @see: http://csl.name/php-secs-to-human-text/
+		 *
+		 * @param  int $secs Seconds to display as readable text.
+		 * @return string    Readable version of number of seconds.
+		 */
 		function seconds_as_sentence( $secs ) {
 			$units = array(
 				"week"   => 7 * 24 * 3600,
@@ -6656,7 +6685,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				"second" =>             1,
 			);
 
-			// specifically handle zero
+			// Specifically handle zero.
 			if ( 0 == $secs ) {
 				return '0 seconds';
 			}
@@ -6819,14 +6848,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
-					// Get all blog ids
+					// Get all blog ids.
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 						switch_to_blog( $blog_id );
 						// Set meaningful defaults for other sites in the network.
 						$this->set_default_options();
-						// Switch back to original blog. See: https://codex.wordpress.org/Function_Reference/restore_current_blog
+						// Switch back to original blog.
 						restore_current_blog();
 					}
 				} else {
@@ -6894,7 +6923,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				// Remove duplicates from approved user lists.
 				if ( is_multisite() ) {
-					// Remove duplicates from each site in the multisite
+					// Remove duplicates from each site in the multisite.
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
