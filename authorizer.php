@@ -239,7 +239,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			global $wpdb;
 
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling.
-			if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 == $_GET['networkwide'] ) {
+			if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 === intval( $_GET['networkwide'] ) ) {
 
 				// Add super admins to the multisite approved list.
 				$auth_multisite_settings_access_users_approved = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() );
@@ -842,7 +842,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					} else {
 						// Update first/last names of WordPress user from external
 						// service if that option is set.
-						if ( ( array_key_exists( 'authenticated_by', $user_data ) && 'cas' === $user_data['authenticated_by'] && array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && 1 == $auth_settings['cas_attr_update_on_login'] ) || ( array_key_exists( 'authenticated_by', $user_data ) && 'ldap' === $user_data['authenticated_by'] && array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && 1 == $auth_settings['ldap_attr_update_on_login'] ) ) {
+						if ( ( array_key_exists( 'authenticated_by', $user_data ) && 'cas' === $user_data['authenticated_by'] && array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['cas_attr_update_on_login'] ) ) || ( array_key_exists( 'authenticated_by', $user_data ) && 'ldap' === $user_data['authenticated_by'] && array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['ldap_attr_update_on_login'] ) ) ) {
 							if ( array_key_exists( 'first_name', $user_data ) && 0 < strlen( $user_data['first_name'] ) ) {
 								wp_update_user( array(
 									'ID' => $user->ID,
@@ -1376,7 +1376,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Establish LDAP connection.
 			$ldap = ldap_connect( $ldap_host, $ldap_port );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-			if ( 1 == $auth_settings['ldap_tls'] ) {
+			if ( 1 === intval( $auth_settings['ldap_tls'] ) ) {
 				if( ! ldap_start_tls( $ldap ) ) {
 					return null;
 				}
@@ -1497,7 +1497,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Reset option containing old error messages.
 			delete_option( 'auth_settings_advanced_login_error' );
 
-			if ( session_id() == '' ) {
+			if ( session_id() === '' ) {
 				session_start();
 			}
 
@@ -3559,7 +3559,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if (
 				is_multisite() &&
 				! is_network_admin() &&
-				'1' != $auth_override_multisite &&
+				'1' !== intval( $auth_override_multisite ) &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
@@ -3977,7 +3977,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
-			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+			if ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
 			} elseif ( is_multisite() && SINGLE_ADMIN === $admin_mode && $this->get_plugin_option( 'multisite_override', MULTISITE_ADMIN ) === '1' ) {
 				// Workaround: javascript code hides/shows other settings based
@@ -3991,8 +3991,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_external_users" name="auth_settings[<?php echo $option; ?>]" value="external_users"<?php checked( 'external_users' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_external_users"><?php _e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_approved_users" name="auth_settings[<?php echo $option; ?>]" value="approved_users"<?php checked( 'approved_users' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_approved_users"><?php _e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php _e( 'approved users', 'authorizer' ); ?></a> <?php _e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br /><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_external_users" name="auth_settings[<?php echo $option; ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_external_users"><?php _e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_approved_users" name="auth_settings[<?php echo $option; ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_approved_users"><?php _e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php _e( 'approved users', 'authorizer' ); ?></a> <?php _e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br /><?php
 		}
 
 
@@ -4081,7 +4081,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4163,7 +4163,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
-			if ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+			if ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
 			} elseif ( is_multisite() && SINGLE_ADMIN === $admin_mode && '1' === $this->get_plugin_option( 'multisite_override', MULTISITE_ADMIN ) ) {
 				// Workaround: javascript code hides/shows other settings based
@@ -4177,8 +4177,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_everyone" name="auth_settings[<?php echo $option; ?>]" value="everyone"<?php checked( 'everyone' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_everyone"><?php _e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_logged_in_users" name="auth_settings[<?php echo $option; ?>]" value="logged_in_users"<?php checked( 'logged_in_users' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_logged_in_users"><?php _e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br /><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_everyone" name="auth_settings[<?php echo $option; ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_everyone"><?php _e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_logged_in_users" name="auth_settings[<?php echo $option; ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_logged_in_users"><?php _e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br /><?php
 		}
 
 
@@ -4194,8 +4194,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_login" name="auth_settings[<?php echo $option; ?>]" value="login"<?php checked( 'login' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_login"><?php _e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_message" name="auth_settings[<?php echo $option; ?>]" value="message"<?php checked( 'message' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_message"><?php _e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_login" name="auth_settings[<?php echo $option; ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_login"><?php _e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_message" name="auth_settings[<?php echo $option; ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_message"><?php _e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4211,8 +4211,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_no" name="auth_settings[<?php echo $option; ?>]" value="no_warning"<?php checked( 'no_warning' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_no"><?php _e( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="warning"<?php checked( 'warning' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>"><?php _e( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ); ?></label><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_no" name="auth_settings[<?php echo $option; ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_no"><?php _e( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>"><?php _e( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4319,7 +4319,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
-				<option value=""<?php if ( "" == $auth_settings_option ) { echo ' selected="selected"'; } ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
+				<option value=""<?php if ( '' === $auth_settings_option ) { echo ' selected="selected"'; } ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 			</select><?php
 		}
 
@@ -4336,7 +4336,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable Google Logins', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable Google Logins', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4437,7 +4437,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo $error_message; ?><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo $error_message; ?><?php
 		}
 
 
@@ -4593,7 +4593,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4609,7 +4609,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
 			<p><small><?php _e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small></p><?php
 		}
 
@@ -4629,7 +4629,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo $ldap_installed_message; ?><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo $ldap_installed_message; ?><?php
 		}
 
 
@@ -4680,7 +4680,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label>
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Use TLS', 'authorizer' ); ?></label>
 			<br /><small><?php _e( "If ldaps is used, this should be unchecked", 'authorizer' ); ?></small><?php
 		}
 
@@ -4836,7 +4836,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4895,7 +4895,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
 			<p><small><?php _e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo wp_login_url(); ?>?external=wordpress" target="_blank"><?php echo wp_login_url(); ?>?external=wordpress</a>.</p><?php
 		}
 
@@ -4912,7 +4912,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_default" name="auth_settings[<?php echo $option; ?>]" value="default"<?php checked( 'default' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_default"><?php _e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_default" name="auth_settings[<?php echo $option; ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_default"><?php _e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
 			<?php
 
 			/**
@@ -4939,7 +4939,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
 					continue;
 				}
-				?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_<?php echo sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $branding_option['value']; ?>"<?php checked( $branding_option['value'] == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_<?php echo sanitize_title( $branding_option['value'] ); ?>"><?php echo $branding_option['description']; ?></label><br /><?php
+				?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_<?php echo sanitize_title( $branding_option['value'] ); ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $branding_option['value']; ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_<?php echo sanitize_title( $branding_option['value'] ); ?>"><?php echo $branding_option['description']; ?></label><br /><?php
 			}
 
 			// Print message about adding custom brands if there are none.
@@ -4961,8 +4961,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_settings" name="auth_settings[<?php echo $option; ?>]" value="settings"<?php checked( 'settings' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_settings"><?php _e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_top" name="auth_settings[<?php echo $option; ?>]" value="top"<?php checked( 'top' == $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_top"><?php _e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br /><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_settings" name="auth_settings[<?php echo $option; ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_settings"><?php _e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_top" name="auth_settings[<?php echo $option; ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_top"><?php _e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br /><?php
 
 		}
 
@@ -5106,7 +5106,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
 			<p><small><?php _e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ) ?></small></p><?php
 		}
 
@@ -5123,7 +5123,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 == $auth_settings_option ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label><?php
 		}
 
 
@@ -5298,7 +5298,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<h2><?php _e( 'Authorizer Settings', 'authorizer' ); ?></h2>
 					<p><?php _e( 'Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.', 'authorizer' ); ?></p>
 
-					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 == $auth_settings['multisite_override'] ); ?> /><label for="auth_settings_multisite_override"><?php _e( 'Override individual site settings with the settings below', 'authorizer' ); ?></label>
+					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 === intval( $auth_settings['multisite_override'] ) ); ?> /><label for="auth_settings_multisite_override"><?php _e( 'Override individual site settings with the settings below', 'authorizer' ); ?></label>
 
 					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
 
@@ -5661,7 +5661,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if (
 				is_multisite() &&
 				! $is_network_admin &&
-				'1' != $auth_override_multisite &&
+				1 !== intval( $auth_override_multisite ) &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
@@ -6248,7 +6248,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'print overlay' === $print_mode &&
 				array_key_exists( 'multisite_override', $auth_settings ) &&
 				'1' === $auth_settings['multisite_override'] &&
-				( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || '1' != $auth_settings['advanced_override_multisite'] )
+				( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || 1 !== intval( $auth_settings['advanced_override_multisite'] ) )
 			) {
 				// Get original plugin options (not overridden value). We'll
 				// show this old value behind the disabled overlay.
@@ -6267,7 +6267,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// If we're getting an option in a site that has overridden the multisite override, make
 			// sure we are returning the option value from that site (not the multisite value).
-			if ( array_key_exists( 'advanced_override_multisite', $auth_settings ) && '1' == $auth_settings['advanced_override_multisite'] ) {
+			if ( array_key_exists( 'advanced_override_multisite', $auth_settings ) && 1 === intval( $auth_settings['advanced_override_multisite'] ) ) {
 				$auth_settings = $this->get_plugin_options( $admin_mode, 'no override' );
 			}
 
@@ -6296,7 +6296,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
-			if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || '1' != $auth_settings['advanced_override_multisite'] ) ) {
+			if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || 1 !== intval( $auth_settings['advanced_override_multisite'] ) ) ) {
 				// Get multisite options.
 				$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 
@@ -6955,7 +6955,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( 'single' !== $multisite_mode ) {
 					// Get multisite users only.
 					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
-				} elseif ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+				} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 					// This site has overridden any multisite settings, so only get its users.
 					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				} else {
@@ -6993,7 +6993,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( SINGLE_ADMIN !== $admin_mode ) {
 					// Get multisite users only.
 					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
-				} elseif ( is_multisite() && $this->get_plugin_option( 'advanced_override_multisite' ) == '1' ) {
+				} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 					// This site has overridden any multisite settings, so only get its users.
 					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
 				} else {
@@ -7130,7 +7130,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print default role (no role).
-			$selected = strlen( $selected_role ) == 0 || ! array_key_exists( $selected_role, $roles ) ? ' selected="selected"' : '';
+			$selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles ) ? ' selected="selected"' : '';
 			$disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input ? ' disabled="disabled"' : '';
 			if ( is_multisite() && current_user_can( 'manage_network' ) ) {
 				$disabled = '';
@@ -7192,7 +7192,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			// Specifically handle zero.
-			if ( 0 == $secs ) {
+			if ( 0 === intval( $secs ) ) {
 				return '0 seconds';
 			}
 
