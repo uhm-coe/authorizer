@@ -3541,11 +3541,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><div class="wrapper_<?php echo $option; ?>"><?php
 
 			// Print option elements.
-			?><ul id="list_auth_settings_access_users_pending" style="margin:0;">
-				<?php if ( count( $auth_settings_option ) > 0 ) : ?>
-					<?php foreach ( $auth_settings_option as $key => $pending_user ) : ?>
-						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
-						<?php $pending_user['is_wp_user'] = false; ?>
+			?><ul id="list_auth_settings_access_users_pending" style="margin:0;"><?php
+				if ( count( $auth_settings_option ) > 0 ) :
+					foreach ( $auth_settings_option as $key => $pending_user ) :
+						if ( empty( $pending_user ) || count( $pending_user ) < 1 ) :
+							continue;
+						endif;
+						$pending_user['is_wp_user'] = false; ?>
 						<li>
 							<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
 							<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
@@ -3894,9 +3896,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
 								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
 							>
-								<option value=""<?php if ( empty( $approved_user['usermeta'] ) ) echo ' selected="selected"'; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
+								<option value=""<?php echo ( empty( $approved_user['usermeta'] ) ) ? ' selected="selected"' : ''; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-									<option value="<?php echo $key; ?>"<?php if ( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) echo ' selected="selected"'; ?>><?php echo $label; ?></option>
+									<option value="<?php echo $key; ?>"<?php echo ( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) ? ' selected="selected"' : ''; ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
 							</select>
 						<?php endif; ?>
@@ -3946,17 +3948,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><div class="wrapper_<?php echo $option; ?>"><?php
 
 			// Print option elements.
-			?><ul id="list_auth_settings_<?php echo $option; ?>" style="margin:0;">
-				<?php foreach ( $auth_settings_option as $key => $blocked_user ) : ?>
-					<?php if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) continue; ?>
-					<?php if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ) : ?>
-						<?php $blocked_user['email'] = $blocked_wp_user->user_email; ?>
-						<?php $blocked_user['role'] = array_shift( $blocked_wp_user->roles ); ?>
-						<?php $blocked_user['date_added'] = $blocked_wp_user->user_registered; ?>
-						<?php $blocked_user['is_wp_user'] = true; ?>
-					<?php else : ?>
-						<?php $blocked_user['is_wp_user'] = false; ?>
-					<?php endif; ?>
+			?><ul id="list_auth_settings_<?php echo $option; ?>" style="margin:0;"><?php
+				foreach ( $auth_settings_option as $key => $blocked_user ) :
+					if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) :
+						continue;
+					endif;
+					if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ) :
+						$blocked_user['email'] = $blocked_wp_user->user_email;
+						$blocked_user['role'] = array_shift( $blocked_wp_user->roles );
+						$blocked_user['date_added'] = $blocked_wp_user->user_registered;
+						$blocked_user['is_wp_user'] = true;
+					else :
+						$blocked_user['is_wp_user'] = false;
+					endif; ?>
 					<li>
 						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
 						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
@@ -5053,13 +5057,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					endwhile; wp_reset_postdata(); ?>
 					<optgroup label="ACF User Fields:">
 						<?php foreach ( (array)$fields as $field => $field_object ) : ?>
-							<option value="acf___<?php echo $field_object['key']; ?>"<?php if ( "acf___{$field_object['key']}" === $auth_settings_option ) echo ' selected="selected"'; ?>><?php echo $field_object['label']; ?></option>
+							<option value="acf___<?php echo $field_object['key']; ?>"<?php echo ( "acf___{$field_object['key']}" === $auth_settings_option ) ? ' selected="selected"' : ''; ?>><?php echo $field_object['label']; ?></option>
 						<?php endforeach; ?>
 					</optgroup>
 				<?php endif; ?>
-				<optgroup label="<?php _e( 'All Usermeta:', 'authorizer' ); ?>">
-					<?php foreach ( $this->get_all_usermeta_keys() as $meta_key ) : if ( substr( $meta_key, 0, 3 ) === 'wp_' ) continue; ?>
-						<option value="<?php echo $meta_key; ?>"<?php if ( $auth_settings_option === $meta_key ) echo ' selected="selected"'; ?>><?php echo $meta_key; ?></option>
+				<optgroup label="<?php _e( 'All Usermeta:', 'authorizer' ); ?>"><?php
+					foreach ( $this->get_all_usermeta_keys() as $meta_key ) :
+						if ( substr( $meta_key, 0, 3 ) === 'wp_' ) :
+							continue;
+						endif; ?>
+						<option value="<?php echo $meta_key; ?>"<?php echo ( $auth_settings_option === $meta_key ) ? ' selected="selected"' : ''; ?>><?php echo $meta_key; ?></option>
 					<?php endforeach; ?>
 				</optgroup>
 			</select><?php
@@ -6955,8 +6962,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return boolean                Whether email was found.
 		 */
 		protected function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
-			if ( empty( $email ) )
+			if ( empty( $email ) ) {
 				return false;
+			}
 
 			switch ( $list ) {
 				case 'pending':
