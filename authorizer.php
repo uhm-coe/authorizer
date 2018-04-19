@@ -427,6 +427,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error(
 					'empty_password',
 					sprintf(
+						/* translators: 1: username; 2: duration of lockout in seconds; 3: duration of lockout as a phrase; 4: lost password URL */
 						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_long_lockout,
@@ -443,6 +444,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return new WP_Error(
 					'empty_password',
 					sprintf(
+						/* translators: 1: username; 2: duration of lockout in seconds; 3: duration of lockout as a phrase; 4: lost password URL */
 						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_short_lockout,
@@ -3690,6 +3692,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$total_pages = 1;
 			}
 
+			/* translators: %s: number of users */
 			$output = ' <span class="displaying-num">' . sprintf( _n( '%s user', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ) . '</span>';
 
 			$disable_first = $current_page <= 1;
@@ -3735,7 +3738,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					strlen( $total_pages )
 				);
 			}
+			/* translators: %s: number of pages */
 			$html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
+			/* translators: 1: number of current page; 2: number of total pages */
 			$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
 
 			if ( $disable_next ) {
@@ -5743,6 +5748,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'success' => $success,
 				'message' => $message,
 				'html' => ob_get_clean(),
+				/* translators: %s: number of users */
 				'total_users_html' => sprintf( _n( '%s user', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ),
 				'total_pages_html' => number_format_i18n( $total_pages ),
 				'total_pages' => $total_pages,
