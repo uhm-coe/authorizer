@@ -1384,7 +1384,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap = ldap_connect( $ldap_host, $ldap_port );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			if ( 1 === intval( $auth_settings['ldap_tls'] ) ) {
-				if( ! ldap_start_tls( $ldap ) ) {
+				if ( ! ldap_start_tls( $ldap ) ) {
 					return null;
 				}
 			}
@@ -1681,7 +1681,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check to see if any category assigned to the requested page is public. If so, show it.
 			$current_page_categories = wp_get_post_categories( $current_page_id, array( 'fields' => 'slugs' ) );
-			foreach( $current_page_categories as $current_page_category ) {
+			foreach ( $current_page_categories as $current_page_category ) {
 				if ( in_array( 'cat_' . $current_page_category, $auth_settings['access_public_pages'], true ) ) {
 					if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
 						update_option( 'auth_settings_advanced_public_notice', false );
@@ -1915,7 +1915,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function load_login_footer_js() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
-			<?php if ( '1' === $auth_settings['google'] ): ?>
+			<?php if ( '1' === $auth_settings['google'] ) : ?>
 				<script type="text/javascript">
 					// Reload login page if reauth querystring param exists,
 					// since reauth interrupts external logins (e.g., google).
@@ -1985,12 +1985,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<div id="auth-external-service-login">
-				<?php if ( '1' === $auth_settings['google'] ): ?>
+				<?php if ( '1' === $auth_settings['google'] ) : ?>
 					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php _e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
 					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
 				<?php endif; ?>
 
-				<?php if ( '1' === $auth_settings['cas'] ): ?>
+				<?php if ( '1' === $auth_settings['cas'] ) : ?>
 					<p><a class="button button-primary button-external button-cas" href="<?php echo $this->modify_current_url_for_cas_login(); ?>">
 						<span class="dashicons dashicons-lock"></span>
 						<span class="label"><?php
@@ -2003,7 +2003,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</a></p>
 				<?php endif; ?>
 
-				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ): ?>
+				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) : ?>
 					<style type="text/css">
 						body.login-action-login form {
 							padding-bottom: 8px;
@@ -2015,7 +2015,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							display: none;
 						}
 					</style>
-				<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ): ?>
+				<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) : ?>
 					<h3> &mdash; <?php _e( 'or', 'authorizer' ); ?> &mdash; </h3>
 				<?php endif; ?>
 			</div>
@@ -3471,13 +3471,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_tabs( $args = '' ) {
-			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args )): ?>
+			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args ) ) : ?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php _e( 'Access Lists', 'authorizer' ); ?></a>
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php _e( 'External Service', 'authorizer' ); ?></a>
 					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php _e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
-			<?php else: ?>
+			<?php else : ?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php _e( 'Access Lists', 'authorizer' ); ?></a>
 					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login' );"><?php _e( 'Login Access', 'authorizer' ); ?></a>
@@ -3543,7 +3543,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><ul id="list_auth_settings_access_users_pending" style="margin:0;">
 				<?php if ( count( $auth_settings_option ) > 0 ) : ?>
-					<?php foreach ( $auth_settings_option as $key => $pending_user ): ?>
+					<?php foreach ( $auth_settings_option as $key => $pending_user ) : ?>
 						<?php if ( empty( $pending_user ) || count( $pending_user ) < 1 ) continue; ?>
 						<?php $pending_user['is_wp_user'] = false; ?>
 						<li>
@@ -3556,7 +3556,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php _e( 'Ignore', 'authorizer' ); ?></a>
 						</li>
 					<?php endforeach; ?>
-				<?php else: ?>
+				<?php else : ?>
 						<li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li>
 				<?php endif; ?>
 			</ul>
@@ -3911,7 +3911,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 					<?php endif; ?>
 				<?php endif; ?>
-				<?php if ( ! $is_current_user && ! $is_multisite_user ): ?>
+				<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
 					<?php if ( ! $is_multisite_admin_page ) : ?>
 						<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="<?php _e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
 					<?php endif; ?>
@@ -3947,14 +3947,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><ul id="list_auth_settings_<?php echo $option; ?>" style="margin:0;">
-				<?php foreach ( $auth_settings_option as $key => $blocked_user ): ?>
+				<?php foreach ( $auth_settings_option as $key => $blocked_user ) : ?>
 					<?php if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) continue; ?>
-					<?php if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ): ?>
+					<?php if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ) : ?>
 						<?php $blocked_user['email'] = $blocked_wp_user->user_email; ?>
 						<?php $blocked_user['role'] = array_shift( $blocked_wp_user->roles ); ?>
 						<?php $blocked_user['date_added'] = $blocked_wp_user->user_registered; ?>
 						<?php $blocked_user['is_wp_user'] = true; ?>
-					<?php else: ?>
+					<?php else : ?>
 						<?php $blocked_user['is_wp_user'] = false; ?>
 					<?php endif; ?>
 					<li>
@@ -4292,11 +4292,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<option value="home" <?php echo in_array( 'home', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Home Page', 'authorizer' ); ?></option>
 					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
-				<?php foreach ( $post_types as $post_type ): ?>
+				<?php foreach ( $post_types as $post_type ) : ?>
 					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
 					<?php $pages = get_posts( array( 'post_type' => $post_type, 'posts_per_page' => -1 ) ); ?>
 					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
-					<?php foreach ( $pages as $page ): ?>
+					<?php foreach ( $pages as $page ) : ?>
 						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
@@ -5873,7 +5873,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( $should_update_auth_settings_access_users_approved ) {
 					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 				}
-
 			} else {
 				// Update user's usermeta value for usermeta key stored in authorizer options.
 				if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
@@ -5883,7 +5882,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// We have a normal usermeta value, so just update it via the WordPress function.
 					update_user_meta( $wp_user->ID, $meta_key, $meta_value );
 				}
-
 			}
 
 			// Return 'success' value to AJAX call.
@@ -5939,7 +5937,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							array_push( $auth_settings_access_users_pending, $pending_user );
 							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 						}
-
 					} elseif ( 'remove' === $pending_user['edit_action'] ) {
 
 						// Remove user from pending list and save.
@@ -5955,7 +5952,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 						}
-
 					}
 				}
 			}
@@ -6024,7 +6020,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								// Email login credentials to new user.
 								wp_new_user_notification( $result, null, 'both' );
 							}
-
 						}
 
 						// Email new user welcome message if plugin option is set.
@@ -6078,7 +6073,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								}
 							}
 						}
-
 					} elseif ( 'remove' === $approved_user['edit_action'] ) { // Remove user from approved list and save (also remove their role if they have a WordPress account).
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
@@ -6122,7 +6116,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 							}
 						}
-
 					} elseif ( 'change_role' === $approved_user['edit_action'] ) { // Update user's role in WordPress.
 						$changed_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $changed_user ) {
@@ -6163,7 +6156,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 							}
 						}
-
 					}
 				}
 			}
@@ -6198,7 +6190,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						} else {
 							$invalid_emails[] = $blocked_user['email'];
 						}
-
 					} elseif ( 'remove' === $blocked_user['edit_action'] ) {
 
 						// Remove auth_blocked usermeta for the user.
@@ -6220,7 +6211,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
 						}
-
 					}
 				}
 			}
