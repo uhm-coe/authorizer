@@ -692,7 +692,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// created below if they don't have one yet).
 				if (
 					! $this->is_email_in_list( $user_email, 'approved' ) &&
-					( 'external_users' === $auth_settings['access_who_can_login'] || $automatically_approve_login	)
+					( 'external_users' === $auth_settings['access_who_can_login'] || $automatically_approve_login )
 				) {
 					$is_newly_approved_user = true;
 
@@ -2060,7 +2060,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( array_key_exists( 'google', $auth_settings ) && '1' === $auth_settings['google'] ) {
 				if ( ! isset( $_COOKIE['login_unique'] ) ) {
 					$this->cookie_value = md5( rand() );
-					setcookie( 'login_unique', $this->cookie_value, time()+1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
+					setcookie( 'login_unique', $this->cookie_value, time() + 1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
 					$_COOKIE['login_unique'] = $this->cookie_value;
 				}
 			}
@@ -5706,7 +5706,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = 'asc' === $sort_order ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
-			} else if ( 'created' === $sort_by && 'asc'!== $sort_order ) {
+			} else if ( 'created' === $sort_by && 'asc' !== $sort_order ) {
 				// If default sort method and reverse order, just reverse the array.
 				$auth_settings_option = array_reverse( $auth_settings_option );
 			}
@@ -7176,7 +7176,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return string         Input in lowercase.
 		 */
 		function lowercase( $string ) {
-			return function_exists( 'mb_strtolower' ) ?  mb_strtolower( $string ) : strtolower( $string );
+			return function_exists( 'mb_strtolower' ) ? mb_strtolower( $string ) : strtolower( $string );
 		}
 
 
@@ -7190,11 +7190,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		function seconds_as_sentence( $secs ) {
 			$units = array(
-				'week'   => 7 * 24 * 3600,
-				'day'    =>     24 * 3600,
-				'hour'   =>          3600,
-				'minute' =>            60,
-				'second' =>             1,
+				'week'   => 3600 * 24 * 7,
+				'day'    => 3600 * 24,
+				'hour'   => 3600,
+				'minute' => 60,
+				'second' => 1,
 			);
 
 			// Specifically handle zero.
@@ -7275,7 +7275,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$host = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
 			$port = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
 			$user = isset( $parsed_url['user'] ) ? $parsed_url['user'] : '';
-			$pass = isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass']  : '';
+			$pass = isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass'] : '';
 			$pass = $user || $pass ? "$pass@" : '';
 			$path = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
 			$query = isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '';
