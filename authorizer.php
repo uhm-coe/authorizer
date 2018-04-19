@@ -1385,8 +1385,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Set bind credentials; attempt an anonymous bind if not provided.
-			$bind_rdn = NULL;
-			$bind_password = NULL;
+			$bind_rdn = null;
+			$bind_password = null;
 			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
 				$bind_rdn = $auth_settings['ldap_user'];
 				$bind_password = $this->decrypt( $auth_settings['ldap_password'] );
@@ -3588,9 +3588,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
 				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
-					return stripos( $user['email'], $search_term ) !== FALSE ||
-						stripos( $user['role'], $search_term ) !== FALSE ||
-						stripos( $user['date_added'], $search_term ) !== FALSE;
+					return stripos( $user['email'], $search_term ) !== false ||
+						stripos( $user['role'], $search_term ) !== false ||
+						stripos( $user['date_added'], $search_term ) !== false;
 				} );
 			}
 
@@ -5686,9 +5686,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
 				$search_term = $_REQUEST['search'];
 				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
-					return stripos( $user['email'], $search_term ) !== FALSE ||
-						stripos( $user['role'], $search_term ) !== FALSE ||
-						stripos( $user['date_added'], $search_term ) !== FALSE;
+					return stripos( $user['email'], $search_term ) !== false ||
+						stripos( $user['role'], $search_term ) !== false ||
+						stripos( $user['date_added'], $search_term ) !== false;
 				} );
 			}
 
