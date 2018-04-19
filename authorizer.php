@@ -980,7 +980,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Nonce check.
 			if ( ! wp_verify_nonce( $nonce, 'google_csrf_nonce' ) ) {
-				return '';
+				die( '' );
 			}
 
 			// Grab plugin settings.
