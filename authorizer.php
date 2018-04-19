@@ -4138,7 +4138,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'<b>[site_url]</b>',
 				'<b>[user_email]</b>'
 			); ?></small><?php
-
 		}
 
 
@@ -6052,8 +6051,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
-					// Remove user from approved list and save (also remove their role if they have a WordPress account).
-					} elseif ( 'remove' === $approved_user['edit_action'] ) {
+					} elseif ( 'remove' === $approved_user['edit_action'] ) { // Remove user from approved list and save (also remove their role if they have a WordPress account).
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
@@ -6097,8 +6095,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 
-					// Update user's role in WordPress.
-					} elseif ( 'change_role' === $approved_user['edit_action'] ) {
+					} elseif ( 'change_role' === $approved_user['edit_action'] ) { // Update user's role in WordPress.
 						$changed_user = get_user_by( 'email', $approved_user['email'] );
 						if ( $changed_user ) {
 							if ( is_multisite() && 'false' !== $approved_user['multisite_user'] ) {
@@ -6858,11 +6855,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					0,
 					substr( hash( 'sha256', self::$iv ), 0, 16 )
 				) );
-			// Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
-			} else if ( function_exists( 'mcrypt_encrypt' ) ) {
+			} else if ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
 				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
-			// Fall back to basic obfuscation.
-			} else {
+			} else { // Fall back to basic obfuscation.
 				for ( $i = 0; $i < strlen( $text ); $i++ ) {
 					$char = substr( $text, $i, 1 );
 					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
@@ -6896,12 +6891,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					0,
 					substr( hash( 'sha256', self::$iv ), 0, 16 )
 				);
-			// Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
-			} else if ( function_exists( 'mcrypt_decrypt' ) ) {
+			} else if ( function_exists( 'mcrypt_decrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
 				$secret = base64_decode( $secret );
 				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
-			// Fall back to basic obfuscation.
-			} else {
+			} else { // Fall back to basic obfuscation.
 				$secret = base64_decode( $secret );
 				for ( $i = 0; $i < strlen( $secret ); $i++ ) {
 					$char = substr( $secret, $i, 1 );
@@ -6948,31 +6941,31 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return false;
 
 			switch ( $list ) {
-			case 'pending':
-				$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
-				return $this->in_multi_array( $email, $auth_settings_access_users_pending );
-				break;
-			case 'blocked':
-				$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
-				return $this->in_multi_array( $email, $auth_settings_access_users_blocked );
-				break;
-			case 'approved':
-			default:
-				if ( 'single' !== $multisite_mode ) {
-					// Get multisite users only.
-					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
-				} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
-					// This site has overridden any multisite settings, so only get its users.
-					$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
-				} else {
-					// Get all site users and all multisite users.
-					$auth_settings_access_users_approved = array_merge(
-						$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
-						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
-					);
-				}
-				return $this->in_multi_array( $email, $auth_settings_access_users_approved );
-				break;
+				case 'pending':
+					$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
+					return $this->in_multi_array( $email, $auth_settings_access_users_pending );
+					break;
+				case 'blocked':
+					$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+					return $this->in_multi_array( $email, $auth_settings_access_users_blocked );
+					break;
+				case 'approved':
+				default:
+					if ( 'single' !== $multisite_mode ) {
+						// Get multisite users only.
+						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
+					} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
+						// This site has overridden any multisite settings, so only get its users.
+						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+					} else {
+						// Get all site users and all multisite users.
+						$auth_settings_access_users_approved = array_merge(
+							$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+							$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+						);
+					}
+					return $this->in_multi_array( $email, $auth_settings_access_users_approved );
+					break;
 			}
 		}
 
@@ -6989,26 +6982,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users = array();
 
 			switch ( $list ) {
-			case 'pending':
-				$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
-				break;
-			case 'blocked':
-				$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
-				break;
-			case 'approved':
-				if ( SINGLE_ADMIN !== $admin_mode ) {
-					// Get multisite users only.
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
-				} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
-					// This site has overridden any multisite settings, so only get its users.
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
-				} else {
-					// Get all site users and all multisite users.
-					$auth_settings_access_users = array_merge(
-						$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
-						$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
-					);
-				}
+				case 'pending':
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
+					break;
+				case 'blocked':
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
+					break;
+				case 'approved':
+					if ( SINGLE_ADMIN !== $admin_mode ) {
+						// Get multisite users only.
+						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN );
+					} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
+						// This site has overridden any multisite settings, so only get its users.
+						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN );
+					} else {
+						// Get all site users and all multisite users.
+						$auth_settings_access_users = array_merge(
+							$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ),
+							$this->get_plugin_option( 'access_users_approved', MULTISITE_ADMIN )
+						);
+					}
 			}
 
 			return count( $auth_settings_access_users );
