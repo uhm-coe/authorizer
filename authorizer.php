@@ -356,6 +356,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Authenticate against an external service.
 		 *
+		 * Filter: authenticate
+		 *
 		 * @param WP_User $user     user to authenticate.
 		 * @param string  $username optional username to authenticate.
 		 * @param string  $password optional password to authenticate.
@@ -974,9 +976,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * custom_authenticate proceeds as normal with the google email address
 		 * as a successfully authenticated external user.
 		 *
+		 * Action: wp_ajax_process_google_login
+		 * Action: wp_ajax_nopriv_process_google_login
+		 *
 		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback().
 		 */
-		function ajax_process_google_login() {
+		public function ajax_process_google_login() {
 			$nonce = array_key_exists( 'nonce', $_POST ) ? $_POST['nonce'] : '';
 			$code = array_key_exists( 'code', $_POST ) ? $_POST['code'] : null;
 
@@ -1490,6 +1495,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Log out of the attached external service.
 		 *
+		 * Action: wp_logout
+		 *
 		 * @return void
 		 */
 		public function custom_logout() {
@@ -1753,7 +1760,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * this because check_user_access() runs on the parse_request hook, which
 		 * does not fire on wp-admin pages.
 		 *
-		 * Action: admin_menu
+		 * Action: init
 		 *
 		 * @return void
 		 */
@@ -1809,7 +1816,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $errors Error description.
 		 * @return string         Error description with Authorizer errors added.
 		 */
-		function show_advanced_login_error( $errors ) {
+		public function show_advanced_login_error( $errors ) {
 			$error = get_option( 'auth_settings_advanced_login_error' );
 			delete_option( 'auth_settings_advanced_login_error' );
 			$errors = '    ' . $error . "<br />\n";
@@ -1819,8 +1826,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Load external resources for the public-facing site.
+		 *
+		 * Action: wp_enqueue_scripts
 		 */
-		function auth_public_scripts() {
+		public function auth_public_scripts() {
 			// Load (and localize) public scripts.
 			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
@@ -1841,9 +1850,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Enqueue JS scripts and CSS styles appearing on wp-login.php.
 		 *
+		 * Action: login_enqueue_scripts
+		 *
 		 * @return void
 		 */
-		function login_enqueue_scripts_and_styles() {
+		public function login_enqueue_scripts_and_styles() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -1901,7 +1912,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * Action: login_footer
 		 */
-		function load_login_footer_js() {
+		public function load_login_footer_js() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<?php if ( '1' === $auth_settings['google'] ): ?>
@@ -1967,8 +1978,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Create links for any external authentication services that are enabled.
+		 *
+		 * Action: login_form
 		 */
-		function login_form_add_external_service_links() {
+		public function login_form_add_external_service_links() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<div id="auth-external-service-login">
@@ -2019,11 +2032,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * output is started (so the redirect header doesn't complain about data
 		 * already being sent).
 		 *
+		 * Filter: wp_login_errors
+		 *
 		 * @param  object $errors      WP Error object.
 		 * @param  string $redirect_to Where to redirect on error.
 		 * @return WP_Error|void       WP Error object or void on redirect.
 		 */
-		function wp_login_errors__maybe_redirect_to_cas( $errors, $redirect_to ) {
+		public function wp_login_errors__maybe_redirect_to_cas( $errors, $redirect_to ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -2050,9 +2065,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * wp-login.php, but before any html output is started (so setting the
 		 * cookie header doesn't complain about data already being sent).
 		 *
+		 * Action: login_init
+		 *
 		 * @return void
 		 */
-		function login_init__maybe_set_google_nonce_cookie() {
+		public function login_init__maybe_set_google_nonce_cookie() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -2072,10 +2089,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Update the user meta for the user that just failed logging in.
 		 * Keep track of time of last failed attempt and number of failed attempts.
 		 *
+		 * Action: wp_login_failed
+		 *
 		 * @param  string $username Username to update login count for.
 		 * @return void
 		 */
-		function update_login_failed_count( $username ) {
+		public function update_login_failed_count( $username ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -2128,7 +2147,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  object $user       WP_User object of the user logging in.
 		 * @return void
 		 */
-		function ensure_wordpress_user_in_approved_list_on_login( $user_login, $user ) {
+		public function ensure_wordpress_user_in_approved_list_on_login( $user_login, $user ) {
 			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
 
@@ -2138,10 +2157,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * If we're authenticating against an external service, standard
 		 * WordPress password resets won't work.
 		 *
+		 * Filter: lostpassword_url
+		 *
 		 * @param  string $lostpassword_url URL to reset password.
 		 * @return string                   URL to reset password.
 		 */
-		function custom_lostpassword_url( $lostpassword_url ) {
+		public function custom_lostpassword_url( $lostpassword_url ) {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
 
@@ -2168,7 +2189,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Add a link to this plugin's settings page from the WordPress Plugins page.
 		 * Called from "plugin_action_links" filter in __construct() above.
 		 *
-		 * Filter: plugin_action_links
+		 * Filter: plugin_action_links_authorizer.php
 		 *
 		 * @param  array $links Admin sidebar links.
 		 * @return array        Admin sidebar links with Authorizer added.
@@ -2185,7 +2206,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Add a link to this plugin's network settings page from the WordPress Plugins page.
 		 * Called from "network_admin_plugin_action_links" filter in __construct() above.
 		 *
-		 * Filter: network_admin_plugin_action_links
+		 * Filter: network_admin_plugin_action_links_authorizer.php
 		 *
 		 * @param  array $links Network admin sidebar links.
 		 * @return array        Network admin sidebar links with Authorizer added.
@@ -2303,9 +2324,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Show custom admin notice.
 		 *
-		 * Filter: admin_notice
+		 * Filter: admin_notices
+		 * filter: network_admin_notices
 		 */
-		function show_advanced_admin_notice() {
+		public function show_advanced_admin_notice() {
 			$notice = get_option( 'auth_settings_advanced_admin_notice' );
 			delete_option( 'auth_settings_advanced_admin_notice' );
 
@@ -2780,7 +2802,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * Note: This function is called on plugin activation.
 		 */
-		function set_default_options() {
+		private function set_default_options() {
 			global $wp_roles;
 
 			$auth_settings = get_option( 'auth_settings' );
@@ -3158,7 +3180,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $multisite_mode Set to 'multisite' to sync roles on all sites the user belongs to.
 		 * @return array                  Array of sanitized users.
 		 */
-		function sanitize_user_list( $list, $side_effect = 'none', $multisite_mode = 'single' ) {
+		private function sanitize_user_list( $list, $side_effect = 'none', $multisite_mode = 'single' ) {
 			// If it's not a list, make it so.
 			if ( ! is_array( $list ) ) {
 				$list = array();
@@ -3192,7 +3214,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  array $auth_settings Authorizer settings array.
 		 * @return array                Sanitized Authorizer settings array.
 		 */
-		function sanitize_options( $auth_settings ) {
+		public function sanitize_options( $auth_settings ) {
 			// Default to "Approved Users" login access restriction.
 			if ( ! in_array( $auth_settings['access_who_can_login'], array( 'external_users', 'approved_users' ), true ) ) {
 				$auth_settings['access_who_can_login'] = 'approved_users';
@@ -3315,7 +3337,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param bool     $update True if updating existing user, false if saving a new one.
 		 * @param stdClass $user   Updated WP_User object for user being edited (passed by reference).
 		 */
-		function edit_user_profile_update_role( &$errors, $update, &$user ) {
+		public function edit_user_profile_update_role( &$errors, $update, &$user ) {
 			// Do nothing if we're not updating role.
 			if ( ! property_exists( $user, 'role' ) ) {
 				return;
@@ -3361,11 +3383,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * list, changing the email address on the approved entry, and removing any
 		 * existing entries that also have the new email address (duplicates).
 		 *
+		 * Filter: send_email_change_email
+		 *
 		 * @param bool  $send     Whether to send the email.
 		 * @param array $user     The original user array.
 		 * @param array $userdata The updated user array.
 		 */
-		function edit_user_profile_update_email( $send, $user, $userdata ) {
+		public function edit_user_profile_update_email( $send, $user, $userdata ) {
 			// If we're in multisite, update the email on all sites in the network
 			// (and remove from any subsites if it's a network-approved user).
 			if ( is_multisite() ) {
@@ -3446,7 +3470,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_tabs( $args = '' ) {
+		public function print_section_info_tabs( $args = '' ) {
 			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args )): ?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php _e( 'Access Lists', 'authorizer' ); ?></a>
@@ -3471,7 +3495,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_access_lists( $args = '' ) {
+		public function print_section_info_access_lists( $args = '' ) {
 			$admin_mode = $this->get_admin_mode( $args );
 			?><div id="section_info_access_lists" class="section_info">
 				<p><?php _e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
@@ -3507,7 +3531,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_combo_auth_access_users_pending( $args = '' ) {
+		public function print_combo_auth_access_users_pending( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_users_pending';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -3547,7 +3571,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_combo_auth_access_users_approved( $args = '' ) {
+		public function print_combo_auth_access_users_approved( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_users_approved';
 			$admin_mode = $this->get_admin_mode( $args );
@@ -3686,7 +3710,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string  $which          Where to render the pager ('top' or 'bottom').
 		 * @return void
 		 */
-		function render_user_pager( $current_page = 1, $users_per_page = 20, $total_users = 0, $which = 'top' ) {
+		private function render_user_pager( $current_page = 1, $users_per_page = 20, $total_users = 0, $which = 'top' ) {
 			$total_pages = ceil( $total_users / $users_per_page );
 			if ( $total_pages < 1 ) {
 				$total_pages = 1;
@@ -3796,7 +3820,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param string $advanced_usermeta Usermeta field to display.
 		 * @return void
 		 */
-		function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
+		private function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
 			$is_local_user = array_key_exists( 'local_user', $approved_user ) && 'true' === $approved_user['local_user'];
 			$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && true === $approved_user['multisite_user'];
 			$option_prefix = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
@@ -3909,7 +3933,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_combo_auth_access_users_blocked( $args = '' ) {
+		public function print_combo_auth_access_users_blocked( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_users_blocked';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -3961,7 +3985,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_access_login( $args = '' ) {
+		public function print_section_info_access_login( $args = '' ) {
 			?><div id="section_info_access_login" class="section_info">
 				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 				<p><?php _e( 'Choose who is able to log into this site below.', 'authorizer' ); ?></p>
@@ -3975,7 +3999,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_access_who_can_login( $args = '' ) {
+		public function print_radio_auth_access_who_can_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_who_can_login';
 			$admin_mode = $this->get_admin_mode( $args );
@@ -4007,7 +4031,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
+		public function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_role_receive_pending_emails';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4026,7 +4050,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
+		public function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_pending_redirect_to_message';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4053,7 +4077,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_wysiwyg_auth_access_blocked_redirect_to_message( $args = '' ) {
+		public function print_wysiwyg_auth_access_blocked_redirect_to_message( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_blocked_redirect_to_message';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4080,7 +4104,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_access_should_email_approved_users( $args = '' ) {
+		public function print_checkbox_auth_access_should_email_approved_users( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_should_email_approved_users';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4096,7 +4120,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_auth_access_email_approved_users_subject( $args = '' ) {
+		public function print_text_auth_access_email_approved_users_subject( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_email_approved_users_subject';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4112,7 +4136,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_wysiwyg_auth_access_email_approved_users_body( $args = '' ) {
+		public function print_wysiwyg_auth_access_email_approved_users_body( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_email_approved_users_body';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4147,7 +4171,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_access_public( $args = '' ) {
+		public function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
 				<p><?php _e( 'Choose your public access options here.', 'authorizer' ); ?></p>
 			</div><?php
@@ -4160,7 +4184,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_access_who_can_view( $args = '' ) {
+		public function print_radio_auth_access_who_can_view( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_who_can_view';
 			$admin_mode = $this->get_admin_mode( $args );
@@ -4192,7 +4216,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_access_redirect( $args = '' ) {
+		public function print_radio_auth_access_redirect( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_redirect';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4209,7 +4233,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_access_public_warning( $args = '' ) {
+		public function print_radio_auth_access_public_warning( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_public_warning';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4226,7 +4250,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
+		public function print_wysiwyg_auth_access_redirect_to_message( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_redirect_to_message';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4253,7 +4277,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_multiselect_auth_access_public_pages( $args = '' ) {
+		public function print_multiselect_auth_access_public_pages( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_public_pages';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4302,7 +4326,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_external( $args = '' ) {
+		public function print_section_info_external( $args = '' ) {
 			?><div id="section_info_external" class="section_info">
 				<p><?php _e( 'Enter your external server settings below.', 'authorizer' ); ?></p>
 			</div><?php
@@ -4315,7 +4339,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_auth_access_default_role( $args = '' ) {
+		public function print_select_auth_access_default_role( $args = '' ) {
 			// Get plugin option.
 			$option = 'access_default_role';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4334,7 +4358,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_external_google( $args = '' ) {
+		public function print_checkbox_auth_external_google( $args = '' ) {
 			// Get plugin option.
 			$option = 'google';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4350,7 +4374,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_google_clientid( $args = '' ) {
+		public function print_text_google_clientid( $args = '' ) {
 			// Get plugin option.
 			$option = 'google_clientid';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4383,7 +4407,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_google_clientsecret( $args = '' ) {
+		public function print_text_google_clientsecret( $args = '' ) {
 			// Get plugin option.
 			$option = 'google_clientsecret';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4400,7 +4424,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_google_hosteddomain( $args = '' ) {
+		public function print_text_google_hosteddomain( $args = '' ) {
 			// Get plugin option.
 			$option = 'google_hosteddomain';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4418,7 +4442,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_external_cas( $args = '' ) {
+		public function print_checkbox_auth_external_cas( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4451,7 +4475,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_custom_label( $args = '' ) {
+		public function print_text_cas_custom_label( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_custom_label';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4467,7 +4491,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_host( $args = '' ) {
+		public function print_text_cas_host( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_host';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4484,7 +4508,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_port( $args = '' ) {
+		public function print_text_cas_port( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_port';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4501,7 +4525,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_path( $args = '' ) {
+		public function print_text_cas_path( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_path';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4518,7 +4542,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_cas_version( $args = '' ) {
+		public function print_select_cas_version( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_version';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4539,7 +4563,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_attr_email( $args = '' ) {
+		public function print_text_cas_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_email';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4557,7 +4581,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_attr_first_name( $args = '' ) {
+		public function print_text_cas_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_first_name';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4574,7 +4598,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_cas_attr_last_name( $args = '' ) {
+		public function print_text_cas_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_last_name';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4591,7 +4615,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_cas_attr_update_on_login( $args = '' ) {
+		public function print_checkbox_cas_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_attr_update_on_login';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4607,7 +4631,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_cas_auto_login( $args = '' ) {
+		public function print_checkbox_cas_auto_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'cas_auto_login';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4624,7 +4648,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_external_ldap( $args = '' ) {
+		public function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4643,7 +4667,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_host( $args = '' ) {
+		public function print_text_ldap_host( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_host';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4660,7 +4684,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_port( $args = '' ) {
+		public function print_text_ldap_port( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_port';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4678,7 +4702,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_ldap_tls( $args = '' ) {
+		public function print_checkbox_ldap_tls( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_tls';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4695,7 +4719,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_search_base( $args = '' ) {
+		public function print_text_ldap_search_base( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_search_base';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4714,7 +4738,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_uid( $args = '' ) {
+		public function print_text_ldap_uid( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_uid';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4731,7 +4755,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_attr_email( $args = '' ) {
+		public function print_text_ldap_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_email';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4749,7 +4773,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_user( $args = '' ) {
+		public function print_text_ldap_user( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_user';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4766,7 +4790,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_password_ldap_password( $args = '' ) {
+		public function print_password_ldap_password( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_password';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4783,7 +4807,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_lostpassword_url( $args = '' ) {
+		public function print_text_ldap_lostpassword_url( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_lostpassword_url';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4800,7 +4824,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_attr_first_name( $args = '' ) {
+		public function print_text_ldap_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_first_name';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4817,7 +4841,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_ldap_attr_last_name( $args = '' ) {
+		public function print_text_ldap_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_last_name';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4834,7 +4858,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
+		public function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'ldap_attr_update_on_login';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4850,7 +4874,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_section_info_advanced( $args = '' ) {
+		public function print_section_info_advanced( $args = '' ) {
 			?><div id="section_info_advanced" class="section_info">
 				<p><?php _e( 'You may optionally specify some advanced settings below.', 'authorizer' ); ?></p>
 			</div><?php
@@ -4863,7 +4887,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_auth_advanced_lockouts( $args = '' ) {
+		public function print_text_auth_advanced_lockouts( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_lockouts';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4893,7 +4917,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
+		public function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_hide_wp_login';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -4910,7 +4934,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_advanced_branding( $args = '' ) {
+		public function print_radio_auth_advanced_branding( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_branding';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4959,7 +4983,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_radio_auth_advanced_admin_menu( $args = '' ) {
+		public function print_radio_auth_advanced_admin_menu( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_admin_menu';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -4977,7 +5001,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_auth_advanced_usermeta( $args = '' ) {
+		public function print_select_auth_advanced_usermeta( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_usermeta';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -5048,7 +5072,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_text_auth_advanced_users_per_page( $args = '' ) {
+		public function print_text_auth_advanced_users_per_page( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_users_per_page';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -5064,7 +5088,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_auth_advanced_users_sort_by( $args = '' ) {
+		public function print_select_auth_advanced_users_sort_by( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_users_sort_by';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -5085,7 +5109,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_select_auth_advanced_users_sort_order( $args = '' ) {
+		public function print_select_auth_advanced_users_sort_order( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_users_sort_order';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -5104,7 +5128,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
+		public function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_widget_enabled';
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
@@ -5121,7 +5145,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
-		function print_checkbox_auth_advanced_override_multisite( $args = '' ) {
+		public function print_checkbox_auth_advanced_override_multisite( $args = '' ) {
 			// Get plugin option.
 			$option = 'advanced_override_multisite';
 			$auth_settings_option = $this->get_plugin_option( $option );
@@ -5138,7 +5162,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return int          Current mode.
 		 */
-		function get_admin_mode( $args ) {
+		private function get_admin_mode( $args ) {
 			if ( is_array( $args ) && array_key_exists( MULTISITE_ADMIN, $args ) && true === $args[MULTISITE_ADMIN] ) {
 				return MULTISITE_ADMIN;
 			} else {
@@ -5489,8 +5513,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Save multisite settings (ajax call).
+		 *
+		 * Action: wp_ajax_save_auth_multisite_settings
 		 */
-		function ajax_save_auth_multisite_settings() {
+		public function ajax_save_auth_multisite_settings() {
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'manage_network_options' ) ) {
 				die( '' );
@@ -5579,8 +5605,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Load Authorizer dashboard widget if it's enabled.
+		 *
+		 * Action: wp_dashboard_setup
 		 */
-		function add_dashboard_widgets() {
+		public function add_dashboard_widgets() {
 			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled', SINGLE_ADMIN, 'allow override' ) === '1';
 
 			// Load authorizer dashboard widget if it's enabled and user has permission.
@@ -5592,9 +5620,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 
 		/**
-		 * Render Authorizer dashboard widget.
+		 * Render Authorizer dashboard widget (callback).
 		 */
-		function add_auth_dashboard_widget() {
+		public function add_auth_dashboard_widget() {
 			?><form method="post" id="auth_settings_access_form" action="">
 				<?php $this->print_section_info_access_login(); ?>
 				<div>
@@ -5631,7 +5659,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return void
 		 */
-		function ajax_refresh_approved_user_list() {
+		public function ajax_refresh_approved_user_list() {
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'create_users' ) ) {
 				die( '' );
@@ -5768,7 +5796,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return void
 		 */
-		function ajax_update_auth_usermeta() {
+		public function ajax_update_auth_usermeta() {
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'create_users' ) ) {
 				die( '' );
@@ -5871,7 +5899,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return void
 		 */
-		function ajax_update_auth_user() {
+		public function ajax_update_auth_user() {
 			// Fail silently if current user doesn't have permissions.
 			if ( ! current_user_can( 'create_users' ) ) {
 				die( '' );
@@ -6400,7 +6428,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int $user_id User ID to remove.
 		 * @return void
 		 */
-		function remove_user_from_authorizer_when_deleted( $user_id ) {
+		public function remove_user_from_authorizer_when_deleted( $user_id ) {
 			$user = get_user_by( 'id', $user_id );
 			$deleted_email = $user->user_email;
 
@@ -6430,7 +6458,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int $user_id User ID to remove.
 		 * @return void
 		 */
-		function remove_network_user_from_authorizer_when_deleted( $user_id ) {
+		public function remove_network_user_from_authorizer_when_deleted( $user_id ) {
 			$user = get_user_by( 'id', $user_id );
 			$deleted_email = $user->user_email;
 
@@ -6468,7 +6496,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int $blog_id Blog ID to remove from.
 		 * @return void
 		 */
-		function remove_network_user_from_site_when_removed( $user_id, $blog_id ) {
+		public function remove_network_user_from_site_when_removed( $user_id, $blog_id ) {
 			$user = get_user_by( 'id', $user_id );
 			$deleted_email = $user->user_email;
 
@@ -6496,7 +6524,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int $blog_id Blog ID to add to.
 		 * @return void
 		 */
-		function add_network_user_to_site( $user_id, $blog_id ) {
+		private function add_network_user_to_site( $user_id, $blog_id ) {
 			// Switch to blog.
 			switch_to_blog( $blog_id );
 
@@ -6537,7 +6565,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array  $role        The role of the invited user (or none if a new user creation).
 		 * @param string $newuser_key The key of the invitation.
 		 */
-		function add_existing_user_to_authorizer_when_created( $user_id, $role = array(), $newuser_key = '' ) {
+		public function add_existing_user_to_authorizer_when_created( $user_id, $role = array(), $newuser_key = '' ) {
 			$user = get_user_by( 'id', $user_id );
 			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles, $role );
 		}
@@ -6554,7 +6582,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param int   $user_id The invited user's ID.
 		 * @param mixed $result  True on success or a WP_Error object if the user doesn't exist.
 		 */
-		function add_existing_user_to_authorizer_when_created_noconfirmation( $user_id, $result ) {
+		public function add_existing_user_to_authorizer_when_created_noconfirmation( $user_id, $result ) {
 			$user = get_user_by( 'id', $user_id );
 			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
@@ -6572,7 +6600,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param string $key        User's activation key.
 		 * @param array  $meta       Additional signup meta, including initially set roles.
 		 */
-		function add_new_user_to_authorizer_when_created( $user, $user_email, $key, $meta ) {
+		public function add_new_user_to_authorizer_when_created( $user, $user_email, $key, $meta ) {
 			$user_roles = isset( $meta['new_role'] ) ? array( $meta['new_role'] ) : array();
 			$this->add_user_to_authorizer_when_created( $user_email, time(), $user_roles );
 		}
@@ -6590,7 +6618,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                        wp_send_new_user_notifications() for more
 		 *                        information on possible values.
 		 */
-		function add_new_user_to_authorizer_when_created_single_site( $user_id, $notify ) {
+		public function add_new_user_to_authorizer_when_created_single_site( $user_id, $notify ) {
 			$user = get_user_by( 'id', $user_id );
 			$this->add_user_to_authorizer_when_created( $user->user_email, $user->user_registered, $user->roles );
 		}
@@ -6664,7 +6692,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @param int $user_id The user's ID.
 		 */
-		function grant_super_admin__add_to_network_approved( $user_id ) {
+		public function grant_super_admin__add_to_network_approved( $user_id ) {
 			$user = get_user_by( 'id', $user_id );
 			$user_email = $user->user_email;
 
@@ -6702,7 +6730,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @param int $user_id The user's ID.
 		 */
-		function revoke_super_admin__remove_from_network_approved( $user_id ) {
+		public function revoke_super_admin__remove_from_network_approved( $user_id ) {
 			$user = get_user_by( 'id', $user_id );
 			$revoked_email = $user->user_email;
 
@@ -6802,14 +6830,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @var string
 		 */
-		protected $cookie_value = null;
+		private $cookie_value = null;
 
 		/**
 		 * Retrieve the unique login cookie.
 		 *
 		 * @return string Login cookie value.
 		 */
-		function get_cookie_value() {
+		private function get_cookie_value() {
 			if ( ! $this->cookie_value ) {
 				if ( isset( $_COOKIE['login_unique'] ) ) {
 					$this->cookie_value = $_COOKIE['login_unique'];
@@ -6843,7 +6871,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $library Encryption library to use (openssl).
 		 * @return string          Encrypted string.
 		 */
-		function encrypt( $text, $library = 'openssl' ) {
+		private function encrypt( $text, $library = 'openssl' ) {
 			$result = '';
 
 			// Use openssl library (better) if it is enabled.
@@ -6879,7 +6907,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $library Encryption lib to use (openssl).
 		 * @return string          Decrypted string
 		 */
-		function decrypt( $secret, $library = 'openssl' ) {
+		private function decrypt( $secret, $library = 'openssl' ) {
 			$result = '';
 
 			// Use openssl library (better) if it is enabled.
@@ -6915,7 +6943,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return bool Whether current user is logged in and a user of the current blog.
 		 */
-		function is_user_logged_in_and_blog_user() {
+		protected function is_user_logged_in_and_blog_user() {
 			$is_user_logged_in_and_blog_user = false;
 			if ( is_multisite() ) {
 				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_user_member_of_blog( get_current_user_id() );
@@ -6936,7 +6964,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $multisite_mode Admin context.
 		 * @return boolean                Whether email was found.
 		 */
-		function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
+		protected function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
 			if ( empty( $email ) )
 				return false;
 
@@ -6978,7 +7006,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $admin_mode SINGLE_ADMIN or MULTISITE_ADMIN determines whether to include multisite users.
 		 * @return int                Number of users in list.
 		 */
-		function get_user_count_from_list( $list, $admin_mode = SINGLE_ADMIN ) {
+		protected function get_user_count_from_list( $list, $admin_mode = SINGLE_ADMIN ) {
 			$auth_settings_access_users = array();
 
 			switch ( $list ) {
@@ -7017,7 +7045,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $case_sensitivity 'case sensitive' if comparisons should respect case.
 		 * @return bool                     Whether needle was found.
 		 */
-		function in_multi_array( $needle = '', $haystack = array(), $strict_mode = 'not strict', $case_sensitivity = 'case insensitive' ) {
+		protected function in_multi_array( $needle = '', $haystack = array(), $strict_mode = 'not strict', $case_sensitivity = 'case insensitive' ) {
 			if ( ! is_array( $haystack ) ) {
 				return false;
 			}
@@ -7042,7 +7070,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $url URL that should be publicly reachable.
 		 * @return boolean     Whether the URL is publicly reachable.
 		 */
-		function url_is_accessible( $url ) {
+		protected function url_is_accessible( $url ) {
 			// Use wp_remote_retrieve_response_code() to retrieve the URL.
 			$response = wp_remote_get( $url );
 			$response_code = wp_remote_retrieve_response_code( $response );
@@ -7058,7 +7086,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  array $parts Array returned from parse_url().
 		 * @return string       URL.
 		 */
-		function build_url( $parts = array() ) {
+		protected function build_url( $parts = array() ) {
 			return
 				( isset( $parts['scheme'] ) ? "{$parts['scheme']}:" : '' ) .
 				( ( isset( $parts['user'] ) || isset( $parts['host'] ) ) ? '//' : '' ) .
@@ -7082,7 +7110,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int    $admin_mode    MULTISITE_ADMIN if we are in that context.
 		 * @return void
 		 */
-		function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled', $admin_mode = SINGLE_ADMIN ) {
+		protected function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled', $admin_mode = SINGLE_ADMIN ) {
 			$roles = get_editable_roles();
 			$current_user = wp_get_current_user();
 
@@ -7152,7 +7180,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *                         ['usermeta' => [''|array()]]
 		 *                       );
 		 */
-		function get_user_info_from_list( $email, $list ) {
+		protected function get_user_info_from_list( $email, $list ) {
 			foreach ( $list as $user_info ) {
 				if ( 0 === strcasecmp( $user_info['email'], $email ) ) {
 					return $user_info;
@@ -7168,7 +7196,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  string $string String to convert to lowercase.
 		 * @return string         Input in lowercase.
 		 */
-		function lowercase( $string ) {
+		protected function lowercase( $string ) {
 			return function_exists( 'mb_strtolower' ) ? mb_strtolower( $string ) : strtolower( $string );
 		}
 
@@ -7181,7 +7209,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  int $secs Seconds to display as readable text.
 		 * @return string    Readable version of number of seconds.
 		 */
-		function seconds_as_sentence( $secs ) {
+		protected function seconds_as_sentence( $secs ) {
 			$units = array(
 				'week'   => 3600 * 24 * 7,
 				'day'    => 3600 * 24,
@@ -7213,7 +7241,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return array All usermeta keys for user.
 		 */
-		function get_all_usermeta_keys() {
+		protected function get_all_usermeta_keys() {
 			global $wpdb;
 			$usermeta_keys = $wpdb->get_col( "SELECT DISTINCT $wpdb->usermeta.meta_key FROM $wpdb->usermeta" );
 			return $usermeta_keys;
@@ -7222,8 +7250,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 		/**
 		 * Load translated strings from *.mo files in /languages.
+		 *
+		 * Action: plugins_loaded
 		 */
-		function load_textdomain() {
+		public function load_textdomain() {
 			load_plugin_textdomain(
 				'authorizer',
 				false,
@@ -7236,7 +7266,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
 		 * and external=cas added).
 		 */
-		function modify_current_url_for_cas_login() {
+		private function modify_current_url_for_cas_login() {
 			// Construct the URL of the current page (wp-login.php).
 			$url = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
@@ -7263,7 +7293,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  array $parsed_url Keys from parse_url().
 		 * @return string            URL constructed from the components in $parsed_url.
 		 */
-		function unparse_url( $parsed_url = array() ) {
+		protected function unparse_url( $parsed_url = array() ) {
 			$scheme = isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] . '://' : '';
 			$host = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
 			$port = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
@@ -7285,14 +7315,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param  boolean $is_multisite_user Whether the class name should indicate it's a multisite user.
 		 * @return string                     Class name, e.g., "auth-email auth-multisite-email".
 		 */
-		function create_class_name( $suffix = '', $is_multisite_user = false ) {
+		private function create_class_name( $suffix = '', $is_multisite_user = false ) {
 			return $is_multisite_user ? "auth-$suffix auth-multisite-$suffix" : "auth-$suffix";
 		}
 
 		/**
 		 * Plugin Update Routines.
+		 *
+		 * Action: plugins_loaded
 		 */
-		function auth_update_check() {
+		public function auth_update_check() {
 			// Get current version.
 			$needs_updating = false;
 			if ( is_multisite() ) {
