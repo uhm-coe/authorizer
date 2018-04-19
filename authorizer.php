@@ -3634,7 +3634,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = 'asc' === $sort_order ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
-			} else if ( 'created' === $sort_by && 'asc' !== $sort_order ) {
+			} elseif ( 'created' === $sort_by && 'asc' !== $sort_order ) {
 				// If default sort method and reverse order, just reverse the array.
 				$auth_settings_option = array_reverse( $auth_settings_option );
 			}
@@ -3655,7 +3655,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Make sure current_page is between 1 and max pages.
 			if ( $current_page < 1 ) {
 				$current_page = 1;
-			} else if ( $current_page > $total_pages ) {
+			} elseif ( $current_page > $total_pages ) {
 				$current_page = $total_pages;
 			}
 
@@ -5740,7 +5740,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 				$sort_order = 'asc' === $sort_order ? SORT_ASC : SORT_DESC;
 				array_multisort( $sort_dimension, $sort_order, $auth_settings_option );
-			} else if ( 'created' === $sort_by && 'asc' !== $sort_order ) {
+			} elseif ( 'created' === $sort_by && 'asc' !== $sort_order ) {
 				// If default sort method and reverse order, just reverse the array.
 				$auth_settings_option = array_reverse( $auth_settings_option );
 			}
@@ -5761,7 +5761,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Make sure current_page is between 1 and max pages.
 			if ( $current_page < 1 ) {
 				$current_page = 1;
-			} else if ( $current_page > $total_pages ) {
+			} elseif ( $current_page > $total_pages ) {
 				$current_page = $total_pages;
 			}
 
@@ -6880,7 +6880,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					0,
 					substr( hash( 'sha256', self::$iv ), 0, 16 )
 				) );
-			} else if ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			} elseif ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
 				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
 			} else { // Fall back to basic obfuscation.
 				for ( $i = 0; $i < strlen( $text ); $i++ ) {
@@ -6916,7 +6916,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					0,
 					substr( hash( 'sha256', self::$iv ), 0, 16 )
 				);
-			} else if ( function_exists( 'mcrypt_decrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			} elseif ( function_exists( 'mcrypt_decrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
 				$secret = base64_decode( $secret );
 				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
 			} else { // Fall back to basic obfuscation.
