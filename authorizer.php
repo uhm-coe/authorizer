@@ -3844,7 +3844,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( strlen( $advanced_usermeta ) > 0 ) :
 					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
 						// Get ACF Field value for the user.
-						$approved_user['usermeta'] = get_field( str_replace('acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
+						$approved_user['usermeta'] = get_field( str_replace( 'acf___', '', $advanced_usermeta ), 'user_' . $approved_wp_user->ID );
 					else :
 						// Get regular usermeta value for the user.
 						$approved_user['usermeta'] = get_user_meta( $approved_wp_user->ID, $advanced_usermeta, true );
@@ -3886,7 +3886,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( strlen( $advanced_usermeta ) > 0 ) :
 					$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
 					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
-						$field_object = get_field_object( str_replace('acf___', '', $advanced_usermeta ) );
+						$field_object = get_field_object( str_replace( 'acf___', '', $advanced_usermeta ) );
 						if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && 'select' === $field_object['type'] ) :
 							$should_show_usermeta_in_text_field = false; ?>
 							<select
@@ -4397,7 +4397,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<li><?php _e( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ); ?></li>
 			</ol>
 			<input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:560px;" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4414,7 +4414,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:220px;" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4498,7 +4498,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  authn.example.edu', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  authn.example.edu', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4515,7 +4515,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" style="width:50px;" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  443', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  443', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4532,7 +4532,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  /cas', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  /cas', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4570,7 +4570,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  mail', 'authorizer'); ?></label>
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  mail', 'authorizer' ); ?></label>
 			<br /><small><?php _e( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ); ?></small><?php
 		}
 
@@ -4588,7 +4588,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  givenName', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  givenName', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4605,7 +4605,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  sn', 'authorizer'); ?></label><?php
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  sn', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4726,7 +4726,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><textarea id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" placeholder="" style="width:330px;"><?php echo $auth_settings_option; ?></textarea>
-			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer'); ?></label>
+			<br /><label for="auth_settings_<?php echo $option; ?>" class="helper"><?php _e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?></label>
 			<br /><small><?php _e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
 			<?php
 		}
@@ -5878,7 +5878,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Update user's usermeta value for usermeta key stored in authorizer options.
 				if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
 					// We have an ACF field value, so use the ACF function to update it.
-					update_field( str_replace('acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
+					update_field( str_replace( 'acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
 				} else {
 					// We have a normal usermeta value, so just update it via the WordPress function.
 					update_user_meta( $wp_user->ID, $meta_key, $meta_value );
