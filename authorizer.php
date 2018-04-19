@@ -6970,11 +6970,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				case 'pending':
 					$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', SINGLE_ADMIN );
 					return $this->in_multi_array( $email, $auth_settings_access_users_pending );
-					break;
 				case 'blocked':
 					$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
 					return $this->in_multi_array( $email, $auth_settings_access_users_blocked );
-					break;
 				case 'approved':
 				default:
 					if ( 'single' !== $multisite_mode ) {
@@ -6991,7 +6989,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						);
 					}
 					return $this->in_multi_array( $email, $auth_settings_access_users_approved );
-					break;
 			}
 		}
 
