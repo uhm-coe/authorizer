@@ -1254,29 +1254,29 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Email attribute can be a string or an array of strings.
 					array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && (
 						(
-							is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
-							count( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+							is_array( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) &&
+							count( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) > 0
 						) || (
-							is_string( $cas_attributes[$auth_settings['cas_attr_email']] ) &&
-							strlen( $cas_attributes[$auth_settings['cas_attr_email']] ) > 0
+							is_string( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) &&
+							strlen( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) > 0
 						)
 					)
 				) {
 					// Each of the emails in the array needs to be set to lowercase.
-					if ( is_array( $cas_attributes[$auth_settings['cas_attr_email']] ) ) {
+					if ( is_array( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) ) {
 						$externally_authenticated_email = array();
-						foreach ( $cas_attributes[$auth_settings['cas_attr_email']] as $external_email ) {
+						foreach ( $cas_attributes[ $auth_settings['cas_attr_email'] ] as $external_email ) {
 							$externally_authenticated_email[] = $this->lowercase( $external_email );
 						}
 					} else {
-						$externally_authenticated_email = $this->lowercase( $cas_attributes[$auth_settings['cas_attr_email']] );
+						$externally_authenticated_email = $this->lowercase( $cas_attributes[ $auth_settings['cas_attr_email'] ] );
 					}
 				}
 			}
 
 			// Get user first name and last name.
-			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_first_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_first_name']] : '';
-			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[$auth_settings['cas_attr_last_name']] ) > 0 ? $cas_attributes[$auth_settings['cas_attr_last_name']] : '';
+			$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) > 0 ? $cas_attributes[ $auth_settings['cas_attr_first_name'] ] : '';
+			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) > 0 ? $cas_attributes[ $auth_settings['cas_attr_last_name'] ] : '';
 
 			return array(
 				'email' => $externally_authenticated_email,
@@ -1438,16 +1438,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get the bind dn and first/last names; if there are multiple results returned, just get the last one.
 			for ( $i = 0; $i < $ldap_entries['count']; $i++ ) {
-				$ldap_user_dn = $ldap_entries[$i]['dn'];
+				$ldap_user_dn = $ldap_entries[ $i ]['dn'];
 
 				// Get user first name and last name.
 				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_first_name'] ) : '';
-				if ( strlen( $ldap_attr_first_name ) > 0 && array_key_exists( $ldap_attr_first_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_first_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_first_name][0] ) > 0 ) {
-					$first_name = $ldap_entries[$i][$ldap_attr_first_name][0];
+				if ( strlen( $ldap_attr_first_name ) > 0 && array_key_exists( $ldap_attr_first_name, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_first_name ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_first_name ][0] ) > 0 ) {
+					$first_name = $ldap_entries[ $i ][ $ldap_attr_first_name ][0];
 				}
 				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_last_name'] ) : '';
-				if ( strlen( $ldap_attr_last_name ) > 0 && array_key_exists( $ldap_attr_last_name, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_last_name]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_last_name][0] ) > 0 ) {
-					$last_name = $ldap_entries[$i][$ldap_attr_last_name][0];
+				if ( strlen( $ldap_attr_last_name ) > 0 && array_key_exists( $ldap_attr_last_name, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_last_name ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_last_name ][0] ) > 0 ) {
+					$last_name = $ldap_entries[ $i ][ $ldap_attr_last_name ][0];
 				}
 				// Get user email if it is specified in another field.
 				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_email'] ) : '';
@@ -1458,8 +1458,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Otherwise, look up the LDAP attribute for email.
 					if ( substr( $ldap_attr_email, 0, 1 ) === '@' ) {
 						$email = $this->lowercase( $username . $ldap_attr_email );
-					} elseif ( array_key_exists( $ldap_attr_email, $ldap_entries[$i] ) && $ldap_entries[$i][$ldap_attr_email]['count'] > 0 && strlen( $ldap_entries[$i][$ldap_attr_email][0] ) > 0 ) {
-						$email = $this->lowercase( $ldap_entries[$i][$ldap_attr_email][0] );
+					} elseif ( array_key_exists( $ldap_attr_email, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_email ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_email ][0] ) > 0 ) {
+						$email = $this->lowercase( $ldap_entries[ $i ][ $ldap_attr_email ][0] );
 					}
 				}
 			}
@@ -3188,7 +3188,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $list as $key => $user_info ) {
 				if ( strlen( $user_info['email'] ) < 1 ) {
 					// Make sure there are no empty entries in the list.
-					unset( $list[$key] );
+					unset( $list[ $key ] );
 				} elseif ( 'update roles' === $side_effect ) {
 					// Make sure the WordPress user accounts have the same role
 					// as that indicated in the list.
@@ -3297,7 +3297,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Make sure all lockout options are integers (attempts_1,
 			// duration_1, attempts_2, duration_2, reset_duration).
 			foreach ( $auth_settings['advanced_lockouts'] as $key => $value ) {
-				$auth_settings['advanced_lockouts'][$key] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
+				$auth_settings['advanced_lockouts'][ $key ] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
 			}
 
 			// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string).
@@ -3365,7 +3365,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN ) );
 				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
 					if ( 0 === strcasecmp( $check_user['email'], $userdata->user_email ) ) {
-						$auth_settings_access_users_approved[$key]['role'] = $user->role;
+						$auth_settings_access_users_approved[ $key ]['role'] = $user->role;
 					}
 				}
 				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
@@ -3403,11 +3403,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					foreach ( $auth_multisite_settings_access_users_approved as $key => $check_user ) {
 						// Update old user email in approved list to the new email.
 						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-							$auth_multisite_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+							$auth_multisite_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
 						}
 						// If new user email is already in approved list, remove that entry.
 						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-							unset( $auth_multisite_settings_access_users_approved[$key] );
+							unset( $auth_multisite_settings_access_users_approved[ $key ] );
 						}
 					}
 					update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
@@ -3424,15 +3424,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
 							// But if the user is already a multisite user, just remove the entry in the subsite.
 							if ( $changed_user_is_multisite_user ) {
-								unset( $auth_settings_access_users_approved[$key] );
+								unset( $auth_settings_access_users_approved[ $key ] );
 							} else {
-								$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+								$auth_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
 							}
 							$updated = true;
 						}
 						// If new user email is already in approved list, remove that entry.
 						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-							unset( $auth_settings_access_users_approved[$key] );
+							unset( $auth_settings_access_users_approved[ $key ] );
 							$updated = true;
 						}
 					}
@@ -3447,11 +3447,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
 						// Update old user email in approved list to the new email.
 						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-							$auth_settings_access_users_approved[$key]['email'] = $this->lowercase( $userdata['user_email'] );
+							$auth_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
 						}
 						// If new user email is already in approved list, remove that entry.
 						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-							unset( $auth_settings_access_users_approved[$key] );
+							unset( $auth_settings_access_users_approved[ $key ] );
 						}
 					}
 					update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
@@ -3625,9 +3625,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
 					if ( 'date_added' === $sort_by ) {
-						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
+						$sort_dimension[ $key ] = date( 'Ymd', strtotime( $user[ $sort_by ] ) );
 					} else {
-						$sort_dimension[$key] = strtolower( $user[$sort_by] );
+						$sort_dimension[ $key ] = strtolower( $user[ $sort_by ] );
 					}
 				}
 				$sort_order = 'asc' === $sort_order ? SORT_ASC : SORT_DESC;
@@ -3668,7 +3668,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$offset = ( $current_page - 1 ) * $users_per_page;
 				$max = min( $offset + $users_per_page, count( $auth_settings_option ) );
 				for ( $key = $offset; $key < $max; $key++ ) :
-					$approved_user = $auth_settings_option[$key];
+					$approved_user = $auth_settings_option[ $key ];
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
@@ -5032,7 +5032,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						));
 						while ( $acf_fields->have_posts() ) : $acf_fields->the_post();
 							global $post;
-							$fields[$post->post_name] = get_field_object( $post->post_name );
+							$fields[ $post->post_name ] = get_field_object( $post->post_name );
 						endwhile; wp_reset_postdata();
 					endforeach;
 					// Get ACF 4 fields.
@@ -5046,7 +5046,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							foreach ( $acf4_fields as $meta_key => $meta_value ) :
 								if ( strpos( $meta_key, 'field_' ) === 0 ) :
 									$meta_value = unserialize( $meta_value[0] );
-									$fields[$meta_key] = $meta_value;
+									$fields[ $meta_key ] = $meta_value;
 								endif;
 							endforeach;
 						endif;
@@ -5163,7 +5163,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return int          Current mode.
 		 */
 		private function get_admin_mode( $args ) {
-			if ( is_array( $args ) && array_key_exists( MULTISITE_ADMIN, $args ) && true === $args[MULTISITE_ADMIN] ) {
+			if ( is_array( $args ) && array_key_exists( MULTISITE_ADMIN, $args ) && true === $args[ MULTISITE_ADMIN ] ) {
 				return MULTISITE_ADMIN;
 			} else {
 				return SINGLE_ADMIN;
@@ -5726,9 +5726,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
 					if ( 'date_added' === $sort_by ) {
-						$sort_dimension[$key] = date( 'Ymd', strtotime( $user[$sort_by] ) );
+						$sort_dimension[ $key ] = date( 'Ymd', strtotime( $user[ $sort_by ] ) );
 					} else {
-						$sort_dimension[$key] = strtolower( $user[$sort_by] );
+						$sort_dimension[ $key ] = strtolower( $user[ $sort_by ] );
 					}
 				}
 				$sort_order = 'asc' === $sort_order ? SORT_ASC : SORT_DESC;
@@ -5763,7 +5763,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$offset = ( $current_page - 1 ) * $users_per_page;
 			$max = min( $offset + $users_per_page, count( $auth_settings_option ) );
 			for ( $key = $offset; $key < $max; $key++ ) :
-				$approved_user = $auth_settings_option[$key];
+				$approved_user = $auth_settings_option[ $key ];
 				if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 					continue;
 				endif;
@@ -5827,9 +5827,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$should_update_auth_multisite_settings_access_users_approved = false;
 				foreach ( $auth_multisite_settings_access_users_approved as $index => $approved_user ) {
 					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
-						if ( ! is_array( $auth_multisite_settings_access_users_approved[$index]['usermeta'] ) ) {
+						if ( ! is_array( $auth_multisite_settings_access_users_approved[ $index ]['usermeta'] ) ) {
 							// Initialize the array of usermeta for each blog this user belongs to.
-							$auth_multisite_settings_access_users_approved[$index]['usermeta'] = array();
+							$auth_multisite_settings_access_users_approved[ $index ]['usermeta'] = array();
 						} else {
 							// There is already usermeta associated with this
 							// preapproved user; iterate through it and make
@@ -5837,15 +5837,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							// so). This can happen if someone changes the
 							// usermeta key in authorizer options, and we don't
 							// want to hang on to old data.
-							foreach ( $auth_multisite_settings_access_users_approved[$index]['usermeta'] as $blog_id => $usermeta ) {
+							foreach ( $auth_multisite_settings_access_users_approved[ $index ]['usermeta'] as $blog_id => $usermeta ) {
 								if ( array_key_exists( 'meta_key', $usermeta ) && $usermeta['meta_key'] === $meta_key ) {
 									continue;
 								} else {
-									unset( $auth_multisite_settings_access_users_approved[$index]['usermeta'][$blog_id] );
+									unset( $auth_multisite_settings_access_users_approved[ $index ]['usermeta'][ $blog_id ] );
 								}
 							}
 						}
-						$auth_multisite_settings_access_users_approved[$index]['usermeta'][get_current_blog_id()] = array(
+						$auth_multisite_settings_access_users_approved[ $index ]['usermeta'][ get_current_blog_id() ] = array(
 							'meta_key' => $meta_key,
 							'meta_value' => $meta_value,
 						);
@@ -5863,7 +5863,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$should_update_auth_settings_access_users_approved = false;
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
-						$auth_settings_access_users_approved[$index]['usermeta'] = array(
+						$auth_settings_access_users_approved[ $index ]['usermeta'] = array(
 							'meta_key' => $meta_key,
 							'meta_value' => $meta_value,
 						);
@@ -5949,7 +5949,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							);
 							foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
 								if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
-									unset( $auth_settings_access_users_pending[$key] );
+									unset( $auth_settings_access_users_pending[ $key ] );
 									break;
 								}
 							}
@@ -6068,7 +6068,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$list_changed = false;
 									foreach ( $user_list as $key => $user ) {
 										if ( 0 === strcasecmp( $user['email'], $approved_user['email'] ) ) {
-											unset( $user_list[$key] );
+											unset( $user_list[ $key ] );
 											$list_changed = true;
 										}
 									}
@@ -6096,7 +6096,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 											}
 										}
 										// Remove entry from Approved Users list.
-										unset( $auth_multisite_settings_access_users_approved[$key] );
+										unset( $auth_multisite_settings_access_users_approved[ $key ] );
 										break;
 									}
 								}
@@ -6115,7 +6115,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 											$user->set_role( '' );
 										}
 										// Remove entry from Approved Users list.
-										unset( $auth_settings_access_users_approved[$key] );
+										unset( $auth_settings_access_users_approved[ $key ] );
 										break;
 									}
 								}
@@ -6142,7 +6142,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
-										$auth_multisite_settings_access_users_approved[$key]['role'] = $approved_user['role'];
+										$auth_multisite_settings_access_users_approved[ $key ]['role'] = $approved_user['role'];
 										break;
 									}
 								}
@@ -6156,7 +6156,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 									if ( 0 === strcasecmp( $approved_user['email'],  $existing_user['email'] ) ) {
-										$auth_settings_access_users_approved[$key]['role'] = $approved_user['role'];
+										$auth_settings_access_users_approved[ $key ]['role'] = $approved_user['role'];
 										break;
 									}
 								}
@@ -6214,7 +6214,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							);
 							foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
 								if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
-									unset( $auth_settings_access_users_blocked[$key] );
+									unset( $auth_settings_access_users_blocked[ $key ] );
 									break;
 								}
 							}
@@ -6307,7 +6307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return null;
 			}
 
-			return $auth_settings[$option];
+			return $auth_settings[ $option ];
 		}
 
 		/**
@@ -6440,7 +6440,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				foreach ( $user_list as $key => $existing_user ) {
 					if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 						$list_changed = true;
-						unset( $user_list[$key] );
+						unset( $user_list[ $key ] );
 					}
 				}
 				if ( $list_changed ) {
@@ -6470,7 +6470,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 				if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 					$list_changed = true;
-					unset( $auth_multisite_settings_access_users_approved[$key] );
+					unset( $auth_multisite_settings_access_users_approved[ $key ] );
 				}
 			}
 			if ( $list_changed ) {
@@ -6507,7 +6507,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				foreach ( $user_list as $key => $existing_user ) {
 					if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
 						$list_changed = true;
-						unset( $user_list[$key] );
+						unset( $user_list[ $key ] );
 					}
 				}
 				if ( $list_changed ) {
@@ -6655,7 +6655,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Remove from pending list if there.
 			foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
 				if ( 0 === strcasecmp( $pending_user['email'], $user_email ) ) {
-					unset( $auth_settings_access_users_pending[$key] );
+					unset( $auth_settings_access_users_pending[ $key ] );
 					$updated = true;
 				}
 			}
@@ -6742,7 +6742,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 				if ( 0 === strcasecmp( $revoked_email, $existing_user['email'] ) ) {
 					$list_changed = true;
-					unset( $auth_multisite_settings_access_users_approved[$key] );
+					unset( $auth_multisite_settings_access_users_approved[ $key ] );
 				}
 			}
 			if ( $list_changed ) {
@@ -6785,7 +6785,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			foreach ( $recently_sent_emails as $key => $recently_sent_email ) {
 				if ( $recently_sent_email['time'] < strtotime( 'now -1 minutes' ) ) {
 					// Remove emails sent more than 1 minute ago.
-					unset( $recently_sent_emails[$key] );
+					unset( $recently_sent_emails[ $key ] );
 				} elseif ( $recently_sent_email['email'] === $email ) {
 					// Sent an email to this user within the last 1 minute, so
 					// quit without sending.
@@ -7127,9 +7127,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$unique_role_names = array();
 				foreach ( $roles as $role_name => $role_info ) {
 					if ( array_key_exists( $role_name, $unique_role_names ) ) {
-						unset( $roles[$role_name] );
+						unset( $roles[ $role_name ] );
 					} else {
-						$unique_role_names[$role_name] = true;
+						$unique_role_names[ $role_name ] = true;
 					}
 				}
 			}
@@ -7477,7 +7477,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							foreach ( $auth_settings_access_users_approved as $key => $user ) {
 								if ( in_array( $user['email'], $distinct_emails, true ) ) {
 									$should_update = true;
-									unset( $auth_settings_access_users_approved[$key] );
+									unset( $auth_settings_access_users_approved[ $key ] );
 								} else {
 									$distinct_emails[] = $user['email'];
 								}
@@ -7495,7 +7495,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						foreach ( $auth_multisite_settings_access_users_approved as $key => $user ) {
 							if ( in_array( $user['email'], $distinct_emails, true ) ) {
 								$should_update = true;
-								unset( $auth_multisite_settings_access_users_approved[$key] );
+								unset( $auth_multisite_settings_access_users_approved[ $key ] );
 							} else {
 								$distinct_emails[] = $user['email'];
 							}
