@@ -4307,7 +4307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php
 					$pages = get_posts( array(
 						'post_type' => $post_type,
-						'posts_per_page' => 1000,
+						'posts_per_page' => 1000, // phpcs:ignore WordPress.VIP.PostsPerPage.posts_per_page_posts_per_page
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
 					foreach ( $pages as $page ) : ?>
