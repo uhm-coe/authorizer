@@ -25,5 +25,20 @@
 		<exclude name="PSR2.ControlStructures.SwitchDeclaration.BreakIndent"/>
 		<exclude name="PSR2.Methods.FunctionCallSignature.Indent"/>
 
+		<!-- Disable Newer function suggestions for backwards compatibility with WordPress -->
+		<exclude name="WordPress.WP.AlternativeFunctions"/>
+
+		<!-- Disable overly picky rules -->
+		<exclude name="Generic.WhiteSpace.ScopeIndent"/>
+		<exclude name="WordPress.WP.CapitalPDangit"/>
+		<exclude name="WordPress.VIP.RestrictedVariables"/>
+		<exclude name="WordPress.VIP.RestrictedVariables"/>
+		<exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
+		<exclude name="WordPress.VIP.SessionVariableUsage"/>
+		<exclude name="WordPress.VIP.SessionFunctionsUsage"/>
+		<exclude name="WordPress.VIP.FileSystemWritesDisallow"/>
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
+		<exclude name="WordPress.VIP.DirectDatabaseQuery"/>
 	</rule>
 </ruleset>
