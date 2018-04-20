@@ -4307,7 +4307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php
 					$pages = get_posts( array(
 						'post_type' => $post_type,
-						'posts_per_page' => -1,
+						'posts_per_page' => 1000,
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
 					foreach ( $pages as $page ) : ?>
