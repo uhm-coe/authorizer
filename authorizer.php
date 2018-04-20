@@ -1009,11 +1009,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			/**
 			 * If the hosted domain parameter is set, restrict logins to that domain.
+			 *
 			 * Note: Will have to upgrade to google-api-php-client v2 or higher for
 			 * this to function server-side; it's not complete in v1, so this check
 			 * is performed manually below.
 			 *
-			 * if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			 * if (
+			 *   array_key_exists( 'google_hosteddomain', $auth_settings ) &&
+			 *   strlen( $auth_settings['google_hosteddomain'] ) > 0
+			 * ) {
 			 *   $google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
 			 *   $google_hosteddomain = trim( $google_hosteddomains[0] );
 			 *   $client->setHostedDomain( $google_hosteddomain );
@@ -1087,7 +1091,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * this to function server-side; it's not complete in v1, so this check
 			 * is performed manually below.
 			 *
-			 * if ( array_key_exists( 'google_hosteddomain', $auth_settings ) && strlen( $auth_settings['google_hosteddomain'] ) > 0 ) {
+			 * if (
+			 *   array_key_exists( 'google_hosteddomain', $auth_settings ) &&
+			 *   strlen( $auth_settings['google_hosteddomain'] ) > 0
+			 * ) {
 			 *   $google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
 			 *   $google_hosteddomain = trim( $google_hosteddomains[0] );
 			 *   $client->setHostedDomain( $google_hosteddomain );
@@ -1206,7 +1213,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$cas_service_url = site_url( '/wp-login.php?external=cas' );
 			$login_querystring = array(); parse_str( $_SERVER['QUERY_STRING'], $login_querystring );
 			if ( isset( $login_querystring['redirect_to'] ) ) {
-				$cas_service_url .= '&redirect_to=' . urlencode( $login_querystring['redirect_to'] );
+				$cas_service_url .= '&redirect_to=' . rawurlencode( $login_querystring['redirect_to'] );
 			}
 			phpCAS::setFixedServiceURL( $cas_service_url );
 
@@ -1216,8 +1223,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} catch ( CAS_AuthenticationException $e ) {
 				// CAS server threw an error in isAuthenticated(), potentially because
 				// the cached ticket is outdated. Try renewing the authentication.
-				error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) );
-				error_log( print_r( $e, true ) );
+				error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+				error_log( print_r( $e, true ) ); // phpcs:ignore
 
 				// CAS server is throwing errors on this login, so try logging the
 				// user out of CAS and redirecting them to the login page.
@@ -1398,7 +1405,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Attempt LDAP bind.
-			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) );
+			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) ); // phpcs:ignore
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				return null;
@@ -1464,7 +1471,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 			}
 
-			$result = @ldap_bind( $ldap, $ldap_user_dn, stripslashes( $password ) );
+			$result = @ldap_bind( $ldap, $ldap_user_dn, stripslashes( $password ) ); // phpcs:ignore
 			if ( ! $result ) {
 				// We have a real ldap user, but an invalid password. Pass
 				// through to wp authentication after failing LDAP (since
@@ -1744,7 +1751,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					__( 'Log In', 'authorizer' ) .
 					'</a></p>';
 				wp_die( $error_message, $page_title );
-			} else { // 'login' === $auth_settings['access_redirect'].
+			} else {
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
 			}
@@ -1794,7 +1801,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				add_user_to_blog( get_current_blog_id(), $current_user->ID, $user_info['role'] );
 
 				// Refresh user permissions.
-				$current_user = new WP_User( $current_user->ID );
+				$current_user = new WP_User( $current_user->ID ); // phpcs:ignore WordPress.Variables.GlobalVariables.OverrideProhibited
 			}
 		}
 
@@ -1940,7 +1947,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
 							// Send the code to the server
-							var ajaxurl = '<?php echo admin_url( 'admin-ajax.php' ); ?>';
+							var ajaxurl = '<?php echo admin_url( 'admin-ajax.php' ); ?>'; // jshint ignore:line
 							$.post(ajaxurl, {
 								'action': 'process_google_login',
 								'code': authResult.code,
@@ -2011,7 +2018,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						body.login-action-login form p > label,
 						body.login-action-login form .forgetmenot,
 						body.login-action-login form .submit,
-						body.login-action-login #nav {
+						body.login-action-login #nav { /* csslint allow: ids */
 							display: none;
 						}
 					</style>
@@ -2459,7 +2466,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'auth_settings_access_login'
 			);
 
-
 			// Create Public Access section.
 			add_settings_section(
 				'auth_settings_access_public',
@@ -2873,7 +2879,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'access_redirect_to_message', $auth_settings ) ) {
 				$auth_settings['access_redirect_to_message'] = '<p>' . __( 'Notice: You are browsing this site anonymously, and only have access to a portion of its content.', 'authorizer' ) . '</p>';
 			}
-
 
 			// External Service Defaults.
 			if ( ! array_key_exists( 'access_default_role', $auth_settings ) ) {
@@ -3676,9 +3681,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					endif;
 					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
 				endfor; ?>
-			</ul><?php
+			</ul>
 
-			?><div id="new_auth_settings_<?php echo $option; ?>">
+			<div id="new_auth_settings_<?php echo $option; ?>">
 				<textarea id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
 				<select id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
@@ -3798,7 +3803,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$search_form[] = '<div class="search-box">';
 				$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';
 				$search_form[] = '<input type="search" size="14" id="user-search-input" name="search" value="' . $search_term . '">';
-				$search_form[] = '<input type="button" id="search-submit" class="button" value="' .  __( 'Search', 'authorizer' ) . '">';
+				$search_form[] = '<input type="button" id="search-submit" class="button" value="' . __( 'Search', 'authorizer' ) . '">';
 				$search_form[] = '</div>';
 			}
 			$search_form = join( "\n", $search_form );
@@ -3953,7 +3958,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) :
 						continue;
 					endif;
-					if ( $blocked_wp_user = get_user_by( 'email', $blocked_user['email'] ) ) :
+					$blocked_wp_user = get_user_by( 'email', $blocked_user['email'] );
+					if ( $blocked_wp_user ) :
 						$blocked_user['email'] = $blocked_wp_user->user_email;
 						$blocked_user['role'] = array_shift( $blocked_wp_user->roles );
 						$blocked_user['date_added'] = $blocked_wp_user->user_registered;
@@ -4298,9 +4304,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ) : ?>
 					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
-					<?php $pages = get_posts( array( 'post_type' => $post_type, 'posts_per_page' => -1 ) ); ?>
-					<?php $pages = is_array( $pages ) ? $pages : array(); ?>
-					<?php foreach ( $pages as $page ) : ?>
+					<?php
+					$pages = get_posts( array(
+						'post_type' => $post_type,
+						'posts_per_page' => -1,
+					) );
+					$pages = is_array( $pages ) ? $pages : array();
+					foreach ( $pages as $page ) : ?>
 						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
@@ -5056,7 +5066,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						endif;
 					endwhile; wp_reset_postdata(); ?>
 					<optgroup label="ACF User Fields:">
-						<?php foreach ( (array)$fields as $field => $field_object ) : ?>
+						<?php foreach ( (array) $fields as $field => $field_object ) : ?>
 							<option value="acf___<?php echo $field_object['key']; ?>"<?php echo ( "acf___{$field_object['key']}" === $auth_settings_option ) ? ' selected="selected"' : ''; ?>><?php echo $field_object['label']; ?></option>
 						<?php endforeach; ?>
 					</optgroup>
@@ -5188,7 +5198,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add help tab for Access Lists Settings.
 			$help_auth_settings_access_lists_content = '
-				<p>' . __( "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) .'</p>
+				<p>' . __( "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) . '</p>
 				<p>' . __( '<strong>Approved Users</strong>: Approved users have access to the site once they successfully log in.', 'authorizer' ) . '</p>
 				<p>' . __( '<strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ) . '</p>
 				<p>' . __( 'Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or <strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list.', 'authorizer' ) . '</p>
@@ -5827,7 +5837,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If user doesn't exist, save usermeta selection to authorizer
 			// list. This value will get saved to usermeta when the user first
 			// logs in (i.e., when their WordPress account is created).
-			if ( ! ( $wp_user = get_user_by( 'email', $email ) ) ) {
+			$wp_user = get_user_by( 'email', $email );
+			if ( ! $wp_user ) {
 				// Look through multisite approved users and add a usermeta
 				// reference for the current blog if the user is found.
 				$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
@@ -6155,7 +6166,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 									$this->get_plugin_option( 'access_users_approved', SINGLE_ADMIN )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 === strcasecmp( $approved_user['email'],  $existing_user['email'] ) ) {
+									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 										$auth_settings_access_users_approved[ $key ]['role'] = $approved_user['role'];
 										break;
 									}
@@ -6883,7 +6894,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			} elseif ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
 				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
 			} else { // Fall back to basic obfuscation.
-				for ( $i = 0; $i < strlen( $text ); $i++ ) {
+				$length = strlen( $text );
+				for ( $i = 0; $i < $length; $i++ ) {
 					$char = substr( $text, $i, 1 );
 					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
 					$char = chr( ord( $char ) + ord( $keychar ) );
@@ -6921,7 +6933,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
 			} else { // Fall back to basic obfuscation.
 				$secret = base64_decode( $secret );
-				for ( $i = 0; $i < strlen( $secret ); $i++ ) {
+				$length = strlen( $secret );
+				for ( $i = 0; $i < $length; $i++ ) {
 					$char = substr( $secret, $i, 1 );
 					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
 					$char = chr( ord( $char ) - ord( $keychar ) );
@@ -7051,7 +7064,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( 'case insensitive' === $case_sensitivity && ! is_array( $item ) ) {
 					$item = strtolower( $item );
 				}
-				if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) {
+				if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 					return true;
 				}
 			}
@@ -7082,7 +7095,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return string       URL.
 		 */
 		protected function build_url( $parts = array() ) {
-			return
+			return (
 				( isset( $parts['scheme'] ) ? "{$parts['scheme']}:" : '' ) .
 				( ( isset( $parts['user'] ) || isset( $parts['host'] ) ) ? '//' : '' ) .
 				( isset( $parts['user'] ) ? "{$parts['user']}" : '' ) .
@@ -7092,7 +7105,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				( isset( $parts['port'] ) ? ":{$parts['port']}" : '' ) .
 				( isset( $parts['path'] ) ? "{$parts['path']}" : '' ) .
 				( isset( $parts['query'] ) ? "?{$parts['query']}" : '' ) .
-				( isset( $parts['fragment'] ) ? "#{$parts['fragment']}" : '' );
+				( isset( $parts['fragment'] ) ? "#{$parts['fragment']}" : '' )
+			);
 		}
 
 
@@ -7221,7 +7235,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$s = '';
 
 			foreach ( $units as $name => $divisor ) {
-				if ( $quot = intval( $secs / $divisor ) ) {
+				$quot = intval( $secs / $divisor );
+				if ( $quot ) {
 					$s .= "$quot $name";
 					$s .= ( abs( $quot ) > 1 ? 's' : '' ) . ', ';
 					$secs -= $quot * $divisor;
