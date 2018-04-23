@@ -3901,9 +3901,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
 								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
 							>
-								<option value=""<?php echo ( empty( $approved_user['usermeta'] ) ) ? ' selected="selected"' : ''; ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
+								<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-									<option value="<?php echo $key; ?>"<?php echo ( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) ? ' selected="selected"' : ''; ?>><?php echo $label; ?></option>
+									<option value="<?php echo $key; ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
 							</select>
 						<?php endif; ?>
@@ -4299,8 +4299,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" multiple="multiple" name="auth_settings[<?php echo esc_attr( $option ); ?>][]">
 				<optgroup label="<?php esc_attr_e( 'Home', 'authorizer' ); ?>">
-					<option value="home" <?php echo in_array( 'home', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php esc_html_e( 'Home Page', 'authorizer' ); ?></option>
-					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php esc_html_e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
+					<option value="home" <?php selected( in_array( 'home', $auth_settings_option, true ) ); ?>><?php esc_html_e( 'Home Page', 'authorizer' ); ?></option>
+					<option value="auth_public_404" <?php selected( in_array( 'auth_public_404', $auth_settings_option, true ) ); ?>><?php esc_html_e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ) : ?>
 					<optgroup label="<?php echo esc_attr( ucfirst( $post_type ) ); ?>">
@@ -4311,7 +4311,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
 					foreach ( $pages as $page ) : ?>
-						<option value="<?php echo $page->ID; ?>" <?php echo in_array( strval( $page->ID ), $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
+						<option value="<?php echo $page->ID; ?>" <?php selected( in_array( strval( $page->ID ), $auth_settings_option, true ) ); ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
@@ -4327,7 +4327,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$categories = get_categories( array( 'hide_empty' => false ) );
 					}
 					foreach ( $categories as $category ) : ?>
-						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php echo in_array( 'cat_' . $category->slug, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $category->name; ?></option>
+						<option value="<?php echo 'cat_' . $category->slug; ?>" <?php selected( in_array( 'cat_' . $category->slug, $auth_settings_option, true ) ); ?>><?php echo $category->name; ?></option>
 					<?php endforeach; ?>
 				</optgroup>
 			</select><?php
@@ -4361,7 +4361,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
-				<option value=""<?php if ( '' === $auth_settings_option ) { echo ' selected="selected"'; } ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
+				<option value=""<?php selected( '' === $auth_settings_option ); ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
 			</select><?php
 		}
 
@@ -5067,7 +5067,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					endwhile; wp_reset_postdata(); ?>
 					<optgroup label="ACF User Fields:">
 						<?php foreach ( (array) $fields as $field => $field_object ) : ?>
-							<option value="acf___<?php echo $field_object['key']; ?>"<?php echo ( "acf___{$field_object['key']}" === $auth_settings_option ) ? ' selected="selected"' : ''; ?>><?php echo $field_object['label']; ?></option>
+							<option value="acf___<?php echo $field_object['key']; ?>"<?php selected( "acf___{$field_object['key']}" === $auth_settings_option ); ?>><?php echo $field_object['label']; ?></option>
 						<?php endforeach; ?>
 					</optgroup>
 				<?php endif; ?>
@@ -5076,7 +5076,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( substr( $meta_key, 0, 3 ) === 'wp_' ) :
 							continue;
 						endif; ?>
-						<option value="<?php echo $meta_key; ?>"<?php echo ( $auth_settings_option === $meta_key ) ? ' selected="selected"' : ''; ?>><?php echo $meta_key; ?></option>
+						<option value="<?php echo $meta_key; ?>"<?php selected( $auth_settings_option === $meta_key ); ?>><?php echo $meta_key; ?></option>
 					<?php endforeach; ?>
 				</optgroup>
 			</select><?php
@@ -7152,26 +7152,18 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print an option element for each permitted role.
 			foreach ( $roles as $name => $role ) {
-				$selected = $selected_role === $name ? ' selected="selected"' : '';
+				$is_selected = $selected_role === $name;
 
-				// Don't let a user change their own role.
-				$disabled = $selected_role !== $name && 'disabled' === $disable_input ? ' disabled="disabled"' : '';
+				// Don't let a user change their own role (but network admins always can).
+				$is_disabled = $selected_role !== $name && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
 
-				// But network admins can always change their role.
-				if ( is_multisite() && current_user_can( 'manage_network' ) ) {
-					$disabled = '';
-				}
-
-				?><option value="<?php echo $name; ?>"<?php echo $selected . $disabled; ?>><?php echo $role['name']; ?></option><?php
+				?><option value="<?php echo $name; ?>"<?php selected( $is_selected ); disabled( $is_disabled ); ?>><?php echo $role['name']; ?></option><?php
 			}
 
 			// Print default role (no role).
-			$selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles ) ? ' selected="selected"' : '';
-			$disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input ? ' disabled="disabled"' : '';
-			if ( is_multisite() && current_user_can( 'manage_network' ) ) {
-				$disabled = '';
-			}
-			?><option value=""<?php echo $selected . $disabled; ?>><?php _e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
+			$is_selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles );
+			$is_disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
+			?><option value=""<?php selected( $is_selected ); disabled( $is_disabled ); ?>><?php _e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
 
 		}
 
