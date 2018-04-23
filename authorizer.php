@@ -4183,7 +4183,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function print_section_info_access_public( $args = '' ) {
 			?><div id="section_info_access_public" class="section_info">
-				<p><?php _e( 'Choose your public access options here.', 'authorizer' ); ?></p>
+				<p><?php esc_html_e( 'Choose your public access options here.', 'authorizer' ); ?></p>
 			</div><?php
 		}
 
@@ -4215,8 +4215,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_everyone" name="auth_settings[<?php echo $option; ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_everyone"><?php _e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_logged_in_users" name="auth_settings[<?php echo $option; ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_logged_in_users"><?php _e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br /><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone"><?php esc_html_e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users"><?php esc_html_e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br /><?php
 		}
 
 
@@ -4232,8 +4232,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_login" name="auth_settings[<?php echo $option; ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_login"><?php _e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_to_message" name="auth_settings[<?php echo $option; ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_to_message"><?php _e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login"><?php esc_html_e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message"><?php esc_html_e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4249,8 +4249,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_no" name="auth_settings[<?php echo $option; ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_no"><?php _e( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>"><?php _e( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ); ?></label><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php _e( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php _e( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4297,13 +4297,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$post_types = is_array( $post_types ) ? $post_types : array();
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo $option; ?>" multiple="multiple" name="auth_settings[<?php echo $option; ?>][]">
-				<optgroup label="<?php _e( 'Home', 'authorizer' ); ?>">
-					<option value="home" <?php echo in_array( 'home', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Home Page', 'authorizer' ); ?></option>
-					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php _e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
+			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" multiple="multiple" name="auth_settings[<?php echo esc_attr( $option ); ?>][]">
+				<optgroup label="<?php esc_attr_e( 'Home', 'authorizer' ); ?>">
+					<option value="home" <?php echo in_array( 'home', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php esc_html_e( 'Home Page', 'authorizer' ); ?></option>
+					<option value="auth_public_404" <?php echo in_array( 'auth_public_404', $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php esc_html_e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
 				</optgroup>
 				<?php foreach ( $post_types as $post_type ) : ?>
-					<optgroup label="<?php echo ucfirst( $post_type ); ?>">
+					<optgroup label="<?php echo esc_attr( ucfirst( $post_type ) ); ?>">
 					<?php
 					$pages = get_posts( array(
 						'post_type' => $post_type,
