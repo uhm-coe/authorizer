@@ -571,6 +571,7 @@ html.busy, html.busy * {
 }
 .dropdown-menu > li > a {
 	text-decoration: none;
+	white-space: normal; /* Allow text to wrap to multiple lines */
 }
 
 /**

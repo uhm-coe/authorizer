@@ -3695,7 +3695,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<span class="sr-only"><?php _e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="javascript:void(0);" onclick="<?php echo $js_function_prefix; ?>add_user( document.getElementById('approve_user_new' ), 'approved', true);"><?php _e( 'Create a local WordPress <br />account instead, and email <br />the user their password.', 'authorizer' ); ?></a></li>
+						<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
 					</ul>
 				</div>
 			</div>
