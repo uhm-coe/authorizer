@@ -2317,7 +2317,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.7.0' );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.7.3' );
 			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
