@@ -1993,7 +1993,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
 			<div id="auth-external-service-login">
 				<?php if ( '1' === $auth_settings['google'] ) : ?>
-					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php _e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
+					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php esc_html_e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
 					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
 				<?php endif; ?>
 
@@ -2023,7 +2023,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 					</style>
 				<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) : ?>
-					<h3> &mdash; <?php _e( 'or', 'authorizer' ); ?> &mdash; </h3>
+					<h3> &mdash; <?php esc_html_e( 'or', 'authorizer' ); ?> &mdash; </h3>
 				<?php endif; ?>
 			</div>
 			<?php
@@ -2261,7 +2261,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function create_admin_page() { ?>
 			<div class="wrap">
-				<h2><?php _e( 'Authorizer Settings', 'authorizer' ); ?></h2>
+				<h2><?php esc_html_e( 'Authorizer Settings', 'authorizer' ); ?></h2>
 				<form method="post" action="options.php" autocomplete="off"><?php
 					// This prints out all hidden settings fields.
 					settings_fields( 'auth_settings_group' );
@@ -2368,7 +2368,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! $this->url_is_accessible( $cas_url ) ) :
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?><div class='notice notice-warning is-dismissible'>
-						<p><?php _e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo $authorizer_options_url; ?>&tab=external'><?php _e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php _e( 'if you intend to use it.', 'authorizer' ); ?></p>
+						<p><?php esc_html_e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo esc_attr( $authorizer_options_url ); ?>&tab=external'><?php esc_html_e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php esc_html_e( 'if you intend to use it.', 'authorizer' ); ?></p>
 					</div><?php
 				endif;
 			endif;
@@ -3478,17 +3478,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function print_section_info_tabs( $args = '' ) {
 			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args ) ) : ?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php _e( 'Access Lists', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php _e( 'External Service', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php _e( 'Advanced', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
 			<?php else : ?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php _e( 'Access Lists', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login' );"><?php _e( 'Login Access', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public' );"><?php _e( 'Public Access', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php _e( 'External Service', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php _e( 'Advanced', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
 			<?php endif;
 		}
@@ -3503,25 +3503,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function print_section_info_access_lists( $args = '' ) {
 			$admin_mode = $this->get_admin_mode( $args );
 			?><div id="section_info_access_lists" class="section_info">
-				<p><?php _e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
+				<p><?php esc_html_e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
 				<ol>
-					<li><?php _e( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ); ?></li>
-					<li><?php _e( '<strong>Approved</strong> users have access to the site once they successfully log in.', 'authorizer' ); ?></li>
-					<li><?php _e( '<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ); ?></li>
+					<li><?php echo wp_kses( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ); ?></li>
+					<li><?php echo wp_kses( '<strong>Approved</strong> users have access to the site once they successfully log in.', 'authorizer' ); ?></li>
+					<li><?php echo wp_kses( '<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ); ?></li>
 				</ol>
 			</div>
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><?php _e( 'Pending Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'pending', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Pending Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'pending', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_pending(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e( 'Approved Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'approved', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Approved Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'approved', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_approved(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php _e( 'Blocked Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'blocked', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Blocked Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'blocked', $admin_mode ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_blocked(); ?></td>
 					</tr>
 				</tbody>
@@ -3558,13 +3558,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php _e( 'Approve', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php _e( 'Block', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php _e( 'Ignore', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else : ?>
-						<li class="auth-empty"><em><?php _e( 'No pending users', 'authorizer' ); ?></em></li>
+						<li class="auth-empty"><em><?php esc_html_e( 'No pending users', 'authorizer' ); ?></em></li>
 				<?php endif; ?>
 			</ul>
 			</div>
@@ -3683,16 +3683,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				endfor; ?>
 			</ul>
 
-			<div id="new_auth_settings_<?php echo $option; ?>">
-				<textarea id="new_approved_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
+			<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
+				<textarea id="new_approved_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
 				<select id="new_approved_user_role" class="auth-role">
 					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 				</select>
 				<div class="btn-group">
-					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo $js_function_prefix; ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php _e( 'Approve', 'authorizer' ); ?></a>
+					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
 					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 						<span class="caret"></span>
-						<span class="sr-only"><?php _e( 'Toggle Dropdown', 'authorizer' ); ?></span>
+						<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
 						<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
@@ -3901,7 +3901,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
 								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
 							>
-								<option value=""<?php echo ( empty( $approved_user['usermeta'] ) ) ? ' selected="selected"' : ''; ?>><?php _e( '-- None --', 'authorizer' ); ?></option>
+								<option value=""<?php echo ( empty( $approved_user['usermeta'] ) ) ? ' selected="selected"' : ''; ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
 									<option value="<?php echo $key; ?>"<?php echo ( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ) ? ' selected="selected"' : ''; ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
@@ -3920,9 +3920,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 				<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
 					<?php if ( ! $is_multisite_admin_page ) : ?>
-						<a class="button" id="block_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>add_user( this, 'blocked', false ); <?php echo $js_function_prefix; ?>ignore_user( this, 'approved' );" title="<?php _e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
+						<a class="button" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>ignore_user( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
 					<?php endif; ?>
-					<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>ignore_user(this, 'approved' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+					<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>ignore_user(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 				<?php endif; ?>
 				<?php if ( $is_local_user ) : ?>
 					&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
@@ -3968,21 +3968,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						$blocked_user['is_wp_user'] = false;
 					endif; ?>
 					<li>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>" value="<?php echo $blocked_user['email']; ?>" readonly="true" class="auth-email" />
-						<select id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_role" class="auth-role">
+						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $blocked_user['email'] ); ?>" readonly="true" class="auth-email" />
+						<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 							<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
-						<input type="text" id="auth_settings_<?php echo $option; ?>_<?php echo $key; ?>_date_added" value="<?php echo date( 'M Y', strtotime( $blocked_user['date_added'] ) ); ?>" readonly="true" class="auth-date-added" />
-						<a class="button" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user(this, 'blocked' );" title="<?php _e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
+						<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
-			<div id="new_auth_settings_<?php echo $option; ?>">
-				<input type="text" id="new_blocked_user_email" placeholder="<?php _e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
+			<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
+				<input type="text" id="new_blocked_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
 				<select id="new_blocked_user_role" class="auth-role">
-					<option value="<?php echo $access_default_role; ?>"><?php echo ucfirst( $access_default_role ); ?></option>
+					<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
 				</select>
-				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user(this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php _e( 'Block', 'authorizer' ); ?></a>
+				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
 			</div>
 			</div>
 			<?php
@@ -3998,7 +3998,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function print_section_info_access_login( $args = '' ) {
 			?><div id="section_info_access_login" class="section_info">
 				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
-				<p><?php _e( 'Choose who is able to log into this site below.', 'authorizer' ); ?></p>
+				<p><?php esc_html_e( 'Choose who is able to log into this site below.', 'authorizer' ); ?></p>
 			</div><?php
 		}
 
@@ -4030,8 +4030,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo $option; ?>_external_users" name="auth_settings[<?php echo $option; ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_external_users"><?php _e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo $option; ?>_approved_users" name="auth_settings[<?php echo $option; ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo $option; ?>_approved_users"><?php _e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php _e( 'approved users', 'authorizer' ); ?></a> <?php _e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br /><?php
+			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users"><?php esc_html_e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users"><?php esc_html_e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php esc_html_e( 'approved users', 'authorizer' ); ?></a> <?php esc_html_e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br /><?php
 		}
 
 
@@ -4047,8 +4047,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]">
-				<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php _e( "None (Don't send notification emails)", 'authorizer' ); ?></option>
+			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+				<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php esc_html_e( "None (Don't send notification emails)", 'authorizer' ); ?></option>
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
 			</select><?php
 		}
@@ -4120,7 +4120,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo $option; ?>"><?php _e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label><?php
+			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label><?php
 		}
 
 
@@ -4136,7 +4136,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo $option; ?>" name="auth_settings[<?php echo $option; ?>]" value="<?php echo $auth_settings_option; ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php _e( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ); ?></small><?php
+			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php _e( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ); ?></small><?php
 		}
 
 
