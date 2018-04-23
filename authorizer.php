@@ -777,7 +777,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( is_multisite() ) {
 							$site_ids_of_user = array_map(
 								function ( $site_of_user ) {
-									return $site_of_user->userblog_id;
+									return intval( $site_of_user->userblog_id );
 								},
 								get_blogs_of_user( $user->ID )
 							);
@@ -787,7 +787,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 
 								// Skip if user is already added to this site.
-								if ( in_array( $blog_id, $site_ids_of_user, true ) ) {
+								if ( in_array( intval( $blog_id ), $site_ids_of_user, true ) ) {
 									continue;
 								}
 
@@ -1677,7 +1677,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {
 				$auth_settings['access_public_pages'] = array();
 			}
-			if ( in_array( $current_page_id, $auth_settings['access_public_pages'], true ) ) {
+			if ( in_array( strval( $current_page_id ), $auth_settings['access_public_pages'], true ) ) {
 				if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
 					update_option( 'auth_settings_advanced_public_notice', false );
 				} else {
@@ -2362,7 +2362,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( '1' === $auth_settings['cas'] ) :
 				// Check if provided CAS URL is accessible.
-				$protocol = in_array( $auth_settings['cas_port'], array( '80', '8080' ), true ) ? 'http' : 'https';
+				$protocol = in_array( strval( $auth_settings['cas_port'] ), array( '80', '8080' ), true ) ? 'http' : 'https';
 				$cas_url = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
 				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint.
 				if ( ! $this->url_is_accessible( $cas_url ) ) :
@@ -4311,7 +4311,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
 					foreach ( $pages as $page ) : ?>
-						<option value="<?php echo $page->ID; ?>" <?php echo in_array( $page->ID, $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
+						<option value="<?php echo $page->ID; ?>" <?php echo in_array( strval( $page->ID ), $auth_settings_option, true ) ? 'selected="selected"' : ''; ?>><?php echo $page->post_title; ?></option>
 					<?php endforeach; ?>
 					</optgroup>
 				<?php endforeach; ?>
