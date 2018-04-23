@@ -3505,9 +3505,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?><div id="section_info_access_lists" class="section_info">
 				<p><?php esc_html_e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
 				<ol>
-					<li><?php echo wp_kses( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ); ?></li>
-					<li><?php echo wp_kses( '<strong>Approved</strong> users have access to the site once they successfully log in.', 'authorizer' ); ?></li>
-					<li><?php echo wp_kses( '<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ); ?></li>
+					<li><?php echo wp_kses( __( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) ); ?></li>
+					<li><?php echo wp_kses( __( '<strong>Approved</strong> users have access to the site once they successfully log in.', 'authorizer' ) ); ?></li>
+					<li><?php echo wp_kses( __( '<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating.', 'authorizer' ) ); ?></li>
 				</ol>
 			</div>
 			<table class="form-table">
