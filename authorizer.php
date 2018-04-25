@@ -311,6 +311,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Run plugin activation on each site in the network.
 				$current_blog_id = $wpdb->blogid;
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
 					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -829,6 +830,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								get_blogs_of_user( $user->ID )
 							);
 
+							// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 							foreach ( $sites as $site ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -3470,6 +3472,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				}
 
 				// Go through all approved lists on individual sites and sync this user there.
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
 					$updated = false;
@@ -6124,6 +6127,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// on individual sites and remove this user from them (to prevent duplicate entries).
 						if ( 'false' !== $approved_user['multisite_user'] && is_multisite() ) {
 							$list_names = array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' );
+							// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 							$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 							foreach ( $sites as $site ) {
 								$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -6537,6 +6541,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
+			// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 			foreach ( $sites as $site ) {
 				$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -6771,6 +6776,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Go through all pending/approved lists on individual sites and remove this user from them.
+			// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 			$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 			foreach ( $sites as $site ) {
 				$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7177,6 +7183,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we're in network admin, also show any roles that might exist only on
 			// specific sites in the network (themes can add their own roles).
 			if ( MULTISITE_ADMIN === $admin_mode ) {
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
 					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7445,6 +7452,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
 					// Get all blog ids.
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7469,6 +7477,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				if ( is_multisite() ) {
 					// Reencrypt LDAP passwords in each site in the network.
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7520,6 +7529,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Remove duplicates from approved user lists.
 				if ( is_multisite() ) {
 					// Remove duplicates from each site in the multisite.
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7586,6 +7596,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7606,6 +7617,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7626,6 +7638,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 				// Provide default values for any $auth_settings options that don't exist.
 				if ( is_multisite() ) {
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
@@ -7655,6 +7668,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Save new version number if we performed any updates.
 			if ( $needs_updating ) {
 				if ( is_multisite() ) {
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
