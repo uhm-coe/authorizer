@@ -1031,7 +1031,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback().
 		 */
 		public function ajax_process_google_login() {
-			$code = array_key_exists( 'code', $_POST ) ? wp_unslash( $_POST['code'] ) : null;
+			$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
 
 			// Nonce check.
 			if (
@@ -1599,7 +1599,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 					// Redirect to home page, or specified page if it's been provided.
 					$redirect_to = site_url( '/' );
-					if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( wp_unslash( $_REQUEST['redirect_to'] ), FILTER_VALIDATE_URL ) !== false ) {
+					if ( isset( $_REQUEST['redirect_to'] ) && filter_var( wp_unslash( $_REQUEST['redirect_to'] ), FILTER_VALIDATE_URL ) !== false ) {
 						$redirect_to = wp_unslash( $_REQUEST['redirect_to'] );
 					}
 
@@ -1671,7 +1671,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API.
 				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, 'rest_oauth1=' ) === 0 ) ||
 				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them.
-				( property_exists( $wp, 'matched_query' ) && 0 === stripos( $wp->matched_query, 'rest_route=' ) && 'GET' !== $_SERVER['REQUEST_METHOD'] ) ||
+				( property_exists( $wp, 'matched_query' ) && 0 === stripos( $wp->matched_query, 'rest_route=' ) && isset( $_SERVER['REQUEST_METHOD'] ) && 'GET' !== $_SERVER['REQUEST_METHOD'] ) ||
 				// Allow access for GET requests to /wp-json/ (root), since REST API discovery calls rely on this.
 				( property_exists( $wp, 'matched_query' ) && 'rest_route=/' === $wp->matched_query )
 				// Note that GET requests to a rest endpoint will be restricted by authorizer. In that case, error messages will be returned as JSON.
@@ -2064,7 +2064,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</a></p>
 				<?php endif; ?>
 
-				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( wp_unslash( $_SERVER['QUERY_STRING'] ), 'external=wordpress' ) ) : ?>
+				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( wp_unslash( $_SERVER['QUERY_STRING'] ), 'external=wordpress' ) ) : ?>
 					<style type="text/css">
 						body.login-action-login form {
 							padding-bottom: 8px;
@@ -2105,6 +2105,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check whether we should redirect to CAS.
 			if (
+				isset( $_SERVER['QUERY_STRING'] ) &&
 				strpos( wp_unslash( $_SERVER['QUERY_STRING'] ), 'external=wordpress' ) === false &&
 				array_key_exists( 'cas_auto_login', $auth_settings ) && '1' === $auth_settings['cas_auto_login'] &&
 				array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
@@ -3790,8 +3791,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$disable_next = $current_page >= $total_pages;
 			$disable_last = $current_page >= $total_pages;
 
-			$current_url = set_url_scheme( 'http://' . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
-			$current_url = remove_query_arg( wp_removable_query_args(), $current_url );
+			$current_url = '';
+			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
+				$current_url = set_url_scheme( 'http://' . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
+				$current_url = remove_query_arg( wp_removable_query_args(), $current_url );
+			}
 
 			$page_links = array();
 
@@ -5884,7 +5888,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Fail if required post data doesn't exist.
-			if ( ! array_key_exists( 'email', $_REQUEST ) || ! array_key_exists( 'usermeta', $_REQUEST ) ) {
+			if ( ! isset( $_REQUEST['email'], $_REQUEST['usermeta'] ) ) {
 				die( '' );
 			}
 
@@ -5986,7 +5990,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Fail if requesting a change to an invalid setting.
-			if ( ! in_array( wp_unslash( $_POST['setting'] ), array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
+			if ( ! isset( $_POST['setting'] ) || ! in_array( wp_unslash( $_POST['setting'] ), array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
 				die( '' );
 			}
 
@@ -5996,12 +6000,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Editing a pending list entry.
 			if ( 'access_users_pending' === $_POST['setting'] ) {
 				// Initialize posted data if empty.
-				if ( ! ( array_key_exists( 'access_users_pending', $_POST ) && is_array( $_POST['access_users_pending'] ) ) ) {
+				if ( ! isset( $_POST['access_users_pending'] ) || ! is_array( $_POST['access_users_pending'] ) ) {
 					$_POST['access_users_pending'] = array();
 				}
 
 				// Deal with each modified user (add or remove).
-				foreach ( $_POST['access_users_pending'] as $pending_user ) {
+				foreach ( wp_unslash( $_POST['access_users_pending'] ) as $pending_user ) {
 
 					if ( 'add' === $pending_user['edit_action'] ) {
 
@@ -6036,12 +6040,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Editing an approved list entry.
 			if ( 'access_users_approved' === $_POST['setting'] ) {
 				// Initialize posted data if empty.
-				if ( ! ( array_key_exists( 'access_users_approved', $_POST ) && is_array( $_POST['access_users_approved'] ) ) ) {
+				if ( ! isset( $_POST['access_users_approved'] ) || ! is_array( $_POST['access_users_approved'] ) ) {
 					$_POST['access_users_approved'] = array();
 				}
 
 				// Deal with each modified user (add, remove, or change_role).
-				foreach ( $_POST['access_users_approved'] as $approved_user ) {
+				foreach ( wp_unslash( $_POST['access_users_approved'] ) as $approved_user ) {
 					// Skip blank entries.
 					if ( strlen( $approved_user['email'] ) < 1 ) {
 						continue;
@@ -6241,12 +6245,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Editing a blocked list entry.
 			if ( 'access_users_blocked' === $_POST['setting'] ) {
 				// Initialize posted data if empty.
-				if ( ! ( array_key_exists( 'access_users_blocked', $_POST ) && is_array( $_POST['access_users_blocked'] ) ) ) {
+				if ( ! isset( $_POST['access_users_blocked'] ) || ! is_array( $_POST['access_users_blocked'] ) ) {
 					$_POST['access_users_blocked'] = array();
 				}
 
 				// Deal with each modified user (add or remove).
-				foreach ( $_POST['access_users_blocked'] as $blocked_user ) {
+				foreach ( wp_unslash( $_POST['access_users_blocked'] ) as $blocked_user ) {
 
 					if ( 'add' === $blocked_user['edit_action'] ) {
 
@@ -6910,7 +6914,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function get_cookie_value() {
 			if ( ! $this->cookie_value ) {
 				if ( isset( $_COOKIE['login_unique'] ) ) {
-					$this->cookie_value = $_COOKIE['login_unique'];
+					$this->cookie_value = wp_unslash( $_COOKIE['login_unique'] );
 				} else {
 					$this->cookie_value = md5( rand() );
 				}
@@ -7333,7 +7337,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function modify_current_url_for_cas_login() {
 			// Construct the URL of the current page (wp-login.php).
-			$url = 'http' . ( isset( $_SERVER['HTTPS'] ) ? 's' : '' ) . '://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+			$url = '';
+			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
+				$url = set_url_scheme( 'http://' . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
+			}
 
 			// Parse the URL into its components.
 			$parsed_url = parse_url( $url );
