@@ -86,14 +86,33 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			),
 			'b' => array(),
 			'br' => array(),
+			'div' => array(
+				'class' => array(),
+			),
 			'em' => array(),
 			'hr' => array(),
 			'i' => array(),
+			'input' => array(
+				'class' => array(),
+				'id' => array(),
+				'type' => array(),
+				'name' => array(),
+				'value' => array(),
+				'size' => array(),
+				'aria-describedby' => array(),
+			),
+			'label' => array(
+				'for' => array(),
+				'class' => array(),
+			),
 			'p' => array(
 				'style' => array(),
 			),
 			'span' => array(
 				'style' => array(),
+				'class' => array(),
+				'aria-hidden' => array(),
+				'id' => array(),
 			),
 			'strong' => array(),
 		);
@@ -1071,7 +1090,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$response = 'Already authenticated.';
 			}
 
-			die( $response );
+			die( esc_html( $response ) );
 		}
 
 
@@ -1934,7 +1953,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// If we're using Google logins, load those resources.
 			if ( '1' === $auth_settings['google'] ) {
 				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ), '2.3.2' ); ?>
-				<meta name="google-signin-clientid" content="<?php echo $auth_settings['google_clientid']; ?>" />
+				<meta name="google-signin-clientid" content="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>" />
 				<meta name="google-signin-scope" content="email" />
 				<meta name="google-signin-cookiepolicy" content="single_host_origin" />
 				<?php
@@ -1975,11 +1994,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
 							// Send the code to the server
-							var ajaxurl = '<?php echo admin_url( 'admin-ajax.php' ); ?>'; // jshint ignore:line
+							var ajaxurl = '<?php echo esc_attr( admin_url( 'admin-ajax.php' ) ); ?>'; // jshint ignore:line
 							$.post(ajaxurl, {
 								'action': 'process_google_login',
 								'code': authResult.code,
-								'nonce': $('#nonce_google_auth-<?php echo $this->get_cookie_value(); ?>' ).val(),
+								'nonce': $('#nonce_google_auth-<?php echo esc_attr( $this->get_cookie_value() ); ?>' ).val(),
 							}, function( response ) {
 								// Handle or verify the server response if necessary.
 								//console.log( response );
@@ -2026,14 +2045,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php endif; ?>
 
 				<?php if ( '1' === $auth_settings['cas'] ) : ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php echo $this->modify_current_url_for_cas_login(); ?>">
+					<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( $this->modify_current_url_for_cas_login() ); ?>">
 						<span class="dashicons dashicons-lock"></span>
 						<span class="label"><?php
-							printf(
+							echo esc_html( sprintf(
 								/* TRANSLATORS: %s: Custom CAS label from authorizer options */
 								__( 'Sign in with %s', 'authorizer' ),
 								$auth_settings['cas_custom_label']
-							);
+							) );
 						?></span>
 					</a></p>
 				<?php endif; ?>
@@ -2359,6 +2378,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Show custom admin notice.
 		 *
+		 * Note: currently unused, but if anywhere we:
+		 *   add_option( 'auth_settings_advanced_admin_notice, 'Your message.' );
+		 * It will display and then delete that message on the admin dashboard.
+		 *
 		 * Filter: admin_notices
 		 * filter: network_admin_notices
 		 */
@@ -2368,7 +2391,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			if ( $notice && strlen( $notice ) > 0 ) { ?>
 				<div class="error">
-					<p><?php echo $notice; ?></p>
+					<p><?php echo wp_kses( $notice, $this->allowed_html ); ?></p>
 				</div><?php
 			}
 		}
@@ -3541,15 +3564,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Pending Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'pending', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Pending Users', 'authorizer' ); ?> <em>(<?php echo esc_html( $this->get_user_count_from_list( 'pending', $admin_mode ) ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_pending(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Approved Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'approved', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Approved Users', 'authorizer' ); ?> <em>(<?php echo esc_html( $this->get_user_count_from_list( 'approved', $admin_mode ) ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_approved(); ?></td>
 					</tr>
 					<tr>
-						<th scope="row"><?php esc_html_e( 'Blocked Users', 'authorizer' ); ?> <em>(<?php echo $this->get_user_count_from_list( 'blocked', $admin_mode ); ?>)</em></th>
+						<th scope="row"><?php esc_html_e( 'Blocked Users', 'authorizer' ); ?> <em>(<?php echo esc_html( $this->get_user_count_from_list( 'blocked', $admin_mode ) ); ?>)</em></th>
 						<td><?php $this->print_combo_auth_access_users_blocked(); ?></td>
 					</tr>
 				</tbody>
@@ -3582,13 +3605,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						endif;
 						$pending_user['is_wp_user'] = false; ?>
 						<li>
-							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo $key; ?>" value="<?php echo $pending_user['email']; ?>" readonly="true" class="auth-email" />
-							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo $key; ?>_role" class="auth-role">
+							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $pending_user['email'] ); ?>" readonly="true" class="auth-email" />
+							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo $key; ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo $key; ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else : ?>
@@ -3839,8 +3862,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$output = "<div class='tablenav-pages'>$output</div>";
 
 			?><div class="tablenav top">
-				<?php echo $output; ?>
-				<?php echo $search_form; ?>
+				<?php echo wp_kses( $output, $this->allowed_html ); ?>
+				<?php echo wp_kses( $search_form, $this->allowed_html ); ?>
 			</div><?php
 		}
 
@@ -3895,15 +3918,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<li>
 				<input
 					type="text"
-					id="<?php echo $option_id; ?>"
-					value="<?php echo $approved_user['email']; ?>"
+					id="<?php echo esc_attr( $option_id ); ?>"
+					value="<?php echo esc_attr( $approved_user['email'] ); ?>"
 					readonly="true"
-					class="<?php echo $this->create_class_name( 'email', $is_multisite_user ); ?>"
+					class="<?php echo esc_attr( $this->create_class_name( 'email', $is_multisite_user ) ); ?>"
 				/>
 				<select
-					id="<?php echo $option_id; ?>_role"
-					class="<?php echo $this->create_class_name( 'role', $is_multisite_user ); ?>"
-					onchange="<?php echo $js_function_prefix; ?>change_role( this );"
+					id="<?php echo esc_attr( $option_id ); ?>_role"
+					class="<?php echo esc_attr( $this->create_class_name( 'role', $is_multisite_user ) ); ?>"
+					onchange="<?php echo esc_attr( $js_function_prefix ); ?>change_role( this );"
 					<?php if ( $is_multisite_user ) : ?>
 						disabled="disabled"
 					<?php endif; ?>
@@ -3913,10 +3936,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				</select>
 				<input
 					type="text"
-					id="<?php echo $option_id; ?>_date_added"
-					value="<?php echo date( 'M Y', strtotime( $approved_user['date_added'] ) ); ?>"
+					id="<?php echo esc_attr( $option_id ); ?>_date_added"
+					value="<?php echo esc_attr( date( 'M Y', strtotime( $approved_user['date_added'] ) ) ); ?>"
 					readonly="true"
-					class="<?php echo $this->create_class_name( 'date-added', $is_multisite_user ); ?>"
+					class="<?php echo esc_attr( $this->create_class_name( 'date-added', $is_multisite_user ) ); ?>"
 				/>
 				<?php if ( strlen( $advanced_usermeta ) > 0 ) :
 					$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
@@ -3925,13 +3948,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && 'select' === $field_object['type'] ) :
 							$should_show_usermeta_in_text_field = false; ?>
 							<select
-								id="<?php echo $option_id; ?>_usermeta"
+								id="<?php echo esc_attr( $option_id ); ?>_usermeta"
 								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
 								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
 							>
 								<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-									<option value="<?php echo $key; ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo $label; ?></option>
+									<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo $label; ?></option>
 								<?php endforeach; ?>
 							</select>
 						<?php endif; ?>
@@ -3943,7 +3966,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"
 							class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
 						/>
-						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo $key; ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 					<?php endif; ?>
 				<?php endif; ?>
 				<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
