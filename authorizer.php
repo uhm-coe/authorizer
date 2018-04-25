@@ -3949,12 +3949,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$should_show_usermeta_in_text_field = false; ?>
 							<select
 								id="<?php echo esc_attr( $option_id ); ?>_usermeta"
-								class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
-								onchange="<?php echo $js_function_prefix; ?>update_usermeta( this );"
+								class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
+								onchange="<?php echo esc_attr( $js_function_prefix ); ?>update_usermeta( this );"
 							>
 								<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-									<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo $label; ?></option>
+									<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo esc_html( $label ); ?></option>
 								<?php endforeach; ?>
 							</select>
 						<?php endif; ?>
@@ -3962,11 +3962,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php if ( $should_show_usermeta_in_text_field ) : ?>
 						<input
 							type="text"
-							id="<?php echo $option_id; ?>_usermeta"
-							value="<?php echo htmlspecialchars( $approved_user['usermeta'], ENT_COMPAT ); ?>"
-							class="<?php echo $this->create_class_name( 'usermeta', $is_multisite_user ); ?>"
+							id="<?php echo esc_attr( $option_id ); ?>_usermeta"
+							value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
+							class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
 						/>
-						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo $js_function_prefix; ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 					<?php endif; ?>
 				<?php endif; ?>
 				<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
