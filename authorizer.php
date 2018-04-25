@@ -679,7 +679,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Notify user about blocked status and return without authenticating them.
-					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
+					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? wp_unslash( $_REQUEST['redirect_to'] ) : home_url();
 					$page_title = sprintf(
 						/* TRANSLATORS: %s: Name of blog */
 						__( '%s - Access Restricted', 'authorizer' ),
@@ -990,7 +990,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Notify user about pending status and return without authenticating them.
-					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? $_REQUEST['redirect_to'] : home_url();
+					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? wp_unslash( $_REQUEST['redirect_to'] ) : home_url();
 					$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
 					$error_message =
 						apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] ) .
@@ -1031,11 +1031,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback().
 		 */
 		public function ajax_process_google_login() {
-			$nonce = array_key_exists( 'nonce', $_POST ) ? $_POST['nonce'] : '';
-			$code = array_key_exists( 'code', $_POST ) ? $_POST['code'] : null;
+			$code = array_key_exists( 'code', $_POST ) ? wp_unslash( $_POST['code'] ) : null;
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( $nonce, 'google_csrf_nonce' ) ) {
+			if (
+				! isset( $_POST['nonce'] ) ||
+				! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'google_csrf_nonce' )
+			) {
 				die( '' );
 			}
 
@@ -1260,7 +1262,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
 			$cas_service_url = site_url( '/wp-login.php?external=cas' );
-			$login_querystring = array(); parse_str( $_SERVER['QUERY_STRING'], $login_querystring );
+			$login_querystring = array();
+			if ( isset( $_SERVER['QUERY_STRING'] ) ) {
+				parse_str( wp_unslash( $_SERVER['QUERY_STRING'] ), $login_querystring );
+			}
 			if ( isset( $login_querystring['redirect_to'] ) ) {
 				$cas_service_url .= '&redirect_to=' . rawurlencode( $login_querystring['redirect_to'] );
 			}
@@ -1594,8 +1599,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 					// Redirect to home page, or specified page if it's been provided.
 					$redirect_to = site_url( '/' );
-					if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( $_REQUEST['redirect_to'], FILTER_VALIDATE_URL ) !== false ) {
-						$redirect_to = $_REQUEST['redirect_to'];
+					if ( array_key_exists( 'redirect_to', $_REQUEST ) && filter_var( wp_unslash( $_REQUEST['redirect_to'] ), FILTER_VALIDATE_URL ) !== false ) {
+						$redirect_to = wp_unslash( $_REQUEST['redirect_to'] );
 					}
 
 					phpCAS::logoutWithRedirectService( $redirect_to );
@@ -1777,7 +1782,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// User is denied access, so show them the error message. Render as JSON
 			// if this is a REST API call; otherwise, show the error message via
 			// wp_die() (rendered html), or redirect to the login URL.
-			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
+			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : wp_unslash( $_SERVER['REQUEST_URI'] );
 			if ( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, 'rest_route=' ) === 0 && 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 				wp_send_json( array(
 					'code' => 'rest_cannot_view',
@@ -1887,7 +1892,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function auth_public_scripts() {
 			// Load (and localize) public scripts.
-			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : $_SERVER['REQUEST_URI'];
+			$current_path = empty( $_SERVER['REQUEST_URI'] ) ? home_url() : wp_unslash( $_SERVER['REQUEST_URI'] );
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
 				'wp_login_url' => wp_login_url( $current_path ),
@@ -2059,7 +2064,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</a></p>
 				<?php endif; ?>
 
-				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) : ?>
+				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && false === strpos( wp_unslash( $_SERVER['QUERY_STRING'] ), 'external=wordpress' ) ) : ?>
 					<style type="text/css">
 						body.login-action-login form {
 							padding-bottom: 8px;
@@ -2100,7 +2105,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Check whether we should redirect to CAS.
 			if (
-				strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false &&
+				strpos( wp_unslash( $_SERVER['QUERY_STRING'] ), 'external=wordpress' ) === false &&
 				array_key_exists( 'cas_auto_login', $auth_settings ) && '1' === $auth_settings['cas_auto_login'] &&
 				array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 				( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
@@ -3670,8 +3675,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$is_multisite_admin_page = MULTISITE_ADMIN === $admin_mode;
 
 			// Filter user list to search terms.
-			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
-				$search_term = $_REQUEST['search'];
+			if ( isset( $_REQUEST['search'] ) && strlen( wp_unslash( $_REQUEST['search'] ) ) > 0 ) {
+				$search_term = wp_unslash( $_REQUEST['search'] );
 				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== false ||
 						stripos( $user['role'], $search_term ) !== false ||
@@ -3785,7 +3790,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$disable_next = $current_page >= $total_pages;
 			$disable_last = $current_page >= $total_pages;
 
-			$current_url = set_url_scheme( 'http://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] );
+			$current_url = set_url_scheme( 'http://' . wp_unslash( $_SERVER['HTTP_HOST'] ) . wp_unslash( $_SERVER['REQUEST_URI'] ) );
 			$current_url = remove_query_arg( wp_removable_query_args(), $current_url );
 
 			$page_links = array();
@@ -3853,7 +3858,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$search_form = array();
 			if ( 'top' === $which ) {
-				$search_term = isset( $_REQUEST['search'] ) ? $_REQUEST['search'] : '';
+				$search_term = isset( $_REQUEST['search'] ) ? wp_unslash( $_REQUEST['search'] ) : '';
 				$search_form[] = '<div class="search-box">';
 				$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';
 				$search_form[] = '<input type="search" size="14" id="user-search-input" name="search" value="' . $search_term . '">';
@@ -5599,7 +5604,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+			if ( ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -5737,7 +5742,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -5749,7 +5754,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get defaults.
 			$success = true;
 			$message = '';
-			$is_network_admin = isset( $_REQUEST['is_network_admin'] ) && $_REQUEST['is_network_admin'];
+			$is_network_admin = isset( $_REQUEST['is_network_admin'] ) && wp_unslash( $_REQUEST['is_network_admin'] );
 
 			// Get user list.
 			$option = 'access_users_approved';
@@ -5781,8 +5786,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
 			// Filter user list to search terms.
-			if ( isset( $_REQUEST['search'] ) && strlen( $_REQUEST['search'] ) > 0 ) {
-				$search_term = $_REQUEST['search'];
+			if ( isset( $_REQUEST['search'] ) && strlen( wp_unslash( $_REQUEST['search'] ) ) > 0 ) {
+				$search_term = wp_unslash( $_REQUEST['search'] );
 				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== false ||
 						stripos( $user['role'], $search_term ) !== false ||
@@ -5874,7 +5879,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -5884,8 +5889,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Get values to update from post data.
-			$email = $_REQUEST['email'];
-			$meta_value = $_REQUEST['usermeta'];
+			$email = wp_unslash( $_REQUEST['email'] );
+			$meta_value = wp_unslash( $_REQUEST['usermeta'] );
 			$meta_key = $this->get_plugin_option( 'advanced_usermeta' );
 
 			// If user doesn't exist, save usermeta selection to authorizer
@@ -5976,12 +5981,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( $_POST['nonce_save_auth_settings'], 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
 			// Fail if requesting a change to an invalid setting.
-			if ( ! in_array( $_POST['setting'], array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
+			if ( ! in_array( wp_unslash( $_POST['setting'] ), array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
 				die( '' );
 			}
 
