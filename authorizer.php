@@ -5217,7 +5217,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Print option elements.
 			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ) ?></small></p><?php
+			<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></small></p><?php
 		}
 
 
@@ -6329,41 +6329,46 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *   ...
 		 * )
 		 *
-		 * @param  array  $users Users to edit.
-		 * @return array         Sanitized users to edit.
+		 * @param  array $users Users to edit.
+		 * @return array        Sanitized users to edit.
 		 */
 		private function sanitize_update_auth_users( $users = array() ) {
 			if ( ! is_array( $users ) ) {
 				$users = array();
 			}
-
-			$users = array_map(
-				function ( $user ) {
-					if ( isset( $user['edit_action'] ) ) {
-						$user['edit_action'] = sanitize_text_field( $user['edit_action'] );
-					}
-					if ( isset( $user['email'] ) ) {
-						$user['email'] = sanitize_email( $user['email'] );
-					}
-					if ( isset( $user['role'] ) ) {
-						$user['role'] = sanitize_text_field( $user['role'] );
-					}
-					if ( isset( $user['date_added'] ) ) {
-						$user['date_added'] = sanitize_text_field( $user['date_added'] );
-					}
-					if ( isset( $user['local_user'] ) ) {
-						$user['local_user'] = 'true' === $user['local_user'] ? 'true' : 'false';
-					}
-					if ( isset( $user['multisite_user'] ) ) {
-						$user['multisite_user'] = 'true' === $user['multisite_user'] ? 'true' : 'false';
-					}
-
-					return $user;
-				},
-				$users
-			);
+			$users = array_map( $this->sanitize_update_auth_user, $users );
 
 			return $users;
+		}
+
+
+		/**
+		 * Callback for array_map in sanitize_update_auth_users().
+		 *
+		 * @param  array $user User data to sanitize.
+		 * @return array       Sanitized user data.
+		 */
+		private function sanitize_update_auth_user( $user ) {
+			if ( array_key_exists( 'edit_action', $user ) ) {
+				$user['edit_action'] = sanitize_text_field( $user['edit_action'] );
+			}
+			if ( isset( $user['email'] ) ) {
+				$user['email'] = sanitize_email( $user['email'] );
+			}
+			if ( isset( $user['role'] ) ) {
+				$user['role'] = sanitize_text_field( $user['role'] );
+			}
+			if ( isset( $user['date_added'] ) ) {
+				$user['date_added'] = sanitize_text_field( $user['date_added'] );
+			}
+			if ( isset( $user['local_user'] ) ) {
+				$user['local_user'] = 'true' === $user['local_user'] ? 'true' : 'false';
+			}
+			if ( isset( $user['multisite_user'] ) ) {
+				$user['multisite_user'] = 'true' === $user['multisite_user'] ? 'true' : 'false';
+			}
+
+			return $user;
 		}
 
 
@@ -7283,13 +7288,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Don't let a user change their own role (but network admins always can).
 				$is_disabled = $selected_role !== $name && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
 
-				?><option value="<?php echo esc_attr( $name ); ?>"<?php selected( $is_selected ); disabled( $is_disabled ); ?>><?php echo esc_html( $role['name'] ); ?></option><?php
+				?><option value="<?php echo esc_attr( $name ); ?>"<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php echo esc_html( $role['name'] ); ?></option><?php
 			}
 
 			// Print default role (no role).
 			$is_selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles );
 			$is_disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
-			?><option value=""<?php selected( $is_selected ); disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
+			?><option value=""<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
 
 		}
 
