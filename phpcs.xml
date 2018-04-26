@@ -40,5 +40,13 @@
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
 		<exclude name="WordPress.VIP.DirectDatabaseQuery"/>
+		<exclude name="WordPress.VIP.SuperGlobalInputUsage.AccessDetected"/>
+	</rule>
+
+	<!-- Add custom sanitizing function(s). -->
+	<rule ref="WordPress.VIP.ValidatedSanitizedInput">
+		<properties>
+			<property name="customSanitizingFunctions" value="sanitize_update_auth_users" type="array" />
+		</properties>
 	</rule>
 </ruleset>
