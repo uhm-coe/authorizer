@@ -285,6 +285,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function activate() {
 			global $wpdb;
 
+			// Nonce check.
+			if (
+				! isset( $_REQUEST['_wpnonce'], $_REQUEST['plugin'] ) ||
+				! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'activate-plugin_' . sanitize_text_field( wp_unslash( $_REQUEST['plugin'] ) ) )
+			) {
+				die( '' );
+			}
+
 			// If we're in a multisite environment, run the plugin activation for each site when network enabling.
 			if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 === intval( $_GET['networkwide'] ) ) {
 
@@ -679,6 +687,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Notify user about blocked status and return without authenticating them.
+					// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
 					$page_title = sprintf(
 						/* TRANSLATORS: %s: Name of blog */
@@ -990,6 +999,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 
 					// Notify user about pending status and return without authenticating them.
+					// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 					$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
 					$page_title = get_bloginfo( 'name' ) . ' - Access Pending';
 					$error_message =
@@ -1031,10 +1041,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void, but die with the value to return to the success() function in AJAX call signInCallback().
 		 */
 		public function ajax_process_google_login() {
-			// Google authentication token.
-			// phpcs:ignore WordPress.VIP.ValidatedSanitizedInput.InputNotSanitized
-			$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
-
 			// Nonce check.
 			if (
 				! isset( $_POST['nonce'] ) ||
@@ -1042,6 +1048,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			) {
 				die( '' );
 			}
+
+			// Google authentication token.
+			// phpcs:ignore WordPress.VIP.ValidatedSanitizedInput.InputNotSanitized
+			$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
 
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
@@ -1111,6 +1121,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function custom_authenticate_google( $auth_settings ) {
 			// Move on if Google auth hasn't been requested here.
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			if ( empty( $_GET['external'] ) || 'google' !== $_GET['external'] ) {
 				return null;
 			}
@@ -1214,6 +1225,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function custom_authenticate_cas( $auth_settings ) {
 			// Move on if CAS hasn't been requested here.
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] ) {
 				return null;
 			}
@@ -1601,7 +1613,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 					// Redirect to home page, or specified page if it's been provided.
 					$redirect_to = site_url( '/' );
-					if ( isset( $_REQUEST['redirect_to'] ) && filter_var( wp_unslash( $_REQUEST['redirect_to'] ), FILTER_VALIDATE_URL ) !== false ) {
+					if ( ! empty( $_REQUEST['redirect_to'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 						$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 					}
 
@@ -1663,6 +1675,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$has_access = (
 				// Always allow access if WordPress is installing.
+				// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 				( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
 				// Always allow access to admins.
 				( current_user_can( 'create_users' ) ) ||
@@ -3678,7 +3691,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$is_multisite_admin_page = MULTISITE_ADMIN === $admin_mode;
 
 			// Filter user list to search terms.
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			if ( isset( $_REQUEST['search'] ) && strlen( sanitize_text_field( wp_unslash( $_REQUEST['search'] ) ) ) > 0 ) {
+				// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 				$search_term = sanitize_text_field( wp_unslash( $_REQUEST['search'] ) );
 				$auth_settings_option = array_filter( $auth_settings_option, function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== false ||
@@ -3713,6 +3728,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Get pager params.
 			$total_users = count( $auth_settings_option );
 			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', SINGLE_ADMIN, 'allow override' ) );
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages = ceil( $total_users / $users_per_page );
 			if ( $total_pages < 1 ) {
@@ -3864,6 +3880,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$search_form = array();
 			if ( 'top' === $which ) {
+				// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 				$search_term = isset( $_REQUEST['search'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['search'] ) ) : '';
 				$search_form[] = '<div class="search-box">';
 				$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';
