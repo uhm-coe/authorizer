@@ -1613,7 +1613,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 					// Redirect to home page, or specified page if it's been provided.
 					$redirect_to = site_url( '/' );
-					if ( ! empty( $_REQUEST['redirect_to'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
+					if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 						$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 					}
 
