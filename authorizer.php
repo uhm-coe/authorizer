@@ -1153,8 +1153,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * If the hosted domain parameter is set, restrict logins to that domain.
 			 * Note: Will have to upgrade to google-api-php-client v2 or higher for
 			 * this to function server-side; it's not complete in v1, so this check
-			 * is performed manually below.
-			 *
+			 * is performed manually later.
 			 * if (
 			 *   array_key_exists( 'google_hosteddomain', $auth_settings ) &&
 			 *   strlen( $auth_settings['google_hosteddomain'] ) > 0
@@ -1948,7 +1947,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * Developers can use the `authorizer_add_branding_option` filter
 			 * to add a radio button for "Custom WordPress login branding"
 			 * under the "Advanced" tab in Authorizer options. Example:
-			 *
 			 * function my_authorizer_add_branding_option( $branding_options ) {
 			 *   $new_branding_option = array(
 			 *    'value' => 'your_brand'
@@ -5156,7 +5154,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 * Developers can use the `authorizer_add_branding_option` filter
 			 * to add a radio button for "Custom WordPress login branding"
 			 * under the "Advanced" tab in Authorizer options. Example:
-			 *
 			 * function my_authorizer_add_branding_option( $branding_options ) {
 			 *   $new_branding_option = array(
 			 *    'value' => 'your_brand'
