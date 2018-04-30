@@ -77,42 +77,42 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @var array
 		 */
 		private $allowed_html = array(
-			'a' => array(
-				'class' => array(),
-				'href' => array(),
-				'style' => array(),
+			'a'      => array(
+				'class'  => array(),
+				'href'   => array(),
+				'style'  => array(),
 				'target' => array(),
-				'title' => array(),
+				'title'  => array(),
 			),
-			'b' => array(),
-			'br' => array(),
-			'div' => array(
+			'b'      => array(),
+			'br'     => array(),
+			'div'    => array(
 				'class' => array(),
 			),
-			'em' => array(),
-			'hr' => array(),
-			'i' => array(),
-			'input' => array(
-				'class' => array(),
-				'id' => array(),
-				'type' => array(),
-				'name' => array(),
-				'value' => array(),
-				'size' => array(),
+			'em'     => array(),
+			'hr'     => array(),
+			'i'      => array(),
+			'input'  => array(
 				'aria-describedby' => array(),
+				'class'            => array(),
+				'id'               => array(),
+				'name'             => array(),
+				'size'             => array(),
+				'type'             => array(),
+				'value'            => array(),
 			),
-			'label' => array(
-				'for' => array(),
+			'label'  => array(
 				'class' => array(),
+				'for'   => array(),
 			),
-			'p' => array(
+			'p'      => array(
 				'style' => array(),
 			),
-			'span' => array(
-				'style' => array(),
-				'class' => array(),
+			'span'   => array(
 				'aria-hidden' => array(),
-				'id' => array(),
+				'class'       => array(),
+				'id'          => array(),
+				'style'       => array(),
 			),
 			'strong' => array(),
 		);
@@ -304,8 +304,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Add to approved list if not there.
 					if ( ! $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 						$approved_user = array(
-							'email' => $this->lowercase( $user->user_email ),
-							'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
+							'email'      => $this->lowercase( $user->user_email ),
+							'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 							'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 							'local_user' => true,
 						);
@@ -374,8 +374,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Add to approved list if not there.
 				if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
 					$approved_user = array(
-						'email' => $this->lowercase( $user->user_email ),
-						'role' => count( $user->roles ) > 0 ? $user->roles[0] : '',
+						'email'      => $this->lowercase( $user->user_email ),
+						'role'       => count( $user->roles ) > 0 ? $user->roles[0] : '',
 						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
 					);
@@ -674,7 +674,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							$this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN )
 						);
 						array_push( $auth_settings_access_users_blocked, array(
-							'email' => $this->lowercase( $user_email ),
+							'email'      => $this->lowercase( $user_email ),
 							'date_added' => date( 'M Y' ),
 						));
 						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
@@ -769,8 +769,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Add this user to the approved list.
 					$approved_user = array(
-						'email' => $this->lowercase( $user_email ),
-						'role' => $approved_role,
+						'email'      => $this->lowercase( $user_email ),
+						'role'       => $approved_role,
 						'date_added' => date( 'Y-m-d H:i:s' ),
 					);
 					array_push( $auth_settings_access_users_approved, $approved_user );
@@ -808,13 +808,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 						$result = wp_insert_user(
 							array(
-								'user_login' => strtolower( $username ),
-								'user_pass' => wp_generate_password(), // random password.
-								'first_name' => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
-								'last_name' => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
-								'user_email' => $this->lowercase( $user_info['email'] ),
+								'user_login'      => strtolower( $username ),
+								'user_pass'       => wp_generate_password(), // random password.
+								'first_name'      => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
+								'last_name'       => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
+								'user_email'      => $this->lowercase( $user_info['email'] ),
 								'user_registered' => date( 'Y-m-d H:i:s' ),
-								'role' => $user_info['role'],
+								'role'            => $user_info['role'],
 							)
 						);
 
@@ -907,13 +907,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( ( array_key_exists( 'authenticated_by', $user_data ) && 'cas' === $user_data['authenticated_by'] && array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['cas_attr_update_on_login'] ) ) || ( array_key_exists( 'authenticated_by', $user_data ) && 'ldap' === $user_data['authenticated_by'] && array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['ldap_attr_update_on_login'] ) ) ) {
 							if ( array_key_exists( 'first_name', $user_data ) && 0 < strlen( $user_data['first_name'] ) ) {
 								wp_update_user( array(
-									'ID' => $user->ID,
+									'ID'         => $user->ID,
 									'first_name' => $user_data['first_name'],
 								));
 							}
 							if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
 								wp_update_user( array(
-									'ID' => $user->ID,
+									'ID'        => $user->ID,
 									'last_name' => $user_data['last_name'],
 								));
 							}
@@ -1204,11 +1204,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return array(
-				'email' => $email,
-				'username' => $username,
-				'first_name' => '',
-				'last_name' => '',
-				'authenticated_by' => 'google',
+				'email'             => $email,
+				'username'          => $username,
+				'first_name'        => '',
+				'last_name'         => '',
+				'authenticated_by'  => 'google',
 				'google_attributes' => $attributes,
 			);
 		}
@@ -1356,12 +1356,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$last_name = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) > 0 ? $cas_attributes[ $auth_settings['cas_attr_last_name'] ] : '';
 
 			return array(
-				'email' => $externally_authenticated_email,
-				'username' => $username,
-				'first_name' => $first_name,
-				'last_name' => $last_name,
+				'email'            => $externally_authenticated_email,
+				'username'         => $username,
+				'first_name'       => $first_name,
+				'last_name'        => $last_name,
 				'authenticated_by' => 'cas',
-				'cas_attributes' => $cas_attributes,
+				'cas_attributes'   => $cas_attributes,
 			);
 		}
 
@@ -1559,12 +1559,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			return array(
-				'email' => $externally_authenticated_email,
-				'username' => $username,
-				'first_name' => $first_name,
-				'last_name' => $last_name,
+				'email'            => $externally_authenticated_email,
+				'username'         => $username,
+				'first_name'       => $first_name,
+				'last_name'        => $last_name,
 				'authenticated_by' => 'ldap',
-				'ldap_attributes' => $ldap_entries,
+				'ldap_attributes'  => $ldap_entries,
 			);
 		}
 
@@ -1802,9 +1802,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
 			if ( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, 'rest_route=' ) === 0 && 'GET' === $_SERVER['REQUEST_METHOD'] ) {
 				wp_send_json( array(
-					'code' => 'rest_cannot_view',
+					'code'    => 'rest_cannot_view',
 					'message' => strip_tags( $auth_settings['access_redirect_to_message'] ),
-					'data' => array(
+					'data'    => array(
 						'status' => 401,
 					),
 				));
@@ -1912,10 +1912,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
-				'wp_login_url' => wp_login_url( $current_path ),
-				'public_warning' => get_option( 'auth_settings_advanced_public_notice' ),
+				'wp_login_url'     => wp_login_url( $current_path ),
+				'public_warning'   => get_option( 'auth_settings_advanced_public_notice' ),
 				'anonymous_notice' => $this->get_plugin_option( 'access_redirect_to_message' ),
-				'log_in' => esc_html__( 'Log In', 'authorizer' ),
+				'log_in'           => esc_html__( 'Log In', 'authorizer' ),
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 
@@ -2366,22 +2366,22 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery-effects-shake' ), '2.7.2', true
 			);
 			wp_localize_script( 'authorizer', 'auth_L10n', array(
-				'baseurl' => get_bloginfo( 'url' ),
-				'saved' => esc_html__( 'Saved', 'authorizer' ),
-				'duplicate' => esc_html__( 'Duplicate', 'authorizer' ),
-				'failed' => esc_html__( 'Failed', 'authorizer' ),
+				'baseurl'              => get_bloginfo( 'url' ),
+				'saved'                => esc_html__( 'Saved', 'authorizer' ),
+				'duplicate'            => esc_html__( 'Duplicate', 'authorizer' ),
+				'failed'               => esc_html__( 'Failed', 'authorizer' ),
 				'local_wordpress_user' => esc_html__( 'Local WordPress user', 'authorizer' ),
-				'block_ban_user' => esc_html__( 'Block/Ban user', 'authorizer' ),
-				'remove_user' => esc_html__( 'Remove user', 'authorizer' ),
-				'no_users_in' => esc_html__( 'No users in', 'authorizer' ),
-				'save_changes' => esc_html__( 'Save Changes', 'authorizer' ),
-				'private_pages' => esc_html__( 'Private Pages', 'authorizer' ),
-				'public_pages' => esc_html__( 'Public Pages', 'authorizer' ),
-				'first_page' => esc_html__( 'First page' ),
-				'previous_page' => esc_html__( 'Previous page' ),
-				'next_page' => esc_html__( 'Next page' ),
-				'last_page' => esc_html__( 'Last page' ),
-				'is_network_admin' => is_network_admin() ? '1' : '0',
+				'block_ban_user'       => esc_html__( 'Block/Ban user', 'authorizer' ),
+				'remove_user'          => esc_html__( 'Remove user', 'authorizer' ),
+				'no_users_in'          => esc_html__( 'No users in', 'authorizer' ),
+				'save_changes'         => esc_html__( 'Save Changes', 'authorizer' ),
+				'private_pages'        => esc_html__( 'Private Pages', 'authorizer' ),
+				'public_pages'         => esc_html__( 'Public Pages', 'authorizer' ),
+				'first_page'           => esc_html__( 'First page' ),
+				'previous_page'        => esc_html__( 'Previous page' ),
+				'next_page'            => esc_html__( 'Next page' ),
+				'last_page'            => esc_html__( 'Last page' ),
+				'is_network_admin'     => is_network_admin() ? '1' : '0',
 			));
 
 			wp_enqueue_script(
@@ -3070,10 +3070,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Advanced defaults.
 			if ( ! array_key_exists( 'advanced_lockouts', $auth_settings ) ) {
 				$auth_settings['advanced_lockouts'] = array(
-					'attempts_1' => 10,
-					'duration_1' => 1,
-					'attempts_2' => 10,
-					'duration_2' => 10,
+					'attempts_1'     => 10,
+					'duration_1'     => 1,
+					'attempts_2'     => 10,
+					'duration_2'     => 10,
 					'reset_duration' => 120,
 				);
 			}
@@ -3233,10 +3233,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Advanced defaults.
 				if ( ! array_key_exists( 'advanced_lockouts', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['advanced_lockouts'] = array(
-						'attempts_1' => 10,
-						'duration_1' => 1,
-						'attempts_2' => 10,
-						'duration_2' => 10,
+						'attempts_1'     => 10,
+						'duration_1'     => 1,
+						'attempts_2'     => 10,
+						'duration_2'     => 10,
 						'reset_duration' => 120,
 					);
 				}
@@ -4178,9 +4178,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => "auth_settings[$option]",
 					'textarea_rows' => 5,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
+					'tinymce'       => true,
+					'teeny'         => true,
+					'quicktags'     => false,
 				)
 			);
 		}
@@ -4205,9 +4205,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => "auth_settings[$option]",
 					'textarea_rows' => 5,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
+					'tinymce'       => true,
+					'teeny'         => true,
+					'quicktags'     => false,
 				)
 			);
 		}
@@ -4268,9 +4268,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => "auth_settings[$option]",
 					'textarea_rows' => 9,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
+					'tinymce'       => true,
+					'teeny'         => true,
+					'quicktags'     => false,
 				)
 			);
 			?>
@@ -4395,9 +4395,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'media_buttons' => false,
 					'textarea_name' => "auth_settings[$option]",
 					'textarea_rows' => 5,
-					'tinymce' => true,
-					'teeny' => true,
-					'quicktags' => false,
+					'tinymce'       => true,
+					'teeny'         => true,
+					'quicktags'     => false,
 				)
 			);
 		}
@@ -4429,7 +4429,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<optgroup label="<?php echo esc_attr( ucfirst( $post_type ) ); ?>">
 					<?php
 					$pages = get_posts( array(
-						'post_type' => $post_type,
+						'post_type'      => $post_type,
 						'posts_per_page' => 1000, // phpcs:ignore WordPress.VIP.PostsPerPage.posts_per_page_posts_per_page
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
@@ -5240,7 +5240,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					endwhile; wp_reset_postdata();
 					foreach ( $acf_field_group_ids as $acf_field_group_id ) :
 						$acf_fields = new WP_Query( array(
-							'post_type' => 'acf-field',
+							'post_type'   => 'acf-field',
 							'post_parent' => $acf_field_group_id,
 						));
 						while ( $acf_fields->have_posts() ) : $acf_fields->the_post();
@@ -5418,8 +5418,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_access_lists_content',
-					'title' => __( 'Access Lists', 'authorizer' ),
+					'id'      => 'help_auth_settings_access_lists_content',
+					'title'   => __( 'Access Lists', 'authorizer' ),
 					'content' => $help_auth_settings_access_lists_content,
 				)
 			);
@@ -5432,8 +5432,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_access_login_content',
-					'title' => __( 'Login Access', 'authorizer' ),
+					'id'      => 'help_auth_settings_access_login_content',
+					'title'   => __( 'Login Access', 'authorizer' ),
 					'content' => $help_auth_settings_access_login_content,
 				)
 			);
@@ -5448,8 +5448,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_access_public_content',
-					'title' => __( 'Public Access', 'authorizer' ),
+					'id'      => 'help_auth_settings_access_public_content',
+					'title'   => __( 'Public Access', 'authorizer' ),
 					'content' => $help_auth_settings_access_public_content,
 				)
 			);
@@ -5492,8 +5492,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_external_content',
-					'title' => __( 'External Service', 'authorizer' ),
+					'id'      => 'help_auth_settings_external_content',
+					'title'   => __( 'External Service', 'authorizer' ),
 					'content' => $help_auth_settings_external_content,
 				)
 			);
@@ -5506,8 +5506,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			';
 			$screen->add_help_tab(
 				array(
-					'id' => 'help_auth_settings_advanced_content',
-					'title' => __( 'Advanced', 'authorizer' ),
+					'id'      => 'help_auth_settings_advanced_content',
+					'title'   => __( 'Advanced', 'authorizer' ),
 					'content' => $help_auth_settings_advanced_content,
 				)
 			);
@@ -6005,13 +6005,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Send response to client.
 			$response = array(
-				'success' => $success,
-				'message' => $message,
-				'html' => ob_get_clean(),
+				'success'          => $success,
+				'message'          => $message,
+				'html'             => ob_get_clean(),
 				/* TRANSLATORS: %s: number of users */
 				'total_users_html' => sprintf( _n( '%s user', '%s users', $total_users, 'authorizer' ), number_format_i18n( $total_users ) ),
 				'total_pages_html' => number_format_i18n( $total_pages ),
-				'total_pages' => $total_pages,
+				'total_pages'      => $total_pages,
 			);
 			header( 'content-type: application/json' );
 			echo wp_json_encode( $response );
@@ -6080,7 +6080,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							}
 						}
 						$auth_multisite_settings_access_users_approved[ $index ]['usermeta'][ get_current_blog_id() ] = array(
-							'meta_key' => $meta_key,
+							'meta_key'   => $meta_key,
 							'meta_value' => $meta_value,
 						);
 						$should_update_auth_multisite_settings_access_users_approved = true;
@@ -6098,7 +6098,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
 						$auth_settings_access_users_approved[ $index ]['usermeta'] = array(
-							'meta_key' => $meta_key,
+							'meta_key'   => $meta_key,
 							'meta_value' => $meta_value,
 						);
 						$should_update_auth_settings_access_users_approved = true;
@@ -6242,13 +6242,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							} else {
 								$result = wp_insert_user(
 									array(
-										'user_login' => strtolower( $username ),
-										'user_pass' => $plaintext_password,
-										'first_name' => '',
-										'last_name' => '',
-										'user_email' => $this->lowercase( $approved_user['email'] ),
+										'user_login'      => strtolower( $username ),
+										'user_pass'       => $plaintext_password,
+										'first_name'      => '',
+										'last_name'       => '',
+										'user_email'      => $this->lowercase( $approved_user['email'] ),
 										'user_registered' => date( 'Y-m-d H:i:s' ),
-										'role' => $approved_user['role'],
+										'role'            => $approved_user['role'],
 									)
 								);
 							}
@@ -6455,7 +6455,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Send response to client.
 			$response = array(
-				'success' => true,
+				'success'        => true,
 				'invalid_emails' => $invalid_emails,
 			);
 			header( 'content-type: application/json' );
@@ -6828,8 +6828,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', SINGLE_ADMIN );
 			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) && ! $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
 				$approved_user = array(
-					'email' => $this->lowercase( $user_email ),
-					'role' => $user_role,
+					'email'      => $this->lowercase( $user_email ),
+					'role'       => $user_role,
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
 				);
@@ -6955,8 +6955,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add to approved list if not there.
 			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
 				$approved_user = array(
-					'email' => $this->lowercase( $user_email ),
-					'role' => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
+					'email'      => $this->lowercase( $user_email ),
+					'role'       => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
 					'date_added' => date( 'M Y', strtotime( $date_registered ) ),
 					'local_user' => true,
 				);
@@ -6991,8 +6991,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 			if ( ! $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
 				$multisite_approved_user = array(
-					'email' => $this->lowercase( $user_email ),
-					'role' => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
+					'email'      => $this->lowercase( $user_email ),
+					'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
 				);
@@ -7085,7 +7085,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Add the email we're about to send to the list.
 			$recently_sent_emails[] = array(
 				'email' => $email,
-				'time' => time(),
+				'time'  => time(),
 			);
 			update_option( 'auth_settings_recently_sent_emails', $recently_sent_emails );
 
