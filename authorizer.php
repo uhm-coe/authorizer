@@ -1097,11 +1097,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$token = json_decode( $client->getAccessToken() );
 
 				// Store the token in the session for later use.
-				$_SESSION['token'] = json_encode( $token );
+				$_SESSION['token'] = wp_json_encode( $token );
 
 				$response = 'Successfully authenticated.';
 			} else {
-				$client->setAccessToken( json_encode( $token ) );
+				$client->setAccessToken( wp_json_encode( $token ) );
 
 				$response = 'Already authenticated.';
 			}
@@ -6014,7 +6014,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'total_pages' => $total_pages,
 			);
 			header( 'content-type: application/json' );
-			echo json_encode( $response );
+			echo wp_json_encode( $response );
 			exit;
 		}
 
@@ -6459,7 +6459,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				'invalid_emails' => $invalid_emails,
 			);
 			header( 'content-type: application/json' );
-			echo json_encode( $response );
+			echo wp_json_encode( $response );
 			exit;
 		}
 
