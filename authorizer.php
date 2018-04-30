@@ -1990,8 +1990,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function load_login_footer_js() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
-			<?php if ( '1' === $auth_settings['google'] ) : ?>
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
+			if ( '1' === $auth_settings['google'] ) :
+				?>
 				<script type="text/javascript">
 					// Reload login page if reauth querystring param exists,
 					// since reauth interrupts external logins (e.g., google).
@@ -2059,7 +2060,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function login_form_add_external_service_links() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' ); ?>
+			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
+			?>
 			<div id="auth-external-service-login">
 				<?php if ( '1' === $auth_settings['google'] ) : ?>
 					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php esc_html_e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
@@ -2069,13 +2071,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( '1' === $auth_settings['cas'] ) : ?>
 					<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( $this->modify_current_url_for_cas_login() ); ?>">
 						<span class="dashicons dashicons-lock"></span>
-						<span class="label"><?php
+						<span class="label">
+							<?php
 							echo esc_html( sprintf(
 								/* TRANSLATORS: %s: Custom CAS label from authorizer options */
 								__( 'Sign in with %s', 'authorizer' ),
 								$auth_settings['cas_custom_label']
 							) );
-						?></span>
+							?>
+						</span>
 					</a></p>
 				<?php endif; ?>
 
@@ -2329,17 +2333,21 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		/**
 		 * Output the HTML for the options page.
 		 */
-		public function create_admin_page() { ?>
+		public function create_admin_page() {
+			?>
 			<div class="wrap">
 				<h2><?php esc_html_e( 'Authorizer Settings', 'authorizer' ); ?></h2>
-				<form method="post" action="options.php" autocomplete="off"><?php
+				<form method="post" action="options.php" autocomplete="off">
+					<?php
 					// This prints out all hidden settings fields.
 					settings_fields( 'auth_settings_group' );
 					// This prints out all the sections.
 					do_settings_sections( 'authorizer' );
-					submit_button(); ?>
+					submit_button();
+					?>
 				</form>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -2412,10 +2420,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$notice = get_option( 'auth_settings_advanced_admin_notice' );
 			delete_option( 'auth_settings_advanced_admin_notice' );
 
-			if ( $notice && strlen( $notice ) > 0 ) { ?>
+			if ( $notice && strlen( $notice ) > 0 ) {
+				?>
 				<div class="error">
 					<p><?php echo wp_kses( $notice, $this->allowed_html ); ?></p>
-				</div><?php
+				</div>
+				<?php
 			}
 		}
 
@@ -2441,9 +2451,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint.
 				if ( ! $this->url_is_accessible( $cas_url ) ) :
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
-					?><div class='notice notice-warning is-dismissible'>
+					?>
+					<div class='notice notice-warning is-dismissible'>
 						<p><?php esc_html_e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo esc_attr( $authorizer_options_url ); ?>&tab=external'><?php esc_html_e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php esc_html_e( 'if you intend to use it.', 'authorizer' ); ?></p>
-					</div><?php
+					</div>
+					<?php
 				endif;
 			endif;
 		}
@@ -3551,7 +3563,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_tabs( $args = '' ) {
-			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args ) ) : ?>
+			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args ) ) :
+				?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
@@ -3577,7 +3590,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function print_section_info_access_lists( $args = '' ) {
 			$admin_mode = $this->get_admin_mode( $args );
-			?><div id="section_info_access_lists" class="section_info">
+			?>
+			<div id="section_info_access_lists" class="section_info">
 				<p><?php esc_html_e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
 				<ol>
 					<li><?php echo wp_kses( __( "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ), $this->allowed_html ); ?></li>
@@ -3618,30 +3632,31 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Render wrapper div (for aligning pager to width of content).
-			?><div class="wrapper_<?php echo esc_attr( $option ); ?>"><?php
-
-			// Print option elements.
-			?><ul id="list_auth_settings_access_users_pending" style="margin:0;"><?php
-				if ( count( $auth_settings_option ) > 0 ) :
-					foreach ( $auth_settings_option as $key => $pending_user ) :
-						if ( empty( $pending_user ) || count( $pending_user ) < 1 ) :
-							continue;
-						endif;
-						$pending_user['is_wp_user'] = false; ?>
-						<li>
-							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $pending_user['email'] ); ?>" readonly="true" class="auth-email" />
-							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
-								<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
-							</select>
-							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
-						</li>
-					<?php endforeach; ?>
-				<?php else : ?>
-						<li class="auth-empty"><em><?php esc_html_e( 'No pending users', 'authorizer' ); ?></em></li>
-				<?php endif; ?>
-			</ul>
+			?>
+			<div class="wrapper_<?php echo esc_attr( $option ); ?>">
+				<ul id="list_auth_settings_access_users_pending" style="margin:0;">
+					<?php
+					if ( count( $auth_settings_option ) > 0 ) :
+						foreach ( $auth_settings_option as $key => $pending_user ) :
+							if ( empty( $pending_user ) || count( $pending_user ) < 1 ) :
+								continue;
+							endif;
+							$pending_user['is_wp_user'] = false;
+							?>
+							<li>
+								<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $pending_user['email'] ); ?>" readonly="true" class="auth-email" />
+								<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
+									<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
+								</select>
+								<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+								<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+								<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
+							</li>
+						<?php endforeach; ?>
+					<?php else : ?>
+							<li class="auth-empty"><em><?php esc_html_e( 'No pending users', 'authorizer' ); ?></em></li>
+					<?php endif; ?>
+				</ul>
 			</div>
 			<?php
 		}
@@ -3743,46 +3758,42 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Render wrapper div (for aligning pager to width of content).
-			?><div class="wrapper_<?php echo esc_attr( $option ); ?>"><?php
+			?>
+			<div class="wrapper_<?php echo esc_attr( $option ); ?>">
+				<?php $this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' ); ?>
+				<ul id="list_auth_settings_access_users_approved" class="<?php echo strlen( $advanced_usermeta ) > 0 ? 'has-usermeta' : ''; ?>">
+					<?php
+					$offset = ( $current_page - 1 ) * $users_per_page;
+					$max = min( $offset + $users_per_page, count( $auth_settings_option ) );
+					for ( $key = $offset; $key < $max; $key++ ) :
+						$approved_user = $auth_settings_option[ $key ];
+						if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
+							continue;
+						endif;
+						$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
+					endfor;
+					?>
+				</ul>
 
-			// Render pager.
-			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'top' );
-
-			// Render user list.
-			?><ul id="list_auth_settings_access_users_approved" class="<?php echo strlen( $advanced_usermeta ) > 0 ? 'has-usermeta' : ''; ?>"><?php
-				$offset = ( $current_page - 1 ) * $users_per_page;
-				$max = min( $offset + $users_per_page, count( $auth_settings_option ) );
-				for ( $key = $offset; $key < $max; $key++ ) :
-					$approved_user = $auth_settings_option[ $key ];
-					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
-						continue;
-					endif;
-					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
-				endfor; ?>
-			</ul>
-
-			<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
-				<textarea id="new_approved_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
-				<select id="new_approved_user_role" class="auth-role">
-					<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
-				</select>
-				<div class="btn-group">
-					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
-						<span class="caret"></span>
-						<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
-					</button>
-					<ul class="dropdown-menu" role="menu">
-						<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
-					</ul>
+				<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
+					<textarea id="new_approved_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
+					<select id="new_approved_user_role" class="auth-role">
+						<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
+					</select>
+					<div class="btn-group">
+						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+						<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
+							<span class="caret"></span>
+							<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
+						</button>
+						<ul class="dropdown-menu" role="menu">
+							<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
+						</ul>
+					</div>
 				</div>
+				<?php $this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' ); ?>
 			</div>
 			<?php
-
-			// Render pager.
-			$this->render_user_pager( $current_page, $users_per_page, $total_users, 'bottom' );
-
-			?></div><?php
 		}
 
 
@@ -3891,11 +3902,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$search_form = join( "\n", $search_form );
 
 			$output = "<div class='tablenav-pages'>$output</div>";
-
-			?><div class="tablenav top">
+			?>
+			<div class="tablenav top">
 				<?php echo wp_kses( $output, $this->allowed_html ); ?>
 				<?php echo wp_kses( $search_form, $this->allowed_html ); ?>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -3945,7 +3957,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			endif;
 			if ( ! array_key_exists( 'usermeta', $approved_user ) ) :
 				$approved_user['usermeta'] = '';
-			endif; ?>
+			endif;
+			?>
 			<li>
 				<input
 					type="text"
@@ -3977,7 +3990,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
 						$field_object = get_field_object( str_replace( 'acf___', '', $advanced_usermeta ) );
 						if ( is_array( $field_object ) && array_key_exists( 'type', $field_object ) && 'select' === $field_object['type'] ) :
-							$should_show_usermeta_in_text_field = false; ?>
+							$should_show_usermeta_in_text_field = false;
+							?>
 							<select
 								id="<?php echo esc_attr( $option_id ); ?>_usermeta"
 								class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
@@ -4012,7 +4026,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<?php if ( $is_multisite_user ) : ?>
 					&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
 				<?php endif; ?>
-			</li><?php
+			</li>
+			<?php
 		}
 
 
@@ -4032,40 +4047,41 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$access_default_role = $this->get_plugin_option( 'access_default_role', SINGLE_ADMIN, 'allow override' );
 
 			// Render wrapper div (for aligning pager to width of content).
-			?><div class="wrapper_<?php echo esc_attr( $option ); ?>"><?php
-
-			// Print option elements.
-			?><ul id="list_auth_settings_<?php echo esc_attr( $option ); ?>" style="margin:0;"><?php
-				foreach ( $auth_settings_option as $key => $blocked_user ) :
-					if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) :
-						continue;
-					endif;
-					$blocked_wp_user = get_user_by( 'email', $blocked_user['email'] );
-					if ( $blocked_wp_user ) :
-						$blocked_user['email'] = $blocked_wp_user->user_email;
-						$blocked_user['role'] = array_shift( $blocked_wp_user->roles );
-						$blocked_user['date_added'] = $blocked_wp_user->user_registered;
-						$blocked_user['is_wp_user'] = true;
-					else :
-						$blocked_user['is_wp_user'] = false;
-					endif; ?>
-					<li>
-						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $blocked_user['email'] ); ?>" readonly="true" class="auth-email" />
-						<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
-							<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
-						</select>
-						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
-						<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
-					</li>
-				<?php endforeach; ?>
-			</ul>
-			<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
-				<input type="text" id="new_blocked_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
-				<select id="new_blocked_user_role" class="auth-role">
-					<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
-				</select>
-				<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-			</div>
+			?>
+			<div class="wrapper_<?php echo esc_attr( $option ); ?>">
+				<ul id="list_auth_settings_<?php echo esc_attr( $option ); ?>" style="margin:0;">
+					<?php
+					foreach ( $auth_settings_option as $key => $blocked_user ) :
+						if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) :
+							continue;
+						endif;
+						$blocked_wp_user = get_user_by( 'email', $blocked_user['email'] );
+						if ( $blocked_wp_user ) :
+							$blocked_user['email'] = $blocked_wp_user->user_email;
+							$blocked_user['role'] = array_shift( $blocked_wp_user->roles );
+							$blocked_user['date_added'] = $blocked_wp_user->user_registered;
+							$blocked_user['is_wp_user'] = true;
+						else :
+							$blocked_user['is_wp_user'] = false;
+						endif;
+						?>
+						<li>
+							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $blocked_user['email'] ); ?>" readonly="true" class="auth-email" />
+							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
+								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
+							</select>
+							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
+							<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+						</li>
+					<?php endforeach; ?>
+				</ul>
+				<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
+					<input type="text" id="new_blocked_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new" />
+					<select id="new_blocked_user_role" class="auth-role">
+						<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
+					</select>
+					<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+				</div>
 			</div>
 			<?php
 		}
@@ -4078,10 +4094,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_access_login( $args = '' ) {
-			?><div id="section_info_access_login" class="section_info">
+			?>
+			<div id="section_info_access_login" class="section_info">
 				<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 				<p><?php esc_html_e( 'Choose who is able to log into this site below.', 'authorizer' ); ?></p>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -4112,8 +4130,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users"><?php esc_html_e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users"><?php esc_html_e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php esc_html_e( 'approved users', 'authorizer' ); ?></a> <?php esc_html_e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br /><?php
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users"><?php esc_html_e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users"><?php esc_html_e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php esc_html_e( 'approved users', 'authorizer' ); ?></a> <?php esc_html_e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br />
+			<?php
 		}
 
 
@@ -4129,10 +4149,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php esc_html_e( "None (Don't send notification emails)", 'authorizer' ); ?></option>
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -4202,7 +4224,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Send a welcome email when approving a new user', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4218,7 +4242,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php echo wp_kses( __( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ), $this->allowed_html ); ?></small><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php echo wp_kses( __( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ), $this->allowed_html ); ?></small>
+			<?php
 		}
 
 
@@ -4246,14 +4272,19 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'quicktags' => false,
 				)
 			);
-
-			?><small><?php printf(
-				/* TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
-				wp_kses( __( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ), $this->allowed_html ),
-				'<b>[site_name]</b>',
-				'<b>[site_url]</b>',
-				'<b>[user_email]</b>'
-			); ?></small><?php
+			?>
+			<small>
+				<?php
+				printf(
+					/* TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
+					wp_kses( __( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ), $this->allowed_html ),
+					'<b>[site_name]</b>',
+					'<b>[site_url]</b>',
+					'<b>[user_email]</b>'
+				);
+				?>
+			</small>
+			<?php
 		}
 
 
@@ -4264,9 +4295,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_access_public( $args = '' ) {
-			?><div id="section_info_access_public" class="section_info">
+			?>
+			<div id="section_info_access_public" class="section_info">
 				<p><?php esc_html_e( 'Choose your public access options here.', 'authorizer' ); ?></p>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -4297,8 +4330,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone"><?php esc_html_e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users"><?php esc_html_e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br /><?php
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone"><?php esc_html_e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users"><?php esc_html_e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br />
+			<?php
 		}
 
 
@@ -4314,8 +4349,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login"><?php esc_html_e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message"><?php esc_html_e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label><?php
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login"><?php esc_html_e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message"><?php esc_html_e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4331,8 +4368,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), $this->allowed_html ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), $this->allowed_html ); ?></label><?php
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), $this->allowed_html ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), $this->allowed_html ); ?></label>
+			<?php
 		}
 
 
@@ -4379,7 +4418,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$post_types = is_array( $post_types ) ? $post_types : array();
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" multiple="multiple" name="auth_settings[<?php echo esc_attr( $option ); ?>][]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" multiple="multiple" name="auth_settings[<?php echo esc_attr( $option ); ?>][]">
 				<optgroup label="<?php esc_attr_e( 'Home', 'authorizer' ); ?>">
 					<option value="home" <?php selected( in_array( 'home', $auth_settings_option, true ) ); ?>><?php esc_html_e( 'Home Page', 'authorizer' ); ?></option>
 					<option value="auth_public_404" <?php selected( in_array( 'auth_public_404', $auth_settings_option, true ) ); ?>><?php esc_html_e( 'Nonexistent (404) Pages', 'authorizer' ); ?></option>
@@ -4392,7 +4432,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'posts_per_page' => 1000, // phpcs:ignore WordPress.VIP.PostsPerPage.posts_per_page_posts_per_page
 					) );
 					$pages = is_array( $pages ) ? $pages : array();
-					foreach ( $pages as $page ) : ?>
+					foreach ( $pages as $page ) :
+						?>
 						<option value="<?php echo esc_attr( $page->ID ); ?>" <?php selected( in_array( strval( $page->ID ), $auth_settings_option, true ) ); ?>><?php echo esc_html( $page->post_title ); ?></option>
 					<?php endforeach; ?>
 					</optgroup>
@@ -4408,11 +4449,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					} else {
 						$categories = get_categories( array( 'hide_empty' => false ) );
 					}
-					foreach ( $categories as $category ) : ?>
+					foreach ( $categories as $category ) :
+						?>
 						<option value="<?php echo esc_attr( 'cat_' . $category->slug ); ?>" <?php selected( in_array( 'cat_' . $category->slug, $auth_settings_option, true ) ); ?>><?php echo esc_html( $category->name ); ?></option>
 					<?php endforeach; ?>
 				</optgroup>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -4423,9 +4466,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_external( $args = '' ) {
-			?><div id="section_info_external" class="section_info">
+			?>
+			<div id="section_info_external" class="section_info">
 				<p><?php esc_html_e( 'Enter your external server settings below.', 'authorizer' ); ?></p>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -4441,10 +4486,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<?php wp_dropdown_roles( $auth_settings_option ); ?>
 				<option value=""<?php selected( '' === $auth_settings_option ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -4460,7 +4507,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable Google Logins', 'authorizer' ); ?></label><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable Google Logins', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4478,7 +4527,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			$site_url_parts = parse_url( get_site_url() );
 			$site_url_host = $site_url_parts['scheme'] . '://' . $site_url_parts['host'] . '/';
-			?><?php esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' ); ?>
+
+			esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' );
+			?>
 			<ol>
 				<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ), $this->allowed_html ); ?></li>
 				<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ), $this->allowed_html ); ?>
@@ -4493,7 +4544,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), $this->allowed_html ); ?></li>
 			</ol>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:560px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label><?php
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4509,8 +4561,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:220px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:220px;" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4526,7 +4580,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:220px;"><?php echo esc_html( $auth_settings_option ); ?></textarea>
+			?>
+			<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:220px;"><?php echo esc_html( $auth_settings_option ); ?></textarea>
 			<br /><small><?php esc_html_e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?><br /><?php esc_html_e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></small>
 			<?php
 		}
@@ -4561,7 +4616,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $error_message, $this->allowed_html ); ?><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $error_message, $this->allowed_html ); ?>
+			<?php
 		}
 
 
@@ -4577,7 +4634,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><?php esc_html_e( 'The button on the login page will read:', 'authorizer' ); ?><p><a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><span class="dashicons dashicons-lock" style="margin: 4px 4px 0 0;"></span> <strong><?php esc_html_e( 'Sign in with', 'authorizer' ); ?> </strong><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="CAS" style="width: 100px;" /></a></p><?php
+			esc_html_e( 'The button on the login page will read:', 'authorizer' );
+			?>
+			<p><a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><span class="dashicons dashicons-lock" style="margin: 4px 4px 0 0;"></span> <strong><?php esc_html_e( 'Sign in with', 'authorizer' ); ?> </strong><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="CAS" style="width: 100px;" /></a></p>
+			<?php
 		}
 
 
@@ -4593,8 +4653,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  authn.example.edu', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  authn.example.edu', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4610,8 +4672,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  443', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  443', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4627,8 +4691,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  /cas', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  /cas', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4644,12 +4710,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value="SAML_VERSION_1_1" <?php selected( $auth_settings_option, 'SAML_VERSION_1_1' ); ?>>SAML_VERSION_1_1</option>
 				<option value="CAS_VERSION_3_0" <?php selected( $auth_settings_option, 'CAS_VERSION_3_0' ); ?>>CAS_VERSION_3_0</option>
 				<option value="CAS_VERSION_2_0" <?php selected( $auth_settings_option, 'CAS_VERSION_2_0' ); ?>>CAS_VERSION_2_0</option>
 				<option value="CAS_VERSION_1_0" <?php selected( $auth_settings_option, 'CAS_VERSION_1_0' ); ?>>CAS_VERSION_1_0</option>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -4665,9 +4733,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-			<br /><small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small><?php
+			<br /><small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small>
+			<?php
 		}
 
 
@@ -4683,8 +4753,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenName', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenName', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4700,8 +4772,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4717,7 +4791,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4733,8 +4809,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small></p><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
+			<p><small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small></p>
+			<?php
 		}
 
 
@@ -4753,7 +4831,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $ldap_installed_message, $this->allowed_html ); ?><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $ldap_installed_message, $this->allowed_html ); ?>
+			<?php
 		}
 
 
@@ -4769,8 +4849,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-			<br /><small><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></small><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
+			<br /><small><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></small>
+			<?php
 		}
 
 
@@ -4786,9 +4868,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  389', 'authorizer' ); ?></label>
-			<br /><small><?php esc_html_e( 'If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored.', 'authorizer' ); ?></small><?php
+			<br /><small><?php esc_html_e( 'If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored.', 'authorizer' ); ?></small>
+			<?php
 		}
 
 
@@ -4804,8 +4888,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></label>
-			<br /><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></label>
+			<br /><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small>
+			<?php
 		}
 
 
@@ -4821,7 +4907,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
+			?>
+			<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?></label>
 			<br /><small><?php esc_html_e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
 			<?php
@@ -4840,8 +4927,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:80px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  uid', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:80px;" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  uid', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4857,9 +4946,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-			<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small><?php
+			<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small>
+			<?php
 		}
 
 
@@ -4875,8 +4966,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4892,8 +4985,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $this->decrypt( $auth_settings_option ) ); ?>" autocomplete="off" /><?php
+			?>
+			<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
+			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $this->decrypt( $auth_settings_option ) ); ?>" autocomplete="off" />
+			<?php
 		}
 
 
@@ -4909,8 +5004,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width: 400px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  https://myschool.example.edu:8888/am-forgot-password', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width: 400px;" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  https://myschool.example.edu:8888/am-forgot-password', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4926,8 +5023,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenname', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenname', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4943,8 +5042,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4960,7 +5061,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -4971,9 +5074,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @return void
 		 */
 		public function print_section_info_advanced( $args = '' ) {
-			?><div id="section_info_advanced" class="section_info">
+			?>
+			<div id="section_info_advanced" class="section_info">
 				<p><?php esc_html_e( 'You may optionally specify some advanced settings below.', 'authorizer' ); ?></p>
-			</div><?php
+			</div>
+			<?php
 		}
 
 
@@ -4989,7 +5094,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><?php esc_html_e( 'After', 'authorizer' ); ?>
+			esc_html_e( 'After', 'authorizer' );
+			?>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_1]" value="<?php echo esc_attr( $auth_settings_option['attempts_1'] ); ?>" placeholder="10" style="width:30px;" />
 			<?php esc_html_e( 'invalid password attempts, delay further attempts on that user for', 'authorizer' ); ?>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_1]" value="<?php echo esc_attr( $auth_settings_option['duration_1'] ); ?>" placeholder="1" style="width:30px;" />
@@ -5003,7 +5109,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			<br />
 			<?php esc_html_e( 'Reset the delays after', 'authorizer' ); ?>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_reset_duration" name="auth_settings[<?php echo esc_attr( $option ); ?>][reset_duration]" value="<?php echo esc_attr( $auth_settings_option['reset_duration'] ); ?>" placeholder="240" style="width:40px;" />
-			<?php esc_html_e( 'minutes with no invalid attempts.', 'authorizer' ); ?><?php
+			<?php esc_html_e( 'minutes with no invalid attempts.', 'authorizer' ); ?>
+			<?php
 		}
 
 
@@ -5019,8 +5126,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</p><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
+			<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</p>
+				<?php
 		}
 
 
@@ -5036,7 +5145,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default"><?php esc_html_e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default"><?php esc_html_e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
 			<?php
 
 			/**
@@ -5063,12 +5173,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
 					continue;
 				}
-				?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $branding_option['value'] ); ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>"><?php echo esc_html( $branding_option['description'] ); ?></label><br /><?php
+				?>
+				<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $branding_option['value'] ); ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>"><?php echo esc_html( $branding_option['description'] ); ?></label><br />
+				<?php
 			}
 
 			// Print message about adding custom brands if there are none.
 			if ( count( $branding_options ) === 0 ) {
-				?><p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), $this->allowed_html ); ?></em></p><?php
+				?>
+				<p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), $this->allowed_html ); ?></em></p>
+				<?php
 			}
 		}
 
@@ -5085,8 +5199,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings"><?php esc_html_e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top"><?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br /><?php
+			?>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings"><?php esc_html_e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top"><?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br />
+			<?php
 
 		}
 
@@ -5103,7 +5219,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value=""><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 				<?php if ( class_exists( 'acf' ) ) :
 					// Get ACF 5 fields. Note: it would be much easier to use `get_field_objects()`
@@ -5146,22 +5263,26 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								endif;
 							endforeach;
 						endif;
-					endwhile; wp_reset_postdata(); ?>
+					endwhile; wp_reset_postdata();
+					?>
 					<optgroup label="ACF User Fields:">
 						<?php foreach ( (array) $fields as $field => $field_object ) : ?>
 							<option value="acf___<?php echo esc_attr( $field_object['key'] ); ?>"<?php selected( "acf___{$field_object['key']}" === $auth_settings_option ); ?>><?php echo esc_html( $field_object['label'] ); ?></option>
 						<?php endforeach; ?>
 					</optgroup>
 				<?php endif; ?>
-				<optgroup label="<?php esc_attr_e( 'All Usermeta:', 'authorizer' ); ?>"><?php
+				<optgroup label="<?php esc_attr_e( 'All Usermeta:', 'authorizer' ); ?>">
+					<?php
 					foreach ( $this->get_all_usermeta_keys() as $meta_key ) :
 						if ( substr( $meta_key, 0, 3 ) === 'wp_' ) :
 							continue;
-						endif; ?>
+						endif;
+						?>
 						<option value="<?php echo esc_attr( $meta_key ); ?>"<?php selected( $auth_settings_option === $meta_key ); ?>><?php echo esc_html( $meta_key ); ?></option>
 					<?php endforeach; ?>
 				</optgroup>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -5177,7 +5298,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" size="4" /><?php
+			?>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" size="4" />
+			<?php
 		}
 
 
@@ -5193,12 +5316,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value="created" <?php selected( $auth_settings_option, 'created' ); ?>><?php esc_html_e( 'Date approved', 'authorizer' ); ?></option>
 				<option value="email" <?php selected( $auth_settings_option, 'email' ); ?>><?php esc_html_e( 'Email', 'authorizer' ); ?></option>
 				<option value="role" <?php selected( $auth_settings_option, 'role' ); ?>><?php esc_html_e( 'Role', 'authorizer' ); ?></option>
 				<option value="date_added" <?php selected( $auth_settings_option, 'date_added' ); ?>><?php esc_html_e( 'Date registered', 'authorizer' ); ?></option>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -5214,10 +5339,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			?>
+			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value="asc" <?php selected( $auth_settings_option, 'asc' ); ?>><?php esc_html_e( 'Ascending', 'authorizer' ); ?></option>
 				<option value="desc" <?php selected( $auth_settings_option, 'desc' ); ?>><?php esc_html_e( 'Descending', 'authorizer' ); ?></option>
-			</select><?php
+			</select>
+			<?php
 		}
 
 
@@ -5233,8 +5360,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></small></p><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
+			<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></small></p>
+			<?php
 		}
 
 
@@ -5250,7 +5379,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option );
 
 			// Print option elements.
-			?><input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label><?php
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label>
+			<?php
 		}
 
 
@@ -5419,7 +5550,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! current_user_can( 'manage_network_options' ) ) {
 				wp_die( wp_kses( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ), $this->allowed_html ) );
 			}
-			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() ); ?>
+			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
+			?>
 			<div class="wrap">
 				<form method="post" action="" autocomplete="off">
 					<h2><?php esc_html_e( 'Authorizer Settings', 'authorizer' ); ?></h2>
@@ -5722,7 +5854,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Render Authorizer dashboard widget (callback).
 		 */
 		public function add_auth_dashboard_widget() {
-			?><form method="post" id="auth_settings_access_form" action="">
+			?>
+			<form method="post" id="auth_settings_access_form" action="">
 				<?php $this->print_section_info_access_login(); ?>
 				<div>
 					<h2><?php esc_html_e( 'Pending Users', 'authorizer' ); ?></h2>
@@ -5737,7 +5870,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<?php $this->print_combo_auth_access_users_blocked(); ?>
 				</div>
 				<br class="clear" />
-			</form><?php
+			</form>
+			<?php
 		}
 
 
@@ -6440,7 +6574,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// (This feature is disabled).
 				//
 				$name = "auth_settings[$option]";
-				$id = "auth_settings_$option"; ?>
+				$id = "auth_settings_$option";
+				?>
 				<div id="overlay-hide-auth_settings_<?php echo esc_attr( $option ); ?>" class="auth_multisite_override_overlay">
 					<span class="overlay-note">
 						<?php esc_html_e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo esc_attr( network_admin_url( 'admin.php?page=authorizer' ) ); ?>"><?php esc_html_e( 'multisite option', 'authorizer' ); ?></a>.
@@ -7304,14 +7439,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 				// Don't let a user change their own role (but network admins always can).
 				$is_disabled = $selected_role !== $name && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
-
-				?><option value="<?php echo esc_attr( $name ); ?>"<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php echo esc_html( $role['name'] ); ?></option><?php
+				?>
+				<option value="<?php echo esc_attr( $name ); ?>"<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php echo esc_html( $role['name'] ); ?></option>
+				<?php
 			}
 
 			// Print default role (no role).
 			$is_selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles );
 			$is_disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
-			?><option value=""<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option><?php
+			?>
+			<option value=""<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option>
+			<?php
 
 		}
 
