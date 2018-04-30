@@ -1,7 +1,7 @@
 === Authorizer ===
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
-Requires at least: 4.1
+Requires at least: 4.4
 Tested up to: 4.9.1
 Stable tag: trunk
 License: GPLv2 or later

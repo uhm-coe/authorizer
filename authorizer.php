@@ -1444,7 +1444,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// the form ldap://hostname:port or ldaps://hostname:port.
 			$ldap_host = $auth_settings['ldap_host'];
 			$ldap_port = intval( $auth_settings['ldap_port'] );
-			$parsed_host = parse_url( $ldap_host );
+			$parsed_host = wp_parse_url( $ldap_host );
 			// Fail (fall back to WordPress auth) if invalid host is specified.
 			if ( false === $parsed_host ) {
 				return null;
@@ -4528,7 +4528,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
-			$site_url_parts = parse_url( get_site_url() );
+			$site_url_parts = wp_parse_url( get_site_url() );
 			$site_url_host = $site_url_parts['scheme'] . '://' . $site_url_parts['host'] . '/';
 
 			esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' );
@@ -7565,7 +7565,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Parse the URL into its components.
-			$parsed_url = parse_url( $url );
+			$parsed_url = wp_parse_url( $url );
 
 			// Fix up the querystring values (remove reauth, make sure external=cas).
 			$querystring = array();
