@@ -1270,6 +1270,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$cacert_contents = $response['body'];
 
 				// Write out the updated certs to the plugin directory.
+				// Note: Don't use WP_Filesystem because we are not in an admin context
+				// and don't want to potentially prompt the end user for credentials.
+				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
 				file_put_contents( $cacert_path, $cacert_contents );
 			}
 			phpCAS::setCasServerCACert( $cacert_path );
