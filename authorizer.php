@@ -5264,7 +5264,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						if ( strpos( get_the_content(), 's:5:"param";s:9:"user_role"' ) !== false || strpos( get_the_content(), 's:5:"param";s:9:"user_form"' ) !== false ) :
 							array_push( $acf_field_group_ids, get_the_ID() );
 						endif;
-					endwhile; wp_reset_postdata();
+					endwhile;
+					wp_reset_postdata();
 					foreach ( $acf_field_group_ids as $acf_field_group_id ) :
 						$acf_fields = new WP_Query(
 							array(
@@ -5275,7 +5276,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						while ( $acf_fields->have_posts() ) : $acf_fields->the_post();
 							global $post;
 							$fields[ $post->post_name ] = get_field_object( $post->post_name );
-						endwhile; wp_reset_postdata();
+						endwhile;
+						wp_reset_postdata();
 					endforeach;
 					// Get ACF 4 fields.
 					$acf4_field_groups = new WP_Query(
@@ -5294,7 +5296,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								endif;
 							endforeach;
 						endif;
-					endwhile; wp_reset_postdata();
+					endwhile;
+					wp_reset_postdata();
 					?>
 					<optgroup label="ACF User Fields:">
 						<?php foreach ( (array) $fields as $field => $field_object ) : ?>
