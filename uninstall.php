@@ -36,9 +36,9 @@ if ( is_multisite() ) {
  * current user (the user uninstalling the plugin).
  */
 if ( ! is_multisite() ) {
-	$current_user = wp_get_current_user();
+	$current_user  = wp_get_current_user();
 	$blocked_users = get_users( array(
-		'meta_key' => 'auth_blocked',
+		'meta_key'   => 'auth_blocked',
 		'meta_value' => 'yes',
 	));
 	foreach ( $blocked_users as $blocked_user ) {
