@@ -4,43 +4,21 @@
 
 	<!-- Use WordPress as a base -->
 	<rule ref="WordPress">
-		<exclude name="WordPress.Arrays.MultipleStatementAlignment" />
-		<exclude name="Generic.Formatting.MultipleStatementAlignment" />
-		<exclude name="WordPress.VIP.SlowDBQuery" />
-		<exclude name="WordPress.VIP.RestrictedFunctions" />
-
-		<!-- Allow opening and closing braces for functions and classes to be on the same line -->
-		<exclude name="Squiz.PHP.EmbeddedPhp.ContentAfterOpen"/>
-		<exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
-		<exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
-		<exclude name="Squiz.WhiteSpace.ScopeClosingBrace"/>
-
-		<!-- Disable newline after opening brace -->
+		<!-- Allow: while ( have_posts() ) : the_post(); -->
 		<exclude name="Squiz.ControlStructures.ControlSignature.NewlineAfterOpenBrace"/>
 
-		<!-- Allow multiple PHP statements in the same line (usually in template files) -->
-		<exclude name="Generic.Formatting.DisallowMultipleStatements.SameLine"/>
-
-		<!-- Disable PSR-2 indentation rules that are buggy with 2 spaces -->
-		<exclude name="PSR2.ControlStructures.SwitchDeclaration.BreakIndent"/>
-		<exclude name="PSR2.Methods.FunctionCallSignature.Indent"/>
-
-		<!-- Disable Newer function suggestions for backwards compatibility with WordPress -->
-		<exclude name="WordPress.WP.AlternativeFunctions"/>
-
 		<!-- Disable overly picky rules -->
-		<exclude name="Generic.WhiteSpace.ScopeIndent"/>
 		<exclude name="WordPress.WP.CapitalPDangit"/>
+		<exclude name="WordPress.VIP.SlowDBQuery" />
+		<exclude name="WordPress.VIP.RestrictedFunctions" />
 		<exclude name="WordPress.VIP.RestrictedVariables"/>
-		<exclude name="WordPress.VIP.RestrictedVariables"/>
-		<exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
 		<exclude name="WordPress.VIP.SessionVariableUsage"/>
 		<exclude name="WordPress.VIP.SessionFunctionsUsage"/>
 		<exclude name="WordPress.VIP.FileSystemWritesDisallow"/>
-		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
-		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
 		<exclude name="WordPress.VIP.DirectDatabaseQuery"/>
 		<exclude name="WordPress.VIP.SuperGlobalInputUsage.AccessDetected"/>
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
+		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
 	</rule>
 
 	<!-- Add custom sanitizing function(s). -->
