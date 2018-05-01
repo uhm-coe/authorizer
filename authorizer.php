@@ -2058,7 +2058,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						}
 					}
 				</script>
-			<?php endif;
+			<?php
+			endif;
 		}
 
 
@@ -3591,7 +3592,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
 					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
-			<?php endif;
+			<?php
+			endif;
 		}
 
 
@@ -4005,7 +4007,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					readonly="true"
 					class="<?php echo esc_attr( $this->create_class_name( 'date-added', $is_multisite_user ) ); ?>"
 				/>
-				<?php if ( strlen( $advanced_usermeta ) > 0 ) :
+				<?php
+				if ( strlen( $advanced_usermeta ) > 0 ) :
 					$should_show_usermeta_in_text_field = true; // Fallback renderer for usermeta; try to use a select first.
 					if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) ) :
 						$field_object = get_field_object( str_replace( 'acf___', '', $advanced_usermeta ) );
@@ -5243,7 +5246,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			?>
 			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 				<option value=""><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-				<?php if ( class_exists( 'acf' ) ) :
+				<?php
+				if ( class_exists( 'acf' ) ) :
 					// Get ACF 5 fields. Note: it would be much easier to use `get_field_objects()`
 					// or `get_field_objects( 'user_' . get_current_user_id() )`, but neither will
 					// list fields that have never been given values for users (i.e., new ACF
