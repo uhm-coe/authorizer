@@ -828,6 +828,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						// Authenticate as new user.
 						$user = new WP_User( $result );
 
+						/**
+						 * Fires after an external user is authenticated for the first time
+						 * and a new WordPress account is created for them.
+						 *
+						 * @since 2.8.0
+						 *
+						 * @param WP_User $user      User object.
+						 * @param array   $user_data User data from external service.
+						 *
+						 * Example $user_data:
+						 * array(
+						 *   'email'            => 'user@example.edu',
+						 *   'username'         => 'user',
+						 *   'first_name'       => 'First',
+						 *   'last_name'        => 'Last',
+						 *   'authenticated_by' => 'cas',
+						 *   'cas_attributes'   => array( ... ),
+						 * );
+						 */
+						do_action( 'authorizer_user_register', $user, $user_data );
+
 						// If multisite, iterate through all sites in the network and add the user
 						// currently logging in to any of them that have the user on the approved list.
 						// Note: this is useful for first-time logins--some users will have access
