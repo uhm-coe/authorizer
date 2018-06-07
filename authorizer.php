@@ -1307,7 +1307,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$cas_service_url   = site_url( '/wp-login.php?external=cas' );
 			$login_querystring = array();
 			if ( isset( $_SERVER['QUERY_STRING'] ) ) {
-				parse_str( sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) ), $login_querystring );
+				parse_str( wp_parse_url( esc_url_raw( wp_unslash( $_SERVER['QUERY_STRING'] ) ), PHP_URL_HOST ), $login_querystring );
 			}
 			if ( isset( $login_querystring['redirect_to'] ) ) {
 				$cas_service_url .= '&redirect_to=' . rawurlencode( $login_querystring['redirect_to'] );
@@ -2116,7 +2116,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					</a></p>
 				<?php endif; ?>
 
-				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) ), 'external=wordpress' ) ) : ?>
+				<?php if ( '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( wp_parse_url( esc_url_raw( wp_unslash( $_SERVER['QUERY_STRING'] ) ), PHP_URL_HOST ), 'external=wordpress' ) ) : ?>
 					<style type="text/css">
 						body.login-action-login form {
 							padding-bottom: 8px;
@@ -2158,7 +2158,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Check whether we should redirect to CAS.
 			if (
 				isset( $_SERVER['QUERY_STRING'] ) &&
-				strpos( sanitize_text_field( wp_unslash( $_SERVER['QUERY_STRING'] ) ), 'external=wordpress' ) === false &&
+				strpos( wp_parse_url( esc_url_raw( wp_unslash( $_SERVER['QUERY_STRING'] ) ), PHP_URL_HOST ), 'external=wordpress' ) === false &&
 				array_key_exists( 'cas_auto_login', $auth_settings ) && '1' === $auth_settings['cas_auto_login'] &&
 				array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 				( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
@@ -3860,7 +3860,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			$current_url = '';
 			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-				$current_url = set_url_scheme( 'http://' . sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+				$current_url = set_url_scheme( esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 				$current_url = remove_query_arg( wp_removable_query_args(), $current_url );
 			}
 
@@ -7617,7 +7617,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Construct the URL of the current page (wp-login.php).
 			$url = '';
 			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-				$url = set_url_scheme( 'http://' . sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
+				$url = set_url_scheme( esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 			}
 
 			// Parse the URL into its components.
