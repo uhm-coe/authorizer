@@ -1,0 +1,14 @@
+{
+  "extends": "plugin:wordpress/recommended",
+  "plugins": [
+    "wordpress"
+  ],
+  "rules": {
+    // Disable picky rule that seems to conflict with actual standard.
+    "wordpress/array-function-spacing": "off",
+    // Disable rule that conflicts with WordPress IIFE standard headers.
+    "no-unused-expressions": "off",
+    // Disable overly picky rule about chaining functions.
+    "newline-per-chained-call": "off"
+  }
+}

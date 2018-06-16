@@ -1,3 +1,34 @@
 {
-	"multistr": true
+  // Extra comma rule conflicts with dangling-comma rule.
+  "-W070": false,
+  // "Wrapping non-IIFE function literals in parens is unnecessary" rule conflicts with WordPress IIFE headers.
+  "-W068": false,
+  // Allow multistrings.
+  "multistr": true,
+  // Standard WordPress rules are below. See: https://develop.svn.wordpress.org/trunk/.jshintrc
+  "boss": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "es3": true,
+  "expr": true,
+  "immed": true,
+  "noarg": true,
+  "nonbsp": true,
+  "onevar": true,
+  "quotmark": "single",
+  "trailing": true,
+  "undef": true,
+  "unused": true,
+  "browser": true,
+  "globals": {
+    "_": false,
+    "Backbone": false,
+    "jQuery": false,
+    "JSON": false,
+    "wp": false,
+    "export": false,
+    "module": false,
+    "require": false
+  }
 }
