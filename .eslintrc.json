@@ -9,6 +9,8 @@
     // Disable rule that conflicts with WordPress IIFE standard headers.
     "no-unused-expressions": "off",
     // Disable overly picky rule about chaining functions.
-    "newline-per-chained-call": "off"
+    "newline-per-chained-call": "off",
+    // Disable yoda conditions.
+    "yoda": "off"
   }
 }
