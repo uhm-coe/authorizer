@@ -1,13 +1,24 @@
-jQuery( document ).ready( function( $ ) {
-	auth.wp_login_url = typeof auth.wp_login_url !== 'undefined' ? auth.wp_login_url : '/wp-login.php';
-	auth.public_warning = typeof auth.public_warning !== 'undefined' ? auth.public_warning : false;
-	if ( auth.public_warning ) {
-		$( '#main' ).prepend(' \
-			<div id="alert" class="alert alert-info auth-alert"> \
-				<button type="button" class="close" data-dismiss="alert">&times;</button> \
-				' + auth.anonymous_notice + ' \
-				<a class="button" href="' + auth.wp_login_url + '">' + auth.log_in + '</a> \
-			</div> \
-		');
-	}
-});
+/**
+ * Displays an alert for anonymous users at the top of pages marked 'public'
+ * instructing them to log in. Example alert: "Notice: You are browsing this
+ * site anonymously, and only have access to a portion of its content."
+ */
+
+/* global document, auth */
+( function( $ ) {
+
+	$( document ).ready( function() {
+		auth.wpLoginUrl = 'undefined' !== typeof auth.wpLoginUrl ? auth.wpLoginUrl : '/wp-login.php';
+		auth.publicWarning = 'undefined' !== typeof auth.publicWarning ? auth.publicWarning : false;
+		if ( auth.publicWarning ) {
+			$( '#main' ).prepend(' \
+				<div id="alert" class="alert alert-info auth-alert"> \
+					<button type="button" class="close" data-dismiss="alert">&times;</button> \
+					' + auth.anonymousNotice + ' \
+					<a class="button" href="' + auth.wpLoginUrl + '">' + auth.logIn + '</a> \
+				</div> \
+			');
+		}
+	});
+
+} )( jQuery );
