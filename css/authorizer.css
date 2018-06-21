@@ -77,10 +77,10 @@
 	opacity: 1.0;
 }
 
-.toplevel_page_authorizer .ms-selectable,
-.toplevel_page_authorizer .ms-selection,
-.settings_page_authorizer .ms-selectable,
-.settings_page_authorizer .ms-selection {
+.toplevel_page_authorizer .ms-container .ms-selectable,
+.toplevel_page_authorizer .ms-container .ms-selection,
+.settings_page_authorizer .ms-container .ms-selectable,
+.settings_page_authorizer .ms-container .ms-selection {
 	background-color: transparent;
 }
 .toplevel_page_authorizer .ms-list,
