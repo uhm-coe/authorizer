@@ -1941,10 +1941,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
-				'wp_login_url'     => wp_login_url( $current_path ),
-				'public_warning'   => get_option( 'auth_settings_advanced_public_notice' ),
-				'anonymous_notice' => $this->get_plugin_option( 'access_redirect_to_message' ),
-				'log_in'           => esc_html__( 'Log In', 'authorizer' ),
+				'wpLoginUrl'     => wp_login_url( $current_path ),
+				'publicWarning'   => get_option( 'auth_settings_advanced_public_notice' ),
+				'anonymousNotice' => $this->get_plugin_option( 'access_redirect_to_message' ),
+				'logIn'           => esc_html__( 'Log In', 'authorizer' ),
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 
@@ -2398,7 +2398,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array( 'jquery-effects-shake' ), '2.7.2', true
 			);
 			wp_localize_script(
-				'authorizer', 'auth_L10n', array(
+				'authorizer', 'authL10n', array(
 					'baseurl'              => get_bloginfo( 'url' ),
 					'saved'                => esc_html__( 'Saved', 'authorizer' ),
 					'duplicate'            => esc_html__( 'Duplicate', 'authorizer' ),
@@ -3601,17 +3601,17 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( MULTISITE_ADMIN === $this->get_admin_mode( $args ) ) :
 				?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
 			<?php else : ?>
 				<h2 class="nav-tab-wrapper">
-					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:choose_tab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-access_login" href="javascript:choose_tab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-access_public" href="javascript:choose_tab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-external" href="javascript:choose_tab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
-					<a class="nav-tab nav-tab-advanced" href="javascript:choose_tab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_login" href="javascript:chooseTab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+					<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 				</h2>
 			<?php
 			endif;
@@ -4176,7 +4176,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Print option elements.
 			?>
 			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="external_users"<?php checked( 'external_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_external_users"><?php esc_html_e( 'All authenticated users (All external service users and all WordPress users)', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users"><?php esc_html_e( 'Only', 'authorizer' ); ?> <a href="javascript:choose_tab('access_lists' );" id="dashboard_link_approved_users"><?php esc_html_e( 'approved users', 'authorizer' ); ?></a> <?php esc_html_e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="approved_users"<?php checked( 'approved_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_approved_users"><?php esc_html_e( 'Only', 'authorizer' ); ?> <a href="javascript:chooseTab('access_lists' );" id="dashboard_link_approved_users"><?php esc_html_e( 'approved users', 'authorizer' ); ?></a> <?php esc_html_e( '(Approved external users and all WordPress users)', 'authorizer' ); ?></label><br />
 			<?php
 		}
 
@@ -5809,12 +5809,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Make sure nonce exists.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) ) {
+			if ( empty( $_POST['nonce'] ) ) {
 				die( '' );
 			}
 
 			// Nonce check.
-			if ( ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
+			if ( ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -5954,7 +5954,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -6093,7 +6093,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -6195,7 +6195,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Nonce check.
-			if ( empty( $_POST['nonce_save_auth_settings'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce_save_auth_settings'] ), 'save_auth_settings' ) ) {
+			if ( empty( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
 				die( '' );
 			}
 
@@ -6544,7 +6544,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( ! is_array( $users ) ) {
 				$users = array();
 			}
-			$users = array_map( $this->sanitize_update_auth_user, $users );
+			$users = array_map( array( $this, 'sanitize_update_auth_user' ), $users );
 
 			return $users;
 		}
