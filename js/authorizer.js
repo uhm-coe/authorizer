@@ -42,7 +42,7 @@
 		$.post( ajaxurl, {
 			action: 'refresh_approved_user_list',
 			nonce: $( '#nonce_save_auth_settings' ).val(),
-			is_network_admin: authL10n.is_network_admin,
+			is_network_admin: authL10n.is_network_admin, // eslint-disable-line camelcase
 			paged: currentPage,
 			search: searchTerm,
 		}, function( response ) {
@@ -58,7 +58,7 @@
 				}
 
 				// Update pager elements.
-				refresh_approved_user_pager( currentPage );
+				refreshApprovedUserPager( currentPage );
 
 				// Update querystring with new paged param value (but don't reload the page).
 				if ( history.pushState ) {
@@ -79,7 +79,7 @@
 	}
 
 	// Update the pager elements when changing pages.
-	function refresh_approved_user_pager( currentPage ) {
+	function refreshApprovedUserPager( currentPage ) {
 		var totalPages = parseInt( $( '.total-pages' ).first().text().replace( /[^0-9]/g, '' ), 10 ) || 1;
 
 		// If total number of pages changed (because a search filter reduced it), make
@@ -135,15 +135,15 @@
 
 	// Make changes to one of the user lists (pending, approved, blocked) via ajax.
 	// @calls php wp_ajax_update_auth_user.
-	function update_auth_user( caller, setting, users_to_edit ) {
-		var access_users_pending = [],
-			access_users_approved = [],
-			access_users_blocked = [],
-			nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+	function updateAuthUser( caller, setting, usersToEdit ) {
+		var accessUsersPending = [],
+			accessUsersApproved = [],
+			accessUsersBlocked = [],
+			nonce = $( '#nonce_save_auth_settings' ).val();
 
 		// Defaults:
 		// setting = 'access_users_pending' or 'access_users_approved' or 'access_users_blocked',
-		// users_to_edit = [
+		// usersToEdit = [
 		// 	{
 		//    email: 'johndoe@example.com',
 		//    role: 'subscriber',
@@ -158,9 +158,9 @@
 		setting = typeof setting !== 'undefined' ? setting : 'none';
 
 		// If we are only editing a single user, make that user the only item in the array.
-		users_to_edit = typeof users_to_edit !== 'undefined' ? users_to_edit : [];
-		if ( ! Array.isArray( users_to_edit ) ) {
-			users_to_edit = [ users_to_edit ];
+		usersToEdit = typeof usersToEdit !== 'undefined' ? usersToEdit : [];
+		if ( ! Array.isArray( usersToEdit ) ) {
+			usersToEdit = [ usersToEdit ];
 		}
 
 		// Enable wait cursor.
@@ -182,20 +182,20 @@
 
 		// Grab the value of the setting we are saving.
 		if ( setting === 'access_users_pending' ) {
-			access_users_pending = users_to_edit;
+			accessUsersPending = usersToEdit;
 		} else if ( setting === 'access_users_approved' ) {
-			access_users_approved = users_to_edit;
+			accessUsersApproved = usersToEdit;
 		} else if ( setting === 'access_users_blocked' ) {
-			access_users_blocked = users_to_edit;
+			accessUsersBlocked = usersToEdit;
 		}
 
 		$.post( ajaxurl, {
 			action: 'update_auth_user',
 			setting: setting,
-			access_users_pending: access_users_pending,
-			access_users_approved: access_users_approved,
-			access_users_blocked: access_users_blocked,
-			nonce: nonce_save_auth_settings,
+			access_users_pending: accessUsersPending, // eslint-disable-line camelcase
+			access_users_approved: accessUsersApproved, // eslint-disable-line camelcase
+			access_users_blocked: accessUsersBlocked, // eslint-disable-line camelcase
+			nonce: nonce,
 		}, function( response ) {
 			// Server responded, but if success isn't true it failed to save.
 			var succeeded = response.success;
@@ -205,8 +205,8 @@
 			// Remove any new user entries that were rejected by the server.
 			if ( response.invalid_emails.length > 0 ) {
 				for ( var i = 0; i < response.invalid_emails.length; i++ ) {
-					var duplicate_email = response.invalid_emails[i];
-					$( 'li.new-user .auth-email[value="' + duplicate_email + '"]' )
+					var duplicateEmail = response.invalid_emails[i];
+					$( 'li.new-user .auth-email[value="' + duplicateEmail + '"]' )
 						.siblings( '.spinner' ).addClass( 'duplicate' ).append( '<span class="spinner-text" style="color: red;">' + authL10n.duplicate + '.</span>' )
 						.parent().fadeOut( spinnerWait, function() { $( this ).remove(); }); // jshint ignore:line
 				}
@@ -237,7 +237,7 @@
 
 
 	// Hide or show (with overlay) the multisite settings based on the "multisite override" setting.
-	function hide_multisite_settings_if_disabled() {
+	function hideMultisiteSettingsIfDisabled() {
 		if ( $( '#auth_settings_multisite_override' ).length === 0 ) {
 			return;
 		}
@@ -264,7 +264,7 @@
 	}
 
 	// Helper function to remove duplicate entries from an array of strings.
-	function remove_duplicates_from_array_of_strings( arrayOfStrings ) {
+	function removeDuplicatesFromArrayOfStrings( arrayOfStrings ) {
 		var seen = {};
 		return arrayOfStrings.filter( function( item ) {
 			return seen.hasOwnProperty( item ) ? false : ( seen[item] = true );
@@ -331,7 +331,7 @@
 	}
 
 	// Helper function to check if an email address is valid.
-	function valid_email( email ) {
+	function validEmail( email ) {
 		var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return email.length > 0 && re.test( email );
 	}
@@ -372,6 +372,7 @@
 
 	$( document ).ready( function() {
 		// Grab references to form elements that we will show/hide on page load
+		/* eslint-disable camelcase */
 		var auth_settings_access_role_receive_pending_emails = $( '#auth_settings_access_role_receive_pending_emails' ).closest( 'tr' );
 		var auth_settings_access_pending_redirect_to_message = $( '#wp-auth_settings_access_pending_redirect_to_message-wrap' ).closest( 'tr' );
 		var auth_settings_access_blocked_redirect_to_message = $( '#wp-auth_settings_access_blocked_redirect_to_message-wrap' ).closest( 'tr' );
@@ -407,6 +408,7 @@
 		var auth_settings_external_ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
+		/* eslint-enable */
 
 		// Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
 		$( 'th, td', auth_settings_access_role_receive_pending_emails ).wrapInner( '<div class="animated_wrapper" />' );
@@ -632,9 +634,9 @@
 
 		// Hide/show multisite settings based on override checkbox.
 		$( 'input[name="auth_settings[multisite_override]"]' ).change( function() {
-			hide_multisite_settings_if_disabled();
+			hideMultisiteSettingsIfDisabled();
 		});
-		hide_multisite_settings_if_disabled();
+		hideMultisiteSettingsIfDisabled();
 
 		// Wire up pager events on Approved User list (first/last/next/previous
 		// buttons, go to page text input, and search.
@@ -711,7 +713,7 @@
 		$( 'a.nav-tab-' + listName ).addClass( 'nav-tab-active' );
 
 		// Hide site options if they are overridden by a multisite setting.
-		setTimeout( window.hide_multisite_overridden_options, delay );
+		setTimeout( window.hideMultisiteOverriddenOptions, delay );
 
 		// Hide Save Changes button if we're on the access lists page (changing
 		// access lists saves automatically via AJAX).
@@ -723,20 +725,20 @@
 	};
 
 	// Hide (with overlay) site options if overridden by a multisite option.
-	window.hide_multisite_overridden_options = function() {
+	window.hideMultisiteOverriddenOptions = function() {
 		$( '.auth_multisite_override_overlay' ).each( function() {
 			// Option to hide is stored in the overlay's id with 'overlay-hide-' prefix.
-			var option_container_to_hide = $( this ).closest( 'tr' );
-			if ( option_container_to_hide.length > 0 ) {
+			var optionContainerToHide = $( this ).closest( 'tr' );
+			if ( optionContainerToHide.length > 0 ) {
 				$( this ).css({
 					'background-color': '#f1f1f1',
 					'z-index': 1,
 					opacity: 0.8,
 					position: 'absolute',
-					top: option_container_to_hide.position().top,
-					left: option_container_to_hide.position().left,
+					top: optionContainerToHide.position().top,
+					left: optionContainerToHide.position().left,
 					width: '100%',
-					height: option_container_to_hide.height(),
+					height: optionContainerToHide.height(),
 				});
 				$( this ).show();
 			}
@@ -745,12 +747,12 @@
 
 	// Update user's usermeta field.
 	// @calls php wp_ajax_update_auth_usermeta.
-	window.auth_update_usermeta = function( caller ) {
+	window.authUpdateUsermeta = function( caller ) {
 		var $caller = $( caller ),
 			$usermeta = $caller.parent().children( '.auth-usermeta' ),
 			email = $caller.siblings( '.auth-email' ).val(),
 			usermeta = $usermeta.val(),
-			nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+			nonce = $( '#nonce_save_auth_settings' ).val();
 
 		// Remove reference to caller if it's the usermeta field itself (not a button triggering the save).
 		if ( $caller.hasClass( 'auth-usermeta' ) ) {
@@ -774,7 +776,7 @@
 			action: 'update_auth_usermeta',
 			email: email,
 			usermeta: usermeta,
-			nonce: nonce_save_auth_settings,
+			nonce: nonce,
 		}, function( response ) {
 			var succeeded = response === 'success';
 			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
@@ -807,54 +809,54 @@
 	};
 
 	// Update user's role.
-	window.auth_change_role = function( caller, is_multisite ) {
+	window.authChangeRole = function( caller, isMultisite ) {
 		// Set default for multisite flag (run different save routine if multisite)
-		is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+		isMultisite = typeof isMultisite !== 'undefined' ? isMultisite : false;
 
 		var email = $( caller ).parent().find( '.auth-email' );
 		var role = $( caller ).parent().find( '.auth-role' );
-		var date_added = $( caller ).parent().find( '.auth-date-added' );
+		var dateAdded = $( caller ).parent().find( '.auth-date-added' );
 
 		var user = {
 			email: email.val(),
 			role: role.val(),
-			date_added: date_added.val(),
-			edit_action: 'change_role',
-			multisite_user: is_multisite,
+			date_added: dateAdded.val(), // eslint-disable-line camelcase
+			edit_action: 'change_role', // eslint-disable-line camelcase
+			multisite_user: isMultisite, // eslint-disable-line camelcase
 		};
 
 		// Update the options in the database with this change.
-		update_auth_user( caller, 'access_users_approved', user );
+		updateAuthUser( caller, 'access_users_approved', user );
 
 		return true;
 	};
 
 	// Update user's role (multisite options page).
-	window.auth_multisite_change_role = function( caller ) {
-		var is_multisite = true;
-		window.auth_change_role( caller, is_multisite );
+	window.authMultisiteChangeRole = function( caller ) {
+		var isMultisite = true;
+		window.authChangeRole( caller, isMultisite );
 	};
 
 	// Add user to list (list = blocked or approved).
-	window.auth_add_user = function( caller, list, create_local_account, is_multisite ) {
+	window.authAddUser = function( caller, list, shouldCreateLocalAccount, isMultisite ) {
 		// Skip email address validation if adding from pending list (not user-editable).
-		var skip_validation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
+		var skipValidation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
 
 		// Skip email address validation if we're banning an existing user (since they're already in a list).
-		skip_validation = skip_validation || $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1;
+		skipValidation = skipValidation || $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1;
 
 		// Set default for multisite flag (run different save routine if multisite)
-		is_multisite = 'undefined' !== typeof is_multisite ? is_multisite : false;
+		isMultisite = 'undefined' !== typeof isMultisite ? isMultisite : false;
 
 		// Default to the approved list.
 		list = 'undefined' !== typeof list ? list : 'approved';
 
 		// Default to not creating a local account.
-		create_local_account = 'undefined' !== typeof create_local_account ? create_local_account : false;
+		shouldCreateLocalAccount = 'undefined' !== typeof shouldCreateLocalAccount ? shouldCreateLocalAccount : false;
 
 		var email = $( caller ).parent().find( '.auth-email' );
 		var role = $( caller ).parent().find( '.auth-role' );
-		var date_added = $( caller ).parent().find( '.auth-date-added' );
+		var dateAdded = $( caller ).parent().find( '.auth-date-added' );
 
 		// Helper variable for disabling buttons while processing. This will be
 		// set differently if our clicked button is nested in a div (below).
@@ -864,7 +866,7 @@
 		if ( 0 === email.length || 0 === role.length ) {
 			email = $( caller ).parent().parent().find( '.auth-email' );
 			role = $( caller ).parent().parent().find( '.auth-role' );
-			date_added = $( caller ).parent().parent().find( '.auth-date-added' );
+			dateAdded = $( caller ).parent().parent().find( '.auth-date-added' );
 			buttons = $( caller ).parent().children();
 		}
 
@@ -872,13 +874,13 @@
 		var emails = $.trim( email.val() ).replace( /mailto:/g, '' ).split( /[\s,;]+/ );
 
 		// Remove any invalid email addresses.
-		if ( ! skip_validation ) {
+		if ( ! skipValidation ) {
 			// Check if the email(s) being added is well-formed.
 			emails = emails.filter( function( emailToValidate ) {
-				return valid_email( emailToValidate );
+				return validEmail( emailToValidate );
 			});
 			// Remove any duplicates in the list of emails to add.
-			emails = remove_duplicates_from_array_of_strings( emails );
+			emails = removeDuplicatesFromArrayOfStrings( emails );
 		}
 
 		// Shake and quit if no valid email addresses exist.
@@ -894,15 +896,15 @@
 			var user = {
 				email: emails[i],
 				role: role.val(),
-				date_added: date_added.val(),
-				edit_action: 'add',
-				local_user: create_local_account,
-				multisite_user: is_multisite,
+				date_added: dateAdded.val(), // eslint-disable-line camelcase
+				edit_action: 'add', // eslint-disable-line camelcase
+				local_user: shouldCreateLocalAccount, // eslint-disable-line camelcase
+				multisite_user: isMultisite, // eslint-disable-line camelcase
 			};
 			users.push( user );
 
 			// Get next highest user ID.
-			var next_id = 1 + Math.max.apply(
+			var nextId = 1 + Math.max.apply(
 				null,
 				// eslint-disable-next-line no-unused-vars
 				$( '#list_auth_settings_access_users_' + list + ' li .auth-email' ).map( function( el ) { // jshint ignore:line
@@ -911,33 +913,33 @@
 			);
 
 			// Add the new item.
-			var auth_js_prefix = is_multisite ? 'auth_multisite_' : 'auth_';
-			var local_icon = create_local_account ? '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
-			var ban_button = list === 'approved' && ! is_multisite ? '<a class="button" id="block_user_' + next_id + '" onclick="' + auth_js_prefix + 'add_user( this, \'blocked\', false ); ' + auth_js_prefix + 'ignore_user( this, \'approved\' );" title="' + authL10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
+			var authJsPrefix = isMultisite ? 'authMultisite' : 'auth';
+			var localIcon = shouldCreateLocalAccount ? '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>' : '';
+			var banButton = list === 'approved' && ! isMultisite ? '<a class="button" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
 			$( ' \
-				<li id="new_user_' + next_id + '" class="new-user" style="display: none;"> \
-					<input type="text" id="auth_settings_access_users_' + list + '_' + next_id + '" name="auth_settings[access_users_' + list + '][' + next_id + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
-					<select name="auth_settings[access_users_' + list + '][' + next_id + '][role]" class="auth-role" onchange="' + auth_js_prefix + 'change_role( this );"> \
+				<li id="new_user_' + nextId + '" class="new-user" style="display: none;"> \
+					<input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
+					<select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="auth-role" onchange="' + authJsPrefix + 'ChangeRole( this );"> \
 					</select> \
-					<input type="text" name="auth_settings[access_users_' + list + '][' + next_id + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
-					' + ban_button + ' \
-					<a class="button" id="ignore_user_' + next_id + '" onclick="' + auth_js_prefix + 'ignore_user( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
-					' + local_icon + ' \
+					<input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
+					' + banButton + ' \
+					<a class="button" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a> \
+					' + localIcon + ' \
 					<span class="spinner is-active"></span> \
 				</li> \
 			' ).appendTo( '#list_auth_settings_access_users_' + list ).slideDown( 250 );
 
 			// Populate the role dropdown in the new element. Because clone() doesn't
 			// save selected state on select elements, set that too.
-			$( 'option', role ).clone().appendTo( '#new_user_' + next_id + ' .auth-role' );
-			$( '#new_user_' + next_id + ' .auth-role' ).val( role.val() );
+			$( 'option', role ).clone().appendTo( '#new_user_' + nextId + ' .auth-role' );
+			$( '#new_user_' + nextId + ' .auth-role' ).val( role.val() );
 		}
 
 		// Remove the 'empty list' item if it exists.
 		$( '#list_auth_settings_access_users_' + list + ' li.auth-empty' ).remove();
 
 		// Update the options in the database with this change.
-		update_auth_user( buttons, 'access_users_' + list, users );
+		updateAuthUser( buttons, 'access_users_' + list, users );
 
 		// Reset the new user textboxes
 		if ( email.hasClass( 'new' ) ) {
@@ -950,27 +952,27 @@
 	};
 
 	// Add user to list (multisite options page).
-	window.auth_multisite_add_user = function( caller, list, create_local_account ) {
-		var is_multisite = true;
+	window.authMultisiteAddUser = function( caller, list, shouldCreateLocalAccount ) {
+		var isMultisite = true;
 
 		// Default to the approved list.
 		list = typeof list !== 'undefined' ? list : 'approved';
 
 		// Default to not creating a local account.
-		create_local_account = typeof create_local_account !== 'undefined' ? create_local_account : false;
+		shouldCreateLocalAccount = typeof shouldCreateLocalAccount !== 'undefined' ? shouldCreateLocalAccount : false;
 
 		// There currently is no multisite blocked list, so do nothing.
 		if ( list === 'blocked' ) {
 			return;
 		}
 
-		window.auth_add_user( caller, list, create_local_account, is_multisite );
+		window.authAddUser( caller, list, shouldCreateLocalAccount, isMultisite );
 	};
 
 	// Remove user from list.
-	window.auth_ignore_user = function( caller, listName, is_multisite ) {
+	window.authIgnoreUser = function( caller, listName, isMultisite ) {
 		// Set default for multisite flag (run different save routine if multisite)
-		is_multisite = typeof is_multisite !== 'undefined' ? is_multisite : false;
+		isMultisite = typeof isMultisite !== 'undefined' ? isMultisite : false;
 
 		// Set default list if not provided.
 		listName = typeof listName !== 'undefined' ? listName : 'approved';
@@ -980,9 +982,9 @@
 		var user = {
 			email: email.val(),
 			role: '',
-			date_added: '',
-			edit_action: 'remove',
-			multisite_user: is_multisite,
+			date_added: '', // eslint-disable-line camelcase
+			edit_action: 'remove', // eslint-disable-line camelcase
+			multisite_user: isMultisite, // eslint-disable-line camelcase
 		};
 
 		// Show an 'empty list' message if we're deleting the last item
@@ -996,23 +998,24 @@
 			$( this ).remove();
 
 			// Update the options in the database with this change.
-			update_auth_user( caller, 'access_users_' + listName, user );
+			updateAuthUser( caller, 'access_users_' + listName, user );
 		});
 	};
 
 	// Remove user from list (multisite options page).
-	window.auth_multisite_ignore_user = function( caller, listName ) {
-		var is_multisite = true;
+	window.authMultisiteIgnoreUser = function( caller, listName ) {
+		var isMultisite = true;
 
 		// Set default list if not provided.
 		listName = typeof listName !== 'undefined' ? listName : '';
 
-		window.auth_ignore_user( caller, listName, is_multisite );
+		window.authIgnoreUser( caller, listName, isMultisite );
 	};
 
 	// Save Authorizer Settings (multisite).
 	// @calls php wp_ajax_save_auth_multisite_settings.
-	window.save_auth_multisite_settings = function( caller ) {
+	/* eslint-disable camelcase */
+	window.saveAuthMultisiteSettings = function( caller ) {
 		// Enable wait cursor.
 		$( 'html' ).addClass( 'busy' );
 
@@ -1028,7 +1031,6 @@
 		$( caller ).after( $spinner );
 
 		// Get form elements to save
-
 		var nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
 
 		var multisite_override = $( '#auth_settings_multisite_override' ).is( ':checked' ) ? '1' : '';
@@ -1160,6 +1162,7 @@
 			$( 'html' ).removeClass( 'busy' );
 		});
 	};
+	/* eslint-enable camelcase */
 
 	/* ========================================================================
 	 * Portions below from Bootstrap.

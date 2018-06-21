@@ -1941,7 +1941,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
 			$auth_localized = array(
-				'wpLoginUrl'     => wp_login_url( $current_path ),
+				'wpLoginUrl'      => wp_login_url( $current_path ),
 				'publicWarning'   => get_option( 'auth_settings_advanced_public_notice' ),
 				'anonymousNotice' => $this->get_plugin_option( 'access_redirect_to_message' ),
 				'logIn'           => esc_html__( 'Log In', 'authorizer' ),
@@ -2021,64 +2021,68 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function load_login_footer_js() {
 			// Grab plugin settings.
 			$auth_settings = $this->get_plugin_options( SINGLE_ADMIN, 'allow override' );
+			$ajaxurl       = admin_url( 'admin-ajax.php' );
 			if ( '1' === $auth_settings['google'] ) :
 				?>
-				<script type="text/javascript">
-					// Reload login page if reauth querystring param exists,
-					// since reauth interrupts external logins (e.g., google).
-					if ( location.search.indexOf( 'reauth=1' ) >= 0 ) {
-						location.href = location.href.replace( 'reauth=1', '' );
-					}
+<script type="text/javascript">
+/* global location, window */
+// Reload login page if reauth querystring param exists,
+// since reauth interrupts external logins (e.g., google).
+if ( location.search.indexOf( 'reauth=1' ) >= 0 ) {
+	location.href = location.href.replace( 'reauth=1', '' );
+}
 
-					function auth_update_querystring_param( uri, key, value ) {
-						var re = new RegExp( '([?&])' + key + '=.*?(&|$)', 'i' );
-						var separator = uri.indexOf( '?' ) !== -1 ? '&' : '?';
-						if ( uri.match( re ) ) {
-							return uri.replace( re, '$1' + key + '=' + value + '$2' );
-						} else {
-							return uri + separator + key + '=' + value;
-						}
-					}
+// eslint-disable-next-line no-implicit-globals
+function authUpdateQuerystringParam( uri, key, value ) {
+	var re = new RegExp( '([?&])' + key + '=.*?(&|$)', 'i' );
+	var separator = uri.indexOf( '?' ) !== -1 ? '&' : '?';
+	if ( uri.match( re ) ) {
+		return uri.replace( re, '$1' + key + '=' + value + '$2' );
+	} else {
+		return uri + separator + key + '=' + value;
+	}
+}
 
-					function signInCallback( authResult ) {
-						var $ = jQuery;
-						if ( authResult.status && authResult.status.signed_in ) {
-							// Hide the sign-in button now that the user is authorized, for example:
-							$( '#googleplus_button' ).attr( 'style', 'display: none' );
+// eslint-disable-next-line
+function signInCallback( authResult ) { // jshint ignore:line
+	var $ = jQuery;
+	if ( authResult.status && authResult.status.signed_in ) {
+		// Hide the sign-in button now that the user is authorized, for example:
+		$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
-							// Send the code to the server
-							var ajaxurl = '<?php echo esc_attr( admin_url( 'admin-ajax.php' ) ); ?>'; // jshint ignore:line
-							$.post(ajaxurl, {
-								'action': 'process_google_login',
-								'code': authResult.code,
-								'nonce': $('#nonce_google_auth-<?php echo esc_attr( $this->get_cookie_value() ); ?>' ).val(),
-							}, function( response ) {
-								// Handle or verify the server response if necessary.
-								//console.log( response );
+		// Send the code to the server
+		var ajaxurl = '<?php echo esc_attr( $ajaxurl ); ?>';
+		$.post(ajaxurl, {
+			action: 'process_google_login',
+			code: authResult.code,
+			nonce: $('#nonce_google_auth-<?php echo esc_attr( $this->get_cookie_value() ); ?>' ).val(),
+		}, function() {
+			// Handle or verify the server response if necessary.
+			// console.log( response );
 
-								// Reload wp-login.php to continue the authentication process.
-								var new_href = auth_update_querystring_param( location.href, 'external', 'google' );
-								if ( location.href === new_href ) {
-									location.reload();
-								} else {
-									location.href = new_href;
-								}
-							});
-						} else {
-							// Update the app to reflect a signed out user
-							// Possible error values:
-							//   "user_signed_out" - User is signed-out
-							//   "access_denied" - User denied access to your app
-							//   "immediate_failed" - Could not automatically log in the user
-							//console.log('Sign-in state: ' + authResult['error']);
+			// Reload wp-login.php to continue the authentication process.
+			var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
+			if ( location.href === newHref ) {
+				location.reload();
+			} else {
+				location.href = newHref;
+			}
+		});
+	} else {
+		// Update the app to reflect a signed out user
+		// Possible error values:
+		//   "user_signed_out" - User is signed-out
+		//   "access_denied" - User denied access to your app
+		//   "immediate_failed" - Could not automatically log in the user
+		// console.log('Sign-in state: ' + authResult['error']);
 
-							// If user denies access, reload the login page.
-							if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
-								window.location.reload();
-							}
-						}
-					}
-				</script>
+		// If user denies access, reload the login page.
+		if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
+			window.location.reload();
+		}
+	}
+}
+</script>
 			<?php
 			endif;
 		}
@@ -3684,9 +3688,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 									<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 								</select>
-								<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'approved', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-								<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="auth_add_user( this, 'blocked', false ); auth_ignore_user( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-								<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
+								<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+								<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+								<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
 							</li>
 						<?php endforeach; ?>
 					<?php else : ?>
@@ -3738,7 +3742,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
 			// Adjust javascript function prefixes if multisite.
-			$js_function_prefix      = MULTISITE_ADMIN === $admin_mode ? 'auth_multisite_' : 'auth_';
+			$js_function_prefix      = MULTISITE_ADMIN === $admin_mode ? 'authMultisite' : 'auth';
 			$is_multisite_admin_page = MULTISITE_ADMIN === $admin_mode;
 
 			// Filter user list to search terms.
@@ -3819,13 +3823,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 					</select>
 					<div class="btn-group">
-						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
 						<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 							<span class="caret"></span>
 							<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 						</button>
 						<ul class="dropdown-menu" role="menu">
-							<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
+							<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
 						</ul>
 					</div>
 				</div>
@@ -3973,7 +3977,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$is_current_user   = $approved_wp_user && get_current_user_id() === $approved_wp_user->ID;
 
 			// Adjust javascript function prefixes if multisite.
-			$js_function_prefix      = MULTISITE_ADMIN === $admin_mode ? 'auth_multisite_' : 'auth_';
+			$js_function_prefix      = MULTISITE_ADMIN === $admin_mode ? 'authMultisite' : 'auth';
 			$is_multisite_admin_page = MULTISITE_ADMIN === $admin_mode;
 
 			if ( ! $approved_wp_user ) :
@@ -4013,7 +4017,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				<select
 					id="<?php echo esc_attr( $option_id ); ?>_role"
 					class="<?php echo esc_attr( $this->create_class_name( 'role', $is_multisite_user ) ); ?>"
-					onchange="<?php echo esc_attr( $js_function_prefix ); ?>change_role( this );"
+					onchange="<?php echo esc_attr( $js_function_prefix ); ?>ChangeRole( this );"
 					<?php if ( $is_multisite_user ) : ?>
 						disabled="disabled"
 					<?php endif; ?>
@@ -4039,7 +4043,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							<select
 								id="<?php echo esc_attr( $option_id ); ?>_usermeta"
 								class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
-								onchange="<?php echo esc_attr( $js_function_prefix ); ?>update_usermeta( this );"
+								onchange="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );"
 							>
 								<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
 								<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
@@ -4055,14 +4059,14 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 							value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
 							class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
 						/>
-						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>update_usermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 					<?php endif; ?>
 				<?php endif; ?>
 				<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
 					<?php if ( ! $is_multisite_admin_page ) : ?>
-						<a class="button" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>add_user( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>ignore_user( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
+						<a class="button" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
 					<?php endif; ?>
-					<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>ignore_user(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+					<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 				<?php endif; ?>
 				<?php if ( $is_local_user ) : ?>
 					&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
@@ -4115,7 +4119,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 							</select>
 							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
-							<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="auth_ignore_user( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+							<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 						</li>
 					<?php endforeach; ?>
 				</ul>
@@ -4124,7 +4128,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					<select id="new_blocked_user_role" class="auth-role">
 						<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
 					</select>
-					<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="auth_add_user( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+					<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="authAddUser( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
 				</div>
 			</div>
 			<?php
@@ -5790,7 +5794,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 						<br class="clear" />
 					</div>
-					<input type="button" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'authorizer' ); ?>" onclick="save_auth_multisite_settings(this);" />
+					<input type="button" name="submit" id="submit" class="button button-primary" value="<?php esc_attr_e( 'Save Changes', 'authorizer' ); ?>" onclick="saveAuthMultisiteSettings(this);" />
 				</form>
 			</div>
 			<?php
