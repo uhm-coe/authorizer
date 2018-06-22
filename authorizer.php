@@ -3823,7 +3823,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 					</select>
 					<div class="btn-group">
-						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
 						<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
 							<span class="caret"></span>
 							<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
@@ -4128,7 +4128,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 					<select id="new_blocked_user_role" class="auth-role">
 						<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
 					</select>
-					<a href="javascript:void(0);" class="button-primary" id="block_user_new" onclick="authAddUser( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+					<a href="javascript:void(0);" class="button-primary button-add-user" id="block_user_new" onclick="authAddUser( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
 				</div>
 			</div>
 			<?php

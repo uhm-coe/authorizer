@@ -594,13 +594,15 @@
 		// List management function: pressing enter in the new approved or new
 		// blocked user (email or role field) adds the user to the list.
 		$( '#new_approved_user_email, #new_approved_user_role, #new_blocked_user_email' ).on( 'keyup', function( event ) {
-			// For textareas, make ctrl-enter add the user; for inputs, make enter add the user.
+			// For textareas, make Enter add the user; for inputs, make enter add the user.
 			if ( $( this ).is( 'textarea' ) ) {
-				if ( event.which === 13 && ( event.ctrlKey || event.altKey ) ) { // Enter key (without Ctrl modifier)
-					$( this ).parent().find( 'a' ).trigger( 'click' );
+				// Enter key adds a newline; Enter key with Ctrl, Alt, Shift, or Meta adds the user.
+				if ( event.which === 13 && ( event.ctrlKey || event.altKey || event.metaKey ) ) {
+					$( this ).parent().find( 'a.button-add-user' ).trigger( 'click' );
+					event.preventDefault();
 				}
 			} else if ( event.which === 13 ) { // Enter key on input[type="text"]
-				$( this ).parent().find( 'a' ).trigger( 'click' );
+				$( this ).parent().find( 'a.button-add-user' ).trigger( 'click' );
 				event.preventDefault();
 			}
 		});
