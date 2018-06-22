@@ -5974,7 +5974,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Get user list.
 			$option               = 'access_users_approved';
-			$admin_mode           = SINGLE_ADMIN;
+			$admin_mode           = is_multisite() && $is_network_admin ? MULTISITE_ADMIN : SINGLE_ADMIN;
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'no override' );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
