@@ -1,4 +1,4 @@
-.button-external {
+.login .button-external {
 	font-size: 18px;
 	height: 44px;
 	margin: 0 0 20px 0;
@@ -6,15 +6,15 @@
 	text-align: center;
 	width: 100%;
 }
-.button-external .dashicons {
+.login .button-external .dashicons {
 	font-size: 32px;
 	margin-top: -2px;
 }
-.button-external .label {
+.login .button-external .label {
 	padding-left: 20px;
 }
 
-.button-google {
+.login .button-google {
 	background-color: #dd4b39;
 	border-bottom: 1px solid #bb3f30;
 	border-color: transparent;
@@ -27,13 +27,13 @@
 	text-shadow: none;
 	width: 270px;
 }
-.button-google:hover {
+.login .button-google:hover {
 	background-color: #e74b37;
 	border-color: transparent;
 	-webkit-box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
 	box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
 }
-.button-google:active {
+.login .button-google:active {
 	background-color: #be3e2e;
 	-webkit-box-shadow: inset 0 2px 0 rgba(0,0,0,.20);
 	box-shadow: inset 0 2px 0 rgba(0,0,0,.20);
