@@ -1273,6 +1273,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Set the CAS client configuration.
 			phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
+			// Allow redirects at the CAS server endpoint (e.g., allow connections
+			// at an old CAS URL that redirects to a newer CAS URL).
+			phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
+
 			// Update server certificate bundle if it doesn't exist or is older
 			// than 6 months, then use it to ensure CAS server is legitimate.
 			// Note: only try to update if the system has the php_openssl extension.
@@ -1651,6 +1655,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Set the CAS client configuration if it hasn't been set already.
 					phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+					// Allow redirects at the CAS server endpoint (e.g., allow connections
+					// at an old CAS URL that redirects to a newer CAS URL).
+					phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
 					// Restrict logout request origin to the CAS server only (prevent DDOS).
 					phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 				}
