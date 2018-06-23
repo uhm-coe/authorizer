@@ -1521,12 +1521,27 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array_push( $ldap_attributes_to_retrieve, $this->lowercase( $auth_settings['ldap_attr_email'] ) );
 			}
 
+			// Create default LDAP search filter (uid=$username).
+			$search_filter = '(' . $auth_settings['ldap_uid'] . '=' . $username . ')';
+
+			/**
+			 * Filter LDAP search filter.
+			 *
+			 * Allows for custom LDAP authentication rules (e.g., restricting login
+			 * access to users in multiple groups, or having certain attributes).
+			 *
+			 * @param string $search_filter The filter to pass to ldap_search().
+			 * @param string $ldap_uid      The attribute to compare username against (from Authorizer Settings).
+			 * @param string $username      The username attempting to log in.
+			 */
+			$search_filter = apply_filters( 'authorizer_ldap_search_filter', $search_filter, $auth_settings['ldap_uid'], $username );
+
 			// Multiple search bases can be provided, so iterate through them until a match is found.
 			foreach ( $search_bases as $search_base ) {
 				$ldap_search  = ldap_search(
 					$ldap,
 					$search_base,
-					'(' . $auth_settings['ldap_uid'] . '=' . $username . ')',
+					$search_filter,
 					$ldap_attributes_to_retrieve
 				);
 				$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
