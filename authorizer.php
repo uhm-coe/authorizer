@@ -126,7 +126,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			if ( defined( 'BLOG_ID_CURRENT_SITE' ) ) {
 				$this->current_site_blog_id = BLOG_ID_CURRENT_SITE;
 			} elseif ( defined( 'BLOGID_CURRENT_SITE' ) ) { // deprecated.
-				$this->current_site->blog_id = BLOGID_CURRENT_SITE;
+				$this->current_site_blog_id = BLOGID_CURRENT_SITE;
 			}
 
 			// Installation and uninstallation hooks.
