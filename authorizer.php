@@ -2524,7 +2524,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 
 		/**
-		 * Create sections and options
+		 * Create sections and options.
 		 *
 		 * Action: admin_init
 		 */
