@@ -1,45 +1,26 @@
 <?php
 /**
  * Plugin Name: Authorizer
- * Plugin URI: https://github.com/uhm-coe/authorizer
  * Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
- * Version: 2.7.2
- * Author: Paul Ryan
+ * Author: Paul Ryan <prar@hawaii.edu>
+ * Plugin URI: https://github.com/uhm-coe/authorizer
  * Text Domain: authorizer
  * Domain Path: /languages
  * License: GPL2
+ * Version: 2.7.2
  *
  * @package authorizer
  */
-
-/*
-Copyright 2014  Paul Ryan  (email: prar@hawaii.edu)
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License, version 2, as
-published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-*/
-
-
-/*
-Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
-Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
-Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
-*/
 
 
 define( 'MULTISITE_ADMIN', 'multisite_admin' );
 define( 'SINGLE_ADMIN', 'single_admin' );
 
+/**
+ * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
+ * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
+ * Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
+ */
 
 /**
  * Add phpCAS library if it's not included.
