@@ -62,6 +62,18 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.0 =
+* Add authorizer_ldap_search_filter filter (for customizing the LDAP search filter to further restrict LDAP logins). Props @jesus33c for the idea!
+* Add authorizer_user_register action. Props @pablo-tapia for the suggestion!
+* Allow CAS servers behind redirected URLs. Props @cwhunt for the code!
+* Check CAS server reachability by testing serviceValidate endpoint. Props @cwhunt for the code!
+* Allow "No role for this site" as a default role for new users. Props @julienlusson for the pull request!
+* Update French translations. Props @julienlusson for the pull request!
+* Update code to follow WordPress coding standards (php, css, js). Props @michaeldfoley for fixing a bug with our overzealous sanitization!
+* Update cacert.pem.
+* Fix bug with paging on network approved user list.
+* Note: this version requires WordPress 4.4 or later.
+
 = 2.7.2 =
 * Fix Approved User list sort when set to Date approved / Descending (was still showing as ascending).
 * Support multiple LDAP search bases. Props @jmutsaerts for the feature request.
