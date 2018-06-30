@@ -1944,7 +1944,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function auth_public_scripts() {
 			// Load (and localize) public scripts.
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
-			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
+			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', __FILE__ ), array( 'jquery' ), '2.8.0' );
 			$auth_localized = array(
 				'wpLoginUrl'      => wp_login_url( $current_path ),
 				'publicWarning'   => get_option( 'auth_settings_advanced_public_notice' ),
@@ -1954,7 +1954,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 
 			// Load public css.
-			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ), array(), '2.3.2' );
+			wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', __FILE__ ), array(), '2.8.0' );
 			wp_enqueue_style( 'authorizer-public-css' );
 		}
 
@@ -1971,10 +1971,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
 
 			// Enqueue scripts appearing on wp-login.php.
-			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.3.2' );
+			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.8.0' );
 
 			// Enqueue styles appearing on wp-login.php.
-			wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', __FILE__ ), array(), '2.3.2' );
+			wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', __FILE__ ), array(), '2.8.0' );
 			wp_enqueue_style( 'authorizer-login-css' );
 
 			/**
@@ -2001,15 +2001,15 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					continue;
 				}
 				if ( $auth_settings['advanced_branding'] === $branding_option['value'] ) {
-					wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.3.2' );
-					wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.3.2' );
+					wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.8.0' );
+					wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.8.0' );
 					wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
 				}
 			}
 
 			// If we're using Google logins, load those resources.
 			if ( '1' === $auth_settings['google'] ) {
-				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ), '2.3.2' ); ?>
+				wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', __FILE__ ), array( 'jquery' ), '2.8.0' ); ?>
 				<meta name="google-signin-clientid" content="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>" />
 				<meta name="google-signin-scope" content="email" />
 				<meta name="google-signin-cookiepolicy" content="single_host_origin" />
@@ -2404,7 +2404,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.7.2', true
+				array( 'jquery-effects-shake' ), '2.8.0', true
 			);
 			wp_localize_script(
 				'authorizer', 'authL10n', array(
