@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.1 =
+* Force asset reload (coding standards changed the formatting of a lot of js and css assets).
+
 = 2.8.0 =
 * Add authorizer_ldap_search_filter filter (for customizing the LDAP search filter to further restrict LDAP logins). Props @jesus33c for the idea!
 * Add authorizer_user_register action. Props @pablo-tapia for the suggestion!
