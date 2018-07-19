@@ -44,7 +44,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Constants for determining our admin context (network or individual site).
 		 */
 		const NETWORK_CONTEXT = 'multisite_admin';
-		const SINGLE_CONTEXT    = 'single_admin';
+		const SINGLE_CONTEXT  = 'single_admin';
 
 		/**
 		 * Current site ID (Multisite).
@@ -2490,10 +2490,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			if ( '1' === $auth_settings['cas'] ) :
 				// Check if provided CAS URL is accessible.
-				$protocol = in_array( strval( $auth_settings['cas_port'] ), array( '80', '8080' ), true ) ? 'http' : 'https';
-				$cas_url  = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
+				$protocol       = in_array( strval( $auth_settings['cas_port'] ), array( '80', '8080' ), true ) ? 'http' : 'https';
+				$cas_url        = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
 				$legacy_cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint (old; some servers don't register a ./login endpoint, use serviceValidate instead).
-				$cas_url  = trailingslashit( $cas_url ) . 'serviceValidate'; // Check the specific CAS login endpoint.
+				$cas_url        = trailingslashit( $cas_url ) . 'serviceValidate'; // Check the specific CAS login endpoint.
 				if ( ! $this->url_is_accessible( $cas_url ) && ! $this->url_is_accessible( $legacy_cas_url ) ) :
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?>
