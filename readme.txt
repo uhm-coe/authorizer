@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.2 =
+* Revert overly strict querystring sanitization (caused CAS login problems in servers that don’t encode forward slashes as %2F in querystring values). Props @anamba for the report and bug testing!
+
 = 2.8.1 =
 * Force asset reload (coding standards changed the formatting of a lot of js and css assets).
 
