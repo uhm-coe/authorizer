@@ -268,15 +268,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public function activate() {
 			global $wpdb;
 
-			// Nonce check.
-			if (
-				! isset( $_REQUEST['_wpnonce'], $_REQUEST['plugin'] ) ||
-				! wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'activate-plugin_' . sanitize_text_field( wp_unslash( $_REQUEST['plugin'] ) ) )
-			) {
-				die( '' );
-			}
-
-			// If we're in a multisite environment, run the plugin activation for each site when network enabling.
+			// If we're in a multisite environment, run the plugin activation for each
+			// site when network enabling.
+			// Note: wp-cli does not use nonces, so we skip the nonce check here to
+			// allow the "wp plugin activate authorizer" command.
+			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 === intval( $_GET['networkwide'] ) ) {
 
 				// Add super admins to the multisite approved list.
