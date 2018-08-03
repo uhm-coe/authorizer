@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.3 =
+* Fix for using wp-cli to activate the plugin (broke in 2.8.0). Props @timkite for the discovery!
+* Fix for network-activating authorizer via wp-cli.
+
 = 2.8.2 =
 * Revert overly strict querystring sanitization (caused CAS login problems in servers that don’t encode forward slashes as %2F in querystring values). Props @anamba for the report and bug testing!
 
