@@ -265,7 +265,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 *
 		 * @return void
 		 */
-		public function activate() {
+		public function activate( $network_wide ) {
 			global $wpdb;
 
 			// If we're in a multisite environment, run the plugin activation for each
@@ -273,7 +273,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// Note: wp-cli does not use nonces, so we skip the nonce check here to
 			// allow the "wp plugin activate authorizer" command.
 			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
-			if ( is_multisite() && isset( $_GET['networkwide'] ) && 1 === intval( $_GET['networkwide'] ) ) {
+			if ( is_multisite() && $network_wide ) {
 
 				// Add super admins to the multisite approved list.
 				$auth_multisite_settings_access_users_approved               = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() );
