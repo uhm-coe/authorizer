@@ -587,7 +587,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				return $result;
 			}
 
-			// If we created a new user in check_user_access(), log that user in.
+			// If we have a valid user from check_user_access(), log that user in.
 			if ( get_class( $result ) === 'WP_User' ) {
 				$user = $result;
 			}
@@ -610,11 +610,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 		 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
 		 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes.
-		 * @return WP_Error|void|null|WP_User
+		 * @return WP_Error|void|WP_User
 		 *                             WP_Error if there was an error on user creation / adding user to blog.
 		 *                             wp_die() if user does not have access.
-		 *                             null if user has access (success).
-		 *                             WP_User if user has access and a new account was created for them.
+		 *                             WP_User if user has access.
 		 */
 		private function check_user_access( $user, $user_emails, $user_data = array() ) {
 			// Grab plugin settings.
@@ -722,7 +721,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// (administrator in single site mode, or super admin in network mode),
 				// and is not in the blocked list, let them in.
 				if ( $user && is_super_admin( $user->ID ) ) {
-					return;
+					return $user;
 				}
 
 				// If this externally authenticated user isn't in the approved list
