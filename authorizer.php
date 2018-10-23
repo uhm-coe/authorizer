@@ -7,7 +7,7 @@
  * Text Domain: authorizer
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.8.3
+ * Version: 2.8.4
  *
  * @package authorizer
  */

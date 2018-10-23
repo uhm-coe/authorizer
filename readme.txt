@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.4 =
+* Fix when inviting existing users to a blog in multisite and setting a role with a display name that doesn't match the role name. Props @julienlusson for finding the bug!
+
 = 2.8.3 =
 * Fix for using wp-cli to activate the plugin (broke in 2.8.0). Props @timkite for the discovery!
 * Fix for network-activating authorizer via wp-cli.
