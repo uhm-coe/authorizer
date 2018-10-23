@@ -6994,7 +6994,18 @@ function signInCallback( authResult ) { // jshint ignore:line
 			if ( count( $default_role ) < 1 ) {
 				$default_role = '';
 			} else {
-				$default_role = strtolower( $default_role['name'] );
+				// If default role was provided, it came from the invite_user hook, and
+				// only contains the role's display name. Here we look up the actual role
+				// name to save (and default to no role if the display name isn't found).
+				global $wp_roles;
+				$default_role_display_name = $default_role['name'];
+				$default_role = '';
+				foreach ( $wp_roles->role_names as $role_name => $display_name ) {
+					if ( $default_role_display_name === $display_name ) {
+						$default_role = $role_name;
+						break;
+					}
+				}
 			}
 
 			$updated = false;
