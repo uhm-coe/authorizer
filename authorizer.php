@@ -24,7 +24,7 @@
  * @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
  */
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/CAS-1.3.5/CAS.php';
+	require_once dirname( __FILE__ ) . '/vendor/phpCAS-1.3.6/CAS.php';
 }
 
 
