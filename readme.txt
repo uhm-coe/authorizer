@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.5 =
+* Update phpCAS library from 1.3.5 to 1.3.6. PHP 7.2 users running CAS are now fully supported. Props @julienlusson for the pull request!
+
 = 2.8.4 =
 * Fix when inviting existing users to a blog in multisite and setting a role with a display name that doesn't match the role name. Props @julienlusson for finding the bug!
 
