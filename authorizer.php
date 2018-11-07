@@ -1722,23 +1722,23 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			);
 
 			/**
-			 * Developers can use the `authorizer_has_access` filter
-			 * to override restricted access on certain pages. Note that the
-			 * restriction checks happens before WordPress executes any queries, so
-			 * use the global `$wp` variable to investigate what the visitor is
-			 * trying to load.
+			 * Developers can use the `authorizer_has_access` filter to override
+			 * restricted access on certain pages. Note that the restriction checks
+			 * happens before WordPress executes any queries, so use the $wp variable
+			 * to investigate what the visitor is trying to load.
 			 *
 			 * For example, to unblock an RSS feed, place the following PHP code in
 			 * the theme's functions.php file or in a simple plug-in:
 			 *
-			 *   function my_rsa_feed_access_override( $has_access ) {
-			 *     global $wp;
-			 *     // check query variables to see if this is the feed
-			 *     if ( ! empty( $wp->query_vars['feed'] ) )
+			 *   function my_feed_access_override( $has_access, $wp ) {
+			 *     // Check query variables to see if this is the feed.
+			 *     if ( ! empty( $wp->query_vars['feed'] ) ) {
 			 *       $has_access = true;
+			 *     }
+			 *
 			 *     return $has_access;
 			 *   }
-			 *   add_filter( 'authorizer_has_access', 'my_rsa_feed_access_override' );
+			 *   add_filter( 'authorizer_has_access', 'my_feed_access_override', 10, 2 );
 			 */
 			if ( apply_filters( 'authorizer_has_access', $has_access, $wp ) === true ) {
 				// Turn off the public notice about browsing anonymously.
