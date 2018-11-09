@@ -845,7 +845,8 @@
 		var skipValidation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
 
 		// Skip email address validation if we're banning an existing user (since they're already in a list).
-		skipValidation = skipValidation || $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1;
+		var blockingNewUser = $( caller ).attr( 'id' ).indexOf( 'block_user_new' ) > -1;
+		skipValidation = skipValidation || ( $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1 && ! blockingNewUser );
 
 		// Set default for multisite flag (run different save routine if multisite)
 		isMultisite = 'undefined' !== typeof isMultisite ? isMultisite : false;
