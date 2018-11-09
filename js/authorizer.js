@@ -330,10 +330,12 @@
 		return matchingValues;
 	}
 
-	// Helper function to check if an email address is valid.
-	function validEmail( email ) {
+	// Helper function to check if an email address is valid. If allowWildcardEmail
+	// is true, then any string starting with an @ is valid.
+	function validEmail( email, allowWildcardEmail ) {
+		allowWildcardEmail = typeof allowWildcardEmail !== 'undefined' ? allowWildcardEmail : false;
 		var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		return email.length > 0 && re.test( email );
+		return email.length > 0 && ( re.test( email ) || email.startsWith( '@' ) );
 	}
 
 	// Helper function to set or update a querystring value.
@@ -845,7 +847,8 @@
 		var skipValidation = $( caller ).parent().parent().attr( 'id' ) === 'list_auth_settings_access_users_pending';
 
 		// Skip email address validation if we're banning an existing user (since they're already in a list).
-		skipValidation = skipValidation || $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1;
+		var blockingNewUser = $( caller ).attr( 'id' ).indexOf( 'block_user_new' ) > -1;
+		skipValidation = skipValidation || ( $( caller ).attr( 'id' ).indexOf( 'block_user' ) > -1 && ! blockingNewUser );
 
 		// Set default for multisite flag (run different save routine if multisite)
 		isMultisite = 'undefined' !== typeof isMultisite ? isMultisite : false;
@@ -879,7 +882,7 @@
 		if ( ! skipValidation ) {
 			// Check if the email(s) being added is well-formed.
 			emails = emails.filter( function( emailToValidate ) {
-				return validEmail( emailToValidate );
+				return validEmail( emailToValidate, blockingNewUser );
 			});
 			// Remove any duplicates in the list of emails to add.
 			emails = removeDuplicatesFromArrayOfStrings( emails );
