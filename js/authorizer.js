@@ -330,10 +330,12 @@
 		return matchingValues;
 	}
 
-	// Helper function to check if an email address is valid.
-	function validEmail( email ) {
+	// Helper function to check if an email address is valid. If allowWildcardEmail
+	// is true, then any string starting with an @ is valid.
+	function validEmail( email, allowWildcardEmail ) {
+		allowWildcardEmail = typeof allowWildcardEmail !== 'undefined' ? allowWildcardEmail : false;
 		var re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		return email.length > 0 && re.test( email );
+		return email.length > 0 && ( re.test( email ) || email.startsWith( '@' ) );
 	}
 
 	// Helper function to set or update a querystring value.
@@ -880,7 +882,7 @@
 		if ( ! skipValidation ) {
 			// Check if the email(s) being added is well-formed.
 			emails = emails.filter( function( emailToValidate ) {
-				return validEmail( emailToValidate );
+				return validEmail( emailToValidate, blockingNewUser );
 			});
 			// Remove any duplicates in the list of emails to add.
 			emails = removeDuplicatesFromArrayOfStrings( emails );
