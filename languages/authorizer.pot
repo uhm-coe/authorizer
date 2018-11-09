@@ -1,32 +1,24 @@
-#, fuzzy
+# Copyright (C) 2018 Authorizer
+# This file is distributed under the same license as the Authorizer package.
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
-"Project-Id-Version: Authorizer\n"
-"POT-Creation-Date: 2018-04-19 14:38-1000\n"
-"PO-Revision-Date: 2017-11-14 14:41-1000\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"Project-Id-Version: Authorizer 2.8.6\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authorizer\n"
+"POT-Creation-Date: 2018-11-09 07:35:41+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.12\n"
-"X-Poedit-Basepath: ..\n"
-"X-Poedit-WPHeader: authorizer.php\n"
-"X-Poedit-SourceCharset: UTF-8\n"
-"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
-"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
-"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
-"X-Poedit-SearchPath-0: .\n"
-"X-Poedit-SearchPathExcluded-0: *.js\n"
+"PO-Revision-Date: 2018-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: authorizer.php:397
+#: authorizer.php:432
 msgid "<strong>ERROR</strong>: Incorrect username or password."
 msgstr ""
 
-#. TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of lockout as a phrase 4: lost password URL
-#: authorizer.php:433 authorizer.php:450
-#, php-format
+#. TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of
+#. lockout as a phrase 4: lost password URL
+#: authorizer.php:468 authorizer.php:485
 msgid ""
 "<strong>ERROR</strong>: There have been too many invalid login attempts for "
 "the username <strong>%1$s</strong>. Please wait <strong id="
@@ -36,24 +28,21 @@ msgid ""
 msgstr ""
 
 #. TRANSLATORS: %s: Name of blog
-#: authorizer.php:637 authorizer.php:1743
-#, php-format
+#: authorizer.php:674 authorizer.php:1843
 msgid "%s - Access Restricted"
 msgstr ""
 
-#: authorizer.php:645 authorizer.php:951
+#: authorizer.php:682 authorizer.php:1015
 msgid "Back"
 msgstr ""
 
 #. TRANSLATORS: 1: User email 2: Name of site
-#: authorizer.php:927
-#, php-format
+#: authorizer.php:990
 msgid "Action required: Pending user %1$s at %2$s"
 msgstr ""
 
 #. TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer
-#: authorizer.php:933
-#, php-format
+#: authorizer.php:996
 msgid ""
 "A new user has tried to access the %1$s site you manage at:\n"
 "%2$s\n"
@@ -62,357 +51,355 @@ msgid ""
 "%3$s\n"
 msgstr ""
 
-#: authorizer.php:959
+#: authorizer.php:1023
 msgid "Invalid login attempted."
 msgstr ""
 
-#: authorizer.php:1109 authorizer.php:1114
+#: authorizer.php:1177 authorizer.php:1182
 msgid "Invalid Google credentials provided."
 msgstr ""
 
-#: authorizer.php:1139
+#: authorizer.php:1207
 msgid "Google credentials do not match the allowed hosted domain"
 msgstr ""
 
-#: authorizer.php:1203
+#: authorizer.php:1276
 msgid ""
 "Unable to update outdated server certificates from https://curl.haxx.se/ca/"
 "cacert.pem."
 msgstr ""
 
-#: authorizer.php:1226
+#: authorizer.php:1305
 msgid "CAS server returned an Authentication Exception. Details:"
 msgstr ""
 
-#: authorizer.php:1351
+#: authorizer.php:1430
 msgid "You must provide a username or email."
 msgstr ""
 
-#: authorizer.php:1354
+#: authorizer.php:1433
 msgid "You must provide a password."
 msgstr ""
 
-#: authorizer.php:1751 authorizer.php:1847
+#: authorizer.php:1851 authorizer.php:1947
 msgid "Log In"
 msgstr ""
 
-#: authorizer.php:1996
+#: authorizer.php:2102
 msgid "Sign in with Google"
 msgstr ""
 
 #. TRANSLATORS: %s: Custom CAS label from authorizer options
-#: authorizer.php:2006
-#, php-format
+#: authorizer.php:2114
 msgid "Sign in with %s"
 msgstr ""
 
-#: authorizer.php:2026
+#: authorizer.php:2136
 msgid "or"
 msgstr ""
 
-#: authorizer.php:2207
+#: authorizer.php:2318
 msgid "Settings"
 msgstr ""
 
-#: authorizer.php:2222
+#: authorizer.php:2333
 msgid "Network Settings"
 msgstr ""
 
-#: authorizer.php:2264 authorizer.php:5343 authorizer.php:5634
+#: authorizer.php:2376 authorizer.php:5617 authorizer.php:5908
 msgid "Authorizer Settings"
 msgstr ""
 
-#: authorizer.php:2291
+#: authorizer.php:2407
 msgid "Saved"
 msgstr ""
 
-#: authorizer.php:2292
+#: authorizer.php:2408
 msgid "Duplicate"
 msgstr ""
 
-#: authorizer.php:2293
+#: authorizer.php:2409
 msgid "Failed"
 msgstr ""
 
-#: authorizer.php:2294
+#: authorizer.php:2410
 msgid "Local WordPress user"
 msgstr ""
 
-#: authorizer.php:2295 authorizer.php:3923
+#: authorizer.php:2411 authorizer.php:4068
 msgid "Block/Ban user"
 msgstr ""
 
-#: authorizer.php:2296 authorizer.php:3563 authorizer.php:3925
-#: authorizer.php:3976
+#: authorizer.php:2412 authorizer.php:3694 authorizer.php:4070
+#: authorizer.php:4123
 msgid "Remove user"
 msgstr ""
 
-#: authorizer.php:2297
+#: authorizer.php:2413
 msgid "No users in"
 msgstr ""
 
-#: authorizer.php:2298 authorizer.php:5524
+#: authorizer.php:2414 authorizer.php:5798
 msgid "Save Changes"
 msgstr ""
 
-#: authorizer.php:2299
+#: authorizer.php:2415
 msgid "Private Pages"
 msgstr ""
 
-#: authorizer.php:2300
+#: authorizer.php:2416
 msgid "Public Pages"
 msgstr ""
 
-#: authorizer.php:2301 authorizer.php:3747
+#: authorizer.php:2417 authorizer.php:3883
 msgid "First page"
 msgstr ""
 
-#: authorizer.php:2302 authorizer.php:3757
+#: authorizer.php:2418 authorizer.php:3894
 msgid "Previous page"
 msgstr ""
 
-#: authorizer.php:2303 authorizer.php:3782
+#: authorizer.php:2419 authorizer.php:3921
 msgid "Next page"
 msgstr ""
 
-#: authorizer.php:2304 authorizer.php:3792
+#: authorizer.php:2420 authorizer.php:3932
 msgid "Last page"
 msgstr ""
 
-#: authorizer.php:2371
+#: authorizer.php:2496
 msgid "Can't reach CAS server. Please provide"
 msgstr ""
 
-#: authorizer.php:2371
+#: authorizer.php:2496
 msgid "accurate CAS settings"
 msgstr ""
 
-#: authorizer.php:2371
+#: authorizer.php:2496
 msgid "if you intend to use it."
 msgstr ""
 
-#: authorizer.php:2421
+#: authorizer.php:2547
 msgid "Who can log into the site?"
 msgstr ""
 
-#: authorizer.php:2428
+#: authorizer.php:2554
 msgid "Which role should receive email notifications about pending users?"
 msgstr ""
 
-#: authorizer.php:2435
+#: authorizer.php:2561
 msgid "What message should pending users see after attempting to log in?"
 msgstr ""
 
-#: authorizer.php:2442
+#: authorizer.php:2568
 msgid "What message should blocked users see after attempting to log in?"
 msgstr ""
 
-#: authorizer.php:2449
+#: authorizer.php:2575
 msgid "Send welcome email to new approved users?"
 msgstr ""
 
-#: authorizer.php:2456
+#: authorizer.php:2582
 msgid "Welcome email subject"
 msgstr ""
 
-#: authorizer.php:2463
+#: authorizer.php:2589
 msgid "Welcome email body"
 msgstr ""
 
-#: authorizer.php:2478
+#: authorizer.php:2604
 msgid "Who can view the site?"
 msgstr ""
 
-#: authorizer.php:2485
+#: authorizer.php:2611
 msgid "What pages (if any) should be available to everyone?"
 msgstr ""
 
-#: authorizer.php:2492
+#: authorizer.php:2618
 msgid "What happens to people without access when they visit a private page?"
 msgstr ""
 
-#: authorizer.php:2499
+#: authorizer.php:2625
 msgid "What happens to people without access when they visit a public page?"
 msgstr ""
 
-#: authorizer.php:2506
+#: authorizer.php:2632
 msgid "What message should people without access see?"
 msgstr ""
 
-#: authorizer.php:2521 authorizer.php:5377
+#: authorizer.php:2647 authorizer.php:5651
 msgid "Default role for new users"
 msgstr ""
 
-#: authorizer.php:2528 authorizer.php:5381
+#: authorizer.php:2654 authorizer.php:5655
 msgid "Google Logins"
 msgstr ""
 
-#: authorizer.php:2535 authorizer.php:5385
+#: authorizer.php:2661 authorizer.php:5659
 msgid "Google Client ID"
 msgstr ""
 
-#: authorizer.php:2542 authorizer.php:5389
+#: authorizer.php:2668 authorizer.php:5663
 msgid "Google Client Secret"
 msgstr ""
 
-#: authorizer.php:2549 authorizer.php:5393
+#: authorizer.php:2675 authorizer.php:5667
 msgid "Google Hosted Domain"
 msgstr ""
 
-#: authorizer.php:2556 authorizer.php:5397
+#: authorizer.php:2682 authorizer.php:5671
 msgid "CAS Logins"
 msgstr ""
 
-#: authorizer.php:2563
+#: authorizer.php:2689
 msgid "CAS custom label"
 msgstr ""
 
-#: authorizer.php:2570 authorizer.php:5405
+#: authorizer.php:2696 authorizer.php:5679
 msgid "CAS server hostname"
 msgstr ""
 
-#: authorizer.php:2577 authorizer.php:5409
+#: authorizer.php:2703 authorizer.php:5683
 msgid "CAS server port"
 msgstr ""
 
-#: authorizer.php:2584 authorizer.php:5413
+#: authorizer.php:2710 authorizer.php:5687
 msgid "CAS server path/context"
 msgstr ""
 
-#: authorizer.php:2598
+#: authorizer.php:2724
 msgid "CAS attribute containing email address"
 msgstr ""
 
-#: authorizer.php:2605 authorizer.php:5425
+#: authorizer.php:2731 authorizer.php:5699
 msgid "CAS attribute containing first name"
 msgstr ""
 
-#: authorizer.php:2612 authorizer.php:5429
+#: authorizer.php:2738 authorizer.php:5703
 msgid "CAS attribute containing last name"
 msgstr ""
 
-#: authorizer.php:2619 authorizer.php:5433
+#: authorizer.php:2745 authorizer.php:5707
 msgid "CAS attribute update"
 msgstr ""
 
-#: authorizer.php:2626 authorizer.php:5437
+#: authorizer.php:2752 authorizer.php:5711
 msgid "CAS automatic login"
 msgstr ""
 
-#: authorizer.php:2633 authorizer.php:5441
+#: authorizer.php:2759 authorizer.php:5715
 msgid "LDAP Logins"
 msgstr ""
 
-#: authorizer.php:2640 authorizer.php:5445
+#: authorizer.php:2766 authorizer.php:5719
 msgid "LDAP Host"
 msgstr ""
 
-#: authorizer.php:2647 authorizer.php:5449
+#: authorizer.php:2773 authorizer.php:5723
 msgid "LDAP Port"
 msgstr ""
 
-#: authorizer.php:2654 authorizer.php:4725 authorizer.php:5453
+#: authorizer.php:2780 authorizer.php:4943 authorizer.php:5727
 msgid "Use TLS"
 msgstr ""
 
-#: authorizer.php:2661 authorizer.php:5457
+#: authorizer.php:2787 authorizer.php:5731
 msgid "LDAP Search Base"
 msgstr ""
 
-#: authorizer.php:2668 authorizer.php:5461
+#: authorizer.php:2794 authorizer.php:5735
 msgid "LDAP attribute containing username"
 msgstr ""
 
-#: authorizer.php:2675
+#: authorizer.php:2801
 msgid "LDAP attribute containing email address"
 msgstr ""
 
-#: authorizer.php:2682 authorizer.php:5469
+#: authorizer.php:2808 authorizer.php:5743
 msgid "LDAP Directory User"
 msgstr ""
 
-#: authorizer.php:2689 authorizer.php:5473
+#: authorizer.php:2815 authorizer.php:5747
 msgid "LDAP Directory User Password"
 msgstr ""
 
-#: authorizer.php:2696 authorizer.php:5477
+#: authorizer.php:2822 authorizer.php:5751
 msgid "Custom lost password URL"
 msgstr ""
 
-#: authorizer.php:2703 authorizer.php:5481
+#: authorizer.php:2829 authorizer.php:5755
 msgid "LDAP attribute containing first name"
 msgstr ""
 
-#: authorizer.php:2710 authorizer.php:5485
+#: authorizer.php:2836 authorizer.php:5759
 msgid "LDAP attribute containing last name"
 msgstr ""
 
-#: authorizer.php:2717 authorizer.php:5489
+#: authorizer.php:2843 authorizer.php:5763
 msgid "LDAP attribute update"
 msgstr ""
 
-#: authorizer.php:2732 authorizer.php:5497
+#: authorizer.php:2858 authorizer.php:5771
 msgid "Limit invalid login attempts"
 msgstr ""
 
-#: authorizer.php:2739
+#: authorizer.php:2865
 msgid "Hide WordPress Login"
 msgstr ""
 
-#: authorizer.php:2746
+#: authorizer.php:2872
 msgid "Custom WordPress login branding"
 msgstr ""
 
-#: authorizer.php:2753
+#: authorizer.php:2879
 msgid "Authorizer admin menu item location"
 msgstr ""
 
-#: authorizer.php:2760
+#: authorizer.php:2886
 msgid "Show custom usermeta in user list"
 msgstr ""
 
-#: authorizer.php:2767 authorizer.php:5505
+#: authorizer.php:2893 authorizer.php:5779
 msgid "Number of users per page"
 msgstr ""
 
-#: authorizer.php:2774 authorizer.php:5509
+#: authorizer.php:2900 authorizer.php:5783
 msgid "Approved users sort method"
 msgstr ""
 
-#: authorizer.php:2781 authorizer.php:5513
+#: authorizer.php:2907 authorizer.php:5787
 msgid "Approved users sort order"
 msgstr ""
 
-#: authorizer.php:2788
+#: authorizer.php:2914
 msgid "Show dashboard widget to admin users"
 msgstr ""
 
-#: authorizer.php:2797
+#: authorizer.php:2923
 msgid "Override multisite options"
 msgstr ""
 
-#: authorizer.php:2841
+#: authorizer.php:2967
 msgid ""
 "You're not currently allowed to view this site. Your administrator has been "
 "notified, and once he/she has approved your request, you will be able to log "
 "in. If you need any other help, please contact your administrator."
 msgstr ""
 
-#: authorizer.php:2844
+#: authorizer.php:2970
 msgid ""
 "You're not currently allowed to log into this site. If you think this is a "
 "mistake, please contact your administrator."
 msgstr ""
 
 #. TRANSLATORS: %s: Shortcode for name of site
-#: authorizer.php:2852
-#, php-format
+#: authorizer.php:2978
 msgid "Welcome to %s!"
 msgstr ""
 
-#. TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL
-#: authorizer.php:2859
-#, php-format
+#. TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3:
+#. Shortcode for site URL
+#: authorizer.php:2985
 msgid ""
 "Hello %1$s,\n"
 "Welcome to %2$s! You now have access to all content on the site. Please "
@@ -420,240 +407,262 @@ msgid ""
 "%3$s\n"
 msgstr ""
 
-#: authorizer.php:2880
+#: authorizer.php:3006
 msgid ""
 "Notice: You are browsing this site anonymously, and only have access to a "
 "portion of its content."
 msgstr ""
 
-#: authorizer.php:3481 authorizer.php:3487 authorizer.php:5209
+#: authorizer.php:3609 authorizer.php:3615 authorizer.php:5482
 msgid "Access Lists"
 msgstr ""
 
-#: authorizer.php:3482 authorizer.php:3490 authorizer.php:5283
+#: authorizer.php:3610 authorizer.php:3618 authorizer.php:5556
 msgid "External Service"
 msgstr ""
 
-#: authorizer.php:3483 authorizer.php:3491 authorizer.php:5297
+#: authorizer.php:3611 authorizer.php:3619 authorizer.php:5570
 msgid "Advanced"
 msgstr ""
 
-#: authorizer.php:3488 authorizer.php:5223
+#: authorizer.php:3616 authorizer.php:5496
 msgid "Login Access"
 msgstr ""
 
-#: authorizer.php:3489 authorizer.php:5239
+#: authorizer.php:3617 authorizer.php:5512
 msgid "Public Access"
 msgstr ""
 
-#: authorizer.php:3506
+#: authorizer.php:3636
 msgid "Manage who has access to this site using these lists."
 msgstr ""
 
-#: authorizer.php:3516 authorizer.php:5646
+#: authorizer.php:3638
+msgid ""
+"<strong>Pending</strong> users are users who have successfully logged in to "
+"the site, but who haven't yet been approved (or blocked) by you."
+msgstr ""
+
+#: authorizer.php:3639
+msgid ""
+"<strong>Approved</strong> users have access to the site once they "
+"successfully log in."
+msgstr ""
+
+#: authorizer.php:3640
+msgid ""
+"<strong>Blocked</strong> users will receive an error message when they try "
+"to visit the site after authenticating."
+msgstr ""
+
+#: authorizer.php:3640
+msgid ""
+"Note: if you want to block all email addresses from a domain, say "
+"anyone@example.com, simply add \"@example.com\" to the blocked list."
+msgstr ""
+
+#: authorizer.php:3646 authorizer.php:5921
 msgid "Pending Users"
 msgstr ""
 
-#: authorizer.php:3520 authorizer.php:5650
+#: authorizer.php:3650 authorizer.php:5925
 msgid "Approved Users"
 msgstr ""
 
-#: authorizer.php:3524 authorizer.php:5654
+#: authorizer.php:3654 authorizer.php:5929
 msgid "Blocked Users"
 msgstr ""
 
-#: authorizer.php:3561 authorizer.php:3692
+#: authorizer.php:3692 authorizer.php:3827
 msgid "Approve"
 msgstr ""
 
-#: authorizer.php:3562 authorizer.php:3985
+#: authorizer.php:3693 authorizer.php:4132
 msgid "Block"
 msgstr ""
 
-#: authorizer.php:3563
+#: authorizer.php:3694
 msgid "Ignore"
 msgstr ""
 
-#: authorizer.php:3567
+#: authorizer.php:3698
 msgid "No pending users"
 msgstr ""
 
-#: authorizer.php:3687 authorizer.php:3981
+#: authorizer.php:3822 authorizer.php:4128
 msgid "email address"
 msgstr ""
 
-#: authorizer.php:3695
+#: authorizer.php:3830
 msgid "Toggle Dropdown"
 msgstr ""
 
-#: authorizer.php:3698
+#: authorizer.php:3833
 msgid ""
 "Create a local WordPress account instead, and email the user their password."
 msgstr ""
 
 #. TRANSLATORS: %s: number of users
-#: authorizer.php:3727 authorizer.php:5796
-#, php-format
+#: authorizer.php:3859 authorizer.php:6074
 msgid "%s user"
 msgid_plural "%s users"
 msgstr[0] ""
 msgstr[1] ""
 
-#: authorizer.php:3764 authorizer.php:3767
+#: authorizer.php:3901 authorizer.php:3905
 msgid "Current Page"
 msgstr ""
 
 #. TRANSLATORS: 1: number of current page 2: number of total pages
-#: authorizer.php:3775
-#, php-format
+#: authorizer.php:3913
 msgctxt "paging"
 msgid "%1$s of %2$s"
 msgstr ""
 
-#: authorizer.php:3804
+#: authorizer.php:3945
 msgid "Search Users"
 msgstr ""
 
-#: authorizer.php:3806
+#: authorizer.php:3947
 msgid "Search"
 msgstr ""
 
-#: authorizer.php:3904 authorizer.php:4364 authorizer.php:5025
+#: authorizer.php:4049 authorizer.php:4543 authorizer.php:5274
 msgid "-- None --"
 msgstr ""
 
-#: authorizer.php:4001
+#: authorizer.php:4149
 msgid "Choose who is able to log into this site below."
 msgstr ""
 
-#: authorizer.php:4033
+#: authorizer.php:4183
 msgid ""
 "All authenticated users (All external service users and all WordPress users)"
 msgstr ""
 
-#: authorizer.php:4034
+#: authorizer.php:4184
 msgid "Only"
 msgstr ""
 
-#: authorizer.php:4034
+#: authorizer.php:4184
 msgid "approved users"
 msgstr ""
 
-#: authorizer.php:4034
+#: authorizer.php:4184
 msgid "(Approved external users and all WordPress users)"
 msgstr ""
 
-#: authorizer.php:4051
+#: authorizer.php:4203
 msgid "None (Don't send notification emails)"
 msgstr ""
 
-#: authorizer.php:4123
+#: authorizer.php:4277
 msgid "Send a welcome email when approving a new user"
 msgstr ""
 
-#: authorizer.php:4139
+#: authorizer.php:4295
 msgid "You can use the <b>[site_name]</b> shortcode."
 msgstr ""
 
-#. TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email
-#: authorizer.php:4170
-#, php-format
+#. TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3:
+#. Shortcode for user email
+#: authorizer.php:4329
 msgid "You can use %1$s, %2$s, and %3$s shortcodes."
 msgstr ""
 
-#: authorizer.php:4186
+#: authorizer.php:4349
 msgid "Choose your public access options here."
 msgstr ""
 
-#: authorizer.php:4218
+#: authorizer.php:4383
 msgid "Everyone can see the site"
 msgstr ""
 
-#: authorizer.php:4219
+#: authorizer.php:4384
 msgid "Only logged in users can see the site"
 msgstr ""
 
-#: authorizer.php:4235
+#: authorizer.php:4402
 msgid "Send them to the login screen"
 msgstr ""
 
-#: authorizer.php:4236
+#: authorizer.php:4403
 msgid "Show them the anonymous access message (below)"
 msgstr ""
 
-#: authorizer.php:4252
+#: authorizer.php:4421
 msgid ""
 "Show them the page <strong>without</strong> the anonymous access message"
 msgstr ""
 
-#: authorizer.php:4253
+#: authorizer.php:4422
 msgid ""
 "Show them the page <strong>with</strong> the anonymous access message "
 "(marked up as a <a href=\"http://getbootstrap.com/components/#alerts-"
 "dismissible\" target=\"_blank\">Bootstrap Dismissible Alert</a>)"
 msgstr ""
 
-#: authorizer.php:4301
+#: authorizer.php:4472
 msgid "Home"
 msgstr ""
 
-#: authorizer.php:4302
+#: authorizer.php:4473
 msgid "Home Page"
 msgstr ""
 
-#: authorizer.php:4303
+#: authorizer.php:4474
 msgid "Nonexistent (404) Pages"
 msgstr ""
 
-#: authorizer.php:4318
+#: authorizer.php:4492
 msgid "Categories"
 msgstr ""
 
-#: authorizer.php:4345
+#: authorizer.php:4522
 msgid "Enter your external server settings below."
 msgstr ""
 
-#: authorizer.php:4381
+#: authorizer.php:4562
 msgid "Enable Google Logins"
 msgstr ""
 
-#: authorizer.php:4399
+#: authorizer.php:4582
 msgid ""
 "If you don't have a Google Client ID and Secret, generate them by following "
 "these instructions:"
 msgstr ""
 
-#: authorizer.php:4401
+#: authorizer.php:4585
 msgid ""
 "Click <strong>Create a Project</strong> on the <a href=\"https://cloud."
 "google.com/console\" target=\"_blank\">Google Developers Console</a>. You "
 "can name it whatever you want."
 msgstr ""
 
-#: authorizer.php:4402
+#: authorizer.php:4586
 msgid ""
 "Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</"
 "em>, then click <strong>Create New Client ID</strong> under OAuth. Use these "
 "settings:"
 msgstr ""
 
-#: authorizer.php:4404
+#: authorizer.php:4588
 msgid "Application Type: <strong>Web application</strong>"
 msgstr ""
 
-#: authorizer.php:4405
+#: authorizer.php:4589
 msgid "Authorized Javascript Origins:"
 msgstr ""
 
-#: authorizer.php:4406
+#: authorizer.php:4590
 msgid "Authorized Redirect URI: <em>none</em>"
 msgstr ""
 
-#: authorizer.php:4409
+#: authorizer.php:4593
 msgid "Copy/paste your new Client ID/Secret pair into the fields below."
 msgstr ""
 
-#: authorizer.php:4410
+#: authorizer.php:4594
 msgid ""
 "<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent "
 "screen</em> to change the way the Google consent screen appears after a user "
@@ -661,79 +670,79 @@ msgid ""
 "to WordPress."
 msgstr ""
 
-#: authorizer.php:4411
+#: authorizer.php:4595
 msgid ""
 "Note: Google may have a more recent version of these instructions in their "
 "<a href=\"https://developers.google.com/identity/sign-in/web/devconsole-"
 "project\" target=\"_blank\">developer documentation</a>."
 msgstr ""
 
-#: authorizer.php:4414
+#: authorizer.php:4598
 msgid ""
 "Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
 "googleusercontent.com"
 msgstr ""
 
-#: authorizer.php:4431
+#: authorizer.php:4617
 msgid "Example:  sDNgX5_pr_5bly-frKmvp8jT"
 msgstr ""
 
-#: authorizer.php:4448
+#: authorizer.php:4636
 msgid ""
 "Restrict Google logins to a specific Google Apps hosted domain (for example, "
 "mycollege.edu). Leave blank to allow all Google sign-ins."
 msgstr ""
 
-#: authorizer.php:4448
+#: authorizer.php:4636
 msgid "If restricting to multiple domains, add one domain per line."
 msgstr ""
 
-#: authorizer.php:4465
+#: authorizer.php:4653
 msgid ""
 "<a href=\"http://www.php.net//manual/en/curl.installation.php\" target="
 "\"_blank\" style=\"color: red;\">PHP CURL extension</a> is not installed"
 msgstr ""
 
-#: authorizer.php:4468
+#: authorizer.php:4656
 msgid ""
 "<a href=\"http://stackoverflow.com/questions/23424459/enable-php-openssl-not-"
 "working\" target=\"_blank\" style=\"color: red;\">PHP openssl extension</a> "
 "is not installed"
 msgstr ""
 
-#: authorizer.php:4474
+#: authorizer.php:4662
 msgid "Warning"
 msgstr ""
 
-#: authorizer.php:4482
+#: authorizer.php:4671
 msgid "Enable CAS Logins"
 msgstr ""
 
-#: authorizer.php:4498
+#: authorizer.php:4688
 msgid "The button on the login page will read:"
 msgstr ""
 
-#: authorizer.php:4498
+#: authorizer.php:4690
 msgid "Sign in with"
 msgstr ""
 
-#: authorizer.php:4515
+#: authorizer.php:4709
 msgid "Example:  authn.example.edu"
 msgstr ""
 
-#: authorizer.php:4532
+#: authorizer.php:4728
 msgid "Example:  443"
 msgstr ""
 
-#: authorizer.php:4549
+#: authorizer.php:4747
 msgid "Example:  /cas"
 msgstr ""
 
-#: authorizer.php:4587 authorizer.php:4779
+#: authorizer.php:4789 authorizer.php:5002
 msgid "Example:  mail"
 msgstr ""
 
-#: authorizer.php:4588
+#: authorizer.php:4790
 msgid ""
 "Note: If your CAS server doesn't return an attribute containing an email, "
 "you can specify the @domain portion of the email address here, and the email "
@@ -742,27 +751,27 @@ msgid ""
 "<strong>@example.edu</strong> in this field."
 msgstr ""
 
-#: authorizer.php:4605
+#: authorizer.php:4809
 msgid "Example:  givenName"
 msgstr ""
 
-#: authorizer.php:4622 authorizer.php:4865
+#: authorizer.php:4828 authorizer.php:5098
 msgid "Example:  sn"
 msgstr ""
 
-#: authorizer.php:4638 authorizer.php:4881
+#: authorizer.php:4846 authorizer.php:5116
 msgid ""
 "Update first and last name fields on login (will overwrite any name the user "
 "has supplied in their profile)"
 msgstr ""
 
-#: authorizer.php:4654
+#: authorizer.php:4864
 msgid ""
 "Immediately redirect to CAS login form if it's the only enabled external "
 "service and WordPress logins are hidden"
 msgstr ""
 
-#: authorizer.php:4655
+#: authorizer.php:4865
 msgid ""
 "Note: This feature will only work if you have checked \"Hide WordPress Logins"
 "\" in Advanced settings, and if CAS is the only enabled service (i.e., no "
@@ -771,51 +780,51 @@ msgid ""
 "automatic logins without any user interaction."
 msgstr ""
 
-#: authorizer.php:4671
+#: authorizer.php:4882
 msgid ""
 "Warning: <a href=\"http://www.php.net/manual/en/ldap.installation.php\" "
 "target=\"_blank\" style=\"color: red;\">PHP LDAP extension</a> is "
 "<strong>not</strong> installed"
 msgstr ""
 
-#: authorizer.php:4674
+#: authorizer.php:4886
 msgid "Enable LDAP Logins"
 msgstr ""
 
-#: authorizer.php:4691
+#: authorizer.php:4905
 msgid ""
 "Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI "
 "(for example, ldaps://ldap.example.edu:636)."
 msgstr ""
 
-#: authorizer.php:4708
+#: authorizer.php:4924
 msgid "Example:  389"
 msgstr ""
 
-#: authorizer.php:4709
+#: authorizer.php:4925
 msgid ""
 "If a full LDAP URI (ldaps://hostname:port) is specified above, this field is "
 "ignored."
 msgstr ""
 
-#: authorizer.php:4726
+#: authorizer.php:4944
 msgid "If ldaps is used, this should be unchecked"
 msgstr ""
 
-#: authorizer.php:4743
+#: authorizer.php:4963
 msgid "Example:  ou=people,dc=example,dc=edu"
 msgstr ""
 
-#: authorizer.php:4744
+#: authorizer.php:4964
 msgid ""
 "If you have multiple search bases, separate them by newlines (one per line)."
 msgstr ""
 
-#: authorizer.php:4762
+#: authorizer.php:4983
 msgid "Example:  uid"
 msgstr ""
 
-#: authorizer.php:4780
+#: authorizer.php:5003
 msgid ""
 "Note: If your LDAP server doesn't return an attribute containing an email, "
 "you can specify the @domain portion of the email address here, and the email "
@@ -824,65 +833,65 @@ msgid ""
 "<strong>@example.edu</strong> in this field."
 msgstr ""
 
-#: authorizer.php:4797
+#: authorizer.php:5022
 msgid "Example:  cn=directory-user,ou=specials,dc=example,dc=edu"
 msgstr ""
 
-#: authorizer.php:4831
+#: authorizer.php:5060
 msgid "Example:  https://myschool.example.edu:8888/am-forgot-password"
 msgstr ""
 
-#: authorizer.php:4848
+#: authorizer.php:5079
 msgid "Example:  givenname"
 msgstr ""
 
-#: authorizer.php:4893
+#: authorizer.php:5130
 msgid "You may optionally specify some advanced settings below."
 msgstr ""
 
-#: authorizer.php:4910 authorizer.php:4916
+#: authorizer.php:5148 authorizer.php:5155
 msgid "After"
 msgstr ""
 
-#: authorizer.php:4912
+#: authorizer.php:5151
 msgid "invalid password attempts, delay further attempts on that user for"
 msgstr ""
 
-#: authorizer.php:4914
+#: authorizer.php:5153
 msgid "minute(s)."
 msgstr ""
 
-#: authorizer.php:4918
+#: authorizer.php:5157
 msgid "more invalid attempts, increase the delay to"
 msgstr ""
 
-#: authorizer.php:4920
+#: authorizer.php:5159
 msgid "minutes."
 msgstr ""
 
-#: authorizer.php:4922
+#: authorizer.php:5161
 msgid "Reset the delays after"
 msgstr ""
 
-#: authorizer.php:4924
+#: authorizer.php:5163
 msgid "minutes with no invalid attempts."
 msgstr ""
 
-#: authorizer.php:4940 authorizer.php:5501
+#: authorizer.php:5181 authorizer.php:5775
 msgid "Hide WordPress Logins"
 msgstr ""
 
-#: authorizer.php:4941
+#: authorizer.php:5182
 msgid ""
 "Note: You can always access the WordPress logins by adding "
 "external=wordpress to the wp-login URL, like so:"
 msgstr ""
 
-#: authorizer.php:4957
+#: authorizer.php:5200
 msgid "Default WordPress login screen"
 msgstr ""
 
-#: authorizer.php:4989
+#: authorizer.php:5234
 msgid ""
 "<strong>Note for theme developers</strong>: Add more options here by using "
 "the `authorizer_add_branding_option` filter in your theme. You can see an "
@@ -890,77 +899,77 @@ msgid ""
 "sample-theme-add-branding."
 msgstr ""
 
-#: authorizer.php:5006
+#: authorizer.php:5253
 msgid "Show in Settings menu"
 msgstr ""
 
-#: authorizer.php:5007
+#: authorizer.php:5254
 msgid "Show in sidebar (top level)"
 msgstr ""
 
-#: authorizer.php:5074
+#: authorizer.php:5334
 msgid "All Usermeta:"
 msgstr ""
 
-#: authorizer.php:5115
+#: authorizer.php:5381
 msgid "Date approved"
 msgstr ""
 
-#: authorizer.php:5116
+#: authorizer.php:5382
 msgid "Email"
 msgstr ""
 
-#: authorizer.php:5117
+#: authorizer.php:5383
 msgid "Role"
 msgstr ""
 
-#: authorizer.php:5118
+#: authorizer.php:5384
 msgid "Date registered"
 msgstr ""
 
-#: authorizer.php:5136
+#: authorizer.php:5404
 msgid "Ascending"
 msgstr ""
 
-#: authorizer.php:5137
+#: authorizer.php:5405
 msgid "Descending"
 msgstr ""
 
-#: authorizer.php:5154 authorizer.php:5517
+#: authorizer.php:5424 authorizer.php:5791
 msgid "Show Dashboard Widget"
 msgstr ""
 
-#: authorizer.php:5155
+#: authorizer.php:5425
 msgid ""
 "Note: Only users with the create_users capability will be able to see the "
 "dashboard widget."
 msgstr ""
 
-#: authorizer.php:5171
+#: authorizer.php:5443
 msgid ""
 "Configure this site independently (don't inherit any multisite settings)"
 msgstr ""
 
-#: authorizer.php:5201
+#: authorizer.php:5474
 msgid ""
 "<strong>Pending Users</strong>: Pending users are users who have "
 "successfully logged in to the site, but who haven't yet been approved (or "
 "blocked) by you."
 msgstr ""
 
-#: authorizer.php:5202
+#: authorizer.php:5475
 msgid ""
 "<strong>Approved Users</strong>: Approved users have access to the site once "
 "they successfully log in."
 msgstr ""
 
-#: authorizer.php:5203
+#: authorizer.php:5476
 msgid ""
 "<strong>Blocked Users</strong>: Blocked users will receive an error message "
 "when they try to visit the site after authenticating."
 msgstr ""
 
-#: authorizer.php:5204
+#: authorizer.php:5477
 msgid ""
 "Users in the <strong>Pending</strong> list appear automatically after a new "
 "user tries to log in from the configured external authentication service. "
@@ -970,7 +979,7 @@ msgid ""
 "list."
 msgstr ""
 
-#: authorizer.php:5216
+#: authorizer.php:5489
 msgid ""
 "<strong>Who can log in to the site?</strong>: Choose the level of access "
 "restriction you'd like to use on your site here. You can leave the site open "
@@ -979,7 +988,7 @@ msgid ""
 "external users that you specify via the <em>Access Lists</em>."
 msgstr ""
 
-#: authorizer.php:5217
+#: authorizer.php:5490
 msgid ""
 "<strong>Which role should receive email notifications about pending users?</"
 "strong>: If you've restricted access to <strong>approved users</strong>, you "
@@ -990,14 +999,14 @@ msgid ""
 "is pending approval."
 msgstr ""
 
-#: authorizer.php:5218
+#: authorizer.php:5491
 msgid ""
 "<strong>What message should pending users see after attempting to log in?</"
 "strong>: Here you can specify the exact message a new external user will see "
 "once they try to log in to the site for the first time."
 msgstr ""
 
-#: authorizer.php:5230
+#: authorizer.php:5503
 msgid ""
 "<strong>Who can view the site?</strong>: You can restrict the site's "
 "visibility by only allowing logged in users to see pages. If you do so, you "
@@ -1005,7 +1014,7 @@ msgid ""
 "below."
 msgstr ""
 
-#: authorizer.php:5231
+#: authorizer.php:5504
 msgid ""
 "<strong>What pages (if any) should be available to everyone?</strong>: If "
 "you'd like to declare certain pages on your site as always public (such as "
@@ -1014,7 +1023,7 @@ msgid ""
 "exist."
 msgstr ""
 
-#: authorizer.php:5232
+#: authorizer.php:5505
 msgid ""
 "<strong>What happens to people without access when they visit a <em>private</"
 "em> page?</strong>: Choose the response anonymous users receive when "
@@ -1023,7 +1032,7 @@ msgid ""
 "strong>."
 msgstr ""
 
-#: authorizer.php:5233
+#: authorizer.php:5506
 msgid ""
 "<strong>What happens to people without access when they visit a <em>public</"
 "em> page?</strong>: Choose the response anonymous users receive when "
@@ -1032,35 +1041,35 @@ msgid ""
 "above the content."
 msgstr ""
 
-#: authorizer.php:5234
+#: authorizer.php:5507
 msgid ""
 "<strong>What message should people without access see?</strong>: If you "
 "chose to show new users a <strong>message</strong> above, type that message "
 "here."
 msgstr ""
 
-#: authorizer.php:5246
+#: authorizer.php:5519
 msgid ""
 "<strong>Type of external service to authenticate against</strong>: Choose "
 "which authentication service type you will be using. You'll have to fill out "
 "different fields below depending on which service you choose."
 msgstr ""
 
-#: authorizer.php:5247
+#: authorizer.php:5520
 msgid ""
 "<strong>Enable Google Logins</strong>: Choose if you want to allow users to "
 "log in with their Google Account credentials. You will need to enter your "
 "API Client ID and Secret to enable Google Logins."
 msgstr ""
 
-#: authorizer.php:5248
+#: authorizer.php:5521
 msgid ""
 "<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log "
 "in with via CAS (Central Authentication Service). You will need to enter "
 "details about your CAS server (host, port, and path) to enable CAS Logins."
 msgstr ""
 
-#: authorizer.php:5249
+#: authorizer.php:5522
 msgid ""
 "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
 "log in with their LDAP (Lightweight Directory Access Protocol) credentials. "
@@ -1069,18 +1078,18 @@ msgid ""
 "use TLS) to enable Google Logins."
 msgstr ""
 
-#: authorizer.php:5250
+#: authorizer.php:5523
 msgid ""
 "<strong>Default role for new CAS users</strong>: Specify which role new "
 "external users will get by default. Be sure to choose a role with limited "
 "permissions!"
 msgstr ""
 
-#: authorizer.php:5251
+#: authorizer.php:5524
 msgid "If you enable Google logins:"
 msgstr ""
 
-#: authorizer.php:5253
+#: authorizer.php:5526
 msgid ""
 "<strong>Google Client ID</strong>: You can generate this ID by creating a "
 "new Project in the <a href='https://cloud.google.com/console'>Google "
@@ -1088,7 +1097,7 @@ msgid ""
 "1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com"
 msgstr ""
 
-#: authorizer.php:5254
+#: authorizer.php:5527
 msgid ""
 "<strong>Google Client Secret</strong>: You can generate this secret by "
 "creating a new Project in the <a href='https://cloud.google.com/"
@@ -1096,29 +1105,29 @@ msgid ""
 "something like this: sDNgX5_pr_5bly-frKmvp8jT"
 msgstr ""
 
-#: authorizer.php:5256
+#: authorizer.php:5529
 msgid "If you enable CAS logins:"
 msgstr ""
 
-#: authorizer.php:5258
+#: authorizer.php:5531
 msgid ""
 "<strong>CAS server hostname</strong>: Enter the hostname of the CAS server "
 "you authenticate against (e.g., authn.example.edu)."
 msgstr ""
 
-#: authorizer.php:5259
+#: authorizer.php:5532
 msgid ""
 "<strong>CAS server port</strong>: Enter the port on the CAS server to "
 "connect to (e.g., 443)."
 msgstr ""
 
-#: authorizer.php:5260
+#: authorizer.php:5533
 msgid ""
 "<strong>CAS server path/context</strong>: Enter the path to the login "
 "endpoint on the CAS server (e.g., /cas)."
 msgstr ""
 
-#: authorizer.php:5261
+#: authorizer.php:5534
 msgid ""
 "<strong>CAS attribute containing first name</strong>: Enter the CAS "
 "attribute that has the user's first name. When this user first logs in, "
@@ -1126,7 +1135,7 @@ msgid ""
 "added to their WordPress profile."
 msgstr ""
 
-#: authorizer.php:5262
+#: authorizer.php:5535
 msgid ""
 "<strong>CAS attribute containing last name</strong>: Enter the CAS attribute "
 "that has the user's last name. When this user first logs in, their WordPress "
@@ -1134,7 +1143,7 @@ msgid ""
 "WordPress profile."
 msgstr ""
 
-#: authorizer.php:5263
+#: authorizer.php:5536
 msgid ""
 "<strong>CAS attribute update</strong>: Select whether the first and last "
 "names retrieved from CAS should overwrite any value the user has entered in "
@@ -1142,29 +1151,29 @@ msgid ""
 "set, this only happens the first time they log in."
 msgstr ""
 
-#: authorizer.php:5265
+#: authorizer.php:5538
 msgid "If you enable LDAP logins:"
 msgstr ""
 
-#: authorizer.php:5267
+#: authorizer.php:5540
 msgid ""
 "<strong>LDAP Host</strong>: Enter the URL of the LDAP server you "
 "authenticate against."
 msgstr ""
 
-#: authorizer.php:5268
+#: authorizer.php:5541
 msgid ""
 "<strong>LDAP Port</strong>: Enter the port number that the LDAP server "
 "listens on."
 msgstr ""
 
-#: authorizer.php:5269
+#: authorizer.php:5542
 msgid ""
 "<strong>LDAP Search Base</strong>: Enter the LDAP string that represents the "
 "search base, e.g., ou=people,dc=example,dc=edu"
 msgstr ""
 
-#: authorizer.php:5270
+#: authorizer.php:5543
 msgid ""
 "<strong>LDAP attribute containing username</strong>: Enter the name of the "
 "LDAP attribute that contains the usernames used by those attempting to log "
@@ -1172,25 +1181,25 @@ msgid ""
 "for login attempts."
 msgstr ""
 
-#: authorizer.php:5271
+#: authorizer.php:5544
 msgid ""
 "<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that "
 "has permissions to browse the directory."
 msgstr ""
 
-#: authorizer.php:5272
+#: authorizer.php:5545
 msgid ""
 "<strong>LDAP Directory User Password</strong>: Enter the password for the "
 "LDAP user that has permission to browse the directory."
 msgstr ""
 
-#: authorizer.php:5273
+#: authorizer.php:5546
 msgid ""
 "<strong>Use TLS</strong>: Select whether all communication with the LDAP "
 "server should be performed over a TLS-secured connection."
 msgstr ""
 
-#: authorizer.php:5274
+#: authorizer.php:5547
 msgid ""
 "<strong>Custom lost password URL</strong>: The WordPress login page contains "
 "a link to recover a lost password. If you have external users who shouldn't "
@@ -1199,7 +1208,7 @@ msgid ""
 "service here."
 msgstr ""
 
-#: authorizer.php:5275
+#: authorizer.php:5548
 msgid ""
 "<strong>LDAP attribute containing first name</strong>: Enter the LDAP "
 "attribute that has the user's first name. When this user first logs in, "
@@ -1207,7 +1216,7 @@ msgid ""
 "added to their WordPress profile."
 msgstr ""
 
-#: authorizer.php:5276
+#: authorizer.php:5549
 msgid ""
 "<strong>LDAP attribute containing last name</strong>: Enter the LDAP "
 "attribute that has the user's last name. When this user first logs in, their "
@@ -1215,7 +1224,7 @@ msgid ""
 "their WordPress profile."
 msgstr ""
 
-#: authorizer.php:5277
+#: authorizer.php:5550
 msgid ""
 "<strong>LDAP attribute update</strong>: Select whether the first and last "
 "names retrieved from LDAP should overwrite any value the user has entered in "
@@ -1223,7 +1232,7 @@ msgid ""
 "set, this only happens the first time they log in."
 msgstr ""
 
-#: authorizer.php:5290
+#: authorizer.php:5563
 msgid ""
 "<strong>Limit invalid login attempts</strong>: Choose how soon (and for how "
 "long) to restrict access to individuals (or bots) making repeated invalid "
@@ -1232,7 +1241,7 @@ msgid ""
 "before the delays will be reset to normal."
 msgstr ""
 
-#: authorizer.php:5291
+#: authorizer.php:5564
 msgid ""
 "<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress "
 "username and password fields and the Log In button on the wp-login screen, "
@@ -1240,7 +1249,7 @@ msgid ""
 "adding external=wordpress to the wp-login URL, like so:"
 msgstr ""
 
-#: authorizer.php:5292
+#: authorizer.php:5565
 msgid ""
 "<strong>Custom WordPress login branding</strong>: If you'd like to use "
 "custom branding on the WordPress login page, select that here. You will need "
@@ -1249,11 +1258,11 @@ msgid ""
 "directory under sample-theme-add-branding."
 msgstr ""
 
-#: authorizer.php:5338
+#: authorizer.php:5611
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: authorizer.php:5344
+#: authorizer.php:5618
 msgid ""
 "Most <strong>Authorizer</strong> settings are set in the individual sites, "
 "but you can specify a few options here that apply to <strong>all sites in "
@@ -1261,58 +1270,58 @@ msgid ""
 "individual sites."
 msgstr ""
 
-#: authorizer.php:5346
+#: authorizer.php:5620
 msgid "Override individual site settings with the settings below"
 msgstr ""
 
-#: authorizer.php:5357
+#: authorizer.php:5631
 msgid "Manage who has access to all sites in the network."
 msgstr ""
 
-#: authorizer.php:5361
+#: authorizer.php:5635
 msgid "Who can log in to sites in this network?"
 msgstr ""
 
-#: authorizer.php:5365
+#: authorizer.php:5639
 msgid "Who can view sites in this network?"
 msgstr ""
 
-#: authorizer.php:5369
+#: authorizer.php:5643
 msgid "Approved Users (All Sites)"
 msgstr ""
 
-#: authorizer.php:5369
+#: authorizer.php:5643
 msgid ""
 "Note: these users will <strong>not</strong> receive welcome emails when "
 "approved. Only users approved from individual sites can receive these "
 "messages."
 msgstr ""
 
-#: authorizer.php:5401
+#: authorizer.php:5675
 msgid "CAS Custom Label"
 msgstr ""
 
-#: authorizer.php:5417
+#: authorizer.php:5691
 msgid "CAS server version"
 msgstr ""
 
-#: authorizer.php:5421
+#: authorizer.php:5695
 msgid "CAS attribute containing email"
 msgstr ""
 
-#: authorizer.php:5465
+#: authorizer.php:5739
 msgid "LDAP attribute containing email"
 msgstr ""
 
-#: authorizer.php:6301
+#: authorizer.php:6685
 msgid "This setting is overridden by a"
 msgstr ""
 
-#: authorizer.php:6301
+#: authorizer.php:6685
 msgid "multisite option"
 msgstr ""
 
-#: authorizer.php:7174
+#: authorizer.php:7583
 msgid "&mdash; No role for this site &mdash;"
 msgstr ""
 
@@ -1331,5 +1340,5 @@ msgid ""
 msgstr ""
 
 #. Author of the plugin/theme
-msgid "Paul Ryan"
+msgid "Paul Ryan <prar@hawaii.edu>"
 msgstr ""
