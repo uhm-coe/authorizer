@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.6 =
+* Feature: Specify a domain wildcard (e.g., “@example.com”) in the block list to block all emails from that domain. Props @olhirt for the feature request!
+
 = 2.8.5 =
 * Update phpCAS library from 1.3.5 to 1.3.6. PHP 7.2 users running CAS are now fully supported. Props @julienlusson for the pull request!
 
