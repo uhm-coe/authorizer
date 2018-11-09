@@ -6535,9 +6535,22 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 			$users = array_map( array( $this, 'sanitize_update_auth_user' ), $users );
 
+			// Remove any entries that failed email address validation.
+			$users = array_filter( $users, array( $this, 'remove_invalid_auth_users' ) );
+
 			return $users;
 		}
 
+
+		/**
+		 * This array filter will remove any users who failed email address validation
+		 * (which would set their email to a blank string).
+		 * @param  array $user User data to check for a valid email.
+		 * @return bool  Whether to filter out the user.
+		 */
+		private function remove_invalid_auth_users( $user ) {
+			return isset( $user['email'] ) && strlen( $user['email'] ) > 0;
+		}
 
 		/**
 		 * Callback for array_map in sanitize_update_auth_users().
