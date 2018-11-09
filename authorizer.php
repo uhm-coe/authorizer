@@ -2399,7 +2399,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.8.0', true
+				array( 'jquery-effects-shake' ), '2.8.6', true
 			);
 			wp_localize_script(
 				'authorizer', 'authL10n', array(
