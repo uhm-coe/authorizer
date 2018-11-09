@@ -12,6 +12,8 @@
  * @package authorizer
  */
 
+namespace Authorizer;
+
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
  * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
@@ -39,12 +41,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 	 * @link     http://hawaii.edu/coe/dcdc/wordpress/authorizer/doc/
 	 */
 	class WP_Plugin_Authorizer {
-
-		/**
-		 * Constants for determining our admin context (network or individual site).
-		 */
-		const NETWORK_CONTEXT = 'multisite_admin';
-		const SINGLE_CONTEXT  = 'single_admin';
 
 		/**
 		 * Current site ID (Multisite).
@@ -104,6 +100,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
+			// Load helper class.
+			require_once dirname( __FILE__ ) . '/src/authorizer/class-helper.php';
+
 			// Save reference to current blog id in the network (support deprecated
 			// constant BLOGID_CURRENT_SITE).
 			if ( defined( 'BLOG_ID_CURRENT_SITE' ) ) {
@@ -281,9 +280,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				foreach ( get_super_admins() as $super_admin ) {
 					$user = get_user_by( 'login', $super_admin );
 					// Add to approved list if not there.
-					if ( ! $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
+					if ( ! Helper::in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 						$approved_user = array(
-							'email'      => $this->lowercase( $user->user_email ),
+							'email'      => Helper::lowercase( $user->user_email ),
 							'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 							'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 							'local_user' => true,
@@ -330,13 +329,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		private function add_wp_users_to_approved_list() {
 			// Add current WordPress users to the approved list.
 			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
-			$auth_settings_access_users_pending            = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_approved           = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_blocked            = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+			$auth_settings_access_users_pending            = $this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_approved           = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_blocked            = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
 			$updated                                       = false;
 			foreach ( get_users() as $user ) {
 				// Skip if user is in blocked list.
-				if ( $this->in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
+				if ( Helper::in_multi_array( $user->user_email, $auth_settings_access_users_blocked ) ) {
 					continue;
 				}
 				// Remove from pending list if there.
@@ -347,13 +346,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					}
 				}
 				// Skip if user is in multisite approved list.
-				if ( $this->in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
+				if ( Helper::in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 					continue;
 				}
 				// Add to approved list if not there.
-				if ( ! $this->in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
+				if ( ! Helper::in_multi_array( $user->user_email, $auth_settings_access_users_approved ) ) {
 					$approved_user = array(
-						'email'      => $this->lowercase( $user->user_email ),
+						'email'      => Helper::lowercase( $user->user_email ),
 						'role'       => count( $user->roles ) > 0 ? $user->roles[0] : '',
 						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
@@ -433,7 +432,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Make sure $last_attempt (time) and $num_attempts are positive integers.
 			// Note: this addresses resetting them if either is unset from above.
@@ -468,7 +467,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_long_lockout,
-						$this->seconds_as_sentence( $seconds_remaining_long_lockout ),
+						Helper::seconds_as_sentence( $seconds_remaining_long_lockout ),
 						wp_lostpassword_url()
 					)
 				);
@@ -485,7 +484,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						__( '<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id="seconds_remaining" data-seconds="%2$s">%3$s</strong> before trying again. <a href="%4$s" title="Password Lost and Found">Lost your password</a>?', 'authorizer' ),
 						$username,
 						$seconds_remaining_short_lockout,
-						$this->seconds_as_sentence( $seconds_remaining_short_lockout ),
+						Helper::seconds_as_sentence( $seconds_remaining_short_lockout ),
 						wp_lostpassword_url()
 					)
 				);
@@ -568,7 +567,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get the external user's WordPress account by email address.
 			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
-				$user = get_user_by( 'email', $this->lowercase( $externally_authenticated_email ) );
+				$user = get_user_by( 'email', Helper::lowercase( $externally_authenticated_email ) );
 
 				// If we've already found a WordPress user associated with one
 				// of the supplied email addresses, don't keep examining other
@@ -617,12 +616,12 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		private function check_user_access( $user, $user_emails, $user_data = array() ) {
 			// Grab plugin settings.
-			$auth_settings                              = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings                              = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 			$auth_settings_access_users_pending         = $this->sanitize_user_list(
-				$this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+				$this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT )
 			);
-			$auth_settings_access_users_approved_single = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_approved_multi  = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+			$auth_settings_access_users_approved_single = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_approved_multi  = $this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT );
 			$auth_settings_access_users_approved        = $this->sanitize_user_list(
 				array_merge(
 					$auth_settings_access_users_approved_single,
@@ -649,11 +648,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Add user to blocked list if it was blocked via the filter.
 					if ( $blocked_by_filter && ! $this->is_email_in_list( $user_email, 'blocked' ) ) {
 						$auth_settings_access_users_blocked = $this->sanitize_user_list(
-							$this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+							$this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT )
 						);
 						array_push(
 							$auth_settings_access_users_blocked, array(
-								'email'      => $this->lowercase( $user_email ),
+								'email'      => Helper::lowercase( $user_email ),
 								'date_added' => date( 'M Y' ),
 							)
 						);
@@ -749,7 +748,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// Add this user to the approved list.
 					$approved_user = array(
-						'email'      => $this->lowercase( $user_email ),
+						'email'      => Helper::lowercase( $user_email ),
 						'role'       => $approved_role,
 						'date_added' => date( 'Y-m-d H:i:s' ),
 					);
@@ -762,7 +761,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// list. If they are approved, log them in (and create their account
 				// if necessary).
 				if ( $is_newly_approved_user || $this->is_email_in_list( $user_email, 'approved' ) ) {
-					$user_info = $is_newly_approved_user ? $approved_user : $this->get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
+					$user_info = $is_newly_approved_user ? $approved_user : Helper::get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
 					// If this user's role was modified above (in the
 					// authorizer_custom_role filter), use that value instead of
@@ -792,7 +791,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 								'user_pass'       => wp_generate_password(), // random password.
 								'first_name'      => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
 								'last_name'       => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
-								'user_email'      => $this->lowercase( $user_info['email'] ),
+								'user_email'      => Helper::lowercase( $user_info['email'] ),
 								'user_registered' => date( 'Y-m-d H:i:s' ),
 								'role'            => $user_info['role'],
 							)
@@ -852,8 +851,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 								// Check if user is on the approved list of this site they are not added to.
 								$other_auth_settings_access_users_approved = get_blog_option( $blog_id, 'auth_settings_access_users_approved', array() );
-								if ( $this->in_multi_array( $user->user_email, $other_auth_settings_access_users_approved ) ) {
-									$other_user_info = $this->get_user_info_from_list( $user->user_email, $other_auth_settings_access_users_approved );
+								if ( Helper::in_multi_array( $user->user_email, $other_auth_settings_access_users_approved ) ) {
+									$other_user_info = Helper::get_user_info_from_list( $user->user_email, $other_auth_settings_access_users_approved );
 									// Add user to other site.
 									add_user_to_blog( $blog_id, $user->ID, $other_user_info['role'] );
 								}
@@ -968,7 +967,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					// Add them to the pending list and notify them and their instructor.
 					if ( strlen( $user_email ) > 0 && ! $this->is_email_in_list( $user_email, 'pending' ) ) {
 						$pending_user               = array();
-						$pending_user['email']      = $this->lowercase( $user_email );
+						$pending_user['email']      = Helper::lowercase( $user_email );
 						$pending_user['role']       = $approved_role;
 						$pending_user['date_added'] = '';
 						array_push( $auth_settings_access_users_pending, $pending_user );
@@ -1059,7 +1058,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
 
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			/**
 			 * Add Google API PHP Client.
@@ -1184,7 +1183,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Get email address.
 			$attributes   = $ticket->getAttributes();
-			$email        = $this->lowercase( $attributes['payload']['email'] );
+			$email        = Helper::lowercase( $attributes['payload']['email'] );
 			$email_domain = substr( strrchr( $email, '@' ), 1 );
 			$username     = current( explode( '@', $email ) );
 
@@ -1321,7 +1320,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// try to guess the domain from the CAS server hostname. This will only
 				// be used if we can't discover the email address from CAS attributes.
 				$domain_guess                   = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
-				$externally_authenticated_email = $this->lowercase( $username ) . '@' . $domain_guess;
+				$externally_authenticated_email = Helper::lowercase( $username ) . '@' . $domain_guess;
 			}
 
 			// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
@@ -1334,7 +1333,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// CAS attribute), and combine that with the username to create the email.
 				// Otherwise, look up the CAS attribute for email.
 				if ( substr( $auth_settings['cas_attr_email'], 0, 1 ) === '@' ) {
-					$externally_authenticated_email = $this->lowercase( $username . $auth_settings['cas_attr_email'] );
+					$externally_authenticated_email = Helper::lowercase( $username . $auth_settings['cas_attr_email'] );
 				} elseif (
 					// If a CAS attribute has been specified as containing the email address, use that instead.
 					// Email attribute can be a string or an array of strings.
@@ -1352,10 +1351,10 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					if ( is_array( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) ) {
 						$externally_authenticated_email = array();
 						foreach ( $cas_attributes[ $auth_settings['cas_attr_email'] ] as $external_email ) {
-							$externally_authenticated_email[] = $this->lowercase( $external_email );
+							$externally_authenticated_email[] = Helper::lowercase( $external_email );
 						}
 					} else {
-						$externally_authenticated_email = $this->lowercase( $cas_attributes[ $auth_settings['cas_attr_email'] ] );
+						$externally_authenticated_email = Helper::lowercase( $cas_attributes[ $auth_settings['cas_attr_email'] ] );
 					}
 				}
 			}
@@ -1463,7 +1462,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				if ( ! array_key_exists( 'port', $parsed_host ) ) {
 					$parsed_host['port'] = $ldap_port;
 				}
-				$ldap_host = $this->build_url( $parsed_host );
+				$ldap_host = Helper::build_url( $parsed_host );
 			}
 
 			// Establish LDAP connection.
@@ -1480,7 +1479,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			$bind_password = null;
 			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
 				$bind_rdn      = $auth_settings['ldap_user'];
-				$bind_password = $this->decrypt( $auth_settings['ldap_password'] );
+				$bind_password = Helper::decrypt( $auth_settings['ldap_password'] );
 			}
 
 			// Attempt LDAP bind.
@@ -1500,7 +1499,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				array_push( $ldap_attributes_to_retrieve, $auth_settings['ldap_attr_last_name'] );
 			}
 			if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && substr( $auth_settings['ldap_attr_email'], 0, 1 ) !== '@' ) {
-				array_push( $ldap_attributes_to_retrieve, $this->lowercase( $auth_settings['ldap_attr_email'] ) );
+				array_push( $ldap_attributes_to_retrieve, Helper::lowercase( $auth_settings['ldap_attr_email'] ) );
 			}
 
 			// Create default LDAP search filter (uid=$username).
@@ -1542,25 +1541,25 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				$ldap_user_dn = $ldap_entries[ $i ]['dn'];
 
 				// Get user first name and last name.
-				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_first_name'] ) : '';
+				$ldap_attr_first_name = array_key_exists( 'ldap_attr_first_name', $auth_settings ) ? Helper::lowercase( $auth_settings['ldap_attr_first_name'] ) : '';
 				if ( strlen( $ldap_attr_first_name ) > 0 && array_key_exists( $ldap_attr_first_name, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_first_name ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_first_name ][0] ) > 0 ) {
 					$first_name = $ldap_entries[ $i ][ $ldap_attr_first_name ][0];
 				}
-				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_last_name'] ) : '';
+				$ldap_attr_last_name = array_key_exists( 'ldap_attr_last_name', $auth_settings ) ? Helper::lowercase( $auth_settings['ldap_attr_last_name'] ) : '';
 				if ( strlen( $ldap_attr_last_name ) > 0 && array_key_exists( $ldap_attr_last_name, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_last_name ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_last_name ][0] ) > 0 ) {
 					$last_name = $ldap_entries[ $i ][ $ldap_attr_last_name ][0];
 				}
 				// Get user email if it is specified in another field.
-				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? $this->lowercase( $auth_settings['ldap_attr_email'] ) : '';
+				$ldap_attr_email = array_key_exists( 'ldap_attr_email', $auth_settings ) ? Helper::lowercase( $auth_settings['ldap_attr_email'] ) : '';
 				if ( strlen( $ldap_attr_email ) > 0 ) {
 					// If the email attribute starts with an at symbol (@), assume that the
 					// email domain is manually entered there (instead of a reference to an
 					// LDAP attribute), and combine that with the username to create the email.
 					// Otherwise, look up the LDAP attribute for email.
 					if ( substr( $ldap_attr_email, 0, 1 ) === '@' ) {
-						$email = $this->lowercase( $username . $ldap_attr_email );
+						$email = Helper::lowercase( $username . $ldap_attr_email );
 					} elseif ( array_key_exists( $ldap_attr_email, $ldap_entries[ $i ] ) && $ldap_entries[ $i ][ $ldap_attr_email ]['count'] > 0 && strlen( $ldap_entries[ $i ][ $ldap_attr_email ][0] ) > 0 ) {
-						$email = $this->lowercase( $ldap_entries[ $i ][ $ldap_attr_email ][0] );
+						$email = Helper::lowercase( $ldap_entries[ $i ][ $ldap_attr_email ][0] );
 					}
 				}
 			}
@@ -1575,11 +1574,11 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			}
 
 			// User successfully authenticated against LDAP, so set the relevant variables.
-			$externally_authenticated_email = $this->lowercase( $username . '@' . $domain );
+			$externally_authenticated_email = Helper::lowercase( $username . '@' . $domain );
 
 			// If an LDAP attribute has been specified as containing the email address, use that instead.
 			if ( strlen( $email ) > 0 ) {
-				$externally_authenticated_email = $this->lowercase( $email );
+				$externally_authenticated_email = Helper::lowercase( $email );
 			}
 
 			return array(
@@ -1602,7 +1601,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function custom_logout() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Reset option containing old error messages.
 			delete_option( 'auth_settings_advanced_login_error' );
@@ -1697,7 +1696,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function restrict_access( $wp ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Grab current user.
 			$current_user = wp_get_current_user();
@@ -1711,7 +1710,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Allow access if option is set to 'everyone'.
 				( 'everyone' === $auth_settings['access_who_can_view'] ) ||
 				// Allow access to approved external users and logged in users if option is set to 'logged_in_users'.
-				( 'logged_in_users' === $auth_settings['access_who_can_view'] && $this->is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
+				( 'logged_in_users' === $auth_settings['access_who_can_view'] && Helper::is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
 				// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API.
 				( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, 'rest_oauth1=' ) === 0 ) ||
 				// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them.
@@ -1886,13 +1885,13 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 				// Get all approved users.
 				$auth_settings_access_users_approved = $this->sanitize_user_list(
 					array_merge(
-						$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT ),
-						$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+						$this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT ),
+						$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 					)
 				);
 
 				// Get user info (we need user role).
-				$user_info = $this->get_user_info_from_list(
+				$user_info = Helper::get_user_info_from_list(
 					$current_user->user_email,
 					$auth_settings_access_users_approved
 				);
@@ -1963,7 +1962,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function login_enqueue_scripts_and_styles() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Enqueue scripts appearing on wp-login.php.
 			wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', __FILE__ ), array( 'jquery' ), '2.8.0' );
@@ -2020,7 +2019,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 */
 		public function load_login_footer_js() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 			$ajaxurl       = admin_url( 'admin-ajax.php' );
 			if ( '1' === $auth_settings['google'] ) :
 				?>
@@ -2055,7 +2054,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		$.post(ajaxurl, {
 			action: 'process_google_login',
 			code: authResult.code,
-			nonce: $('#nonce_google_auth-<?php echo esc_attr( $this->get_cookie_value() ); ?>' ).val(),
+			nonce: $('#nonce_google_auth-<?php echo esc_attr( Helper::get_cookie_value() ); ?>' ).val(),
 		}, function() {
 			// Handle or verify the server response if necessary.
 			// console.log( response );
@@ -2095,16 +2094,16 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function login_form_add_external_service_links() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 			?>
 			<div id="auth-external-service-login">
 				<?php if ( '1' === $auth_settings['google'] ) : ?>
 					<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php esc_html_e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
-					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . $this->get_cookie_value() ); ?>
+					<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . Helper::get_cookie_value() ); ?>
 				<?php endif; ?>
 
 				<?php if ( '1' === $auth_settings['cas'] ) : ?>
-					<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( $this->modify_current_url_for_cas_login() ); ?>">
+					<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_cas_login() ); ?>">
 						<span class="dashicons dashicons-lock"></span>
 						<span class="label">
 							<?php
@@ -2157,7 +2156,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function wp_login_errors__maybe_redirect_to_cas( $errors, $redirect_to ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Check whether we should redirect to CAS.
 			if (
@@ -2169,7 +2168,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 				array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 			) {
-				wp_redirect( $this->modify_current_url_for_cas_login() );
+				wp_redirect( Helper::modify_current_url_for_cas_login() );
 				exit;
 			}
 
@@ -2189,7 +2188,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function login_init__maybe_set_google_nonce_cookie() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// If Google logins are enabled, make sure the cookie is set.
 			if ( array_key_exists( 'google', $auth_settings ) && '1' === $auth_settings['google'] ) {
@@ -2214,7 +2213,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function update_login_failed_count( $username ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Get user trying to log in.
 			// If this isn't a real user, update the global failed attempt
@@ -2282,7 +2281,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function custom_lostpassword_url( $lostpassword_url ) {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			if (
 				array_key_exists( 'ldap_lostpassword_url', $auth_settings ) &&
@@ -2481,7 +2480,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function admin_notices() {
 			// Grab plugin settings.
-			$auth_settings = $this->get_plugin_options( WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$auth_settings = $this->get_plugin_options( Helper::SINGLE_CONTEXT, 'allow override' );
 
 			if ( '1' === $auth_settings['cas'] ) :
 				// Check if provided CAS URL is accessible.
@@ -2489,7 +2488,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				$cas_url        = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
 				$legacy_cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint (old; some servers don't register a ./login endpoint, use serviceValidate instead).
 				$cas_url        = trailingslashit( $cas_url ) . 'serviceValidate'; // Check the specific CAS login endpoint.
-				if ( ! $this->url_is_accessible( $cas_url ) && ! $this->url_is_accessible( $legacy_cas_url ) ) :
+				if ( ! Helper::url_is_accessible( $cas_url ) && ! Helper::url_is_accessible( $legacy_cas_url ) ) :
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 					?>
 					<div class='notice notice-warning is-dismissible'>
@@ -3412,7 +3411,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// Obfuscate LDAP directory user password.
 			if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
 				// encrypt the directory user password for some minor obfuscation in the database.
-				$auth_settings['ldap_password'] = $this->encrypt( $auth_settings['ldap_password'] );
+				$auth_settings['ldap_password'] = Helper::encrypt( $auth_settings['ldap_password'] );
 			}
 
 			// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string).
@@ -3493,7 +3492,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// If user is in approved list, update his/her associated role.
 			if ( $this->is_email_in_list( $userdata->user_email, 'approved' ) ) {
-				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT ) );
+				$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
 				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
 					if ( 0 === strcasecmp( $check_user['email'], $userdata->user_email ) ) {
 						$auth_settings_access_users_approved[ $key ]['role'] = $user->role;
@@ -3529,12 +3528,12 @@ function signInCallback( authResult ) { // jshint ignore:line
 				if ( $this->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
 					$changed_user_is_multisite_user                = true;
 					$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-						$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+						$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 					);
 					foreach ( $auth_multisite_settings_access_users_approved as $key => $check_user ) {
 						// Update old user email in approved list to the new email.
 						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-							$auth_multisite_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
+							$auth_multisite_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
 						}
 						// If new user email is already in approved list, remove that entry.
 						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
@@ -3558,7 +3557,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 							if ( $changed_user_is_multisite_user ) {
 								unset( $auth_settings_access_users_approved[ $key ] );
 							} else {
-								$auth_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
+								$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
 							}
 							$updated = true;
 						}
@@ -3575,11 +3574,11 @@ function signInCallback( authResult ) { // jshint ignore:line
 			} else {
 				// In a single site environment, just find the old user in the approved list and update the email.
 				if ( $this->is_email_in_list( $user['user_email'], 'approved' ) ) {
-					$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT ) );
+					$auth_settings_access_users_approved = $this->sanitize_user_list( $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
 					foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
 						// Update old user email in approved list to the new email.
 						if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-							$auth_settings_access_users_approved[ $key ]['email'] = $this->lowercase( $userdata['user_email'] );
+							$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
 						}
 						// If new user email is already in approved list, remove that entry.
 						if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
@@ -3603,7 +3602,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * @return void
 		 */
 		public function print_section_info_tabs( $args = '' ) {
-			if ( WP_Plugin_Authorizer::NETWORK_CONTEXT === $this->get_admin_mode( $args ) ) :
+			if ( Helper::NETWORK_CONTEXT === Helper::get_context( $args ) ) :
 				?>
 				<h2 class="nav-tab-wrapper">
 					<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
@@ -3630,7 +3629,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * @return void
 		 */
 		public function print_section_info_access_lists( $args = '' ) {
-			$admin_mode = $this->get_admin_mode( $args );
+			$admin_mode = Helper::get_context( $args );
 			?>
 			<div id="section_info_access_lists" class="section_info">
 				<p><?php esc_html_e( 'Manage who has access to this site using these lists.', 'authorizer' ); ?></p>
@@ -3687,7 +3686,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 							<li>
 								<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $pending_user['email'] ); ?>" readonly="true" class="auth-email" />
 								<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
-									<?php $this->wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
+									<?php Helper::wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 								</select>
 								<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
 								<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
@@ -3712,13 +3711,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_combo_auth_access_users_approved( $args = '' ) {
 			// Get plugin option.
 			$option               = 'access_users_approved';
-			$admin_mode           = $this->get_admin_mode( $args );
+			$admin_mode           = Helper::get_context( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'no override' );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get multisite approved users (will be added to top of list, greyed out).
 			$auth_override_multisite        = $this->get_plugin_option( 'advanced_override_multisite' );
-			$auth_multisite_settings        = $this->get_plugin_options( WP_Plugin_Authorizer::NETWORK_CONTEXT );
+			$auth_multisite_settings        = $this->get_plugin_options( Helper::NETWORK_CONTEXT );
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
@@ -3727,7 +3726,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
-				$auth_settings_option_multisite = $this->get_plugin_option( $option, WP_Plugin_Authorizer::NETWORK_CONTEXT, 'allow override' );
+				$auth_settings_option_multisite = $this->get_plugin_option( $option, Helper::NETWORK_CONTEXT, 'allow override' );
 				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
 				// Add multisite users to the beginning of the main user array.
 				foreach ( array_reverse( $auth_settings_option_multisite ) as $approved_user ) {
@@ -3737,14 +3736,14 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 
 			// Get default role for new user dropdown.
-			$access_default_role = $this->get_plugin_option( 'access_default_role', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$access_default_role = $this->get_plugin_option( 'access_default_role', Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Get custom usermeta field to show.
 			$advanced_usermeta = $this->get_plugin_option( 'advanced_usermeta' );
 
 			// Adjust javascript function prefixes if multisite.
-			$js_function_prefix      = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
-			$is_multisite_admin_page = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode;
+			$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
+			$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
 
 			// Filter user list to search terms.
 			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
@@ -3761,8 +3760,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 
 			// Sort user list.
-			$sort_by        = $this->get_plugin_option( 'advanced_users_sort_by', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ); // email, role, date_added (registered), created (date approved).
-			$sort_order     = $this->get_plugin_option( 'advanced_users_sort_order', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ); // asc or desc.
+			$sort_by        = $this->get_plugin_option( 'advanced_users_sort_by', Helper::SINGLE_CONTEXT, 'allow override' ); // email, role, date_added (registered), created (date approved).
+			$sort_order     = $this->get_plugin_option( 'advanced_users_sort_order', Helper::SINGLE_CONTEXT, 'allow override' ); // asc or desc.
 			$sort_dimension = array();
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
@@ -3785,7 +3784,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Get pager params.
 			$total_users    = count( $auth_settings_option );
-			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ) );
+			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', Helper::SINGLE_CONTEXT, 'allow override' ) );
 			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 			$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages  = ceil( $total_users / $users_per_page );
@@ -3821,7 +3820,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				<div id="new_auth_settings_<?php echo esc_attr( $option ); ?>">
 					<textarea id="new_approved_user_email" placeholder="<?php esc_attr_e( 'email address', 'authorizer' ); ?>" class="auth-email new autogrow-short" rows="1"></textarea>
 					<select id="new_approved_user_role" class="auth-role">
-						<?php $this->wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
+						<?php Helper::wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 					</select>
 					<div class="btn-group">
 						<a href="javascript:void(0);" class="btn button-primary dropdown-toggle button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
@@ -3978,8 +3977,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$is_current_user   = $approved_wp_user && get_current_user_id() === $approved_wp_user->ID;
 
 			// Adjust javascript function prefixes if multisite.
-			$js_function_prefix      = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
-			$is_multisite_admin_page = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode;
+			$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
+			$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
 
 			if ( ! $approved_wp_user ) :
 				$approved_user['is_wp_user'] = false;
@@ -4013,25 +4012,25 @@ function signInCallback( authResult ) { // jshint ignore:line
 					id="<?php echo esc_attr( $option_id ); ?>"
 					value="<?php echo esc_attr( $approved_user['email'] ); ?>"
 					readonly="true"
-					class="<?php echo esc_attr( $this->create_class_name( 'email', $is_multisite_user ) ); ?>"
+					class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'email', $is_multisite_user ) ); ?>"
 				/>
 				<select
 					id="<?php echo esc_attr( $option_id ); ?>_role"
-					class="<?php echo esc_attr( $this->create_class_name( 'role', $is_multisite_user ) ); ?>"
+					class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'role', $is_multisite_user ) ); ?>"
 					onchange="<?php echo esc_attr( $js_function_prefix ); ?>ChangeRole( this );"
 					<?php if ( $is_multisite_user ) : ?>
 						disabled="disabled"
 					<?php endif; ?>
 				>
 					<?php $disable_input = $is_current_user ? 'disabled' : null; ?>
-					<?php $this->wp_dropdown_permitted_roles( $approved_user['role'], $disable_input, $admin_mode ); ?>
+					<?php Helper::wp_dropdown_permitted_roles( $approved_user['role'], $disable_input, $admin_mode ); ?>
 				</select>
 				<input
 					type="text"
 					id="<?php echo esc_attr( $option_id ); ?>_date_added"
 					value="<?php echo esc_attr( date( 'M Y', strtotime( $approved_user['date_added'] ) ) ); ?>"
 					readonly="true"
-					class="<?php echo esc_attr( $this->create_class_name( 'date-added', $is_multisite_user ) ); ?>"
+					class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'date-added', $is_multisite_user ) ); ?>"
 				/>
 				<?php
 				if ( strlen( $advanced_usermeta ) > 0 ) :
@@ -4043,7 +4042,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 							?>
 							<select
 								id="<?php echo esc_attr( $option_id ); ?>_usermeta"
-								class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
+								class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'usermeta', $is_multisite_user ) ); ?>"
 								onchange="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );"
 							>
 								<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
@@ -4058,7 +4057,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 							type="text"
 							id="<?php echo esc_attr( $option_id ); ?>_usermeta"
 							value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
-							class="<?php echo esc_attr( $this->create_class_name( 'usermeta', $is_multisite_user ) ); ?>"
+							class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'usermeta', $is_multisite_user ) ); ?>"
 						/>
 						<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 					<?php endif; ?>
@@ -4093,7 +4092,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get default role for new blocked user dropdown.
-			$access_default_role = $this->get_plugin_option( 'access_default_role', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$access_default_role = $this->get_plugin_option( 'access_default_role', Helper::SINGLE_CONTEXT, 'allow override' );
 
 			// Render wrapper div (for aligning pager to width of content).
 			?>
@@ -4117,7 +4116,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<li>
 							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $blocked_user['email'] ); ?>" readonly="true" class="auth-email" />
 							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
-								<?php $this->wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
+								<?php Helper::wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 							</select>
 							<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
 							<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
@@ -4161,13 +4160,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_radio_auth_access_who_can_login( $args = '' ) {
 			// Get plugin option.
 			$option               = 'access_who_can_login';
-			$admin_mode           = $this->get_admin_mode( $args );
+			$admin_mode           = Helper::get_context( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
 			if ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
-			} elseif ( is_multisite() && WP_Plugin_Authorizer::SINGLE_CONTEXT === $admin_mode && $this->get_plugin_option( 'multisite_override', WP_Plugin_Authorizer::NETWORK_CONTEXT ) === '1' ) {
+			} elseif ( is_multisite() && Helper::SINGLE_CONTEXT === $admin_mode && $this->get_plugin_option( 'multisite_override', Helper::NETWORK_CONTEXT ) === '1' ) {
 				// Workaround: javascript code hides/shows other settings based
 				// on the selection in this option. If this option is overridden
 				// by a multisite option, it should show that value in order to
@@ -4175,7 +4174,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				// Side effect: this site option will be overwritten by the
 				// multisite option on save. Since this is a 2-item radio, we
 				// determined this was acceptable.
-				$auth_settings_option = $this->get_plugin_option( $option, WP_Plugin_Authorizer::NETWORK_CONTEXT );
+				$auth_settings_option = $this->get_plugin_option( $option, Helper::NETWORK_CONTEXT );
 			}
 
 			// Print option elements.
@@ -4361,13 +4360,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_radio_auth_access_who_can_view( $args = '' ) {
 			// Get plugin option.
 			$option               = 'access_who_can_view';
-			$admin_mode           = $this->get_admin_mode( $args );
+			$admin_mode           = Helper::get_context( $args );
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'allow override', 'print overlay' );
 
 			// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
 			if ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 				$auth_settings_option = $this->get_plugin_option( $option );
-			} elseif ( is_multisite() && WP_Plugin_Authorizer::SINGLE_CONTEXT === $admin_mode && '1' === $this->get_plugin_option( 'multisite_override', WP_Plugin_Authorizer::NETWORK_CONTEXT ) ) {
+			} elseif ( is_multisite() && Helper::SINGLE_CONTEXT === $admin_mode && '1' === $this->get_plugin_option( 'multisite_override', Helper::NETWORK_CONTEXT ) ) {
 				// Workaround: javascript code hides/shows other settings based
 				// on the selection in this option. If this option is overridden
 				// by a multisite option, it should show that value in order to
@@ -4375,7 +4374,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				// Side effect: this site option will be overwritten by the
 				// multisite option on save. Since this is a 2-item radio, we
 				// determined this was acceptable.
-				$auth_settings_option = $this->get_plugin_option( $option, WP_Plugin_Authorizer::NETWORK_CONTEXT );
+				$auth_settings_option = $this->get_plugin_option( $option, Helper::NETWORK_CONTEXT );
 			}
 
 			// Print option elements.
@@ -4534,7 +4533,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_select_auth_access_default_role( $args = '' ) {
 			// Get plugin option.
 			$option               = 'access_default_role';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4555,7 +4554,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_auth_external_google( $args = '' ) {
 			// Get plugin option.
 			$option               = 'google';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4573,7 +4572,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_google_clientid( $args = '' ) {
 			// Get plugin option.
 			$option               = 'google_clientid';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			$site_url_parts = wp_parse_url( get_site_url() );
@@ -4609,7 +4608,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_google_clientsecret( $args = '' ) {
 			// Get plugin option.
 			$option               = 'google_clientsecret';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4628,7 +4627,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_google_hosteddomain( $args = '' ) {
 			// Get plugin option.
 			$option               = 'google_hosteddomain';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4647,7 +4646,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_auth_external_cas( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-curl extension is installed on server.
 			$curl_installed_message = ! function_exists( 'curl_init' ) ? __( '<a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is not installed', 'authorizer' ) : '';
@@ -4682,7 +4681,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_custom_label( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_custom_label';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			esc_html_e( 'The button on the login page will read:', 'authorizer' );
@@ -4701,7 +4700,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_host( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_host';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4720,7 +4719,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_port( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_port';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4739,7 +4738,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_path( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_path';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4758,7 +4757,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_select_cas_version( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_version';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4781,7 +4780,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_attr_email';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4801,7 +4800,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_attr_first_name';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4820,7 +4819,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_cas_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_attr_last_name';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4839,7 +4838,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_cas_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_attr_update_on_login';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4857,7 +4856,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_cas_auto_login( $args = '' ) {
 			// Get plugin option.
 			$option               = 'cas_auto_login';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4876,7 +4875,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Make sure php5-ldap extension is installed on server.
 			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
@@ -4897,7 +4896,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_host( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_host';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4916,7 +4915,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_port( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_port';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4936,7 +4935,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_ldap_tls( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_tls';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4955,7 +4954,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_search_base( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_search_base';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4975,7 +4974,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_uid( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_uid';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -4994,7 +4993,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_attr_email( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_attr_email';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5014,7 +5013,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_user( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_user';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5033,12 +5032,12 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_password_ldap_password( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_password';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
 			<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $this->decrypt( $auth_settings_option ) ); ?>" autocomplete="off" />
+			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( Helper::decrypt( $auth_settings_option ) ); ?>" autocomplete="off" />
 			<?php
 		}
 
@@ -5052,7 +5051,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_lostpassword_url( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_lostpassword_url';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5071,7 +5070,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_attr_first_name( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_attr_first_name';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5090,7 +5089,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_ldap_attr_last_name( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_attr_last_name';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5109,7 +5108,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap_attr_update_on_login';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5142,7 +5141,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_auth_advanced_lockouts( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_lockouts';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			esc_html_e( 'After', 'authorizer' );
@@ -5174,7 +5173,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_hide_wp_login';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5333,7 +5332,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				<?php endif; ?>
 				<optgroup label="<?php esc_attr_e( 'All Usermeta:', 'authorizer' ); ?>">
 					<?php
-					foreach ( $this->get_all_usermeta_keys() as $meta_key ) :
+					foreach ( Helper::get_all_usermeta_keys() as $meta_key ) :
 						if ( substr( $meta_key, 0, 3 ) === 'wp_' ) :
 							continue;
 						endif;
@@ -5355,7 +5354,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_text_auth_advanced_users_per_page( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_users_per_page';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5373,7 +5372,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_select_auth_advanced_users_sort_by( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_users_sort_by';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5396,7 +5395,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_select_auth_advanced_users_sort_order( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_users_sort_order';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5417,7 +5416,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		public function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
 			// Get plugin option.
 			$option               = 'advanced_widget_enabled';
-			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+			$auth_settings_option = $this->get_plugin_option( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 			// Print option elements.
 			?>
@@ -5444,21 +5443,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 			<?php
 		}
 
-
-
-		/**
-		 * Determines whether we are in single site or multisite admin context.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return int          Current mode.
-		 */
-		private function get_admin_mode( $args ) {
-			if ( is_array( $args ) && array_key_exists( WP_Plugin_Authorizer::NETWORK_CONTEXT, $args ) && true === $args[ WP_Plugin_Authorizer::NETWORK_CONTEXT ] ) {
-				return WP_Plugin_Authorizer::NETWORK_CONTEXT;
-			} else {
-				return WP_Plugin_Authorizer::SINGLE_CONTEXT;
-			}
-		}
 
 
 		/**
@@ -5622,7 +5606,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 					<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
 
 					<div class="wrap" id="auth_multisite_settings">
-						<?php $this->print_section_info_tabs( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?>
+						<?php $this->print_section_info_tabs( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?>
 
 						<?php wp_nonce_field( 'save_auth_settings', 'nonce_save_auth_settings' ); ?>
 
@@ -5633,15 +5617,15 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Who can log in to sites in this network?', 'authorizer' ); ?></th>
-								<td><?php $this->print_radio_auth_access_who_can_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_radio_auth_access_who_can_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Who can view sites in this network?', 'authorizer' ); ?></th>
-								<td><?php $this->print_radio_auth_access_who_can_view( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_radio_auth_access_who_can_view( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved Users (All Sites)', 'authorizer' ); ?><br /><small><em><?php echo wp_kses( __( 'Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.', 'authorizer' ), $this->allowed_html ); ?></em></small></th>
-								<td><?php $this->print_combo_auth_access_users_approved( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_combo_auth_access_users_approved( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -5649,119 +5633,119 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Default role for new users', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_access_default_role( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_external_google( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Client ID', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_clientid( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_google_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Client Secret', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_clientsecret( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_google_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Hosted Domain', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_hosteddomain( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_external_cas( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_cas( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS Custom Label', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_custom_label( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS server hostname', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_host( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_host( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS server port', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_port( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS server path/context', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_path( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_path( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS server version', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_cas_version( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_select_cas_version( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS attribute containing email', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_attr_email( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS attribute containing first name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_attr_first_name( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS attribute containing last name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_cas_attr_last_name( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_cas_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS attribute update', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_cas_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS automatic login', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_cas_auto_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_cas_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_external_ldap( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Host', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_host( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_host( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Port', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_port( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_ldap_tls( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_ldap_tls( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Search Base', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_search_base( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_search_base( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing username', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_uid( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_uid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing email', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_email( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Directory User', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_user( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_user( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Directory User Password', 'authorizer' ); ?></th>
-								<td><?php $this->print_password_ldap_password( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_password_ldap_password( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Custom lost password URL', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_lostpassword_url( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_lostpassword_url( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing first name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_first_name( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing last name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_last_name( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_ldap_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute update', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -5769,27 +5753,27 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Limit invalid login attempts', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_auth_advanced_lockouts( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_auth_advanced_lockouts( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Number of users per page', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_auth_advanced_users_per_page( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_text_auth_advanced_users_per_page( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved users sort method', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_advanced_users_sort_by( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_select_auth_advanced_users_sort_by( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved users sort order', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_advanced_users_sort_order( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_select_auth_advanced_users_sort_order( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
@@ -5900,7 +5884,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * Action: wp_dashboard_setup
 		 */
 		public function add_dashboard_widgets() {
-			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ) === '1';
+			$widget_enabled = $this->get_plugin_option( 'advanced_widget_enabled', Helper::SINGLE_CONTEXT, 'allow override' ) === '1';
 
 			// Load authorizer dashboard widget if it's enabled and user has permission.
 			if ( current_user_can( 'create_users' ) && $widget_enabled ) {
@@ -5975,13 +5959,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Get user list.
 			$option               = 'access_users_approved';
-			$admin_mode           = is_multisite() && $is_network_admin ? WP_Plugin_Authorizer::NETWORK_CONTEXT : WP_Plugin_Authorizer::SINGLE_CONTEXT;
+			$admin_mode           = is_multisite() && $is_network_admin ? Helper::NETWORK_CONTEXT : Helper::SINGLE_CONTEXT;
 			$auth_settings_option = $this->get_plugin_option( $option, $admin_mode, 'no override' );
 			$auth_settings_option = is_array( $auth_settings_option ) ? $auth_settings_option : array();
 
 			// Get multisite approved users (will be added to top of list, greyed out).
 			$auth_override_multisite        = $this->get_plugin_option( 'advanced_override_multisite' );
-			$auth_multisite_settings        = $this->get_plugin_options( WP_Plugin_Authorizer::NETWORK_CONTEXT );
+			$auth_multisite_settings        = $this->get_plugin_options( Helper::NETWORK_CONTEXT );
 			$auth_settings_option_multisite = array();
 			if (
 				is_multisite() &&
@@ -5990,7 +5974,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
-				$auth_settings_option_multisite = $this->get_plugin_option( $option, WP_Plugin_Authorizer::NETWORK_CONTEXT, 'allow override' );
+				$auth_settings_option_multisite = $this->get_plugin_option( $option, Helper::NETWORK_CONTEXT, 'allow override' );
 				$auth_settings_option_multisite = is_array( $auth_settings_option_multisite ) ? $auth_settings_option_multisite : array();
 				// Add multisite users to the beginning of the main user array.
 				foreach ( array_reverse( $auth_settings_option_multisite ) as $approved_user ) {
@@ -6015,8 +5999,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 
 			// Sort user list.
-			$sort_by        = $this->get_plugin_option( 'advanced_users_sort_by', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ); // email, role, date_added (registered), created (date approved).
-			$sort_order     = $this->get_plugin_option( 'advanced_users_sort_order', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ); // asc or desc.
+			$sort_by        = $this->get_plugin_option( 'advanced_users_sort_by', Helper::SINGLE_CONTEXT, 'allow override' ); // email, role, date_added (registered), created (date approved).
+			$sort_order     = $this->get_plugin_option( 'advanced_users_sort_order', Helper::SINGLE_CONTEXT, 'allow override' ); // asc or desc.
 			$sort_dimension = array();
 			if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 				foreach ( $auth_settings_option as $key => $user ) {
@@ -6039,7 +6023,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Get pager params.
 			$total_users    = count( $auth_settings_option );
-			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' ) );
+			$users_per_page = intval( $this->get_plugin_option( 'advanced_users_per_page', Helper::SINGLE_CONTEXT, 'allow override' ) );
 			$current_page   = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 			$total_pages    = ceil( $total_users / $users_per_page );
 			if ( $total_pages < 1 ) {
@@ -6155,7 +6139,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				// Look through the approved users (of the current blog in a
 				// multisite install, or just of the single site) and add a
 				// usermeta reference if the user is found.
-				$auth_settings_access_users_approved               = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+				$auth_settings_access_users_approved               = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
 				$should_update_auth_settings_access_users_approved = false;
 				foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 					if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
@@ -6229,7 +6213,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						// already there--someone else might have just done it).
 						if ( ! $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
 							$auth_settings_access_users_pending = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+								$this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT )
 							);
 							array_push( $auth_settings_access_users_pending, $pending_user );
 							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
@@ -6237,7 +6221,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 					} elseif ( 'remove' === $pending_user['edit_action'] ) {
 
 						// Remove user from pending list and save.
-						$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT );
 						foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
 							if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
 								unset( $auth_settings_access_users_pending[ $key ] );
@@ -6289,13 +6273,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 							$username = explode( '@', $approved_user['email'] );
 							$username = $username[0];
 							if ( get_user_by( 'login', $username ) !== false ) {
-								$username = $this->lowercase( $approved_user['email'] );
+								$username = Helper::lowercase( $approved_user['email'] );
 							}
 							if ( 'false' !== $approved_user['multisite_user'] ) {
 								$result = wpmu_create_user(
 									strtolower( $username ),
 									$plaintext_password,
-									$this->lowercase( $approved_user['email'] )
+									Helper::lowercase( $approved_user['email'] )
 								);
 							} else {
 								$result = wp_insert_user(
@@ -6304,7 +6288,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 										'user_pass'       => $plaintext_password,
 										'first_name'      => '',
 										'last_name'       => '',
-										'user_email'      => $this->lowercase( $approved_user['email'] ),
+										'user_email'      => Helper::lowercase( $approved_user['email'] ),
 										'user_registered' => date( 'Y-m-d H:i:s' ),
 										'role'            => $approved_user['role'],
 									)
@@ -6324,7 +6308,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+									$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 								);
 								$approved_user['date_added']                   = date( 'M Y' );
 								array_push( $auth_multisite_settings_access_users_approved, $approved_user );
@@ -6335,7 +6319,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						} else {
 							if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+									$this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT )
 								);
 								$approved_user['date_added']         = date( 'M Y' );
 								array_push( $auth_settings_access_users_approved, $approved_user );
@@ -6370,7 +6354,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						}
 					} elseif ( 'remove' === $approved_user['edit_action'] ) { // Remove user from approved list and save (also remove their role if they have a WordPress account).
 						if ( 'false' !== $approved_user['multisite_user'] ) {
-							$auth_multisite_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+							$auth_multisite_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT );
 							foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 								if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 									// Remove role of the associated WordPress user from all blogs (but don't delete the user).
@@ -6388,7 +6372,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 								}
 							}
 						} else {
-							$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+							$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
 							foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 								if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
 									// Remove role of the associated WordPress user (but don't delete the user).
@@ -6418,7 +6402,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+									$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 								);
 								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
 									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
@@ -6432,7 +6416,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 							// Update user's role in approved list and save.
 							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+									$this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT )
 								);
 								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
@@ -6475,7 +6459,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						// already there--someone else might have just done it).
 						if ( ! $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
 							$auth_settings_access_users_blocked = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT )
+								$this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT )
 							);
 							$blocked_user['date_added']         = date( 'M Y' );
 							array_push( $auth_settings_access_users_blocked, $blocked_user );
@@ -6492,7 +6476,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						}
 
 						// Remove user from blocked list and save.
-						$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
 						foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
 							if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
 								unset( $auth_settings_access_users_blocked[ $key ] );
@@ -6639,16 +6623,16 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * Retrieves a specific plugin option from db. Multisite enabled.
 		 *
 		 * @param  string $option        Option name.
-		 * @param  string $admin_mode    WP_Plugin_Authorizer::NETWORK_CONTEXT will retrieve the multisite value.
+		 * @param  string $admin_mode    Helper::NETWORK_CONTEXT will retrieve the multisite value.
 		 * @param  string $override_mode 'allow override' will retrieve the multisite value if it exists.
 		 * @param  string $print_mode    'print overlay' will output overlay that hides this option on the settings page.
 		 * @return mixed                 Option value, or null on failure.
 		 */
-		private function get_plugin_option( $option, $admin_mode = WP_Plugin_Authorizer::SINGLE_CONTEXT, $override_mode = 'no override', $print_mode = 'no overlay' ) {
+		private function get_plugin_option( $option, $admin_mode = Helper::SINGLE_CONTEXT, $override_mode = 'no override', $print_mode = 'no overlay' ) {
 			// Special case for user lists (they are saved seperately to prevent concurrency issues).
 			if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
-				$list = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings_' . $option );
-				if ( is_multisite() && WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ) {
+				$list = Helper::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings_' . $option );
+				if ( is_multisite() && Helper::NETWORK_CONTEXT === $admin_mode ) {
 					$list = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_' . $option, array() );
 				}
 				return $list;
@@ -6665,7 +6649,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// If requested and appropriate, print the overlay hiding the
 			// single site option that is overridden by a multisite option.
 			if (
-				WP_Plugin_Authorizer::NETWORK_CONTEXT !== $admin_mode &&
+				Helper::NETWORK_CONTEXT !== $admin_mode &&
 				'allow override' === $override_mode &&
 				'print overlay' === $print_mode &&
 				array_key_exists( 'multisite_override', $auth_settings ) &&
@@ -6705,13 +6689,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 		/**
 		 * Retrieves all plugin options from db. Multisite enabled.
 		 *
-		 * @param  string $admin_mode    WP_Plugin_Authorizer::NETWORK_CONTEXT will retrieve the multisite value.
+		 * @param  string $admin_mode    Helper::NETWORK_CONTEXT will retrieve the multisite value.
 		 * @param  string $override_mode 'allow override' will retrieve the multisite value if it exists.
 		 * @return mixed                 Option value, or null on failure.
 		 */
-		private function get_plugin_options( $admin_mode = WP_Plugin_Authorizer::SINGLE_CONTEXT, $override_mode = 'no override' ) {
-			// Grab plugin settings (skip if in WP_Plugin_Authorizer::NETWORK_CONTEXT mode).
-			$auth_settings = WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings' );
+		private function get_plugin_options( $admin_mode = Helper::SINGLE_CONTEXT, $override_mode = 'no override' ) {
+			// Grab plugin settings (skip if in Helper::NETWORK_CONTEXT mode).
+			$auth_settings = Helper::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings' );
 
 			// Initialize to default values if the plugin option doesn't exist.
 			if ( false === $auth_settings ) {
@@ -6725,7 +6709,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 				// Return the multisite options if we're viewing the network admin options page.
 				// Otherwise override options with their multisite equivalents.
-				if ( WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ) {
+				if ( Helper::NETWORK_CONTEXT === $admin_mode ) {
 					$auth_settings = $auth_multisite_settings;
 				} elseif (
 					'allow override' === $override_mode &&
@@ -6748,8 +6732,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 					 * them both seperately. This is done because the two lists should be
 					 * treated differently.
 					 *
-					 * $approved_users    = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-					 * $ms_approved_users = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+					 * $approved_users    = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
+					 * $ms_approved_users = $this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT );
 					 */
 
 					// Override external services (google, cas, or ldap) and associated options.
@@ -6827,7 +6811,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// Remove user from pending/approved lists and save.
 			$list_names = array( 'access_users_pending', 'access_users_approved' );
 			foreach ( $list_names as $list_name ) {
-				$user_list    = $this->sanitize_user_list( $this->get_plugin_option( $list_name, WP_Plugin_Authorizer::SINGLE_CONTEXT ) );
+				$user_list    = $this->sanitize_user_list( $this->get_plugin_option( $list_name, Helper::SINGLE_CONTEXT ) );
 				$list_changed = false;
 				foreach ( $user_list as $key => $existing_user ) {
 					if ( 0 === strcasecmp( $deleted_email, $existing_user['email'] ) ) {
@@ -6856,7 +6840,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Go through multisite approved user list and remove this user.
 			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-				$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+				$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 			);
 			$list_changed                                  = false;
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
@@ -6922,17 +6906,17 @@ function signInCallback( authResult ) { // jshint ignore:line
 			switch_to_blog( $blog_id );
 
 			// Get user details and role.
-			$access_default_role = $this->get_plugin_option( 'access_default_role', WP_Plugin_Authorizer::SINGLE_CONTEXT, 'allow override' );
+			$access_default_role = $this->get_plugin_option( 'access_default_role', Helper::SINGLE_CONTEXT, 'allow override' );
 			$user                = get_user_by( 'id', $user_id );
 			$user_email          = $user->user_email;
 			$user_role           = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $access_default_role;
 
 			// Add user to approved list if not already there and not in blocked list.
-			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_blocked  = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) && ! $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
+			$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_blocked  = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
+			if ( ! Helper::in_multi_array( $user_email, $auth_settings_access_users_approved ) && ! Helper::in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
 				$approved_user = array(
-					'email'      => $this->lowercase( $user_email ),
+					'email'      => Helper::lowercase( $user_email ),
 					'role'       => $user_role,
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
@@ -7028,9 +7012,9 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		private function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
 			$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
-			$auth_settings_access_users_pending            = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_approved           = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-			$auth_settings_access_users_blocked            = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+			$auth_settings_access_users_pending            = $this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_approved           = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
+			$auth_settings_access_users_blocked            = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
 
 			// Get default role if one isn't specified.
 			if ( count( $default_role ) < 1 ) {
@@ -7053,7 +7037,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$updated = false;
 
 			// Skip if user is in blocked list.
-			if ( $this->in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
+			if ( Helper::in_multi_array( $user_email, $auth_settings_access_users_blocked ) ) {
 				return;
 			}
 			// Remove from pending list if there.
@@ -7064,13 +7048,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 				}
 			}
 			// Skip if user is in multisite approved list.
-			if ( $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
+			if ( Helper::in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
 				return;
 			}
 			// Add to approved list if not there.
-			if ( ! $this->in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
+			if ( ! Helper::in_multi_array( $user_email, $auth_settings_access_users_approved ) ) {
 				$approved_user = array(
-					'email'      => $this->lowercase( $user_email ),
+					'email'      => Helper::lowercase( $user_email ),
 					'role'       => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
 					'date_added' => date( 'M Y', strtotime( $date_registered ) ),
 					'local_user' => true,
@@ -7102,11 +7086,11 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Add user to multisite approved user list (if not already there).
 			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-				$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+				$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 			);
-			if ( ! $this->in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
+			if ( ! Helper::in_multi_array( $user_email, $auth_multisite_settings_access_users_approved ) ) {
 				$multisite_approved_user = array(
-					'email'      => $this->lowercase( $user_email ),
+					'email'      => Helper::lowercase( $user_email ),
 					'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
@@ -7141,7 +7125,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Go through multisite approved user list and remove this user.
 			$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-				$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+				$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 			);
 			$list_changed                                  = false;
 			foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
@@ -7231,139 +7215,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 
 		/**
-		 * Generate a unique cookie to add to nonces to prevent CSRF.
-		 *
-		 * @var string
-		 */
-		private $cookie_value = null;
-
-		/**
-		 * Retrieve the unique login cookie.
-		 *
-		 * @return string Login cookie value.
-		 */
-		private function get_cookie_value() {
-			if ( ! $this->cookie_value ) {
-				if ( isset( $_COOKIE['login_unique'] ) ) {
-					$this->cookie_value = sanitize_key( wp_unslash( $_COOKIE['login_unique'] ) );
-				} else {
-					$this->cookie_value = md5( rand() );
-				}
-			}
-			return $this->cookie_value;
-		}
-
-
-		/**
-		 * Encryption key (not secret!).
-		 *
-		 * @var string
-		 */
-		private static $key = "8QxnrvjdtweisvCBKEY!+0\0\0";
-
-		/**
-		 * Encryption salt (not secret!).
-		 *
-		 * @var string
-		 */
-		private static $iv = 'R_O2D]jPn]1[fhJl!-P1.oe';
-
-		/**
-		 * Basic encryption using a public (not secret!) key. Used for general
-		 * database obfuscation of passwords.
-		 *
-		 * @param  string $text    String to encrypt.
-		 * @param  string $library Encryption library to use (openssl).
-		 * @return string          Encrypted string.
-		 */
-		private function encrypt( $text, $library = 'openssl' ) {
-			$result = '';
-
-			// Use openssl library (better) if it is enabled.
-			if ( function_exists( 'openssl_encrypt' ) && 'openssl' === $library ) {
-				$result = base64_encode(
-					openssl_encrypt(
-						$text,
-						'AES-256-CBC',
-						hash( 'sha256', self::$key ),
-						0,
-						substr( hash( 'sha256', self::$iv ), 0, 16 )
-					)
-				);
-			} elseif ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
-				$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
-			} else { // Fall back to basic obfuscation.
-				$length = strlen( $text );
-				for ( $i = 0; $i < $length; $i++ ) {
-					$char    = substr( $text, $i, 1 );
-					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
-					$char    = chr( ord( $char ) + ord( $keychar ) );
-					$result .= $char;
-				}
-				$result = base64_encode( $result );
-			}
-
-			return $result;
-		}
-
-
-		/**
-		 * Basic decryption using a public (not secret!) key. Used for general
-		 * database obfuscation of passwords.
-		 *
-		 * @param  string $secret  String to encrypt.
-		 * @param  string $library Encryption lib to use (openssl).
-		 * @return string          Decrypted string
-		 */
-		private function decrypt( $secret, $library = 'openssl' ) {
-			$result = '';
-
-			// Use openssl library (better) if it is enabled.
-			if ( function_exists( 'openssl_decrypt' ) && 'openssl' === $library ) {
-				$result = openssl_decrypt(
-					base64_decode( $secret ),
-					'AES-256-CBC',
-					hash( 'sha256', self::$key ),
-					0,
-					substr( hash( 'sha256', self::$iv ), 0, 16 )
-				);
-			} elseif ( function_exists( 'mcrypt_decrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
-				$secret = base64_decode( $secret );
-				$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
-			} else { // Fall back to basic obfuscation.
-				$secret = base64_decode( $secret );
-				$length = strlen( $secret );
-				for ( $i = 0; $i < $length; $i++ ) {
-					$char    = substr( $secret, $i, 1 );
-					$keychar = substr( self::$key, ( $i % strlen( self::$key ) ) - 1, 1 );
-					$char    = chr( ord( $char ) - ord( $keychar ) );
-					$result .= $char;
-				}
-			}
-
-			return $result;
-		}
-
-
-		/**
-		 * In a multisite environment, returns true if the current user is logged
-		 * in and a user of the current blog. In single site mode, simply returns
-		 * true if the current user is logged in.
-		 *
-		 * @return bool Whether current user is logged in and a user of the current blog.
-		 */
-		protected function is_user_logged_in_and_blog_user() {
-			$is_user_logged_in_and_blog_user = false;
-			if ( is_multisite() ) {
-				$is_user_logged_in_and_blog_user = is_user_logged_in() && is_user_member_of_blog( get_current_user_id() );
-			} else {
-				$is_user_logged_in_and_blog_user = is_user_logged_in();
-			}
-			return $is_user_logged_in_and_blog_user;
-		}
-
-
-		/**
 		 * Helper function to determine whether a given email is in one of
 		 * the lists (pending, approved, blocked). Defaults to the list of
 		 * approved users.
@@ -7380,10 +7231,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			switch ( $list ) {
 				case 'pending':
-					$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
-					return $this->in_multi_array( $email, $auth_settings_access_users_pending );
+					$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT );
+					return Helper::in_multi_array( $email, $auth_settings_access_users_pending );
 				case 'blocked':
-					$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+					$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
 					// Blocked list can have wildcard matches, e.g., @baddomain.com, which
 					// should match any email address at that domain. Check if any wildcards
 					// exist, and if the email address has that domain.
@@ -7399,23 +7250,23 @@ function signInCallback( authResult ) { // jshint ignore:line
 							break;
 						}
 					}
-					return $email_in_blocked_domain || $this->in_multi_array( $email, $auth_settings_access_users_blocked );
+					return $email_in_blocked_domain || Helper::in_multi_array( $email, $auth_settings_access_users_blocked );
 				case 'approved':
 				default:
 					if ( 'single' !== $multisite_mode ) {
 						// Get multisite users only.
-						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT );
 					} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 						// This site has overridden any multisite settings, so only get its users.
-						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
 					} else {
 						// Get all site users and all multisite users.
 						$auth_settings_access_users_approved = array_merge(
-							$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT ),
-							$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+							$this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT ),
+							$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 						);
 					}
-					return $this->in_multi_array( $email, $auth_settings_access_users_approved );
+					return Helper::in_multi_array( $email, $auth_settings_access_users_approved );
 			}
 		}
 
@@ -7425,246 +7276,36 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * in a given list (pending, approved, or blocked).
 		 *
 		 * @param  string $list       List to get count of.
-		 * @param  string $admin_mode WP_Plugin_Authorizer::SINGLE_CONTEXT or WP_Plugin_Authorizer::NETWORK_CONTEXT determines whether to include multisite users.
+		 * @param  string $admin_mode Helper::SINGLE_CONTEXT or Helper::NETWORK_CONTEXT determines whether to include multisite users.
 		 * @return int                Number of users in list.
 		 */
-		protected function get_user_count_from_list( $list, $admin_mode = WP_Plugin_Authorizer::SINGLE_CONTEXT ) {
+		protected function get_user_count_from_list( $list, $admin_mode = Helper::SINGLE_CONTEXT ) {
 			$auth_settings_access_users = array();
 
 			switch ( $list ) {
 				case 'pending':
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_pending', Helper::SINGLE_CONTEXT );
 					break;
 				case 'blocked':
-					$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+					$auth_settings_access_users = $this->get_plugin_option( 'access_users_blocked', Helper::SINGLE_CONTEXT );
 					break;
 				case 'approved':
-					if ( WP_Plugin_Authorizer::SINGLE_CONTEXT !== $admin_mode ) {
+					if ( Helper::SINGLE_CONTEXT !== $admin_mode ) {
 						// Get multisite users only.
-						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT );
 					} elseif ( is_multisite() && 1 === intval( $this->get_plugin_option( 'advanced_override_multisite' ) ) ) {
 						// This site has overridden any multisite settings, so only get its users.
-						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						$auth_settings_access_users = $this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT );
 					} else {
 						// Get all site users and all multisite users.
 						$auth_settings_access_users = array_merge(
-							$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT ),
-							$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
+							$this->get_plugin_option( 'access_users_approved', Helper::SINGLE_CONTEXT ),
+							$this->get_plugin_option( 'access_users_approved', Helper::NETWORK_CONTEXT )
 						);
 					}
 			}
 
 			return count( $auth_settings_access_users );
-		}
-
-
-		/**
-		 * Helper function to search a multidimensional array for a value.
-		 *
-		 * @param  string $needle           Value to search for.
-		 * @param  array  $haystack         Multidimensional array to search.
-		 * @param  string $strict_mode      'strict' if strict comparisons should be used.
-		 * @param  string $case_sensitivity 'case sensitive' if comparisons should respect case.
-		 * @return bool                     Whether needle was found.
-		 */
-		protected function in_multi_array( $needle = '', $haystack = array(), $strict_mode = 'not strict', $case_sensitivity = 'case insensitive' ) {
-			if ( ! is_array( $haystack ) ) {
-				return false;
-			}
-			if ( 'case insensitive' === $case_sensitivity ) {
-				$needle = strtolower( $needle );
-			}
-			foreach ( $haystack as $item ) {
-				if ( 'case insensitive' === $case_sensitivity && ! is_array( $item ) ) {
-					$item = strtolower( $item );
-				}
-				if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
-					return true;
-				}
-			}
-			return false;
-		}
-
-
-		/**
-		 * Helper function to determine if an URL is accessible.
-		 *
-		 * @param  string $url URL that should be publicly reachable.
-		 * @return boolean     Whether the URL is publicly reachable.
-		 */
-		protected function url_is_accessible( $url ) {
-			// Use wp_remote_retrieve_response_code() to retrieve the URL.
-			$response      = wp_remote_get( $url );
-			$response_code = wp_remote_retrieve_response_code( $response );
-
-			// Return true if the document has loaded successfully without any redirection or error.
-			return $response_code >= 200 && $response_code < 400;
-		}
-
-
-		/**
-		 * Helper function to reconstruct a URL split using parse_url().
-		 *
-		 * @param  array $parts Array returned from parse_url().
-		 * @return string       URL.
-		 */
-		protected function build_url( $parts = array() ) {
-			return (
-				( isset( $parts['scheme'] ) ? "{$parts['scheme']}:" : '' ) .
-				( ( isset( $parts['user'] ) || isset( $parts['host'] ) ) ? '//' : '' ) .
-				( isset( $parts['user'] ) ? "{$parts['user']}" : '' ) .
-				( isset( $parts['pass'] ) ? ":{$parts['pass']}" : '' ) .
-				( isset( $parts['user'] ) ? '@' : '' ) .
-				( isset( $parts['host'] ) ? "{$parts['host']}" : '' ) .
-				( isset( $parts['port'] ) ? ":{$parts['port']}" : '' ) .
-				( isset( $parts['path'] ) ? "{$parts['path']}" : '' ) .
-				( isset( $parts['query'] ) ? "?{$parts['query']}" : '' ) .
-				( isset( $parts['fragment'] ) ? "#{$parts['fragment']}" : '' )
-			);
-		}
-
-
-		/**
-		 * Helper function that prints option tags for a select element for all
-		 * roles the current user has permission to assign.
-		 *
-		 * @param  string $selected_role Which role should be selected in the dropdown.
-		 * @param  string $disable_input 'disabled' if select element should be disabled.
-		 * @param  int    $admin_mode    WP_Plugin_Authorizer::NETWORK_CONTEXT if we are in that context.
-		 * @return void
-		 */
-		protected function wp_dropdown_permitted_roles( $selected_role = 'subscriber', $disable_input = 'not disabled', $admin_mode = WP_Plugin_Authorizer::SINGLE_CONTEXT ) {
-			$roles        = get_editable_roles();
-			$current_user = wp_get_current_user();
-
-			// If we're in network admin, also show any roles that might exist only on
-			// specific sites in the network (themes can add their own roles).
-			if ( WP_Plugin_Authorizer::NETWORK_CONTEXT === $admin_mode ) {
-				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
-				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
-				foreach ( $sites as $site ) {
-					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
-					switch_to_blog( $blog_id );
-					$roles = array_merge( $roles, get_editable_roles() );
-					restore_current_blog();
-				}
-				$unique_role_names = array();
-				foreach ( $roles as $role_name => $role_info ) {
-					if ( array_key_exists( $role_name, $unique_role_names ) ) {
-						unset( $roles[ $role_name ] );
-					} else {
-						$unique_role_names[ $role_name ] = true;
-					}
-				}
-			}
-
-			// If the currently selected role exists, but is not in the list of roles,
-			// the current user is not permitted to assign it. Assume they can't edit
-			// that user's role at all. Return only the one role for the dropdown list.
-			if ( strlen( $selected_role ) > 0 && ! array_key_exists( $selected_role, $roles ) && ! is_null( get_role( $selected_role ) ) ) {
-				return;
-			}
-
-			// Print an option element for each permitted role.
-			foreach ( $roles as $name => $role ) {
-				$is_selected = $selected_role === $name;
-
-				// Don't let a user change their own role (but network admins always can).
-				$is_disabled = $selected_role !== $name && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
-				?>
-				<option value="<?php echo esc_attr( $name ); ?>"<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php echo esc_html( $role['name'] ); ?></option>
-				<?php
-			}
-
-			// Print default role (no role).
-			$is_selected = strlen( $selected_role ) === 0 || ! array_key_exists( $selected_role, $roles );
-			$is_disabled = strlen( $selected_role ) > 0 && 'disabled' === $disable_input && ! ( is_multisite() && current_user_can( 'manage_network' ) );
-			?>
-			<option value=""<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option>
-			<?php
-
-		}
-
-
-		/**
-		 * Helper function to get a single user info array from one of the access
-		 * control lists (pending, approved, or blocked).
-		 *
-		 * @param  string $email Email address to retrieve info for.
-		 * @param  string $list  List to get info from.
-		 * @return mixed         false if not found, otherwise: array(
-		 *                         'email' => '',
-		 *                         'role' => '',
-		 *                         'date_added' => '',
-		 *                         ['usermeta' => [''|array()]]
-		 *                       );
-		 */
-		protected function get_user_info_from_list( $email, $list ) {
-			foreach ( $list as $user_info ) {
-				if ( 0 === strcasecmp( $user_info['email'], $email ) ) {
-					return $user_info;
-				}
-			}
-			return false;
-		}
-
-		/**
-		 * Helper function to convert a string to lowercase.  Prefers to use mb_strtolower,
-		 * but will fall back to strtolower if the former is not available.
-		 *
-		 * @param  string $string String to convert to lowercase.
-		 * @return string         Input in lowercase.
-		 */
-		protected function lowercase( $string ) {
-			return function_exists( 'mb_strtolower' ) ? mb_strtolower( $string ) : strtolower( $string );
-		}
-
-
-		/**
-		 * Helper function to convert seconds to human readable text.
-		 *
-		 * @see: http://csl.name/php-secs-to-human-text/
-		 *
-		 * @param  int $secs Seconds to display as readable text.
-		 * @return string    Readable version of number of seconds.
-		 */
-		protected function seconds_as_sentence( $secs ) {
-			$units = array(
-				'week'   => 3600 * 24 * 7,
-				'day'    => 3600 * 24,
-				'hour'   => 3600,
-				'minute' => 60,
-				'second' => 1,
-			);
-
-			// Specifically handle zero.
-			if ( 0 === intval( $secs ) ) {
-				return '0 seconds';
-			}
-
-			$s = '';
-
-			foreach ( $units as $name => $divisor ) {
-				$quot = intval( $secs / $divisor );
-				if ( $quot ) {
-					$s    .= "$quot $name";
-					$s    .= ( abs( $quot ) > 1 ? 's' : '' ) . ', ';
-					$secs -= $quot * $divisor;
-				}
-			}
-
-			return substr( $s, 0, -2 );
-		}
-
-		/**
-		 * Helper function to get all available usermeta keys as an array.
-		 *
-		 * @return array All usermeta keys for user.
-		 */
-		protected function get_all_usermeta_keys() {
-			global $wpdb;
-			$usermeta_keys = $wpdb->get_col( "SELECT DISTINCT $wpdb->usermeta.meta_key FROM $wpdb->usermeta" );
-			return $usermeta_keys;
 		}
 
 
@@ -7679,67 +7320,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 				false,
 				plugin_basename( dirname( __FILE__ ) ) . '/languages'
 			);
-		}
-
-
-		/**
-		 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
-		 * and external=cas added).
-		 */
-		private function modify_current_url_for_cas_login() {
-			// Construct the URL of the current page (wp-login.php).
-			$url = '';
-			if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
-				$url = set_url_scheme( esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
-			}
-
-			// Parse the URL into its components.
-			$parsed_url = wp_parse_url( $url );
-
-			// Fix up the querystring values (remove reauth, make sure external=cas).
-			$querystring = array();
-			if ( array_key_exists( 'query', $parsed_url ) ) {
-				parse_str( $parsed_url['query'], $querystring );
-			}
-			unset( $querystring['reauth'] );
-			$querystring['external'] = 'cas';
-			$parsed_url['query']     = http_build_query( $querystring );
-
-			// Return the URL as a string.
-			return $this->unparse_url( $parsed_url );
-		}
-
-
-		/**
-		 * Reconstruct a URL after it has been deconstructed with parse_url().
-		 *
-		 * @param  array $parsed_url Keys from parse_url().
-		 * @return string            URL constructed from the components in $parsed_url.
-		 */
-		protected function unparse_url( $parsed_url = array() ) {
-			$scheme   = isset( $parsed_url['scheme'] ) ? $parsed_url['scheme'] . '://' : '';
-			$host     = isset( $parsed_url['host'] ) ? $parsed_url['host'] : '';
-			$port     = isset( $parsed_url['port'] ) ? ':' . $parsed_url['port'] : '';
-			$user     = isset( $parsed_url['user'] ) ? $parsed_url['user'] : '';
-			$pass     = isset( $parsed_url['pass'] ) ? ':' . $parsed_url['pass'] : '';
-			$pass     = $user || $pass ? "$pass@" : '';
-			$path     = isset( $parsed_url['path'] ) ? $parsed_url['path'] : '';
-			$query    = isset( $parsed_url['query'] ) ? '?' . $parsed_url['query'] : '';
-			$fragment = isset( $parsed_url['fragment'] ) ? '#' . $parsed_url['fragment'] : '';
-			return "$scheme$user$pass$host$port$path$query$fragment";
-		}
-
-
-		/**
-		 * Helper function to generate an HTML class name for an option (used in
-		 * Authorizer Settings in the Approved User list).
-		 *
-		 * @param  string  $suffix            Unique part of class name.
-		 * @param  boolean $is_multisite_user Whether the class name should indicate it's a multisite user.
-		 * @return string                     Class name, e.g., "auth-email auth-multisite-email".
-		 */
-		private function create_class_name( $suffix = '', $is_multisite_user = false ) {
-			return $is_multisite_user ? "auth-$suffix auth-multisite-$suffix" : "auth-$suffix";
 		}
 
 
@@ -7847,8 +7427,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 						$blog_id       = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 						$auth_settings = get_blog_option( $blog_id, 'auth_settings', array() );
 						if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
-							$plaintext_ldap_password        = $this->decrypt( $auth_settings['ldap_password'], 'mcrypt' );
-							$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+							$plaintext_ldap_password        = Helper::decrypt( $auth_settings['ldap_password'], 'mcrypt' );
+							$auth_settings['ldap_password'] = Helper::encrypt( $plaintext_ldap_password );
 							update_blog_option( $blog_id, 'auth_settings', $auth_settings );
 						}
 					}
@@ -7856,8 +7436,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 					// Reencrypt LDAP password on this single-site install.
 					$auth_settings = get_option( 'auth_settings', array() );
 					if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
-						$plaintext_ldap_password        = $this->decrypt( $auth_settings['ldap_password'], 'mcrypt' );
-						$auth_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+						$plaintext_ldap_password        = Helper::decrypt( $auth_settings['ldap_password'], 'mcrypt' );
+						$auth_settings['ldap_password'] = Helper::encrypt( $plaintext_ldap_password );
 						update_option( 'auth_settings', $auth_settings );
 					}
 				}
@@ -7875,8 +7455,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 					// Reencrypt LDAP password in network (multisite) options.
 					$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 					if ( array_key_exists( 'ldap_password', $auth_multisite_settings ) && strlen( $auth_multisite_settings['ldap_password'] ) > 0 ) {
-						$plaintext_ldap_password                  = $this->decrypt( $auth_multisite_settings['ldap_password'], 'mcrypt' );
-						$auth_multisite_settings['ldap_password'] = $this->encrypt( $plaintext_ldap_password );
+						$plaintext_ldap_password                  = Helper::decrypt( $auth_multisite_settings['ldap_password'], 'mcrypt' );
+						$auth_multisite_settings['ldap_password'] = Helper::encrypt( $plaintext_ldap_password );
 						update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 					}
 				}
