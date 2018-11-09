@@ -6237,17 +6237,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 					} elseif ( 'remove' === $pending_user['edit_action'] ) {
 
 						// Remove user from pending list and save.
-						if ( $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
-							$auth_settings_access_users_pending = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT )
-							);
-							foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
-								if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
-									unset( $auth_settings_access_users_pending[ $key ] );
-									break;
-								}
+						$auth_settings_access_users_pending = $this->get_plugin_option( 'access_users_pending', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
+							if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
+								unset( $auth_settings_access_users_pending[ $key ] );
+								update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+								break;
 							}
-							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
 						}
 					}
 				}
@@ -6374,45 +6370,37 @@ function signInCallback( authResult ) { // jshint ignore:line
 						}
 					} elseif ( 'remove' === $approved_user['edit_action'] ) { // Remove user from approved list and save (also remove their role if they have a WordPress account).
 						if ( 'false' !== $approved_user['multisite_user'] ) {
-							if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
-								$auth_multisite_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT )
-								);
-								foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
-										// Remove role of the associated WordPress user from all blogs (but don't delete the user).
-										$user = get_user_by( 'email', $approved_user['email'] );
-										if ( false !== $user ) {
-											// Loop through all of the blogs this user is a member of and remove their capabilities.
-											foreach ( get_blogs_of_user( $user->ID ) as $blog ) {
-												remove_user_from_blog( $user->ID, $blog->userblog_id, '' );
-											}
+							$auth_multisite_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::NETWORK_CONTEXT );
+							foreach ( $auth_multisite_settings_access_users_approved as $key => $existing_user ) {
+								if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
+									// Remove role of the associated WordPress user from all blogs (but don't delete the user).
+									$user = get_user_by( 'email', $approved_user['email'] );
+									if ( false !== $user ) {
+										// Loop through all of the blogs this user is a member of and remove their capabilities.
+										foreach ( get_blogs_of_user( $user->ID ) as $blog ) {
+											remove_user_from_blog( $user->ID, $blog->userblog_id, '' );
 										}
-										// Remove entry from Approved Users list.
-										unset( $auth_multisite_settings_access_users_approved[ $key ] );
-										break;
 									}
+									// Remove entry from Approved Users list.
+									unset( $auth_multisite_settings_access_users_approved[ $key ] );
+									update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+									break;
 								}
-								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 							}
 						} else {
-							if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
-								$auth_settings_access_users_approved = $this->sanitize_user_list(
-									$this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT )
-								);
-								foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
-									if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
-										// Remove role of the associated WordPress user (but don't delete the user).
-										$user = get_user_by( 'email', $approved_user['email'] );
-										if ( false !== $user ) {
-											$user->set_role( '' );
-										}
-										// Remove entry from Approved Users list.
-										unset( $auth_settings_access_users_approved[ $key ] );
-										break;
+							$auth_settings_access_users_approved = $this->get_plugin_option( 'access_users_approved', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+							foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
+								if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
+									// Remove role of the associated WordPress user (but don't delete the user).
+									$user = get_user_by( 'email', $approved_user['email'] );
+									if ( false !== $user ) {
+										$user->set_role( '' );
 									}
+									// Remove entry from Approved Users list.
+									unset( $auth_settings_access_users_approved[ $key ] );
+									update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+									break;
 								}
-								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 							}
 						}
 					} elseif ( 'change_role' === $approved_user['edit_action'] ) { // Update user's role in WordPress.
@@ -6499,17 +6487,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 						}
 
 						// Remove user from blocked list and save.
-						if ( $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
-							$auth_settings_access_users_blocked = $this->sanitize_user_list(
-								$this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT )
-							);
-							foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
-								if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
-									unset( $auth_settings_access_users_blocked[ $key ] );
-									break;
-								}
+						$auth_settings_access_users_blocked = $this->get_plugin_option( 'access_users_blocked', WP_Plugin_Authorizer::SINGLE_CONTEXT );
+						foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
+							if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
+								unset( $auth_settings_access_users_blocked[ $key ] );
+								update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+								break;
 							}
-							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
 						}
 					}
 				}
