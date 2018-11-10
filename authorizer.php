@@ -4180,6 +4180,9 @@ function signInCallback( authResult ) { // jshint ignore:line
 				wp_die( wp_kses( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ), Helper::$allowed_html ) );
 			}
 			$options       = Options::get_instance();
+			$access_lists  = Access_Lists::get_instance();
+			$login_access  = Login_Access::get_instance();
+			$public_access = Public_Access::get_instance();
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
@@ -4203,15 +4206,15 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Who can log in to sites in this network?', 'authorizer' ); ?></th>
-								<td><?php $this->print_radio_auth_access_who_can_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $access_login->print_radio_auth_access_who_can_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Who can view sites in this network?', 'authorizer' ); ?></th>
-								<td><?php $this->print_radio_auth_access_who_can_view( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $public_access->print_radio_auth_access_who_can_view( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved Users (All Sites)', 'authorizer' ); ?><br /><small><em><?php echo wp_kses( __( 'Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.', 'authorizer' ), Helper::$allowed_html ); ?></em></small></th>
-								<td><?php $this->print_combo_auth_access_users_approved( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $access_lists->print_combo_auth_access_users_approved( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
