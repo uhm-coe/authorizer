@@ -14,11 +14,12 @@
 
 namespace Authorizer;
 
+use Authorizer\Options;
+require_once dirname( __FILE__ ) . '/src/authorizer/class-options.php';
+
 use Authorizer\Options\Access_Lists;
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-access-lists.php';
 
-use Authorizer\Options;
-require_once dirname( __FILE__ ) . '/src/authorizer/class-options.php';
 
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
