@@ -50,53 +50,6 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		public $current_site_blog_id = 1;
 
 		/**
-		 * HTML allowed when rendering translatable strings in the Authorizer UI.
-		 * This is passed to wp_kses() when sanitizing HMTL strings.
-		 *
-		 * @var array
-		 */
-		private $allowed_html = array(
-			'a'      => array(
-				'class'  => array(),
-				'href'   => array(),
-				'style'  => array(),
-				'target' => array(),
-				'title'  => array(),
-			),
-			'b'      => array(),
-			'br'     => array(),
-			'div'    => array(
-				'class' => array(),
-			),
-			'em'     => array(),
-			'hr'     => array(),
-			'i'      => array(),
-			'input'  => array(
-				'aria-describedby' => array(),
-				'class'            => array(),
-				'id'               => array(),
-				'name'             => array(),
-				'size'             => array(),
-				'type'             => array(),
-				'value'            => array(),
-			),
-			'label'  => array(
-				'class' => array(),
-				'for'   => array(),
-			),
-			'p'      => array(
-				'style' => array(),
-			),
-			'span'   => array(
-				'aria-hidden' => array(),
-				'class'       => array(),
-				'id'          => array(),
-				'style'       => array(),
-			),
-			'strong' => array(),
-		);
-
-		/**
 		 * Constructor.
 		 */
 		public function __construct() {
@@ -681,7 +634,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						__( 'Back', 'authorizer' ) .
 						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
-					wp_die( wp_kses( $error_message, $this->allowed_html ), esc_html( $page_title ) );
+					wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 				}
 			}
 
@@ -1014,7 +967,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						__( 'Back', 'authorizer' ) .
 						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
-					wp_die( wp_kses( $error_message, $this->allowed_html ), esc_html( $page_title ) );
+					wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 				}
 			}
 
@@ -1849,7 +1802,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 					'<a class="button" href="' . wp_login_url( $current_path ) . '">' .
 					__( 'Log In', 'authorizer' ) .
 					'</a></p>';
-				wp_die( wp_kses( $error_message, $this->allowed_html ), esc_html( $page_title ) );
+				wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 			} else {
 				wp_redirect( wp_login_url( $current_path ), 302 );
 				exit;
@@ -2461,7 +2414,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			if ( $notice && strlen( $notice ) > 0 ) {
 				?>
 				<div class="error">
-					<p><?php echo wp_kses( $notice, $this->allowed_html ); ?></p>
+					<p><?php echo wp_kses( $notice, Helper::$allowed_html ); ?></p>
 				</div>
 				<?php
 			}
@@ -4291,7 +4244,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Print option elements.
 			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php echo wp_kses( __( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ), $this->allowed_html ); ?></small>
+			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php echo wp_kses( __( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ), Helper::$allowed_html ); ?></small>
 			<?php
 		}
 
@@ -4325,7 +4278,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				<?php
 				printf(
 					/* TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email */
-					wp_kses( __( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ), $this->allowed_html ),
+					wp_kses( __( 'You can use %1$s, %2$s, and %3$s shortcodes.', 'authorizer' ), Helper::$allowed_html ),
 					'<b>[site_name]</b>',
 					'<b>[site_url]</b>',
 					'<b>[user_email]</b>'
@@ -4417,8 +4370,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Print option elements.
 			?>
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), $this->allowed_html ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), $this->allowed_html ); ?></label>
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), Helper::$allowed_html ); ?></label><br />
+			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), Helper::$allowed_html ); ?></label>
 			<?php
 		}
 
@@ -4581,17 +4534,17 @@ function signInCallback( authResult ) { // jshint ignore:line
 			esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' );
 			?>
 			<ol>
-				<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ), $this->allowed_html ); ?></li>
-				<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ), $this->allowed_html ); ?>
+				<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ), Helper::$allowed_html ); ?></li>
+				<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ), Helper::$allowed_html ); ?>
 					<ul>
-						<li><?php echo wp_kses( __( 'Application Type: <strong>Web application</strong>', 'authorizer' ), $this->allowed_html ); ?></li>
+						<li><?php echo wp_kses( __( 'Application Type: <strong>Web application</strong>', 'authorizer' ), Helper::$allowed_html ); ?></li>
 						<li><?php esc_html_e( 'Authorized Javascript Origins:', 'authorizer' ); ?> <strong><?php echo esc_html( rtrim( $site_url_host, '/' ) ); ?></strong></li>
-						<li><?php echo wp_kses( __( 'Authorized Redirect URI: <em>none</em>', 'authorizer' ), $this->allowed_html ); ?></li>
+						<li><?php echo wp_kses( __( 'Authorized Redirect URI: <em>none</em>', 'authorizer' ), Helper::$allowed_html ); ?></li>
 					</ul>
 				</li>
 				<li><?php esc_html_e( 'Copy/paste your new Client ID/Secret pair into the fields below.', 'authorizer' ); ?></li>
-				<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), $this->allowed_html ); ?></li>
-				<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), $this->allowed_html ); ?></li>
+				<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), Helper::$allowed_html ); ?></li>
+				<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
 			</ol>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:560px;" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label>
@@ -4667,7 +4620,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Print option elements.
 			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $error_message, $this->allowed_html ); ?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable CAS Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $error_message, Helper::$allowed_html ); ?>
 			<?php
 		}
 
@@ -4786,7 +4739,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			?>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-			<br /><small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small>
+			<br /><small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
 			<?php
 		}
 
@@ -4882,7 +4835,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Print option elements.
 			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $ldap_installed_message, $this->allowed_html ); ?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $ldap_installed_message, Helper::$allowed_html ); ?>
 			<?php
 		}
 
@@ -4999,7 +4952,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			?>
 			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-			<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), $this->allowed_html ); ?></small>
+			<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
 			<?php
 		}
 
@@ -5230,7 +5183,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// Print message about adding custom brands if there are none.
 			if ( count( $branding_options ) === 0 ) {
 				?>
-				<p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), $this->allowed_html ); ?></em></p>
+				<p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></em></p>
 				<?php
 			}
 		}
@@ -5592,14 +5545,14 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 */
 		public function create_network_admin_page() {
 			if ( ! current_user_can( 'manage_network_options' ) ) {
-				wp_die( wp_kses( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ), $this->allowed_html ) );
+				wp_die( wp_kses( __( 'You do not have sufficient permissions to access this page.', 'authorizer' ), Helper::$allowed_html ) );
 			}
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
 				<form method="post" action="" autocomplete="off">
 					<h2><?php esc_html_e( 'Authorizer Settings', 'authorizer' ); ?></h2>
-					<p><?php echo wp_kses( __( 'Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.', 'authorizer' ), $this->allowed_html ); ?></p>
+					<p><?php echo wp_kses( __( 'Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.', 'authorizer' ), Helper::$allowed_html ); ?></p>
 
 					<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 === intval( $auth_settings['multisite_override'] ) ); ?> /><label for="auth_settings_multisite_override"><?php esc_html_e( 'Override individual site settings with the settings below', 'authorizer' ); ?></label>
 
@@ -5624,7 +5577,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 								<td><?php $this->print_radio_auth_access_who_can_view( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
-								<th scope="row"><?php esc_html_e( 'Approved Users (All Sites)', 'authorizer' ); ?><br /><small><em><?php echo wp_kses( __( 'Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.', 'authorizer' ), $this->allowed_html ); ?></em></small></th>
+								<th scope="row"><?php esc_html_e( 'Approved Users (All Sites)', 'authorizer' ); ?><br /><small><em><?php echo wp_kses( __( 'Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages.', 'authorizer' ), Helper::$allowed_html ); ?></em></small></th>
 								<td><?php $this->print_combo_auth_access_users_approved( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>

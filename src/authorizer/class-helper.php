@@ -22,6 +22,53 @@ class Helper {
 
 
 	/**
+	 * HTML allowed when rendering translatable strings in the Authorizer UI.
+	 * This is passed to wp_kses() when sanitizing HMTL strings.
+	 *
+	 * @var array
+	 */
+	public static $allowed_html = array(
+		'a'      => array(
+			'class'  => array(),
+			'href'   => array(),
+			'style'  => array(),
+			'target' => array(),
+			'title'  => array(),
+		),
+		'b'      => array(),
+		'br'     => array(),
+		'div'    => array(
+			'class' => array(),
+		),
+		'em'     => array(),
+		'hr'     => array(),
+		'i'      => array(),
+		'input'  => array(
+			'aria-describedby' => array(),
+			'class'            => array(),
+			'id'               => array(),
+			'name'             => array(),
+			'size'             => array(),
+			'type'             => array(),
+			'value'            => array(),
+		),
+		'label'  => array(
+			'class' => array(),
+			'for'   => array(),
+		),
+		'p'      => array(
+			'style' => array(),
+		),
+		'span'   => array(
+			'aria-hidden' => array(),
+			'class'       => array(),
+			'id'          => array(),
+			'style'       => array(),
+		),
+		'strong' => array(),
+	);
+
+	/**
 	 * Generate a unique cookie to add to nonces to prevent CSRF.
 	 *
 	 * @var string
