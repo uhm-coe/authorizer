@@ -29,6 +29,9 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.
 use Authorizer\Options\External;
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
 
+use Authorizer\Options\External\Google;
+require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-google.php';
+
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
  * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
@@ -2639,28 +2642,28 @@ function signInCallback( authResult ) { // jshint ignore:line
 			add_settings_field(
 				'auth_settings_external_google',
 				__( 'Google Logins', 'authorizer' ),
-				array( $this, 'print_checkbox_auth_external_google' ),
+				array( Google::get_instance(), 'print_checkbox_auth_external_google' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_google_clientid',
 				__( 'Google Client ID', 'authorizer' ),
-				array( $this, 'print_text_google_clientid' ),
+				array( Google::get_instance(), 'print_text_google_clientid' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_google_clientsecret',
 				__( 'Google Client Secret', 'authorizer' ),
-				array( $this, 'print_text_google_clientsecret' ),
+				array( Google::get_instance(), 'print_text_google_clientsecret' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_google_hosteddomain',
 				__( 'Google Hosted Domain', 'authorizer' ),
-				array( $this, 'print_text_google_hosteddomain' ),
+				array( Google::get_instance(), 'print_text_google_hosteddomain' ),
 				'authorizer',
 				'auth_settings_external'
 			);
@@ -3055,102 +3058,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// We're hooking into this filter merely for its location in the codebase,
 			// so make sure to return the filter value unmodified.
 			return $send;
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_auth_external_google( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'google';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable Google Logins', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_google_clientid( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'google_clientid';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			$site_url_parts = wp_parse_url( get_site_url() );
-			$site_url_host  = $site_url_parts['scheme'] . '://' . $site_url_parts['host'] . '/';
-
-			esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' );
-			?>
-			<ol>
-				<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ), Helper::$allowed_html ); ?></li>
-				<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ), Helper::$allowed_html ); ?>
-					<ul>
-						<li><?php echo wp_kses( __( 'Application Type: <strong>Web application</strong>', 'authorizer' ), Helper::$allowed_html ); ?></li>
-						<li><?php esc_html_e( 'Authorized Javascript Origins:', 'authorizer' ); ?> <strong><?php echo esc_html( rtrim( $site_url_host, '/' ) ); ?></strong></li>
-						<li><?php echo wp_kses( __( 'Authorized Redirect URI: <em>none</em>', 'authorizer' ), Helper::$allowed_html ); ?></li>
-					</ul>
-				</li>
-				<li><?php esc_html_e( 'Copy/paste your new Client ID/Secret pair into the fields below.', 'authorizer' ); ?></li>
-				<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), Helper::$allowed_html ); ?></li>
-				<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
-			</ol>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:560px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_google_clientsecret( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'google_clientsecret';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:220px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_google_hosteddomain( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'google_hosteddomain';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:220px;"><?php echo esc_html( $auth_settings_option ); ?></textarea>
-			<br /><small><?php esc_html_e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?><br /><?php esc_html_e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></small>
-			<?php
 		}
 
 
@@ -4150,6 +4057,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$login_access  = Login_Access::get_instance();
 			$public_access = Public_Access::get_instance();
 			$external      = External::get_instance();
+			$google        = Google::get_instance();
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
@@ -4193,19 +4101,19 @@ function signInCallback( authResult ) { // jshint ignore:line
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $google->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Client ID', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $google->print_text_google_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Client Secret', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $google->print_text_google_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Hosted Domain', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $google->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
