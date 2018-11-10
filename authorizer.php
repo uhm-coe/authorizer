@@ -26,6 +26,9 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-login-access.p
 use Authorizer\Options\Public_Access;
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.php';
 
+use Authorizer\Options\External;
+require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
+
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
  * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
@@ -2623,13 +2626,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 			add_settings_section(
 				'auth_settings_external',
 				'',
-				array( $this, 'print_section_info_external' ),
+				array( External::get_instance(), 'print_section_info_external' ),
 				'authorizer'
 			);
 			add_settings_field(
 				'auth_settings_access_default_role',
 				__( 'Default role for new users', 'authorizer' ),
-				array( $this, 'print_select_auth_access_default_role' ),
+				array( External::get_instance(), 'print_select_auth_access_default_role' ),
 				'authorizer',
 				'auth_settings_external'
 			);
@@ -3052,43 +3055,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// We're hooking into this filter merely for its location in the codebase,
 			// so make sure to return the filter value unmodified.
 			return $send;
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_section_info_external( $args = '' ) {
-			?>
-			<div id="section_info_external" class="section_info">
-				<p><?php esc_html_e( 'Enter your external server settings below.', 'authorizer' ); ?></p>
-			</div>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_select_auth_access_default_role( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'access_default_role';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-				<?php wp_dropdown_roles( $auth_settings_option ); ?>
-				<option value=""<?php selected( '' === $auth_settings_option ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-			</select>
-			<?php
 		}
 
 
@@ -4183,6 +4149,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$access_lists  = Access_Lists::get_instance();
 			$login_access  = Login_Access::get_instance();
 			$public_access = Public_Access::get_instance();
+			$external      = External::get_instance();
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
@@ -4218,11 +4185,11 @@ function signInCallback( authResult ) { // jshint ignore:line
 							</tr>
 						</tbody></table>
 
-						<?php $this->print_section_info_external(); ?>
+						<?php $external->print_section_info_external(); ?>
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Default role for new users', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $external->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
