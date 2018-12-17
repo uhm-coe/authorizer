@@ -610,9 +610,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 		 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
 		 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes.
-		 * @return WP_Error|void|WP_User
+		 * @return WP_Error|WP_User
 		 *                             WP_Error if there was an error on user creation / adding user to blog.
-		 *                             wp_die() if user does not have access.
+		 *                             WP_Error / wp_die() if user does not have access.
 		 *                             WP_User if user has access.
 		 */
 		private function check_user_access( $user, $user_emails, $user_data = array() ) {
@@ -683,6 +683,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
 					wp_die( wp_kses( $error_message, $this->allowed_html ), esc_html( $page_title ) );
+					return new WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 				}
 			}
 
