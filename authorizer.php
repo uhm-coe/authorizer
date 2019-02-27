@@ -5012,7 +5012,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// Print option elements.
 			?>
 			<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $this->decrypt( $auth_settings_option ) ); ?>" autocomplete="off" />
+			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $this->decrypt( $auth_settings_option ) ); ?>" autocomplete="new-password" />
 			<?php
 		}
 
