@@ -3697,7 +3697,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			if (
 				is_multisite() &&
 				! is_network_admin() &&
-				'1' !== intval( $auth_override_multisite ) &&
+				1 !== intval( $auth_override_multisite ) &&
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
