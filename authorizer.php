@@ -3849,10 +3849,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$total_pages_after  = '</span></span>';
 
 			if ( $disable_first ) {
-				$page_links[] = '<span class="first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>';
+				$page_links[] = '<span class="button disabled first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>';
 			} else {
 				$page_links[] = sprintf(
-					"<a class='first-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					"<a class='button first-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( remove_query_arg( 'paged', $current_url ) ),
 					__( 'First page' ),
 					'&laquo;'
@@ -3860,10 +3860,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 
 			if ( $disable_prev ) {
-				$page_links[] = '<span class="prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>';
+				$page_links[] = '<span class="button disabled prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>';
 			} else {
 				$page_links[] = sprintf(
-					"<a class='prev-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					"<a class='button prev-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', max( 1, $current_page - 1 ), $current_url ) ),
 					__( 'Previous page' ),
 					'&lsaquo;'
@@ -3887,10 +3887,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
 
 			if ( $disable_next ) {
-				$page_links[] = '<span class="next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
+				$page_links[] = '<span class="button disabled next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
 			} else {
 				$page_links[] = sprintf(
-					"<a class='next-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					"<a class='button next-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', min( $total_pages, $current_page + 1 ), $current_url ) ),
 					__( 'Next page' ),
 					'&rsaquo;'
@@ -3898,10 +3898,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			}
 
 			if ( $disable_last ) {
-				$page_links[] = '<span class="last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>';
+				$page_links[] = '<span class="button disabled last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>';
 			} else {
 				$page_links[] = sprintf(
-					"<a class='last-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
+					"<a class='button last-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 					esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
 					__( 'Last page' ),
 					'&raquo;'

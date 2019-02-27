@@ -103,33 +103,33 @@
 		// Update first page button.
 		var $first = $( '.first-page' );
 		if ( $first.is( 'a' ) && currentPage <= 1 ) {
-			$first.replaceWith( '<span class="first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>' );
+			$first.replaceWith( '<span class="button disabled first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>' );
 		} else if ( $first.is( 'span' ) && currentPage > 1 ) {
-			$first.replaceWith( '<a class="first-page" href="' + updateQueryStringParameter( window.location.href, 'paged', '1' ) + '"><span class="screen-reader-text">' + authL10n.first_page + '</span><span aria-hidden="true">&laquo;</span></a>' );
+			$first.replaceWith( '<a class="button first-page" href="' + updateQueryStringParameter( window.location.href, 'paged', '1' ) + '"><span class="screen-reader-text">' + authL10n.first_page + '</span><span aria-hidden="true">&laquo;</span></a>' );
 		}
 
 		// Update prev page button.
 		var $prev = $( '.prev-page' );
 		if ( $prev.is( 'a' ) && currentPage <= 1 ) {
-			$prev.replaceWith( '<span class="prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>' );
+			$prev.replaceWith( '<span class="button disabled prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>' );
 		} else if ( currentPage > 1 ) {
-			$prev.replaceWith( '<a class="prev-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage - 1 ) + '"><span class="screen-reader-text">' + authL10n.prev_page + '</span><span aria-hidden="true">&lsaquo;</span></a>' );
+			$prev.replaceWith( '<a class="button prev-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage - 1 ) + '"><span class="screen-reader-text">' + authL10n.prev_page + '</span><span aria-hidden="true">&lsaquo;</span></a>' );
 		}
 
 		// Update next button.
 		var $next = $( '.next-page' );
 		if ( $next.is( 'a' ) && currentPage >= totalPages ) {
-			$next.replaceWith( '<span class="next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>' );
+			$next.replaceWith( '<span class="button disabled next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>' );
 		} else if ( currentPage < totalPages ) {
-			$next.replaceWith( '<a class="next-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage + 1 ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&rsaquo;</span></a>' );
+			$next.replaceWith( '<a class="button next-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage + 1 ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&rsaquo;</span></a>' );
 		}
 
 		// Update last button.
 		var $last = $( '.last-page' );
 		if ( $last.is( 'a' ) && currentPage >= totalPages ) {
-			$last.replaceWith( '<span class="last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>' );
+			$last.replaceWith( '<span class="button disabled last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>' );
 		} else if ( $last.is( 'span' ) && currentPage < totalPages ) {
-			$last.replaceWith( '<a class="last-page" href="' + updateQueryStringParameter( window.location.href, 'paged', totalPages ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&raquo;</span></a>' );
+			$last.replaceWith( '<a class="button last-page" href="' + updateQueryStringParameter( window.location.href, 'paged', totalPages ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&raquo;</span></a>' );
 		}
 	}
 
