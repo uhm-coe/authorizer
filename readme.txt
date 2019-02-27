@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.8.8 =
+* Add missing database migration for new option added in last version.
+
 = 2.8.7 =
 * Allow CAS servers to link to WordPress accounts via username instead of email (less secure, but supports more uncommon server configurations). Props @mrn55 for the suggestion!
 * Clarify that new local WordPress users get emailed an activation link, not a password.
