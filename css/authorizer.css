@@ -247,7 +247,7 @@ div.section_info, div.section_info ~ table {
 }
 
 #list_auth_settings_access_users_approved {
-	margin: 0;
+	margin: 14px 0 0 0;
 }
 
 #list_auth_settings_access_users_approved .auth-email,

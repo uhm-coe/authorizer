@@ -20,7 +20,7 @@
 		var $list = $( '#list_auth_settings_access_users_approved' );
 		var $spinner = $( '<span class="spinner is-active"></span>' ).css({
 			position: 'relative',
-			top: '45%',
+			top: '40%',
 			left: '-240px',
 		});
 		var $overlay = $( '<div id="list_auth_settings_access_users_approved_overlay"></div>' ).css({
@@ -28,7 +28,7 @@
 			'z-index': 1,
 			opacity: 0.8,
 			position: 'absolute',
-			top: $list.position().top,
+			top: $list.position().top + parseInt( $list.css( 'margin-top' ) ),
 			left: $list.position().left,
 			width: $list.width(),
 			height: $list.height(),

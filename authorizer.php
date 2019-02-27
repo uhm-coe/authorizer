@@ -2373,7 +2373,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.8.6', true
+				array( 'jquery-effects-shake' ), '2.8.7', true
 			);
 			wp_localize_script(
 				'authorizer', 'authL10n', array(
@@ -2408,7 +2408,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.7.3' );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.8.7' );
 			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
