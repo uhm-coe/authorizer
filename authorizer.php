@@ -1256,35 +1256,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// at an old CAS URL that redirects to a newer CAS URL).
 			phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
 
-			// Update server certificate bundle if it doesn't exist or is older
-			// than 6 months, then use it to ensure CAS server is legitimate.
-			// Note: only try to update if the system has the php_openssl extension.
-			$cacert_url        = 'https://curl.haxx.se/ca/cacert.pem';
-			$cacert_path       = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
-			$time_180_days     = 180 * 24 * 60 * 60; // days * hours * minutes * seconds.
-			$time_180_days_ago = time() - $time_180_days;
-			if (
-				extension_loaded( 'openssl' ) &&
-				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_180_days_ago )
-			) {
-				// Get new cacert.pem file from https://curl.haxx.se/ca/cacert.pem.
-				$response = wp_safe_remote_get( $cacert_url );
-				if (
-					is_wp_error( $response ) ||
-					200 !== wp_remote_retrieve_response_code( $response ) ||
-					! array_key_exists( 'body', $response )
-				) {
-					new WP_Error( 'cannot_update_cacert', __( 'Unable to update outdated server certificates from https://curl.haxx.se/ca/cacert.pem.', 'authorizer' ) );
-				}
-				$cacert_contents = $response['body'];
-
-				// Write out the updated certs to the plugin directory.
-				// Note: Don't use WP_Filesystem because we are not in an admin context
-				// and don't want to potentially prompt the end user for credentials.
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-				file_put_contents( $cacert_path, $cacert_contents );
-			}
-			phpCAS::setCasServerCACert( $cacert_path );
+			// Use the WordPress certificate bundle at /wp-includes/certificates/ca-bundle.crt.
+			phpCAS::setCasServerCACert( ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
 
 			// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
 			$cas_service_url   = site_url( '/wp-login.php?external=cas' );
