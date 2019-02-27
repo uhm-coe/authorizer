@@ -398,6 +398,7 @@
 		var auth_settings_external_cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_cas_auto_login = $( '#auth_settings_cas_auto_login' ).closest( 'tr' );
+		var auth_settings_external_cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).closest( 'tr' );
 		var auth_settings_external_ldap_host = $( '#auth_settings_ldap_host' ).closest( 'tr' );
 		var auth_settings_external_ldap_port = $( '#auth_settings_ldap_port' ).closest( 'tr' );
 		var auth_settings_external_ldap_search_base = $( '#auth_settings_ldap_search_base' ).closest( 'tr' );
@@ -436,6 +437,7 @@
 		$( 'th, td', auth_settings_external_cas_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_cas_link_on_username ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_search_base ).wrapInner( '<div class="animated_wrapper" />' );
@@ -497,6 +499,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_last_name );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_update_on_login );
 			animateOption( 'hide_immediately', auth_settings_external_cas_auto_login );
+			animateOption( 'hide_immediately', auth_settings_external_cas_link_on_username );
 		}
 
 		// Hide LDAP options if unchecked
@@ -565,6 +568,7 @@
 			animateOption( action, auth_settings_external_cas_attr_last_name );
 			animateOption( action, auth_settings_external_cas_attr_update_on_login );
 			animateOption( action, auth_settings_external_cas_auto_login );
+			animateOption( action, auth_settings_external_cas_link_on_username );
 		});
 
 		// Event handler: Show/hide LDAP options based on checkbox
@@ -1072,6 +1076,7 @@
 		var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
 		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
 		var cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
+		var cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
 		var ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';
 		var ldap_host = $( '#auth_settings_ldap_host' ).val();
@@ -1123,6 +1128,7 @@
 			cas_attr_last_name: cas_attr_last_name,
 			cas_attr_update_on_login: cas_attr_update_on_login,
 			cas_auto_login: cas_auto_login,
+			cas_link_on_username: cas_link_on_username,
 			ldap: ldap,
 			ldap_host: ldap_host,
 			ldap_port: ldap_port,

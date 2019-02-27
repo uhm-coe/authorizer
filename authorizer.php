@@ -566,15 +566,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 *   $authenticated_by
 			 */
 
-			// Get the external user's WordPress account by email address.
-			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
-				$user = get_user_by( 'email', $this->lowercase( $externally_authenticated_email ) );
-
-				// If we've already found a WordPress user associated with one
-				// of the supplied email addresses, don't keep examining other
-				// email addresses associated with the externally authenticated user.
-				if ( false !== $user ) {
-					break;
+			// Look for an existing WordPress account matching the externally
+			// authenticated user. Perform the match either by username or email.
+			if ( isset( $auth_settings['cas_link_on_username'] ) && 1 === intval( $auth_settings['cas_link_on_username'] ) ) {
+				// Get the external user's WordPress account by username. This is less
+				// secure, but a user reported having an installation where a previous
+				// CAS plugin had created over 9000 WordPress accounts without email
+				// addresses. This option was created to support that case, and any
+				// other CAS servers where emails are not used as account identifiers.
+				$user = get_user_by( 'login', $result['username']);
+			} else {
+				// Get the external user's WordPress account by email address. This is
+				// the normal behavior (and the most secure).
+				foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
+					$user = get_user_by( 'email', $this->lowercase( $externally_authenticated_email ) );
+					// Stop trying email addresses once we have found a match.
+					if ( false !== $user ) {
+						break;
+					}
 				}
 			}
 
@@ -774,16 +783,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// If the approved external user does not have a WordPress account, create it.
 					if ( ! $user ) {
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
 						if ( array_key_exists( 'username', $user_data ) ) {
 							$username = $user_data['username'];
 						} else {
 							$username = explode( '@', $user_info['email'] );
 							$username = $username[0];
 						}
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
 						if ( get_user_by( 'login', $username ) !== false ) {
 							$username = $user_info['email'];
 						}
@@ -2729,6 +2738,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 				'auth_settings_external'
 			);
 			add_settings_field(
+				'auth_settings_cas_link_on_username',
+				__( 'CAS users linked by username', 'authorizer' ),
+				array( $this, 'print_checkbox_cas_link_on_username' ),
+				'authorizer',
+				'auth_settings_external'
+			);
+			add_settings_field(
 				'auth_settings_external_ldap',
 				__( 'LDAP Logins', 'authorizer' ),
 				array( $this, 'print_checkbox_auth_external_ldap' ),
@@ -3042,6 +3058,9 @@ function signInCallback( authResult ) { // jshint ignore:line
 			if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
 				$auth_settings['cas_auto_login'] = '';
 			}
+			if ( ! array_key_exists( 'cas_link_on_username', $auth_settings ) ) {
+				$auth_settings['cas_link_on_username'] = '';
+			}
 
 			if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
 				$auth_settings['ldap_host'] = '';
@@ -3207,6 +3226,9 @@ function signInCallback( authResult ) { // jshint ignore:line
 				if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['cas_auto_login'] = '';
 				}
+				if ( ! array_key_exists( 'cas_link_on_username', $auth_multisite_settings ) ) {
+					$auth_multisite_settings['cas_link_on_username'] = '';
+				}
 				if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 					$auth_multisite_settings['ldap_host'] = '';
 				}
@@ -3364,6 +3386,9 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
 			$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
+
+			// Sanitize CAS link on username (checkbox: value can only be '1' or empty string).
+			$auth_settings['cas_link_on_username'] = array_key_exists( 'cas_link_on_username', $auth_settings ) && strlen( $auth_settings['cas_link_on_username'] ) > 0 ? '1' : '';
 
 			// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string).
 			$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
@@ -4847,6 +4872,25 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
+		public function print_checkbox_cas_link_on_username( $args = '' ) {
+			// Get plugin option.
+			$option               = 'cas_link_on_username';
+			$auth_settings_option = $this->get_plugin_option( $option, $this->get_admin_mode( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Link CAS accounts to WordPress accounts by their username (leave this off to link by email address)", 'authorizer' ); ?></label>
+			<p><small><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></small></p>
+			<?php
+		}
+
+
+		/**
+		 * Settings print callback.
+		 *
+		 * @param  string $args Args (e.g., multisite admin mode).
+		 * @return void
+		 */
 		public function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$option               = 'ldap';
@@ -5686,6 +5730,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 								<td><?php $this->print_checkbox_cas_auto_login( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php esc_html_e( 'CAS users linked by username', 'authorizer' ); ?></th>
+								<td><?php $this->print_checkbox_cas_link_on_username( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( WP_Plugin_Authorizer::NETWORK_CONTEXT => true ) ); ?></td>
 							</tr>
@@ -5829,6 +5877,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				'cas_attr_last_name',
 				'cas_attr_update_on_login',
 				'cas_auto_login',
+				'cas_link_on_username',
 				'ldap',
 				'ldap_host',
 				'ldap_port',
@@ -6742,6 +6791,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 					$auth_settings['cas_attr_last_name']        = $auth_multisite_settings['cas_attr_last_name'];
 					$auth_settings['cas_attr_update_on_login']  = $auth_multisite_settings['cas_attr_update_on_login'];
 					$auth_settings['cas_auto_login']            = $auth_multisite_settings['cas_auto_login'];
+					$auth_settings['cas_link_on_username']      = $auth_multisite_settings['cas_link_on_username'];
 					$auth_settings['ldap']                      = $auth_multisite_settings['ldap'];
 					$auth_settings['ldap_host']                 = $auth_multisite_settings['ldap_host'];
 					$auth_settings['ldap_port']                 = $auth_multisite_settings['ldap_port'];
