@@ -20,7 +20,7 @@
 		var $list = $( '#list_auth_settings_access_users_approved' );
 		var $spinner = $( '<span class="spinner is-active"></span>' ).css({
 			position: 'relative',
-			top: '45%',
+			top: '40%',
 			left: '-240px',
 		});
 		var $overlay = $( '<div id="list_auth_settings_access_users_approved_overlay"></div>' ).css({
@@ -28,7 +28,7 @@
 			'z-index': 1,
 			opacity: 0.8,
 			position: 'absolute',
-			top: $list.position().top,
+			top: $list.position().top + parseInt( $list.css( 'margin-top' ) ),
 			left: $list.position().left,
 			width: $list.width(),
 			height: $list.height(),
@@ -103,33 +103,33 @@
 		// Update first page button.
 		var $first = $( '.first-page' );
 		if ( $first.is( 'a' ) && currentPage <= 1 ) {
-			$first.replaceWith( '<span class="first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>' );
+			$first.replaceWith( '<span class="button disabled first-page tablenav-pages-navspan" aria-hidden="true">&laquo;</span>' );
 		} else if ( $first.is( 'span' ) && currentPage > 1 ) {
-			$first.replaceWith( '<a class="first-page" href="' + updateQueryStringParameter( window.location.href, 'paged', '1' ) + '"><span class="screen-reader-text">' + authL10n.first_page + '</span><span aria-hidden="true">&laquo;</span></a>' );
+			$first.replaceWith( '<a class="button first-page" href="' + updateQueryStringParameter( window.location.href, 'paged', '1' ) + '"><span class="screen-reader-text">' + authL10n.first_page + '</span><span aria-hidden="true">&laquo;</span></a>' );
 		}
 
 		// Update prev page button.
 		var $prev = $( '.prev-page' );
 		if ( $prev.is( 'a' ) && currentPage <= 1 ) {
-			$prev.replaceWith( '<span class="prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>' );
+			$prev.replaceWith( '<span class="button disabled prev-page tablenav-pages-navspan" aria-hidden="true">&lsaquo;</span>' );
 		} else if ( currentPage > 1 ) {
-			$prev.replaceWith( '<a class="prev-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage - 1 ) + '"><span class="screen-reader-text">' + authL10n.prev_page + '</span><span aria-hidden="true">&lsaquo;</span></a>' );
+			$prev.replaceWith( '<a class="button prev-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage - 1 ) + '"><span class="screen-reader-text">' + authL10n.prev_page + '</span><span aria-hidden="true">&lsaquo;</span></a>' );
 		}
 
 		// Update next button.
 		var $next = $( '.next-page' );
 		if ( $next.is( 'a' ) && currentPage >= totalPages ) {
-			$next.replaceWith( '<span class="next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>' );
+			$next.replaceWith( '<span class="button disabled next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>' );
 		} else if ( currentPage < totalPages ) {
-			$next.replaceWith( '<a class="next-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage + 1 ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&rsaquo;</span></a>' );
+			$next.replaceWith( '<a class="button next-page" href="' + updateQueryStringParameter( window.location.href, 'paged', currentPage + 1 ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&rsaquo;</span></a>' );
 		}
 
 		// Update last button.
 		var $last = $( '.last-page' );
 		if ( $last.is( 'a' ) && currentPage >= totalPages ) {
-			$last.replaceWith( '<span class="last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>' );
+			$last.replaceWith( '<span class="button disabled last-page tablenav-pages-navspan" aria-hidden="true">&raquo;</span>' );
 		} else if ( $last.is( 'span' ) && currentPage < totalPages ) {
-			$last.replaceWith( '<a class="last-page" href="' + updateQueryStringParameter( window.location.href, 'paged', totalPages ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&raquo;</span></a>' );
+			$last.replaceWith( '<a class="button last-page" href="' + updateQueryStringParameter( window.location.href, 'paged', totalPages ) + '"><span class="screen-reader-text">' + authL10n.next_page + '</span><span aria-hidden="true">&raquo;</span></a>' );
 		}
 	}
 
@@ -398,6 +398,7 @@
 		var auth_settings_external_cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_cas_auto_login = $( '#auth_settings_cas_auto_login' ).closest( 'tr' );
+		var auth_settings_external_cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).closest( 'tr' );
 		var auth_settings_external_ldap_host = $( '#auth_settings_ldap_host' ).closest( 'tr' );
 		var auth_settings_external_ldap_port = $( '#auth_settings_ldap_port' ).closest( 'tr' );
 		var auth_settings_external_ldap_search_base = $( '#auth_settings_ldap_search_base' ).closest( 'tr' );
@@ -436,6 +437,7 @@
 		$( 'th, td', auth_settings_external_cas_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_cas_link_on_username ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_search_base ).wrapInner( '<div class="animated_wrapper" />' );
@@ -497,6 +499,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_last_name );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_update_on_login );
 			animateOption( 'hide_immediately', auth_settings_external_cas_auto_login );
+			animateOption( 'hide_immediately', auth_settings_external_cas_link_on_username );
 		}
 
 		// Hide LDAP options if unchecked
@@ -565,6 +568,7 @@
 			animateOption( action, auth_settings_external_cas_attr_last_name );
 			animateOption( action, auth_settings_external_cas_attr_update_on_login );
 			animateOption( action, auth_settings_external_cas_auto_login );
+			animateOption( action, auth_settings_external_cas_link_on_username );
 		});
 
 		// Event handler: Show/hide LDAP options based on checkbox
@@ -1072,6 +1076,7 @@
 		var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
 		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
 		var cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
+		var cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
 		var ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';
 		var ldap_host = $( '#auth_settings_ldap_host' ).val();
@@ -1123,6 +1128,7 @@
 			cas_attr_last_name: cas_attr_last_name,
 			cas_attr_update_on_login: cas_attr_update_on_login,
 			cas_auto_login: cas_auto_login,
+			cas_link_on_username: cas_link_on_username,
 			ldap: ldap,
 			ldap_host: ldap_host,
 			ldap_port: ldap_port,

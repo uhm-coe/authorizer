@@ -7,7 +7,7 @@
  * Text Domain: authorizer
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.8.6
+ * Version: 2.8.8
  *
  * @package authorizer
  */
@@ -540,15 +540,24 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			 *   $authenticated_by
 			 */
 
-			// Get the external user's WordPress account by email address.
-			foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
-				$user = get_user_by( 'email', Helper::lowercase( $externally_authenticated_email ) );
-
-				// If we've already found a WordPress user associated with one
-				// of the supplied email addresses, don't keep examining other
-				// email addresses associated with the externally authenticated user.
-				if ( false !== $user ) {
-					break;
+			// Look for an existing WordPress account matching the externally
+			// authenticated user. Perform the match either by username or email.
+			if ( isset( $auth_settings['cas_link_on_username'] ) && 1 === intval( $auth_settings['cas_link_on_username'] ) ) {
+				// Get the external user's WordPress account by username. This is less
+				// secure, but a user reported having an installation where a previous
+				// CAS plugin had created over 9000 WordPress accounts without email
+				// addresses. This option was created to support that case, and any
+				// other CAS servers where emails are not used as account identifiers.
+				$user = get_user_by( 'login', $result['username']);
+			} else {
+				// Get the external user's WordPress account by email address. This is
+				// the normal behavior (and the most secure).
+				foreach ( $externally_authenticated_emails as $externally_authenticated_email ) {
+					$user = get_user_by( 'email', Helper::lowercase( $externally_authenticated_email ) );
+					// Stop trying email addresses once we have found a match.
+					if ( false !== $user ) {
+						break;
+					}
 				}
 			}
 
@@ -584,9 +593,9 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 		 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 		 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
 		 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes.
-		 * @return WP_Error|void|WP_User
+		 * @return WP_Error|WP_User
 		 *                             WP_Error if there was an error on user creation / adding user to blog.
-		 *                             wp_die() if user does not have access.
+		 *                             WP_Error / wp_die() if user does not have access.
 		 *                             WP_User if user has access.
 		 */
 		private function check_user_access( $user, $user_emails, $user_data = array() ) {
@@ -658,6 +667,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 						'</a></p>';
 					update_option( 'auth_settings_advanced_login_error', $error_message );
 					wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
+					return new WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 				}
 			}
 
@@ -748,16 +758,16 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 					// If the approved external user does not have a WordPress account, create it.
 					if ( ! $user ) {
-						// If there's already a user with this username (e.g.,
-						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
 						if ( array_key_exists( 'username', $user_data ) ) {
 							$username = $user_data['username'];
 						} else {
 							$username = explode( '@', $user_info['email'] );
 							$username = $username[0];
 						}
+						// If there's already a user with this username (e.g.,
+						// johndoe/johndoe@gmail.com exists, and we're trying to add
+						// johndoe/johndoe@example.com), use the full email address
+						// as the username.
 						if ( get_user_by( 'login', $username ) !== false ) {
 							$username = $user_info['email'];
 						}
@@ -1231,35 +1241,8 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 			// at an old CAS URL that redirects to a newer CAS URL).
 			phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
 
-			// Update server certificate bundle if it doesn't exist or is older
-			// than 6 months, then use it to ensure CAS server is legitimate.
-			// Note: only try to update if the system has the php_openssl extension.
-			$cacert_url        = 'https://curl.haxx.se/ca/cacert.pem';
-			$cacert_path       = plugin_dir_path( __FILE__ ) . 'vendor/cacert.pem';
-			$time_180_days     = 180 * 24 * 60 * 60; // days * hours * minutes * seconds.
-			$time_180_days_ago = time() - $time_180_days;
-			if (
-				extension_loaded( 'openssl' ) &&
-				( ! file_exists( $cacert_path ) || filemtime( $cacert_path ) < $time_180_days_ago )
-			) {
-				// Get new cacert.pem file from https://curl.haxx.se/ca/cacert.pem.
-				$response = wp_safe_remote_get( $cacert_url );
-				if (
-					is_wp_error( $response ) ||
-					200 !== wp_remote_retrieve_response_code( $response ) ||
-					! array_key_exists( 'body', $response )
-				) {
-					new WP_Error( 'cannot_update_cacert', __( 'Unable to update outdated server certificates from https://curl.haxx.se/ca/cacert.pem.', 'authorizer' ) );
-				}
-				$cacert_contents = $response['body'];
-
-				// Write out the updated certs to the plugin directory.
-				// Note: Don't use WP_Filesystem because we are not in an admin context
-				// and don't want to potentially prompt the end user for credentials.
-				// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_file_put_contents
-				file_put_contents( $cacert_path, $cacert_contents );
-			}
-			phpCAS::setCasServerCACert( $cacert_path );
+			// Use the WordPress certificate bundle at /wp-includes/certificates/ca-bundle.crt.
+			phpCAS::setCasServerCACert( ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
 
 			// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
 			$cas_service_url   = site_url( '/wp-login.php?external=cas' );
@@ -2388,7 +2371,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			wp_enqueue_script(
 				'authorizer',
 				plugins_url( 'js/authorizer.js', __FILE__ ),
-				array( 'jquery-effects-shake' ), '2.8.6', true
+				array( 'jquery-effects-shake' ), '2.8.7', true
 			);
 			wp_localize_script(
 				'authorizer', 'authL10n', array(
@@ -2423,7 +2406,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				array( 'jquery' ), '1.8', true
 			);
 
-			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.7.3' );
+			wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', __FILE__ ), array(), '2.8.7' );
 			wp_enqueue_style( 'authorizer-css' );
 
 			wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', __FILE__ ), array(), '1.8' );
@@ -2741,6 +2724,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 				'auth_settings_cas_auto_login',
 				__( 'CAS automatic login', 'authorizer' ),
 				array( $this, 'print_checkbox_cas_auto_login' ),
+				'authorizer',
+				'auth_settings_external'
+			);
+			add_settings_field(
+				'auth_settings_cas_link_on_username',
+				__( 'CAS users linked by username', 'authorizer' ),
+				array( $this, 'print_checkbox_cas_link_on_username' ),
 				'authorizer',
 				'auth_settings_external'
 			);
@@ -3307,6 +3297,26 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * @param  string $args Args (e.g., multisite admin mode).
 		 * @return void
 		 */
+		public function print_checkbox_cas_link_on_username( $args = '' ) {
+			// Get plugin option.
+			$options              = Options::get_instance();
+			$option               = 'cas_link_on_username';
+			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+			// Print option elements.
+			?>
+			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Link CAS accounts to WordPress accounts by their username (leave this off to link by email address)", 'authorizer' ); ?></label>
+			<p><small><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></small></p>
+			<?php
+		}
+
+
+		/**
+		 * Settings print callback.
+		 *
+		 * @param  string $args Args (e.g., multisite admin mode).
+		 * @return void
+		 */
 		public function print_checkbox_auth_external_ldap( $args = '' ) {
 			// Get plugin option.
 			$options              = Options::get_instance();
@@ -3481,7 +3491,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// Print option elements.
 			?>
 			<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-			<input type="password" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( Helper::decrypt( $auth_settings_option ) ); ?>" autocomplete="off" />
+
 			<?php
 		}
 
@@ -4160,6 +4170,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 								<td><?php $this->print_checkbox_cas_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
+								<th scope="row"><?php esc_html_e( 'CAS users linked by username', 'authorizer' ); ?></th>
+								<td><?php $this->print_checkbox_cas_link_on_username( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							</tr>
+							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
 								<td><?php $this->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
@@ -4306,6 +4320,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				'cas_attr_last_name',
 				'cas_attr_update_on_login',
 				'cas_auto_login',
+				'cas_link_on_username',
 				'ldap',
 				'ldap_host',
 				'ldap_port',
@@ -5803,6 +5818,27 @@ function signInCallback( authResult ) { // jshint ignore:line
 					}
 				} else {
 					$options->set_default_options();
+				}
+				// Update version to reflect this change has been made.
+				$auth_version   = $update_if_older_than;
+				$needs_updating = true;
+			}
+
+			// Update: Set default value for newly added option cas_link_on_username.
+			$update_if_older_than = 20190227;
+			if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
+				// Provide default values for any $auth_settings options that don't exist.
+				if ( is_multisite() ) {
+					// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
+					$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+					foreach ( $sites as $site ) {
+						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+						switch_to_blog( $blog_id );
+						$this->set_default_options();
+						restore_current_blog();
+					}
+				} else {
+					$this->set_default_options();
 				}
 				// Update version to reflect this change has been made.
 				$auth_version   = $update_if_older_than;

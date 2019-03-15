@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 4.4
-Tested up to: 4.9.1
+Tested up to: 5.1.0
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -61,6 +61,20 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.8.8 =
+* Add missing database migration for new option added in last version.
+
+= 2.8.7 =
+* Allow CAS servers to link to WordPress accounts via username instead of email (less secure, but supports more uncommon server configurations). Props @mrn55 for the suggestion!
+* Clarify that new local WordPress users get emailed an activation link, not a password.
+* Update French translations. Props @julienlusson for the updates!
+* Update translatable strings.
+* Use the WordPress certificate bundle at /wp-includes/certificates/ca-bundle.crt instead of our own. Props @julienlusson for leading us there!
+* Fix for PHP warning in edge case where user isn't allowed to log in.
+* Fix pager button styles in Approved User list.
+* Fix multisite approved users showing on a site with "override multisite options" enabled.
+* Fix for Chrome autofilling the new Blocked User field with saved login email.
 
 = 2.8.6 =
 * Feature: Specify a domain wildcard (e.g., “@example.com”) in the block list to block all emails from that domain. Props @olhirt for the feature request!
