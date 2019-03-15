@@ -174,6 +174,7 @@ class Options {
 				$auth_settings['cas_attr_last_name']        = $auth_multisite_settings['cas_attr_last_name'];
 				$auth_settings['cas_attr_update_on_login']  = $auth_multisite_settings['cas_attr_update_on_login'];
 				$auth_settings['cas_auto_login']            = $auth_multisite_settings['cas_auto_login'];
+				$auth_settings['cas_link_on_username']      = $auth_multisite_settings['cas_link_on_username'];
 				$auth_settings['ldap']                      = $auth_multisite_settings['ldap'];
 				$auth_settings['ldap_host']                 = $auth_multisite_settings['ldap_host'];
 				$auth_settings['ldap_port']                 = $auth_multisite_settings['ldap_port'];
@@ -357,6 +358,9 @@ class Options {
 		if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
 			$auth_settings['cas_auto_login'] = '';
 		}
+		if ( ! array_key_exists( 'cas_link_on_username', $auth_settings ) ) {
+			$auth_settings['cas_link_on_username'] = '';
+		}
 
 		if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
 			$auth_settings['ldap_host'] = '';
@@ -522,6 +526,9 @@ class Options {
 			if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_auto_login'] = '';
 			}
+			if ( ! array_key_exists( 'cas_link_on_username', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['cas_link_on_username'] = '';
+			}
 			if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap_host'] = '';
 			}
@@ -679,6 +686,9 @@ class Options {
 
 		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
+
+		// Sanitize CAS link on username (checkbox: value can only be '1' or empty string).
+		$auth_settings['cas_link_on_username'] = array_key_exists( 'cas_link_on_username', $auth_settings ) && strlen( $auth_settings['cas_link_on_username'] ) > 0 ? '1' : '';
 
 		// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
