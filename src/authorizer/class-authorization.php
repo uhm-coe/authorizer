@@ -674,5 +674,4 @@ class Authorization extends Static_Instance {
 				return Helper::in_multi_array( $email, $auth_settings_access_users_approved );
 		}
 	}
-
-
+}
