@@ -10,6 +10,7 @@
 namespace Authorizer;
 
 use Authorizer\Options;
+use Authorizer\Authorization;
 
 /**
  * Contains functions for interfacing with WordPress users and syncing between
@@ -90,7 +91,7 @@ class Sync_Userdata extends Static_Instance {
 			is_multisite() &&
 			is_user_logged_in() &&
 			! is_user_member_of_blog() &&
-			$this->is_email_in_list( $current_user->user_email, 'approved' )
+			Authorization::get_instance()->is_email_in_list( $current_user->user_email, 'approved' )
 		) {
 			// Get all approved users.
 			$auth_settings_access_users_approved = $options->sanitize_user_list(
@@ -231,7 +232,7 @@ class Sync_Userdata extends Static_Instance {
 		}
 
 		// If user is in approved list, update his/her associated role.
-		if ( $this->is_email_in_list( $userdata->user_email, 'approved' ) ) {
+		if ( Authorization::get_instance()->is_email_in_list( $userdata->user_email, 'approved' ) ) {
 			$options                             = Options::get_instance();
 			$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
 			foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
@@ -268,7 +269,7 @@ class Sync_Userdata extends Static_Instance {
 		if ( is_multisite() ) {
 			// If it's a multisite approved user, sync the email there.
 			$changed_user_is_multisite_user = false;
-			if ( $this->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
+			if ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved', 'multisite' ) ) {
 				$changed_user_is_multisite_user                = true;
 				$auth_multisite_settings_access_users_approved = $options->sanitize_user_list(
 					$options->get( 'access_users_approved', Helper::NETWORK_CONTEXT )
@@ -316,7 +317,7 @@ class Sync_Userdata extends Static_Instance {
 			}
 		} else {
 			// In a single site environment, just find the old user in the approved list and update the email.
-			if ( $this->is_email_in_list( $user['user_email'], 'approved' ) ) {
+			if ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved' ) ) {
 				$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
 				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
 					// Update old user email in approved list to the new email.

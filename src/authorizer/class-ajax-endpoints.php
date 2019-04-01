@@ -11,7 +11,7 @@ namespace Authorizer;
 
 use Authorizer\Helper;
 use Authorizer\Options;
-
+use Authorizer\Authorization;
 
 /**
  * Contains endpoints for any AJAX methods.
@@ -491,7 +491,7 @@ class Ajax_Endpoints extends Static_Instance {
 
 					// Add new user to pending list and save (skip if it's
 					// already there--someone else might have just done it).
-					if ( ! $this->is_email_in_list( $pending_user['email'], 'pending' ) ) {
+					if ( ! Authorization::get_instance()->is_email_in_list( $pending_user['email'], 'pending' ) ) {
 						$auth_settings_access_users_pending = $options->sanitize_user_list(
 							$options->get( 'access_users_pending', Helper::SINGLE_CONTEXT )
 						);
@@ -586,7 +586,7 @@ class Ajax_Endpoints extends Static_Instance {
 					// Add new user to approved list and save (skip if it's
 					// already there--someone else might have just done it).
 					if ( 'false' !== $approved_user['multisite_user'] ) {
-						if ( ! $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
+						if ( ! Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 							$auth_multisite_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::NETWORK_CONTEXT )
 							);
@@ -597,7 +597,7 @@ class Ajax_Endpoints extends Static_Instance {
 							$invalid_emails[] = $approved_user['email'];
 						}
 					} else {
-						if ( ! $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+						if ( ! Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 							$auth_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )
 							);
@@ -680,7 +680,7 @@ class Ajax_Endpoints extends Static_Instance {
 					}
 
 					if ( 'false' !== $approved_user['multisite_user'] ) {
-						if ( $this->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
+						if ( Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 							$auth_multisite_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::NETWORK_CONTEXT )
 							);
@@ -694,7 +694,7 @@ class Ajax_Endpoints extends Static_Instance {
 						}
 					} else {
 						// Update user's role in approved list and save.
-						if ( $this->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+						if ( Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 							$auth_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )
 							);
@@ -737,7 +737,7 @@ class Ajax_Endpoints extends Static_Instance {
 
 					// Add new user to blocked list and save (skip if it's
 					// already there--someone else might have just done it).
-					if ( ! $this->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
+					if ( ! Authorization::get_instance()->is_email_in_list( $blocked_user['email'], 'blocked' ) ) {
 						$auth_settings_access_users_blocked = $options->sanitize_user_list(
 							$options->get( 'access_users_blocked', Helper::SINGLE_CONTEXT )
 						);
