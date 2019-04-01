@@ -824,4 +824,50 @@ class Options extends Static_Instance {
 		endif;
 	}
 
+
+	/**
+	 * This array filter will remove any users who failed email address validation
+	 * (which would set their email to a blank string).
+	 *
+	 * @param  array $user User data to check for a valid email.
+	 * @return bool  Whether to filter out the user.
+	 */
+	private function remove_invalid_auth_users( $user ) {
+		return isset( $user['email'] ) && strlen( $user['email'] ) > 0;
+	}
+
+
+	/**
+	 * Callback for array_map in sanitize_update_auth_users().
+	 *
+	 * @param  array $user User data to sanitize.
+	 * @return array       Sanitized user data.
+	 */
+	private function sanitize_update_auth_user_allow_wildcard_email( $user ) {
+		if ( array_key_exists( 'edit_action', $user ) ) {
+			$user['edit_action'] = sanitize_text_field( $user['edit_action'] );
+		}
+		if ( isset( $user['email'] ) ) {
+			if ( strpos( $user['email'], '@' ) === 0 ) {
+				$user['email'] = sanitize_text_field( $user['email'] );
+			} else {
+				$user['email'] = sanitize_email( $user['email'] );
+			}
+		}
+		if ( isset( $user['role'] ) ) {
+			$user['role'] = sanitize_text_field( $user['role'] );
+		}
+		if ( isset( $user['date_added'] ) ) {
+			$user['date_added'] = sanitize_text_field( $user['date_added'] );
+		}
+		if ( isset( $user['local_user'] ) ) {
+			$user['local_user'] = 'true' === $user['local_user'] ? 'true' : 'false';
+		}
+		if ( isset( $user['multisite_user'] ) ) {
+			$user['multisite_user'] = 'true' === $user['multisite_user'] ? 'true' : 'false';
+		}
+
+		return $user;
+	}
+
 }
