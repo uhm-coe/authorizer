@@ -27,7 +27,7 @@ class Authorization extends Static_Instance {
 	 *                             WP_Error / wp_die() if user does not have access.
 	 *                             WP_User if user has access.
 	 */
-	private function check_user_access( $user, $user_emails, $user_data = array() ) {
+	public function check_user_access( $user, $user_emails, $user_data = array() ) {
 		// Grab plugin settings.
 		$options                                    = Options::get_instance();
 		$auth_settings                              = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );

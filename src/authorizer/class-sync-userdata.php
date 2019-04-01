@@ -27,7 +27,7 @@ class Sync_Userdata extends Static_Instance {
 	 *
 	 * @return void
 	 */
-	private function add_wp_users_to_approved_list() {
+	public function add_wp_users_to_approved_list() {
 		$options = Options::get_instance();
 		// Add current WordPress users to the approved list.
 		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
@@ -123,7 +123,7 @@ class Sync_Userdata extends Static_Instance {
 	 * @param  string $email Email address to send welcome email to.
 	 * @return bool          Whether the email was sent.
 	 */
-	private function maybe_email_welcome_message( $email ) {
+	public function maybe_email_welcome_message( $email ) {
 		// Get option for whether to email welcome messages.
 		$options                         = Options::get_instance();
 		$should_email_new_approved_users = $options->get( 'access_should_email_approved_users' );
