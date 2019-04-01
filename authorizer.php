@@ -5834,11 +5834,11 @@ function signInCallback( authResult ) { // jshint ignore:line
 					foreach ( $sites as $site ) {
 						$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 						switch_to_blog( $blog_id );
-						$this->set_default_options();
+						$options->set_default_options();
 						restore_current_blog();
 					}
 				} else {
-					$this->set_default_options();
+					$options->set_default_options();
 				}
 				// Update version to reflect this change has been made.
 				$auth_version   = $update_if_older_than;

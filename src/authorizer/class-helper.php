@@ -329,7 +329,7 @@ class Helper {
 			if ( 'case insensitive' === $case_sensitivity && ! is_array( $item ) ) {
 				$item = strtolower( $item );
 			}
-			if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && $this->in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+			if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && self::in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 				return true;
 			}
 		}
@@ -470,7 +470,7 @@ class Helper {
 		$parsed_url['query']     = http_build_query( $querystring );
 
 		// Return the URL as a string.
-		return $this->unparse_url( $parsed_url );
+		return self::unparse_url( $parsed_url );
 	}
 
 
