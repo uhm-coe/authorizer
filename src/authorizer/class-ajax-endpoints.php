@@ -66,7 +66,7 @@ class Ajax_Endpoints extends Static_Instance {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Build the Google Client.
-		$client = new Google_Client();
+		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
 		$client->setClientId( $auth_settings['google_clientid'] );
 		$client->setClientSecret( $auth_settings['google_clientsecret'] );

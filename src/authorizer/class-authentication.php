@@ -265,7 +265,7 @@ class Authentication extends Static_Instance {
 		}
 
 		// Build the Google Client.
-		$client = new Google_Client();
+		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
 		$client->setClientId( $auth_settings['google_clientid'] );
 		$client->setClientSecret( $auth_settings['google_clientsecret'] );
@@ -746,7 +746,7 @@ class Authentication extends Static_Instance {
 			$token = json_decode( $_SESSION['token'] )->access_token;
 
 			// Build the Google Client.
-			$client = new Google_Client();
+			$client = new \Google_Client();
 			$client->setApplicationName( 'WordPress' );
 			$client->setClientId( $auth_settings['google_clientid'] );
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
