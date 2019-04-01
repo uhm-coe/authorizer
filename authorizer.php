@@ -9,12 +9,25 @@
  * License: GPL2
  * Version: 2.8.8
  *
+ * Portions forked from Restricted Site Access plugin:
+ *   http://wordpress.org/plugins/restricted-site-access/
+ * Portions forked from wpCAS plugin:
+ *   http://wordpress.org/extend/plugins/cas-authentication/
+ * Portions forked from Limit Login Attempts:
+ *   http://wordpress.org/plugins/limit-login-attempts/
+ *
  * @package authorizer
  */
 
 namespace Authorizer;
 
 require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-static-instance.php';
+
+require_once dirname( __FILE__ ) . '/src/authorizer/class-wp-plugin-authorizer.php';
+
+require_once dirname( __FILE__ ) . '/src/authorizer/class-helper.php';
+
+require_once dirname( __FILE__ ) . '/src/authorizer/class-updates.php';
 
 require_once dirname( __FILE__ ) . '/src/authorizer/class-authentication.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-authorization.php';
@@ -23,23 +36,19 @@ require_once dirname( __FILE__ ) . '/src/authorizer/class-dashboard-widget.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-ajax-endpoints.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-sync-userdata.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-admin-page.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/class-options.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-access-lists.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-login-access.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-google.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
-
-use Authorizer\Options;
-
-/**
- * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
- * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
- * Portions forked from Limit Login Attempts: http://wordpress.org/plugins/limit-login-attempts/
- */
 
 /**
  * Add phpCAS library if it's not included.
