@@ -35,6 +35,9 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-googl
 use Authorizer\Options\External\Cas;
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.php';
 
+use Authorizer\Options\External\Ldap;
+require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';
+
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
  * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
@@ -2740,91 +2743,91 @@ function signInCallback( authResult ) { // jshint ignore:line
 			add_settings_field(
 				'auth_settings_external_ldap',
 				__( 'LDAP Logins', 'authorizer' ),
-				array( $this, 'print_checkbox_auth_external_ldap' ),
+				array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_host',
 				__( 'LDAP Host', 'authorizer' ),
-				array( $this, 'print_text_ldap_host' ),
+				array( Ldap::get_instance(), 'print_text_ldap_host' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_port',
 				__( 'LDAP Port', 'authorizer' ),
-				array( $this, 'print_text_ldap_port' ),
+				array( Ldap::get_instance(), 'print_text_ldap_port' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_tls',
 				__( 'Use TLS', 'authorizer' ),
-				array( $this, 'print_checkbox_ldap_tls' ),
+				array( Ldap::get_instance(), 'print_checkbox_ldap_tls' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_search_base',
 				__( 'LDAP Search Base', 'authorizer' ),
-				array( $this, 'print_text_ldap_search_base' ),
+				array( Ldap::get_instance(), 'print_text_ldap_search_base' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_uid',
 				__( 'LDAP attribute containing username', 'authorizer' ),
-				array( $this, 'print_text_ldap_uid' ),
+				array( Ldap::get_instance(), 'print_text_ldap_uid' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_attr_email',
 				__( 'LDAP attribute containing email address', 'authorizer' ),
-				array( $this, 'print_text_ldap_attr_email' ),
+				array( Ldap::get_instance(), 'print_text_ldap_attr_email' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_user',
 				__( 'LDAP Directory User', 'authorizer' ),
-				array( $this, 'print_text_ldap_user' ),
+				array( Ldap::get_instance(), 'print_text_ldap_user' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_password',
 				__( 'LDAP Directory User Password', 'authorizer' ),
-				array( $this, 'print_password_ldap_password' ),
+				array( Ldap::get_instance(), 'print_password_ldap_password' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_lostpassword_url',
 				__( 'Custom lost password URL', 'authorizer' ),
-				array( $this, 'print_text_ldap_lostpassword_url' ),
+				array( Ldap::get_instance(), 'print_text_ldap_lostpassword_url' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_attr_first_name',
 				__( 'LDAP attribute containing first name', 'authorizer' ),
-				array( $this, 'print_text_ldap_attr_first_name' ),
+				array( Ldap::get_instance(), 'print_text_ldap_attr_first_name' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_attr_last_name',
 				__( 'LDAP attribute containing last name', 'authorizer' ),
-				array( $this, 'print_text_ldap_attr_last_name' ),
+				array( Ldap::get_instance(), 'print_text_ldap_attr_last_name' ),
 				'authorizer',
 				'auth_settings_external'
 			);
 			add_settings_field(
 				'auth_settings_ldap_attr_update_on_login',
 				__( 'LDAP attribute update', 'authorizer' ),
-				array( $this, 'print_checkbox_ldap_attr_update_on_login' ),
+				array( Ldap::get_instance(), 'print_checkbox_ldap_attr_update_on_login' ),
 				'authorizer',
 				'auth_settings_external'
 			);
@@ -3812,6 +3815,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$external      = External::get_instance();
 			$google        = Google::get_instance();
 			$cas           = Cas::get_instance();
+			$ldap          = Ldap::get_instance();
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
@@ -3919,55 +3923,55 @@ function signInCallback( authResult ) { // jshint ignore:line
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Host', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_host( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_host( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Port', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_ldap_tls( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_checkbox_ldap_tls( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Search Base', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_search_base( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_search_base( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing username', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_uid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_uid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing email', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Directory User', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_user( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_user( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP Directory User Password', 'authorizer' ); ?></th>
-								<td><?php $this->print_password_ldap_password( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_password_ldap_password( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Custom lost password URL', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_lostpassword_url( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_lostpassword_url( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing first name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute containing last name', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_ldap_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_text_ldap_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'LDAP attribute update', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $ldap->print_checkbox_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
