@@ -16,6 +16,7 @@ namespace Authorizer;
 
 require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-static-instance.php';
 
+require_once dirname( __FILE__ ) . '/src/authorizer/class-dashboard-widget.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-ajax-endpoints.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-sync-userdata.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-admin-page.php';
@@ -182,7 +183,7 @@ if ( ! class_exists( 'WP_Plugin_Authorizer' ) ) {
 
 			// Add dashboard widget so instructors can add/edit users with access.
 			// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
-			add_action( 'wp_dashboard_setup', array( $this, 'add_dashboard_widgets' ) );
+			add_action( 'wp_dashboard_setup', array( Dashboard_Widget::get_instance(), 'add_dashboard_widgets' ) );
 
 			// If we have a custom admin message, add the action to show it.
 			$notice = get_option( 'auth_settings_advanced_admin_notice' );
@@ -2072,50 +2073,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 		 * ***************************
 		 */
 
-
-
-		/**
-		 * Load Authorizer dashboard widget if it's enabled.
-		 *
-		 * Action: wp_dashboard_setup
-		 */
-		public function add_dashboard_widgets() {
-			$options        = Options::get_instance();
-			$widget_enabled = $options->get( 'advanced_widget_enabled', Helper::SINGLE_CONTEXT, 'allow override' ) === '1';
-
-			// Load authorizer dashboard widget if it's enabled and user has permission.
-			if ( current_user_can( 'create_users' ) && $widget_enabled ) {
-				// Add dashboard widget for adding/editing users with access.
-				wp_add_dashboard_widget( 'auth_dashboard_widget', __( 'Authorizer Settings', 'authorizer' ), array( $this, 'add_auth_dashboard_widget' ) );
-			}
-		}
-
-
-		/**
-		 * Render Authorizer dashboard widget (callback).
-		 */
-		public function add_auth_dashboard_widget() {
-			$access_lists = Access_Lists::get_instance();
-			$login_access = Login_Access::get_instance();
-			?>
-			<form method="post" id="auth_settings_access_form" action="">
-				<?php $login_access->print_section_info_access_login(); ?>
-				<div>
-					<h2><?php esc_html_e( 'Pending Users', 'authorizer' ); ?></h2>
-					<?php $access_lists->print_combo_auth_access_users_pending(); ?>
-				</div>
-				<div>
-					<h2><?php esc_html_e( 'Approved Users', 'authorizer' ); ?></h2>
-					<?php $access_lists->print_combo_auth_access_users_approved(); ?>
-				</div>
-				<div>
-					<h2><?php esc_html_e( 'Blocked Users', 'authorizer' ); ?></h2>
-					<?php $access_lists->print_combo_auth_access_users_blocked(); ?>
-				</div>
-				<br class="clear" />
-			</form>
-			<?php
-		}
 
 
 
