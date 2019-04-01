@@ -25,7 +25,7 @@ class Login_Form extends Static_Instance {
 		// Load (and localize) public scripts.
 		$options      = Options::get_instance();
 		$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
-		wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), '2.8.0' );
+		wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', plugin_root() ), array( 'jquery' ), '2.8.0' );
 		$auth_localized = array(
 			'wpLoginUrl'      => wp_login_url( $current_path ),
 			'publicWarning'   => get_option( 'auth_settings_advanced_public_notice' ),
@@ -35,7 +35,7 @@ class Login_Form extends Static_Instance {
 		wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );
 
 		// Load public css.
-		wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', dirname( dirname( __FILE__ ) ) ), array(), '2.8.0' );
+		wp_register_style( 'authorizer-public-css', plugins_url( 'css/authorizer-public.css', plugin_root() ), array(), '2.8.0' );
 		wp_enqueue_style( 'authorizer-public-css' );
 	}
 
@@ -53,10 +53,10 @@ class Login_Form extends Static_Instance {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Enqueue scripts appearing on wp-login.php.
-		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), '2.8.0' );
+		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', plugin_root() ), array( 'jquery' ), '2.8.0' );
 
 		// Enqueue styles appearing on wp-login.php.
-		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', dirname( dirname( __FILE__ ) ) ), array(), '2.8.0' );
+		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '2.8.0' );
 		wp_enqueue_style( 'authorizer-login-css' );
 
 		/**
@@ -91,7 +91,7 @@ class Login_Form extends Static_Instance {
 
 		// If we're using Google logins, load those resources.
 		if ( '1' === $auth_settings['google'] ) {
-			wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', dirname( dirname( __FILE__ ) ) ), array( 'jquery' ), '2.8.0' ); ?>
+			wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', plugin_root() ), array( 'jquery' ), '2.8.0' ); ?>
 			<meta name="google-signin-clientid" content="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>" />
 			<meta name="google-signin-scope" content="email" />
 			<meta name="google-signin-cookiepolicy" content="single_host_origin" />

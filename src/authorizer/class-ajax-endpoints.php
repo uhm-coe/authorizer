@@ -24,7 +24,7 @@ class Ajax_Endpoints extends Static_Instance {
 	 * @see https://github.com/google/google-api-php-client branch:v1-master
 	 */
 	public function __construct() {
-		require_once dirname( dirname( dirname( __FILE__ ) ) ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+		require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 	}
 
 
