@@ -15,32 +15,7 @@ use Authorizer\Options;
  * Contains functions for interfacing with WordPress users and syncing between
  * them and users in the Authorizer lists.
  */
-class Sync_Userdata {
-
-	/**
-	 * Plugin instance.
-	 *
-	 * @var object Plugin instance.
-	 */
-	protected static $instance = null;
-
-
-	/**
-	 * Access this plugin's working instance.
-	 *
-	 * @return object Object of this class.
-	 */
-	public static function get_instance() {
-		return null === self::$instance ? new self() : self::$instance;
-	}
-
-
-	/**
-	 * Constructor intentionally left empty and public.
-	 */
-	public function __construct() {
-	}
-
+class Sync_Userdata extends Static_Instance {
 
 	/**
 	 * Adds all WordPress users in the current site to the approved list,

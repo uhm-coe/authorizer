@@ -24,32 +24,7 @@ use Authorizer\Options\Advanced;
  * Contains functions for creating the Authorizer Settings page and adding it to
  * the WordPress Dashboard menu.
  */
-class Admin_Page {
-
-	/**
-	 * Plugin instance.
-	 *
-	 * @var object Plugin instance.
-	 */
-	protected static $instance = null;
-
-
-	/**
-	 * Access this plugin's working instance.
-	 *
-	 * @return object Object of this class.
-	 */
-	public static function get_instance() {
-		return null === self::$instance ? new self() : self::$instance;
-	}
-
-
-	/**
-	 * Constructor intentionally left empty and public.
-	 */
-	public function __construct() {
-	}
-
+class Admin_Page extends Static_Instance {
 
 	/**
 	 * Add help documentation to the options page.

@@ -14,6 +14,8 @@
 
 namespace Authorizer;
 
+require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-static-instance.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/class-sync-userdata.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-admin-page.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/class-options.php';

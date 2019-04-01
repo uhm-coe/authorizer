@@ -14,32 +14,7 @@ use Authorizer\Helper;
 /**
  * Contains functions for rendering the Access Lists tab in Authorizer Settings.
  */
-class Options {
-
-	/**
-	 * Plugin instance.
-	 *
-	 * @var object Plugin instance.
-	 */
-	protected static $instance = null;
-
-
-	/**
-	 * Access this plugin's working instance.
-	 *
-	 * @return object Object of this class.
-	 */
-	public static function get_instance() {
-		return null === self::$instance ? new self() : self::$instance;
-	}
-
-
-	/**
-	 * Constructor intentionally left empty and public.
-	 */
-	public function __construct() {
-	}
-
+class Options extends Static_Instance {
 
 	/**
 	 * Retrieves a specific plugin option from db. Multisite enabled.

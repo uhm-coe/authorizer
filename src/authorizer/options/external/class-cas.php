@@ -16,32 +16,7 @@ use Authorizer\Options;
  * Contains functions for rendering the CAS options in the External Service
  * tab in Authorizer Settings.
  */
-class Cas {
-
-	/**
-	 * Plugin instance.
-	 *
-	 * @var object Plugin instance.
-	 */
-	protected static $instance = null;
-
-
-	/**
-	 * Access this plugin's working instance.
-	 *
-	 * @return object Object of this class.
-	 */
-	public static function get_instance() {
-		return null === self::$instance ? new self() : self::$instance;
-	}
-
-
-	/**
-	 * Constructor intentionally left empty and public.
-	 */
-	public function __construct() {
-	}
-
+class Cas extends \Authorizer\Static_Instance {
 
 	/**
 	 * Settings print callback.
