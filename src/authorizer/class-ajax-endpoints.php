@@ -777,4 +777,5 @@ class Ajax_Endpoints extends Static_Instance {
 		echo wp_json_encode( $response );
 		exit;
 	}
+
 }

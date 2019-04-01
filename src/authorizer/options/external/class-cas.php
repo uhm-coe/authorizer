@@ -276,4 +276,5 @@ class Cas extends \Authorizer\Static_Instance {
 		<p><small><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></small></p>
 		<?php
 	}
+
 }

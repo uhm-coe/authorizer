@@ -386,4 +386,5 @@ class Login_Form extends Static_Instance {
 		$errors = '    ' . $error . "<br />\n";
 		return $errors;
 	}
+
 }

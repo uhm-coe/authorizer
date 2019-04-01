@@ -1007,6 +1007,4 @@ class Admin_Page extends Static_Instance {
 		add_action( 'admin_head', array( Admin_Page::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
 	}
 
-
-
 }

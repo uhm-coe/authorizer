@@ -10,7 +10,8 @@
 namespace Authorizer;
 
 /**
- * Builds the Dashboard widget.
+ * Implements the authentication (is user who they say they are?) features of
+ * the plugin.
  */
 class Authentication extends Static_Instance {
 
@@ -757,6 +758,6 @@ class Authentication extends Static_Instance {
 			// Remove the credentials from the user's session.
 			unset( $_SESSION['token'] );
 		}
-
 	}
+
 }

@@ -59,4 +59,5 @@ class Dashboard_Widget extends Static_Instance {
 		</form>
 		<?php
 	}
+
 }

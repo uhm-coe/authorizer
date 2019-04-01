@@ -10,7 +10,7 @@
 namespace Authorizer;
 
 /**
- * Builds the Dashboard widget.
+ * Implements the authorization (roles and permissions) features of the plugin.
  */
 class Authorization extends Static_Instance {
 
@@ -674,4 +674,5 @@ class Authorization extends Static_Instance {
 				return Helper::in_multi_array( $email, $auth_settings_access_users_approved );
 		}
 	}
+
 }

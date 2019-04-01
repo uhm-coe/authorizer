@@ -36,4 +36,5 @@ abstract class Static_Instance {
 	 */
 	public function __construct() {
 	}
+
 }

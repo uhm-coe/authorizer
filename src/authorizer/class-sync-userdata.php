@@ -695,6 +695,6 @@ class Sync_Userdata extends Static_Instance {
 			$blog_id = $site->userblog_id;
 			$this->add_network_user_to_site( $user_id, $blog_id );
 		}
-
 	}
+
 }
