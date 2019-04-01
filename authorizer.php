@@ -38,6 +38,9 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.p
 use Authorizer\Options\External\Ldap;
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';
 
+use Authorizer\Options\Advanced;
+require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
+
 /**
  * Portions forked from Restricted Site Access plugin: http://wordpress.org/plugins/restricted-site-access/
  * Portions forked from wpCAS plugin: http://wordpress.org/extend/plugins/cas-authentication/
@@ -2836,69 +2839,69 @@ function signInCallback( authResult ) { // jshint ignore:line
 			add_settings_section(
 				'auth_settings_advanced',
 				'',
-				array( $this, 'print_section_info_advanced' ),
+				array( Advanced::get_instance(), 'print_section_info_advanced' ),
 				'authorizer'
 			);
 			add_settings_field(
 				'auth_settings_advanced_lockouts',
 				__( 'Limit invalid login attempts', 'authorizer' ),
-				array( $this, 'print_text_auth_advanced_lockouts' ),
+				array( Advanced::get_instance(), 'print_text_auth_advanced_lockouts' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_hide_wp_login',
 				__( 'Hide WordPress Login', 'authorizer' ),
-				array( $this, 'print_checkbox_auth_advanced_hide_wp_login' ),
+				array( Advanced::get_instance(), 'print_checkbox_auth_advanced_hide_wp_login' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_branding',
 				__( 'Custom WordPress login branding', 'authorizer' ),
-				array( $this, 'print_radio_auth_advanced_branding' ),
+				array( Advanced::get_instance(), 'print_radio_auth_advanced_branding' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_admin_menu',
 				__( 'Authorizer admin menu item location', 'authorizer' ),
-				array( $this, 'print_radio_auth_advanced_admin_menu' ),
+				array( Advanced::get_instance(), 'print_radio_auth_advanced_admin_menu' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_usermeta',
 				__( 'Show custom usermeta in user list', 'authorizer' ),
-				array( $this, 'print_select_auth_advanced_usermeta' ),
+				array( Advanced::get_instance(), 'print_select_auth_advanced_usermeta' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_users_per_page',
 				__( 'Number of users per page', 'authorizer' ),
-				array( $this, 'print_text_auth_advanced_users_per_page' ),
+				array( Advanced::get_instance(), 'print_text_auth_advanced_users_per_page' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_users_sort_by',
 				__( 'Approved users sort method', 'authorizer' ),
-				array( $this, 'print_select_auth_advanced_users_sort_by' ),
+				array( Advanced::get_instance(), 'print_select_auth_advanced_users_sort_by' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_users_sort_order',
 				__( 'Approved users sort order', 'authorizer' ),
-				array( $this, 'print_select_auth_advanced_users_sort_order' ),
+				array( Advanced::get_instance(), 'print_select_auth_advanced_users_sort_order' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
 			add_settings_field(
 				'auth_settings_advanced_widget_enabled',
 				__( 'Show dashboard widget to admin users', 'authorizer' ),
-				array( $this, 'print_checkbox_auth_advanced_widget_enabled' ),
+				array( Advanced::get_instance(), 'print_checkbox_auth_advanced_widget_enabled' ),
 				'authorizer',
 				'auth_settings_advanced'
 			);
@@ -2907,7 +2910,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				add_settings_field(
 					'auth_settings_advanced_override_multisite',
 					__( 'Override multisite options', 'authorizer' ),
-					array( $this, 'print_checkbox_auth_advanced_override_multisite' ),
+					array( Advanced::get_instance(), 'print_checkbox_auth_advanced_override_multisite' ),
 					'authorizer',
 					'auth_settings_advanced'
 				);
@@ -3054,607 +3057,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 			// We're hooking into this filter merely for its location in the codebase,
 			// so make sure to return the filter value unmodified.
 			return $send;
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_auth_external_ldap( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Make sure php5-ldap extension is installed on server.
-			$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Enable LDAP Logins', 'authorizer' ); ?></label> <?php echo wp_kses( $ldap_installed_message, Helper::$allowed_html ); ?>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_host( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_host';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-			<br /><small><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></small>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_port( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_port';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  389', 'authorizer' ); ?></label>
-			<br /><small><?php esc_html_e( 'If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored.', 'authorizer' ); ?></small>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_ldap_tls( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_tls';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></label>
-			<br /><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_search_base( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_search_base';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?></label>
-			<br /><small><?php esc_html_e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_uid( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_uid';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:80px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  uid', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_attr_email( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_attr_email';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-			<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_user( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_user';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_password_ldap_password( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_password';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
-
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_lostpassword_url( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_lostpassword_url';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width: 400px;" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  https://myschool.example.edu:8888/am-forgot-password', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_attr_first_name( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_attr_first_name';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenname', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_ldap_attr_last_name( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_attr_last_name';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-			<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_ldap_attr_update_on_login( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'ldap_attr_update_on_login';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_section_info_advanced( $args = '' ) {
-			?>
-			<div id="section_info_advanced" class="section_info">
-				<p><?php esc_html_e( 'You may optionally specify some advanced settings below.', 'authorizer' ); ?></p>
-			</div>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_auth_advanced_lockouts( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_lockouts';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			esc_html_e( 'After', 'authorizer' );
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_1]" value="<?php echo esc_attr( $auth_settings_option['attempts_1'] ); ?>" placeholder="10" style="width:30px;" />
-			<?php esc_html_e( 'invalid password attempts, delay further attempts on that user for', 'authorizer' ); ?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_1]" value="<?php echo esc_attr( $auth_settings_option['duration_1'] ); ?>" placeholder="1" style="width:30px;" />
-			<?php esc_html_e( 'minute(s).', 'authorizer' ); ?>
-			<br />
-			<?php esc_html_e( 'After', 'authorizer' ); ?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_2]" value="<?php echo esc_attr( $auth_settings_option['attempts_2'] ); ?>" placeholder="10" style="width:30px;" />
-			<?php esc_html_e( 'more invalid attempts, increase the delay to', 'authorizer' ); ?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_2]" value="<?php echo esc_attr( $auth_settings_option['duration_2'] ); ?>" placeholder="10" style="width:30px;" />
-			<?php esc_html_e( 'minutes.', 'authorizer' ); ?>
-			<br />
-			<?php esc_html_e( 'Reset the delays after', 'authorizer' ); ?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_reset_duration" name="auth_settings[<?php echo esc_attr( $option ); ?>][reset_duration]" value="<?php echo esc_attr( $auth_settings_option['reset_duration'] ); ?>" placeholder="240" style="width:40px;" />
-			<?php esc_html_e( 'minutes with no invalid attempts.', 'authorizer' ); ?>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_auth_advanced_hide_wp_login( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_hide_wp_login';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</p>
-				<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_radio_auth_advanced_branding( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_branding';
-			$auth_settings_option = $options->get( $option );
-
-			// Print option elements.
-			?>
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default"><?php esc_html_e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
-			<?php
-
-			/**
-			 * Developers can use the `authorizer_add_branding_option` filter
-			 * to add a radio button for "Custom WordPress login branding"
-			 * under the "Advanced" tab in Authorizer options. Example:
-			 * function my_authorizer_add_branding_option( $branding_options ) {
-			 *   $new_branding_option = array(
-			 *    'value' => 'your_brand'
-			 *    'description' => 'Custom Your Brand Login Screen',
-			 *    'css_url' => 'http://url/to/your_brand.css',
-			 *    'js_url' => 'http://url/to/your_brand.js',
-			 *   );
-			 *   array_push( $branding_options, $new_branding_option );
-			 *   return $branding_options;
-			 * }
-			 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
-			 */
-			$branding_options = array();
-			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
-			foreach ( $branding_options as $branding_option ) {
-				// Make sure the custom brands have the required values.
-				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
-					continue;
-				}
-				?>
-				<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $branding_option['value'] ); ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>"><?php echo esc_html( $branding_option['description'] ); ?></label><br />
-				<?php
-			}
-
-			// Print message about adding custom brands if there are none.
-			if ( count( $branding_options ) === 0 ) {
-				?>
-				<p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></em></p>
-				<?php
-			}
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_radio_auth_advanced_admin_menu( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_admin_menu';
-			$auth_settings_option = $options->get( $option );
-
-			// Print option elements.
-			?>
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings"><?php esc_html_e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top"><?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br />
-			<?php
-
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_select_auth_advanced_usermeta( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_usermeta';
-			$auth_settings_option = $options->get( $option );
-
-			// Print option elements.
-			?>
-			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-				<option value=""><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-				<?php
-				if ( class_exists( 'acf' ) ) :
-					// Get ACF 5 fields. Note: it would be much easier to use `get_field_objects()`
-					// or `get_field_objects( 'user_' . get_current_user_id() )`, but neither will
-					// list fields that have never been given values for users (i.e., new ACF
-					// fields). Therefore we fall back on finding any ACF fields applied to users
-					// (user_role or user_form location rules in the field group definition).
-					$fields              = array();
-					$acf_field_group_ids = array();
-					$acf_field_groups    = new WP_Query(
-						array(
-							'post_type' => 'acf-field-group',
-						)
-					);
-					while ( $acf_field_groups->have_posts() ) : $acf_field_groups->the_post();
-						if ( strpos( get_the_content(), 's:5:"param";s:9:"user_role"' ) !== false || strpos( get_the_content(), 's:5:"param";s:9:"user_form"' ) !== false ) :
-							array_push( $acf_field_group_ids, get_the_ID() );
-						endif;
-					endwhile;
-					wp_reset_postdata();
-					foreach ( $acf_field_group_ids as $acf_field_group_id ) :
-						$acf_fields = new WP_Query(
-							array(
-								'post_type'   => 'acf-field',
-								'post_parent' => $acf_field_group_id,
-							)
-						);
-						while ( $acf_fields->have_posts() ) : $acf_fields->the_post();
-							global $post;
-							$fields[ $post->post_name ] = get_field_object( $post->post_name );
-						endwhile;
-						wp_reset_postdata();
-					endforeach;
-					// Get ACF 4 fields.
-					$acf4_field_groups = new WP_Query(
-						array(
-							'post_type' => 'acf',
-						)
-					);
-					while ( $acf4_field_groups->have_posts() ) : $acf4_field_groups->the_post();
-						$field_group_rules = get_post_meta( get_the_ID(), 'rule', true );
-						if ( is_array( $field_group_rules ) && array_key_exists( 'param', $field_group_rules ) && 'ef_user' === $field_group_rules['param'] ) :
-							$acf4_fields = get_post_custom( get_the_ID() );
-							foreach ( $acf4_fields as $meta_key => $meta_value ) :
-								if ( strpos( $meta_key, 'field_' ) === 0 ) :
-									$meta_value          = unserialize( $meta_value[0] );
-									$fields[ $meta_key ] = $meta_value;
-								endif;
-							endforeach;
-						endif;
-					endwhile;
-					wp_reset_postdata();
-					?>
-					<optgroup label="ACF User Fields:">
-						<?php foreach ( (array) $fields as $field => $field_object ) : ?>
-							<option value="acf___<?php echo esc_attr( $field_object['key'] ); ?>"<?php selected( "acf___{$field_object['key']}" === $auth_settings_option ); ?>><?php echo esc_html( $field_object['label'] ); ?></option>
-						<?php endforeach; ?>
-					</optgroup>
-				<?php endif; ?>
-				<optgroup label="<?php esc_attr_e( 'All Usermeta:', 'authorizer' ); ?>">
-					<?php
-					foreach ( Helper::get_all_usermeta_keys() as $meta_key ) :
-						if ( substr( $meta_key, 0, 3 ) === 'wp_' ) :
-							continue;
-						endif;
-						?>
-						<option value="<?php echo esc_attr( $meta_key ); ?>"<?php selected( $auth_settings_option === $meta_key ); ?>><?php echo esc_html( $meta_key ); ?></option>
-					<?php endforeach; ?>
-				</optgroup>
-			</select>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_text_auth_advanced_users_per_page( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_users_per_page';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" size="4" />
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_select_auth_advanced_users_sort_by( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_users_sort_by';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-				<option value="created" <?php selected( $auth_settings_option, 'created' ); ?>><?php esc_html_e( 'Date approved', 'authorizer' ); ?></option>
-				<option value="email" <?php selected( $auth_settings_option, 'email' ); ?>><?php esc_html_e( 'Email', 'authorizer' ); ?></option>
-				<option value="role" <?php selected( $auth_settings_option, 'role' ); ?>><?php esc_html_e( 'Role', 'authorizer' ); ?></option>
-				<option value="date_added" <?php selected( $auth_settings_option, 'date_added' ); ?>><?php esc_html_e( 'Date registered', 'authorizer' ); ?></option>
-			</select>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_select_auth_advanced_users_sort_order( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_users_sort_order';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-				<option value="asc" <?php selected( $auth_settings_option, 'asc' ); ?>><?php esc_html_e( 'Ascending', 'authorizer' ); ?></option>
-				<option value="desc" <?php selected( $auth_settings_option, 'desc' ); ?>><?php esc_html_e( 'Descending', 'authorizer' ); ?></option>
-			</select>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_widget_enabled';
-			$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
-			<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></small></p>
-			<?php
-		}
-
-
-		/**
-		 * Settings print callback.
-		 *
-		 * @param  string $args Args (e.g., multisite admin mode).
-		 * @return void
-		 */
-		public function print_checkbox_auth_advanced_override_multisite( $args = '' ) {
-			// Get plugin option.
-			$options              = Options::get_instance();
-			$option               = 'advanced_override_multisite';
-			$auth_settings_option = $options->get( $option );
-
-			// Print option elements.
-			?>
-			<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label>
-			<?php
 		}
 
 
@@ -3816,6 +3218,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$google        = Google::get_instance();
 			$cas           = Cas::get_instance();
 			$ldap          = Ldap::get_instance();
+			$advanced      = Advanced::get_instance();
 			$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
 			?>
 			<div class="wrap">
@@ -3979,27 +3382,27 @@ function signInCallback( authResult ) { // jshint ignore:line
 						<table class="form-table"><tbody>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Limit invalid login attempts', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_auth_advanced_lockouts( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_text_auth_advanced_lockouts( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_advanced_hide_wp_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_checkbox_auth_advanced_hide_wp_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Number of users per page', 'authorizer' ); ?></th>
-								<td><?php $this->print_text_auth_advanced_users_per_page( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_text_auth_advanced_users_per_page( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved users sort method', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_advanced_users_sort_by( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_select_auth_advanced_users_sort_by( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Approved users sort order', 'authorizer' ); ?></th>
-								<td><?php $this->print_select_auth_advanced_users_sort_order( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_select_auth_advanced_users_sort_order( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></th>
-								<td><?php $this->print_checkbox_auth_advanced_widget_enabled( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+								<td><?php $advanced->print_checkbox_auth_advanced_widget_enabled( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 							</tr>
 						</tbody></table>
 
