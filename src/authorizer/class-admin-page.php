@@ -702,7 +702,7 @@ class Admin_Page extends Static_Instance {
 		$cas           = Cas::get_instance();
 		$ldap          = Ldap::get_instance();
 		$advanced      = Advanced::get_instance();
-		$auth_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
+		$auth_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 		?>
 		<div class="wrap">
 			<form method="post" action="" autocomplete="off">

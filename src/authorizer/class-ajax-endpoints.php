@@ -142,7 +142,7 @@ class Ajax_Endpoints extends Static_Instance {
 		$options = Options::get_instance();
 
 		// Get multisite settings.
-		$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
+		$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 
 		// Sanitize settings.
 		$auth_multisite_settings = $options->sanitize_options( $_POST );
@@ -192,7 +192,7 @@ class Ajax_Endpoints extends Static_Instance {
 		$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
 		// Update multisite settings in database.
-		update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+		update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
 
 		// Return 'success' value to AJAX call.
 		die( 'success' );
@@ -380,7 +380,7 @@ class Ajax_Endpoints extends Static_Instance {
 		if ( ! $wp_user ) {
 			// Look through multisite approved users and add a usermeta
 			// reference for the current blog if the user is found.
-			$auth_multisite_settings_access_users_approved               = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
+			$auth_multisite_settings_access_users_approved               = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 			$should_update_auth_multisite_settings_access_users_approved = false;
 			foreach ( $auth_multisite_settings_access_users_approved as $index => $approved_user ) {
 				if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
@@ -410,7 +410,7 @@ class Ajax_Endpoints extends Static_Instance {
 				}
 			}
 			if ( $should_update_auth_multisite_settings_access_users_approved ) {
-				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Look through the approved users (of the current blog in a
@@ -592,7 +592,7 @@ class Ajax_Endpoints extends Static_Instance {
 							);
 							$approved_user['date_added']                   = date( 'M Y' );
 							array_push( $auth_multisite_settings_access_users_approved, $approved_user );
-							update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 						} else {
 							$invalid_emails[] = $approved_user['email'];
 						}
@@ -647,7 +647,7 @@ class Ajax_Endpoints extends Static_Instance {
 								}
 								// Remove entry from Approved Users list.
 								unset( $auth_multisite_settings_access_users_approved[ $key ] );
-								update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+								update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 								break;
 							}
 						}
@@ -690,7 +690,7 @@ class Ajax_Endpoints extends Static_Instance {
 									break;
 								}
 							}
-							update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+							update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 						}
 					} else {
 						// Update user's role in approved list and save.

@@ -30,7 +30,7 @@ class Sync_Userdata extends Static_Instance {
 	private function add_wp_users_to_approved_list() {
 		$options = Options::get_instance();
 		// Add current WordPress users to the approved list.
-		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
+		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 		$auth_settings_access_users_pending            = $options->get( 'access_users_pending', Helper::SINGLE_CONTEXT );
 		$auth_settings_access_users_approved           = $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT );
 		$auth_settings_access_users_blocked            = $options->get( 'access_users_blocked', Helper::SINGLE_CONTEXT );
@@ -284,7 +284,7 @@ class Sync_Userdata extends Static_Instance {
 						unset( $auth_multisite_settings_access_users_approved[ $key ] );
 					}
 				}
-				update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Go through all approved lists on individual sites and sync this user there.
@@ -395,7 +395,7 @@ class Sync_Userdata extends Static_Instance {
 			}
 		}
 		if ( $list_changed ) {
-			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 		}
 
 		// Go through all pending/approved lists on individual sites and remove this user from them.
@@ -558,7 +558,7 @@ class Sync_Userdata extends Static_Instance {
 	 */
 	private function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
 		$options                                       = Options::get_instance();
-		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
+		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 		$auth_settings_access_users_pending            = $options->get( 'access_users_pending', Helper::SINGLE_CONTEXT );
 		$auth_settings_access_users_approved           = $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT );
 		$auth_settings_access_users_blocked            = $options->get( 'access_users_blocked', Helper::SINGLE_CONTEXT );
@@ -644,7 +644,7 @@ class Sync_Userdata extends Static_Instance {
 				'local_user' => true,
 			);
 			array_push( $auth_multisite_settings_access_users_approved, $multisite_approved_user );
-			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 		}
 
 		// Go through all pending/approved lists on individual sites and remove this user from them.
@@ -685,7 +685,7 @@ class Sync_Userdata extends Static_Instance {
 			}
 		}
 		if ( $list_changed ) {
-			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 		}
 
 		// Go through this user's current sites and add them to the approved list

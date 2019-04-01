@@ -30,7 +30,7 @@ class Options extends Static_Instance {
 		if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
 			$list = Helper::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings_' . $option );
 			if ( is_multisite() && Helper::NETWORK_CONTEXT === $admin_mode ) {
-				$list = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_' . $option, array() );
+				$list = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_' . $option, array() );
 			}
 			return $list;
 		}
@@ -102,7 +102,7 @@ class Options extends Static_Instance {
 		// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
 		if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || 1 !== intval( $auth_settings['advanced_override_multisite'] ) ) ) {
 			// Get multisite options.
-			$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 
 			// Return the multisite options if we're viewing the network admin options page.
 			// Otherwise override options with their multisite equivalents.
@@ -420,7 +420,7 @@ class Options extends Static_Instance {
 
 		// Multisite defaults.
 		if ( is_multisite() ) {
-			$auth_multisite_settings = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 
 			if ( false === $auth_multisite_settings ) {
 				$auth_multisite_settings = array();
@@ -430,7 +430,7 @@ class Options extends Static_Instance {
 				$auth_multisite_settings['multisite_override'] = '';
 			}
 			// Access Lists Defaults.
-			$auth_multisite_settings_access_users_approved = get_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved' );
+			$auth_multisite_settings_access_users_approved = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved' );
 			if ( false === $auth_multisite_settings_access_users_approved ) {
 				$auth_multisite_settings_access_users_approved = array();
 			}
@@ -566,8 +566,8 @@ class Options extends Static_Instance {
 				$auth_multisite_settings['advanced_widget_enabled'] = '1';
 			}
 			// Save default network options to database.
-			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings', $auth_multisite_settings );
-			update_blog_option( $this->current_site_blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+			update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 		}
 
 		return $auth_settings;
