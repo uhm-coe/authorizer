@@ -725,7 +725,7 @@ class Admin_Page extends Static_Instance {
 					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Who can log in to sites in this network?', 'authorizer' ); ?></th>
-							<td><?php $access_login->print_radio_auth_access_who_can_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							<td><?php $login_access->print_radio_auth_access_who_can_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Who can view sites in this network?', 'authorizer' ); ?></th>
