@@ -119,7 +119,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 		if (
 			is_multisite() &&
 			! is_network_admin() &&
-			'1' !== intval( $auth_override_multisite ) &&
+			1 !== intval( $auth_override_multisite ) &&
 			array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 			'1' === $auth_multisite_settings['multisite_override']
 		) {
@@ -226,7 +226,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 						<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 					</button>
 					<ul class="dropdown-menu" role="menu">
-						<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a local WordPress account instead, and email the user their password.', 'authorizer' ); ?></a></li>
+						<li><a href="javascript:void(0);" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( document.getElementById( 'approve_user_new' ), 'approved', true);"><?php esc_html_e( 'Create a new WordPress account, and email the user an activation link.', 'authorizer' ); ?></a></li>
 					</ul>
 				</div>
 			</div>
