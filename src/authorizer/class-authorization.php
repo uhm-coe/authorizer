@@ -96,7 +96,7 @@ class Authorization extends Static_Instance {
 					'</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
 				wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
-				return new WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
+				return new \WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 			}
 		}
 
@@ -218,7 +218,7 @@ class Authorization extends Static_Instance {
 					}
 
 					// Authenticate as new user.
-					$user = new WP_User( $result );
+					$user = new \WP_User( $result );
 
 					/**
 					 * Fires after an external user is authenticated for the first time
@@ -434,7 +434,7 @@ class Authorization extends Static_Instance {
 		}
 
 		// Sanity check: if we made it here without returning, something has gone wrong.
-		return new WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
+		return new \WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 
 	}
 
@@ -522,7 +522,7 @@ class Authorization extends Static_Instance {
 		if ( empty( $wp->request ) ) {
 			$current_page_id = 'home';
 		} else {
-			$request_query   = isset( $wp->query_vars ) ? new WP_Query( $wp->query_vars ) : null;
+			$request_query   = isset( $wp->query_vars ) ? new \WP_Query( $wp->query_vars ) : null;
 			$current_page_id = isset( $request_query->post_count ) && $request_query->post_count > 0 ? $request_query->post->ID : '';
 		}
 		if ( ! array_key_exists( 'access_public_pages', $auth_settings ) || ! is_array( $auth_settings['access_public_pages'] ) ) {

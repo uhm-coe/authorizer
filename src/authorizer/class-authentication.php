@@ -56,7 +56,7 @@ class Authentication extends Static_Instance {
 		// pretend they don't exist).
 		if ( $unauthenticated_user_is_blocked ) {
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-			return new WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.', 'authorizer' ) );
+			return new \WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.', 'authorizer' ) );
 		}
 
 		// Grab plugin settings.
@@ -89,7 +89,7 @@ class Authentication extends Static_Instance {
 			// trigger the wp_login_failed hook, which would continue to
 			// increment the failed attempt count.
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-			return new WP_Error(
+			return new \WP_Error(
 				'empty_password',
 				sprintf(
 					/* TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of lockout as a phrase 4: lost password URL */
@@ -106,7 +106,7 @@ class Authentication extends Static_Instance {
 			// trigger the wp_login_failed hook, which would continue to
 			// increment the failed attempt count.
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
-			return new WP_Error(
+			return new \WP_Error(
 				'empty_password',
 				sprintf(
 					/* TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of lockout as a phrase 4: lost password URL */
@@ -291,12 +291,12 @@ class Authentication extends Static_Instance {
 			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
 		} catch ( Google_Auth_Exception $e ) {
 			// Invalid ticket, so this in not a successful Google login.
-			return new WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
+			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 		}
 
 		// Invalid ticket, so this in not a successful Google login.
 		if ( ! $ticket ) {
-			return new WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
+			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 		}
 
 		// Get email address.
@@ -321,7 +321,7 @@ class Authentication extends Static_Instance {
 			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
 			if ( ! in_array( $email_domain, $google_hosteddomains, true ) ) {
 				$this->custom_logout();
-				return new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
+				return \new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
 			}
 		}
 
@@ -517,10 +517,10 @@ class Authentication extends Static_Instance {
 
 		// Fail with error message if username or password is blank.
 		if ( empty( $username ) ) {
-			return new WP_Error( 'empty_username', __( 'You must provide a username or email.', 'authorizer' ) );
+			return new \WP_Error( 'empty_username', __( 'You must provide a username or email.', 'authorizer' ) );
 		}
 		if ( empty( $password ) ) {
-			return new WP_Error( 'empty_password', __( 'You must provide a password.', 'authorizer' ) );
+			return new \WP_Error( 'empty_password', __( 'You must provide a password.', 'authorizer' ) );
 		}
 
 		// If php5-ldap extension isn't installed on server, fall back to WP auth.

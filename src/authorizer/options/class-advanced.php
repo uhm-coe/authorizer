@@ -185,7 +185,7 @@ class Advanced extends \Authorizer\Static_Instance {
 				// (user_role or user_form location rules in the field group definition).
 				$fields              = array();
 				$acf_field_group_ids = array();
-				$acf_field_groups    = new WP_Query(
+				$acf_field_groups    = new \WP_Query(
 					array(
 						'post_type' => 'acf-field-group',
 					)
@@ -197,7 +197,7 @@ class Advanced extends \Authorizer\Static_Instance {
 				endwhile;
 				wp_reset_postdata();
 				foreach ( $acf_field_group_ids as $acf_field_group_id ) :
-					$acf_fields = new WP_Query(
+					$acf_fields = new \WP_Query(
 						array(
 							'post_type'   => 'acf-field',
 							'post_parent' => $acf_field_group_id,
@@ -210,7 +210,7 @@ class Advanced extends \Authorizer\Static_Instance {
 					wp_reset_postdata();
 				endforeach;
 				// Get ACF 4 fields.
-				$acf4_field_groups = new WP_Query(
+				$acf4_field_groups = new \WP_Query(
 					array(
 						'post_type' => 'acf',
 					)
