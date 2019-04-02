@@ -219,6 +219,11 @@ class Authentication extends Static_Instance {
 			}
 		}
 
+		// We'll track how this user was authenticated in user meta.
+		if ( $user ) {
+			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+		}
+
 		// Check this external user's access against the access lists
 		// (pending, approved, blocked).
 		$result = Authorization::get_instance()->check_user_access( $user, $externally_authenticated_emails, $result );
@@ -231,11 +236,6 @@ class Authentication extends Static_Instance {
 		// If we have a valid user from check_user_access(), log that user in.
 		if ( get_class( $result ) === 'WP_User' ) {
 			$user = $result;
-		}
-
-		// We'll track how this user was authenticated in user meta.
-		if ( $user ) {
-			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
 		}
 
 		// If we haven't exited yet, we have a valid/approved user, so authenticate them.
