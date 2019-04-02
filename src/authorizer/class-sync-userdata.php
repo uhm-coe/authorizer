@@ -9,6 +9,7 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
 

@@ -9,7 +9,16 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
 use Authorizer\Options;
+use Authorizer\Authentication;
+use Authorizer\Authorization;
+use Authorizer\Admin_Page;
+use Authorizer\Login_Form;
+use Authorizer\Updates;
+use Authorizer\Sync_Userdata;
+use Authorizer\Ajax_Endpoints;
+use Authorizer\Dashboard_Widget;
 
 /**
  * Main plugin class. Activates/deactivates the plugin, and registers all hooks.

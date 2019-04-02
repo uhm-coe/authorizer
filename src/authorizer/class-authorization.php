@@ -9,6 +9,9 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
+use Authorizer\Options;
+
 /**
  * Implements the authorization (roles and permissions) features of the plugin.
  */

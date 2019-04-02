@@ -9,6 +9,9 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
+use Authorizer\Options;
+
 /**
  * Run any database migrations or plugin updates when installing a new version.
  */

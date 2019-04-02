@@ -12,6 +12,8 @@ namespace Authorizer;
 use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
+use Authorizer\Access_Lists;
+use Authorizer\Sync_Userdata;
 
 /**
  * Contains endpoints for any AJAX methods.

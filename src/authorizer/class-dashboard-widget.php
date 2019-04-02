@@ -9,6 +9,8 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
+use Authorizer\Options;
 use Authorizer\Options\Access_Lists;
 use Authorizer\Options\Login_Access;
 

@@ -9,6 +9,10 @@
 
 namespace Authorizer;
 
+use Authorizer\Helper;
+use Authorizer\Options;
+use Authorizer\Authorization;
+
 /**
  * Implements the authentication (is user who they say they are?) features of
  * the plugin.
