@@ -321,7 +321,7 @@ class Authentication extends Static_Instance {
 			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
 			if ( ! in_array( $email_domain, $google_hosteddomains, true ) ) {
 				$this->custom_logout();
-				return \new WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
+				return new \WP_Error( 'invalid_google_login', __( 'Google credentials do not match the allowed hosted domain', 'authorizer' ) );
 			}
 		}
 
