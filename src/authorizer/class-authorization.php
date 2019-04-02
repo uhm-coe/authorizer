@@ -624,7 +624,7 @@ class Authorization extends Static_Instance {
 	 * @param  string $multisite_mode Admin context.
 	 * @return boolean                Whether email was found.
 	 */
-	protected function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
+	public function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
 		if ( empty( $email ) ) {
 			return false;
 		}

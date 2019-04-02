@@ -774,7 +774,7 @@ class Options extends Static_Instance {
 	 * @param  array $user User data to sanitize.
 	 * @return array       Sanitized user data.
 	 */
-	protected function sanitize_update_auth_user( $user ) {
+	public function sanitize_update_auth_user( $user ) {
 		if ( array_key_exists( 'edit_action', $user ) ) {
 			$user['edit_action'] = sanitize_text_field( $user['edit_action'] );
 		}
