@@ -446,7 +446,7 @@ class Sync_Userdata extends Static_Instance {
 	 * @param  int $blog_id Blog ID to add to.
 	 * @return void
 	 */
-	private function add_network_user_to_site( $user_id, $blog_id ) {
+	protected function add_network_user_to_site( $user_id, $blog_id ) {
 		// Switch to blog.
 		switch_to_blog( $blog_id );
 
@@ -556,7 +556,7 @@ class Sync_Userdata extends Static_Instance {
 	 * @param array  $user_roles      Role to add for user.
 	 * @param array  $default_role    Default role, if no role specified.
 	 */
-	private function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
+	protected function add_user_to_authorizer_when_created( $user_email, $date_registered, $user_roles = array(), $default_role = array() ) {
 		$options                                       = Options::get_instance();
 		$auth_multisite_settings_access_users_approved = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() ) : array();
 		$auth_settings_access_users_pending            = $options->get( 'access_users_pending', Helper::SINGLE_CONTEXT );

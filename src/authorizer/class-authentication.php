@@ -248,7 +248,7 @@ class Authentication extends Static_Instance {
 	 *                              authenticated user, or WP_Error() object on failure,
 	 *                              or null if not attempting a google login.
 	 */
-	private function custom_authenticate_google( $auth_settings ) {
+	protected function custom_authenticate_google( $auth_settings ) {
 		// Move on if Google auth hasn't been requested here.
 		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 		if ( empty( $_GET['external'] ) || 'google' !== $_GET['external'] ) {
@@ -344,7 +344,7 @@ class Authentication extends Static_Instance {
 	 *                              for the successfully authenticated user, or WP_Error()
 	 *                              object on failure, or null if not attempting a CAS login.
 	 */
-	private function custom_authenticate_cas( $auth_settings ) {
+	protected function custom_authenticate_cas( $auth_settings ) {
 		// Move on if CAS hasn't been requested here.
 		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
 		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] ) {
@@ -476,7 +476,7 @@ class Authentication extends Static_Instance {
 	 *                               object on failure, or null if skipping LDAP auth and
 	 *                               falling back to WP auth.
 	 */
-	private function custom_authenticate_ldap( $auth_settings, $username, $password ) {
+	protected function custom_authenticate_ldap( $auth_settings, $username, $password ) {
 		// Get LDAP search base(s).
 		$search_bases = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_search_base'] ) ) );
 

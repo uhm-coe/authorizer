@@ -832,7 +832,7 @@ class Options extends Static_Instance {
 	 * @param  array $user User data to check for a valid email.
 	 * @return bool  Whether to filter out the user.
 	 */
-	private function remove_invalid_auth_users( $user ) {
+	protected function remove_invalid_auth_users( $user ) {
 		return isset( $user['email'] ) && strlen( $user['email'] ) > 0;
 	}
 
@@ -843,7 +843,7 @@ class Options extends Static_Instance {
 	 * @param  array $user User data to sanitize.
 	 * @return array       Sanitized user data.
 	 */
-	private function sanitize_update_auth_user_allow_wildcard_email( $user ) {
+	protected function sanitize_update_auth_user_allow_wildcard_email( $user ) {
 		if ( array_key_exists( 'edit_action', $user ) ) {
 			$user['edit_action'] = sanitize_text_field( $user['edit_action'] );
 		}
