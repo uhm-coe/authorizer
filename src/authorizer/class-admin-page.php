@@ -861,7 +861,7 @@ class Admin_Page extends Static_Instance {
 						</tr>
 					</tbody></table>
 
-					<?php $this->print_section_info_advanced(); ?>
+					<?php $advanced->print_section_info_advanced(); ?>
 					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Limit invalid login attempts', 'authorizer' ); ?></th>
