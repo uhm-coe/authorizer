@@ -912,7 +912,7 @@ class Admin_Page extends Static_Instance {
 			'Authorizer',
 			'manage_network_options',
 			'authorizer',
-			array( Admin_Page::get_instance(), 'create_network_admin_page' ),
+			array( self::get_instance(), 'create_network_admin_page' ),
 			'dashicons-groups',
 			89 // Position.
 		);
@@ -934,7 +934,7 @@ class Admin_Page extends Static_Instance {
 				'Authorizer',
 				'create_users',
 				'authorizer',
-				array( Admin_Page::get_instance(), 'create_admin_page' )
+				array( self::get_instance(), 'create_admin_page' )
 			);
 		} else {
 			// @see http://codex.wordpress.org/Function_Reference/add_menu_page
@@ -943,7 +943,7 @@ class Admin_Page extends Static_Instance {
 				'Authorizer',
 				'create_users',
 				'authorizer',
-				array( Admin_Page::get_instance(), 'create_admin_page' ),
+				array( self::get_instance(), 'create_admin_page' ),
 				'dashicons-groups',
 				'99.0018465' // position (decimal is to make overlap with other plugins less likely).
 			);
@@ -1003,8 +1003,8 @@ class Admin_Page extends Static_Instance {
 		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', plugin_root() ), array(), '1.8' );
 		wp_enqueue_style( 'jquery-multi-select-css' );
 
-		add_action( 'admin_notices', array( Admin_Page::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
-		add_action( 'admin_head', array( Admin_Page::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
+		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
+		add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
 	}
 
 }
