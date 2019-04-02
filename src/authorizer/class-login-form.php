@@ -284,9 +284,8 @@ class Login_Form extends Static_Instance {
 		// If Google logins are enabled, make sure the cookie is set.
 		if ( array_key_exists( 'google', $auth_settings ) && '1' === $auth_settings['google'] ) {
 			if ( ! isset( $_COOKIE['login_unique'] ) ) {
-				$this->cookie_value = md5( rand() );
-				setcookie( 'login_unique', $this->cookie_value, time() + 1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
-				$_COOKIE['login_unique'] = $this->cookie_value;
+				setcookie( 'login_unique', Helper::get_cookie_value(), time() + 1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
+				$_COOKIE['login_unique'] = Helper::get_cookie_value();
 			}
 		}
 	}

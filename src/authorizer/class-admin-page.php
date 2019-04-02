@@ -246,7 +246,7 @@ class Admin_Page extends Static_Instance {
 		register_setting(
 			'auth_settings_group',
 			'auth_settings',
-			array( $this, 'sanitize_options' )
+			array( Options::get_instance(), 'sanitize_options' )
 		);
 
 		add_settings_section(
