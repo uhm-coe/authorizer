@@ -68,7 +68,8 @@ class Authorization extends Static_Instance {
 						$options->get( 'access_users_blocked', Helper::SINGLE_CONTEXT )
 					);
 					array_push(
-						$auth_settings_access_users_blocked, array(
+						$auth_settings_access_users_blocked,
+						array(
 							'email'      => Helper::lowercase( $user_email ),
 							'date_added' => date( 'M Y' ),
 						)
@@ -83,7 +84,7 @@ class Authorization extends Static_Instance {
 				}
 
 				// Notify user about blocked status and return without authenticating them.
-				// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+				// phpcs:ignore WordPress.Security.NonceVerification
 				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
 				$page_title  = sprintf(
 					/* TRANSLATORS: %s: Name of blog */
@@ -421,7 +422,7 @@ class Authorization extends Static_Instance {
 				}
 
 				// Notify user about pending status and return without authenticating them.
-				// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+				// phpcs:ignore WordPress.Security.NonceVerification
 				$redirect_to   = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
 				$page_title    = get_bloginfo( 'name' ) . ' - Access Pending';
 				$error_message =
@@ -460,7 +461,7 @@ class Authorization extends Static_Instance {
 
 		$has_access = (
 			// Always allow access if WordPress is installing.
-			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			// phpcs:ignore WordPress.Security.NonceVerification
 			( defined( 'WP_INSTALLING' ) && isset( $_GET['key'] ) ) ||
 			// Always allow access to admins.
 			( current_user_can( 'create_users' ) ) ||
@@ -587,7 +588,7 @@ class Authorization extends Static_Instance {
 			wp_send_json(
 				array(
 					'code'    => 'rest_cannot_view',
-					'message' => strip_tags( $auth_settings['access_redirect_to_message'] ),
+					'message' => wp_strip_all_tags( $auth_settings['access_redirect_to_message'] ),
 					'data'    => array(
 						'status' => 401,
 					),
@@ -608,7 +609,7 @@ class Authorization extends Static_Instance {
 				'</a></p>';
 			wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 		} else {
-			wp_redirect( wp_login_url( $current_path ), 302 );
+			wp_safe_redirect( wp_login_url( $current_path ), 302 );
 			exit;
 		}
 
@@ -645,7 +646,8 @@ class Authorization extends Static_Instance {
 				// exist, and if the email address has that domain.
 				$email_in_blocked_domain = false;
 				$blocked_domains         = preg_grep(
-					'/^@.*/', array_map(
+					'/^@.*/',
+					array_map(
 						function ( $blocked_item ) {
 							return $blocked_item['email']; },
 						$auth_settings_access_users_blocked

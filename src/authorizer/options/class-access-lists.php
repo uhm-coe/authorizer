@@ -143,12 +143,13 @@ class Access_Lists extends \Authorizer\Static_Instance {
 		$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
 
 		// Filter user list to search terms.
-		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( isset( $_REQUEST['search'] ) && strlen( sanitize_text_field( wp_unslash( $_REQUEST['search'] ) ) ) > 0 ) {
-			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			// phpcs:ignore WordPress.Security.NonceVerification
 			$search_term          = sanitize_text_field( wp_unslash( $_REQUEST['search'] ) );
 			$auth_settings_option = array_filter(
-				$auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option,
+				function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== false ||
 					stripos( $user['role'], $search_term ) !== false ||
 					stripos( $user['date_added'], $search_term ) !== false;
@@ -182,7 +183,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 		// Get pager params.
 		$total_users    = count( $auth_settings_option );
 		$users_per_page = intval( $options->get( 'advanced_users_per_page', Helper::SINGLE_CONTEXT, 'allow override' ) );
-		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification
 		$current_page = isset( $_REQUEST['paged'] ) ? intval( $_REQUEST['paged'] ) : 1;
 		$total_pages  = ceil( $total_users / $users_per_page );
 		if ( $total_pages < 1 ) {
@@ -392,7 +393,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 
 		$search_form = array();
 		if ( 'top' === $which ) {
-			// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+			// phpcs:ignore WordPress.Security.NonceVerification
 			$search_term   = isset( $_REQUEST['search'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['search'] ) ) : '';
 			$search_form[] = '<div class="search-box">';
 			$search_form[] = '<label class="screen-reader-text" for="user-search-input">' . __( 'Search Users', 'authorizer' ) . '</label>';

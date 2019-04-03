@@ -959,13 +959,11 @@ class Admin_Page extends Static_Instance {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script(
-			'authorizer',
-			plugins_url( 'js/authorizer.js', plugin_root() ),
-			array( 'jquery-effects-shake' ), '2.8.7', true
-		);
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.8.7', true );
 		wp_localize_script(
-			'authorizer', 'authL10n', array(
+			'authorizer',
+			'authL10n',
+			array(
 				'baseurl'              => get_bloginfo( 'url' ),
 				'saved'                => esc_html__( 'Saved', 'authorizer' ),
 				'duplicate'            => esc_html__( 'Duplicate', 'authorizer' ),
@@ -985,17 +983,9 @@ class Admin_Page extends Static_Instance {
 			)
 		);
 
-		wp_enqueue_script(
-			'jquery-autogrow-textarea',
-			plugins_url( 'vendor/jquery.autogrow-textarea/jquery.autogrow-textarea.js', plugin_root() ),
-			array( 'jquery' ), '2.7.0', true
-		);
+		wp_enqueue_script( 'jquery-autogrow-textarea', plugins_url( 'vendor/jquery.autogrow-textarea/jquery.autogrow-textarea.js', plugin_root() ), array( 'jquery' ), '2.7.0', true );
 
-		wp_enqueue_script(
-			'jquery.multi-select',
-			plugins_url( 'vendor/jquery.multi-select/js/jquery.multi-select.js', plugin_root() ),
-			array( 'jquery' ), '1.8', true
-		);
+		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor/jquery.multi-select/js/jquery.multi-select.js', plugin_root() ), array( 'jquery' ), '1.8', true );
 
 		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '2.8.7' );
 		wp_enqueue_style( 'authorizer-css' );

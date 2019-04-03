@@ -9,20 +9,12 @@
 
 		<!-- Disable overly picky rules -->
 		<exclude name="WordPress.WP.CapitalPDangit"/>
-		<exclude name="WordPress.VIP.SlowDBQuery" />
-		<exclude name="WordPress.VIP.RestrictedFunctions" />
-		<exclude name="WordPress.VIP.RestrictedVariables"/>
-		<exclude name="WordPress.VIP.SessionVariableUsage"/>
-		<exclude name="WordPress.VIP.SessionFunctionsUsage"/>
-		<exclude name="WordPress.VIP.FileSystemWritesDisallow"/>
-		<exclude name="WordPress.VIP.DirectDatabaseQuery"/>
-		<exclude name="WordPress.VIP.SuperGlobalInputUsage.AccessDetected"/>
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
 	</rule>
 
 	<!-- Add custom sanitizing function(s). -->
-	<rule ref="WordPress.VIP.ValidatedSanitizedInput">
+	<rule ref="WordPress.Security.ValidatedSanitizedInput">
 		<properties>
 			<property name="customSanitizingFunctions" value="sanitize_update_auth_users" type="array" />
 		</properties>

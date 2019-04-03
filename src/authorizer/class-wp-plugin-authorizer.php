@@ -181,7 +181,7 @@ class WP_Plugin_Authorizer extends Static_Instance {
 	 */
 	public function activate( $network_wide ) {
 		global $wpdb;
-		$options = Options::get_instance();
+		$options       = Options::get_instance();
 		$sync_userdata = Sync_Userdata::get_instance();
 
 		// If we're in a multisite environment, run the plugin activation for each

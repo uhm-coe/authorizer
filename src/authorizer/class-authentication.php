@@ -206,7 +206,7 @@ class Authentication extends Static_Instance {
 			// CAS plugin had created over 9000 WordPress accounts without email
 			// addresses. This option was created to support that case, and any
 			// other CAS servers where emails are not used as account identifiers.
-			$user = get_user_by( 'login', $result['username']);
+			$user = get_user_by( 'login', $result['username'] );
 		} else {
 			// Get the external user's WordPress account by email address. This is
 			// the normal behavior (and the most secure).
@@ -254,7 +254,7 @@ class Authentication extends Static_Instance {
 	 */
 	protected function custom_authenticate_google( $auth_settings ) {
 		// Move on if Google auth hasn't been requested here.
-		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'google' !== $_GET['external'] ) {
 			return null;
 		}
@@ -350,7 +350,7 @@ class Authentication extends Static_Instance {
 	 */
 	protected function custom_authenticate_cas( $auth_settings ) {
 		// Move on if CAS hasn't been requested here.
-		// phpcs:ignore WordPress.CSRF.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] ) {
 			return null;
 		}
@@ -383,7 +383,7 @@ class Authentication extends Static_Instance {
 		$cas_service_url   = site_url( '/wp-login.php?external=cas' );
 		$login_querystring = array();
 		if ( isset( $_SERVER['QUERY_STRING'] ) ) {
-			parse_str( $_SERVER['QUERY_STRING'], $login_querystring ); // phpcs:ignore WordPress.VIP.ValidatedSanitizedInput
+			parse_str( $_SERVER['QUERY_STRING'], $login_querystring ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 		}
 		if ( isset( $login_querystring['redirect_to'] ) ) {
 			$cas_service_url .= '&redirect_to=' . rawurlencode( $login_querystring['redirect_to'] );

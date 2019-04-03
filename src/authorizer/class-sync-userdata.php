@@ -112,7 +112,7 @@ class Sync_Userdata extends Static_Instance {
 			add_user_to_blog( get_current_blog_id(), $current_user->ID, $user_info['role'] );
 
 			// Refresh user permissions.
-			$current_user = new \WP_User( $current_user->ID ); // phpcs:ignore WordPress.Variables.GlobalVariables.OverrideProhibited
+			$current_user = new \WP_User( $current_user->ID ); // phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited
 		}
 	}
 

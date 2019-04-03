@@ -820,7 +820,7 @@ class Options extends Static_Instance {
 				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
-		<?php
+			<?php
 		endif;
 	}
 

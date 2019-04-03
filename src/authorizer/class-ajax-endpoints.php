@@ -60,7 +60,7 @@ class Ajax_Endpoints extends Static_Instance {
 		}
 
 		// Google authentication token.
-		// phpcs:ignore WordPress.VIP.ValidatedSanitizedInput.InputNotSanitized
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
 
 		// Grab plugin settings.
@@ -268,7 +268,8 @@ class Ajax_Endpoints extends Static_Instance {
 		if ( ! empty( $_REQUEST['search'] ) ) {
 			$search_term          = sanitize_text_field( wp_unslash( $_REQUEST['search'] ) );
 			$auth_settings_option = array_filter(
-				$auth_settings_option, function ( $user ) use ( $search_term ) {
+				$auth_settings_option,
+				function ( $user ) use ( $search_term ) {
 					return stripos( $user['email'], $search_term ) !== false ||
 					stripos( $user['role'], $search_term ) !== false ||
 					stripos( $user['date_added'], $search_term ) !== false;
@@ -405,8 +406,8 @@ class Ajax_Endpoints extends Static_Instance {
 						}
 					}
 					$auth_multisite_settings_access_users_approved[ $index ]['usermeta'][ get_current_blog_id() ] = array(
-						'meta_key'   => $meta_key,
-						'meta_value' => $meta_value,
+						'meta_key'   => $meta_key,   // phpcs:ignore WordPress.DB.SlowDBQuery
+						'meta_value' => $meta_value, // phpcs:ignore WordPress.DB.SlowDBQuery
 					);
 					$should_update_auth_multisite_settings_access_users_approved                                  = true;
 				}
@@ -423,8 +424,8 @@ class Ajax_Endpoints extends Static_Instance {
 			foreach ( $auth_settings_access_users_approved as $index => $approved_user ) {
 				if ( 0 === strcasecmp( $email, $approved_user['email'] ) ) {
 					$auth_settings_access_users_approved[ $index ]['usermeta'] = array(
-						'meta_key'   => $meta_key,
-						'meta_value' => $meta_value,
+						'meta_key'   => $meta_key,   // phpcs:ignore WordPress.DB.SlowDBQuery
+						'meta_value' => $meta_value, // phpcs:ignore WordPress.DB.SlowDBQuery
 					);
 					$should_update_auth_settings_access_users_approved         = true;
 				}

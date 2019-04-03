@@ -315,11 +315,11 @@ class Updates extends Static_Instance {
 			$needs_updating = true;
 		}
 
-		/*
+		/* phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		// Update: TEMPLATE
 		$update_if_older_than = YYYYMMDD;
 		if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
-			UPDATE CODE HERE
+			////// PLACE UPDATE CODE HERE
 			// Update version to reflect this change has been made.
 			$auth_version = $update_if_older_than;
 			$needs_updating = true;

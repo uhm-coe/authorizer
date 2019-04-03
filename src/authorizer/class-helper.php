@@ -120,7 +120,7 @@ class Helper {
 			if ( isset( $_COOKIE['login_unique'] ) ) {
 				self::$cookie_value = sanitize_key( wp_unslash( $_COOKIE['login_unique'] ) );
 			} else {
-				self::$cookie_value = md5( rand() );
+				self::$cookie_value = md5( wp_rand() );
 			}
 		}
 		return self::$cookie_value;
@@ -153,6 +153,7 @@ class Helper {
 
 		// Use openssl library (better) if it is enabled.
 		if ( function_exists( 'openssl_encrypt' ) && 'openssl' === $library ) {
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 			$result = base64_encode(
 				openssl_encrypt(
 					$text,
@@ -163,6 +164,7 @@ class Helper {
 				)
 			);
 		} elseif ( function_exists( 'mcrypt_encrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 			$result = base64_encode( mcrypt_encrypt( MCRYPT_RIJNDAEL_256, self::$key, $text, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ) );
 		} else { // Fall back to basic obfuscation.
 			$length = strlen( $text );
@@ -172,6 +174,7 @@ class Helper {
 				$char    = chr( ord( $char ) + ord( $keychar ) );
 				$result .= $char;
 			}
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 			$result = base64_encode( $result );
 		}
 
@@ -193,16 +196,18 @@ class Helper {
 		// Use openssl library (better) if it is enabled.
 		if ( function_exists( 'openssl_decrypt' ) && 'openssl' === $library ) {
 			$result = openssl_decrypt(
-				base64_decode( $secret ),
+				base64_decode( $secret ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 				'AES-256-CBC',
 				hash( 'sha256', self::$key ),
 				0,
 				substr( hash( 'sha256', self::$iv ), 0, 16 )
 			);
 		} elseif ( function_exists( 'mcrypt_decrypt' ) ) { // Use mcrypt library (deprecated in PHP 7.1) if php5-mcrypt extension is enabled.
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 			$secret = base64_decode( $secret );
 			$result = rtrim( mcrypt_decrypt( MCRYPT_RIJNDAEL_256, self::$key, $secret, MCRYPT_MODE_ECB, 'abcdefghijklmnopqrstuvwxyz012345' ), "\0$result" );
 		} else { // Fall back to basic obfuscation.
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_decode
 			$secret = base64_decode( $secret );
 			$length = strlen( $secret );
 			for ( $i = 0; $i < $length; $i++ ) {
@@ -242,6 +247,7 @@ class Helper {
 	 */
 	public static function get_all_usermeta_keys() {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery
 		$usermeta_keys = $wpdb->get_col( "SELECT DISTINCT $wpdb->usermeta.meta_key FROM $wpdb->usermeta" );
 		return $usermeta_keys;
 	}

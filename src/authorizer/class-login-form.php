@@ -26,7 +26,7 @@ class Login_Form extends Static_Instance {
 		// Load (and localize) public scripts.
 		$options      = Options::get_instance();
 		$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
-		wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', plugin_root() ), array( 'jquery' ), '2.8.0' );
+		wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', plugin_root() ), array( 'jquery' ), '2.8.0', false );
 		$auth_localized = array(
 			'wpLoginUrl'      => wp_login_url( $current_path ),
 			'publicWarning'   => get_option( 'auth_settings_advanced_public_notice' ),
@@ -54,7 +54,7 @@ class Login_Form extends Static_Instance {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Enqueue scripts appearing on wp-login.php.
-		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', plugin_root() ), array( 'jquery' ), '2.8.0' );
+		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', plugin_root() ), array( 'jquery' ), '2.8.0', false );
 
 		// Enqueue styles appearing on wp-login.php.
 		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '2.8.0' );
@@ -84,7 +84,7 @@ class Login_Form extends Static_Instance {
 				continue;
 			}
 			if ( $auth_settings['advanced_branding'] === $branding_option['value'] ) {
-				wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.8.0' );
+				wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.8.0', false );
 				wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.8.0' );
 				wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
 			}
@@ -92,7 +92,7 @@ class Login_Form extends Static_Instance {
 
 		// If we're using Google logins, load those resources.
 		if ( '1' === $auth_settings['google'] ) {
-			wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', plugin_root() ), array( 'jquery' ), '2.8.0' ); ?>
+			wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', plugin_root() ), array( 'jquery' ), '2.8.0', false ); ?>
 			<meta name="google-signin-clientid" content="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>" />
 			<meta name="google-signin-scope" content="email" />
 			<meta name="google-signin-cookiepolicy" content="single_host_origin" />
@@ -101,80 +101,80 @@ class Login_Form extends Static_Instance {
 	}
 
 
-		/**
-		 * Load external resources in the footer of the wp-login.php page.
-		 *
-		 * Action: login_footer
-		 */
-		public function load_login_footer_js() {
-			// Grab plugin settings.
-			$options       = Options::get_instance();
-			$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
-			$ajaxurl       = admin_url( 'admin-ajax.php' );
-			if ( '1' === $auth_settings['google'] ) :
-				?>
-				<script type="text/javascript">
-				/* global location, window */
-				// Reload login page if reauth querystring param exists,
-				// since reauth interrupts external logins (e.g., google).
-				if ( location.search.indexOf( 'reauth=1' ) >= 0 ) {
-					location.href = location.href.replace( 'reauth=1', '' );
-				}
+	/**
+	 * Load external resources in the footer of the wp-login.php page.
+	 *
+	 * Action: login_footer
+	 */
+	public function load_login_footer_js() {
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+		$ajaxurl       = admin_url( 'admin-ajax.php' );
+		if ( '1' === $auth_settings['google'] ) :
+			?>
+<script type="text/javascript">
+/* global location, window */
+// Reload login page if reauth querystring param exists,
+// since reauth interrupts external logins (e.g., google).
+if ( location.search.indexOf( 'reauth=1' ) >= 0 ) {
+	location.href = location.href.replace( 'reauth=1', '' );
+}
 
-				// eslint-disable-next-line no-implicit-globals
-				function authUpdateQuerystringParam( uri, key, value ) {
-					var re = new RegExp( '([?&])' + key + '=.*?(&|$)', 'i' );
-					var separator = uri.indexOf( '?' ) !== -1 ? '&' : '?';
-					if ( uri.match( re ) ) {
-						return uri.replace( re, '$1' + key + '=' + value + '$2' );
-					} else {
-						return uri + separator + key + '=' + value;
-					}
-				}
+// eslint-disable-next-line no-implicit-globals
+function authUpdateQuerystringParam( uri, key, value ) {
+	var re = new RegExp( '([?&])' + key + '=.*?(&|$)', 'i' );
+	var separator = uri.indexOf( '?' ) !== -1 ? '&' : '?';
+	if ( uri.match( re ) ) {
+		return uri.replace( re, '$1' + key + '=' + value + '$2' );
+	} else {
+		return uri + separator + key + '=' + value;
+	}
+}
 
-				// eslint-disable-next-line
-				function signInCallback( authResult ) { // jshint ignore:line
-					var $ = jQuery;
-					if ( authResult.status && authResult.status.signed_in ) {
-						// Hide the sign-in button now that the user is authorized, for example:
-						$( '#googleplus_button' ).attr( 'style', 'display: none' );
+// eslint-disable-next-line
+function signInCallback( authResult ) { // jshint ignore:line
+	var $ = jQuery;
+	if ( authResult.status && authResult.status.signed_in ) {
+		// Hide the sign-in button now that the user is authorized, for example:
+		$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
-						// Send the code to the server
-						var ajaxurl = '<?php echo esc_attr( $ajaxurl ); ?>';
-						$.post(ajaxurl, {
-							action: 'process_google_login',
-							code: authResult.code,
-							nonce: $('#nonce_google_auth-<?php echo esc_attr( Helper::get_cookie_value() ); ?>' ).val(),
-						}, function() {
-							// Handle or verify the server response if necessary.
-							// console.log( response );
+		// Send the code to the server
+		var ajaxurl = '<?php echo esc_attr( $ajaxurl ); ?>';
+		$.post(ajaxurl, {
+			action: 'process_google_login',
+			code: authResult.code,
+			nonce: $('#nonce_google_auth-<?php echo esc_attr( Helper::get_cookie_value() ); ?>' ).val(),
+		}, function() {
+			// Handle or verify the server response if necessary.
+			// console.log( response );
 
-							// Reload wp-login.php to continue the authentication process.
-							var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
-							if ( location.href === newHref ) {
-								location.reload();
-							} else {
-								location.href = newHref;
-							}
-						});
-					} else {
-						// Update the app to reflect a signed out user
-						// Possible error values:
-						//   "user_signed_out" - User is signed-out
-						//   "access_denied" - User denied access to your app
-						//   "immediate_failed" - Could not automatically log in the user
-						// console.log('Sign-in state: ' + authResult['error']);
+			// Reload wp-login.php to continue the authentication process.
+			var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
+			if ( location.href === newHref ) {
+				location.reload();
+			} else {
+				location.href = newHref;
+			}
+		});
+	} else {
+		// Update the app to reflect a signed out user
+		// Possible error values:
+		//   "user_signed_out" - User is signed-out
+		//   "access_denied" - User denied access to your app
+		//   "immediate_failed" - Could not automatically log in the user
+		// console.log('Sign-in state: ' + authResult['error']);
 
-						// If user denies access, reload the login page.
-						if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
-							window.location.reload();
-						}
-					}
-				}
-				</script>
-				<?php
-			endif;
+		// If user denies access, reload the login page.
+		if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
+			window.location.reload();
 		}
+	}
+}
+</script>
+			<?php
+		endif;
+	}
 
 
 	/**
@@ -210,7 +210,7 @@ class Login_Form extends Static_Instance {
 				</a></p>
 			<?php endif; ?>
 
-			<?php if ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) :  // phpcs:ignore WordPress.VIP.ValidatedSanitizedInput ?>
+			<?php if ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) :  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
 				<style type="text/css">
 					body.login-action-login form {
 						padding-bottom: 8px;
@@ -252,14 +252,14 @@ class Login_Form extends Static_Instance {
 		// Check whether we should redirect to CAS.
 		if (
 			isset( $_SERVER['QUERY_STRING'] ) &&
-			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.VIP.ValidatedSanitizedInput
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			array_key_exists( 'cas_auto_login', $auth_settings ) && '1' === $auth_settings['cas_auto_login'] &&
 			array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_cas_login() );
+			wp_redirect( Helper::modify_current_url_for_cas_login() ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 
