@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.0 =
+* Major code refactor to make the codebase easier to manage. Authorizer now requires PHP 5.3 or later.
+* Fix for edge case with new unapproved users and stale session IDs. Props @vib94 for the pull request!
+
 = 2.8.8 =
 * Add missing database migration for new option added in last version.
 
