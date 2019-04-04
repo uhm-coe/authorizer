@@ -268,6 +268,12 @@ class Authentication extends Static_Instance {
 			return null;
 		}
 
+		// Add Google API PHP Client.
+		// @see https://github.com/google/google-api-php-client branch:v1-master
+		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+		}
+
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
@@ -748,6 +754,12 @@ class Authentication extends Static_Instance {
 		// If session token set, log out of Google.
 		if ( 'google' === $current_user_authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 			$token = json_decode( $_SESSION['token'] )->access_token;
+
+			// Add Google API PHP Client.
+			// @see https://github.com/google/google-api-php-client branch:v1-master
+			if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+			}
 
 			// Build the Google Client.
 			$client = new \Google_Client();

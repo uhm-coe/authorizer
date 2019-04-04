@@ -21,16 +21,6 @@ use Authorizer\Sync_Userdata;
 class Ajax_Endpoints extends Static_Instance {
 
 	/**
-	 * Add Google API PHP Client when initializing.
-	 *
-	 * @see https://github.com/google/google-api-php-client branch:v1-master
-	 */
-	public function __construct() {
-		require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
-	}
-
-
-	/**
 	 * Verify the Google login and set a session token.
 	 *
 	 * Flow: "Sign in with Google" button clicked; JS Google library
@@ -66,6 +56,12 @@ class Ajax_Endpoints extends Static_Instance {
 		// Grab plugin settings.
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		// Add Google API PHP Client.
+		// @see https://github.com/google/google-api-php-client branch:v1-master
+		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+		}
 
 		// Build the Google Client.
 		$client = new \Google_Client();
