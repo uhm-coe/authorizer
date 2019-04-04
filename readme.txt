@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.1 =
+* Fix for conflict with other plugins including the Google API PHP Client (e.g., Simple Calendar).
+
 = 2.9.0 =
 * Major code refactor to make the codebase easier to manage. Authorizer now requires PHP 5.3 or later.
 * Fix for edge case with new unapproved users and stale session IDs. Props @vib94 for the pull request!
