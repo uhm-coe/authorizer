@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.2 =
+* Fix for broken translations in 2.9.0. Props @julienlusson for the pull request!
+* Updated French translations. Props @julienlusson for the pull request!
+
 = 2.9.1 =
 * Fix for conflict with other plugins including the Google API PHP Client (e.g., Simple Calendar).
 
