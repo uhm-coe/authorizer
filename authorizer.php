@@ -21,6 +21,8 @@
 
 namespace Authorizer;
 
+load_plugin_textdomain( 'authorizer', false, basename( dirname( __FILE__ ) ) . '/languages/' );
+
 require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-static-instance.php';
 
 require_once dirname( __FILE__ ) . '/src/authorizer/class-wp-plugin-authorizer.php';
