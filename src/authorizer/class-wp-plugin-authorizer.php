@@ -253,7 +253,7 @@ class WP_Plugin_Authorizer extends Static_Instance {
 		load_plugin_textdomain(
 			'authorizer',
 			false,
-			basename( dirname( __FILE__ ) ) . '/languages'
+			basename( dirname( plugin_root() ) ) . '/languages'
 		);
 	}
 
