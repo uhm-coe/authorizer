@@ -269,7 +269,7 @@ class Authentication extends Static_Instance {
 		}
 
 		// Add Google API PHP Client.
-		// @see https://github.com/google/google-api-php-client branch:v1-master
+		// @see https://github.com/google/google-api-php-client branch:v1-master.
 		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
 			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 		}
@@ -756,7 +756,7 @@ class Authentication extends Static_Instance {
 			$token = json_decode( $_SESSION['token'] )->access_token;
 
 			// Add Google API PHP Client.
-			// @see https://github.com/google/google-api-php-client branch:v1-master
+			// @see https://github.com/google/google-api-php-client branch:v1-master.
 			if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
 				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
 			}
