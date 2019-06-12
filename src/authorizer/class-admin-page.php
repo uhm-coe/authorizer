@@ -959,7 +959,7 @@ class Admin_Page extends Static_Instance {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.8.7', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.3', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
@@ -987,7 +987,7 @@ class Admin_Page extends Static_Instance {
 
 		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor/jquery.multi-select/js/jquery.multi-select.js', plugin_root() ), array( 'jquery' ), '1.8', true );
 
-		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '2.8.7' );
+		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '2.9.3' );
 		wp_enqueue_style( 'authorizer-css' );
 
 		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/jquery.multi-select/css/multi-select.css', plugin_root() ), array(), '1.8' );
