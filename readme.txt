@@ -63,6 +63,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.3 =
+* Fix uncaught CAS exception triggering the new Fatal Error Recovery system (email to admins) in WordPress 5.2.
+* Fix spacing on Authorizer Settings page.
+* Update screenshots.
+
 = 2.9.2 =
 * Fix for broken translations in 2.9.0. Props @julienlusson for the pull request!
 * Updated French translations. Props @julienlusson for the pull request!
