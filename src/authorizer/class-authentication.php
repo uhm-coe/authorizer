@@ -399,11 +399,11 @@ class Authentication extends Static_Instance {
 		// Authenticate against CAS.
 		try {
 			\phpCAS::forceAuthentication();
-		} catch ( CAS_AuthenticationException $e ) {
+		} catch ( \CAS_AuthenticationException $e ) {
 			// CAS server threw an error in isAuthenticated(), potentially because
 			// the cached ticket is outdated. Try renewing the authentication.
 			error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) ); // phpcs:ignore
-			error_log( print_r( $e, true ) ); // phpcs:ignore
+			error_log( $e->getMessage() ); // phpcs:ignore
 
 			// CAS server is throwing errors on this login, so try logging the
 			// user out of CAS and redirecting them to the login page.
