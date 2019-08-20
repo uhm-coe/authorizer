@@ -60,7 +60,7 @@ class Ajax_Endpoints extends Static_Instance {
 		// Add Google API PHP Client.
 		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
 		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/vendor/autoload.php';
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/vendor/autoload.php';
 		}
 
 		// Build the Google Client.
