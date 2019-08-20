@@ -6,18 +6,38 @@
     "homepage": "http://developers.google.com/api-client-library/php",
     "license": "Apache-2.0",
     "require": {
-        "php": ">=5.2.1"
+        "php": ">=5.4",
+        "google/auth": "^1.0",
+        "google/apiclient-services": "~0.13",
+        "firebase/php-jwt": "~2.0||~3.0||~4.0||~5.0",
+        "monolog/monolog": "^1.17",
+        "phpseclib/phpseclib": "~0.3.10||~2.0",
+        "guzzlehttp/guzzle": "~5.3.1||~6.0",
+        "guzzlehttp/psr7": "^1.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.7.*",
-        "squizlabs/php_codesniffer": "~2.3"
+        "phpunit/phpunit": "~4.8.36",
+        "squizlabs/php_codesniffer": "~2.3",
+        "symfony/dom-crawler": "~2.1",
+        "symfony/css-selector": "~2.1",
+        "cache/filesystem-adapter": "^0.3.2",
+        "phpcompatibility/php-compatibility": "^9.2",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.5.0"
+    },
+    "suggest": {
+        "cache/filesystem-adapter": "For caching certs and tokens (using Google_Client::setCache)"
     },
     "autoload": {
-        "files": ["src/Google/autoload.php"]
+        "psr-0": {
+            "Google_": "src/"
+        },
+        "classmap": [
+            "src/Google/Service/"
+        ]
     },
     "extra": {
         "branch-alias": {
-            "dev-v1-master": "1.1.x-dev"
+            "dev-master": "2.x-dev"
         }
     }
 }

@@ -58,9 +58,9 @@ class Ajax_Endpoints extends Static_Instance {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Add Google API PHP Client.
-		// @see https://github.com/google/google-api-php-client branch:v1-master
+		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
 		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/vendor/autoload.php';
 		}
 
 		// Build the Google Client.
@@ -89,19 +89,18 @@ class Ajax_Endpoints extends Static_Instance {
 
 		// Get one time use token (if it doesn't exist, we'll create one below).
 		session_start();
-		$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
+		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
 
 		if ( empty( $token ) ) {
 			// Exchange the OAuth 2.0 authorization code for user credentials.
 			$client->authenticate( $code );
-			$token = json_decode( $client->getAccessToken() );
 
 			// Store the token in the session for later use.
-			$_SESSION['token'] = wp_json_encode( $token );
+			$_SESSION['token'] = $client->getAccessToken();
 
 			$response = 'Successfully authenticated.';
 		} else {
-			$client->setAccessToken( wp_json_encode( $token ) );
+			$client->setAccessToken( $token );
 
 			$response = 'Already authenticated.';
 		}

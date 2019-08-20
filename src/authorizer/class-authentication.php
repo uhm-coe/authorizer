@@ -261,7 +261,7 @@ class Authentication extends Static_Instance {
 
 		// Get one time use token.
 		session_start();
-		$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'] ) : null;
+		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
 
 		// No token, so this is not a succesful Google login.
 		if ( is_null( $token ) ) {
@@ -269,9 +269,9 @@ class Authentication extends Static_Instance {
 		}
 
 		// Add Google API PHP Client.
-		// @see https://github.com/google/google-api-php-client branch:v1-master.
+		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
 		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/src/Google/autoload.php';
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client/vendor/autoload.php';
 		}
 
 		// Build the Google Client.
@@ -297,8 +297,12 @@ class Authentication extends Static_Instance {
 		 */
 
 		// Verify this is a successful Google authentication.
+		// NOTE:  verifyIdToken originally returned an object as per vendor/google/auth/src/OAuth2.php.
+		// However, it looks as though this function is overridden by src/Google/Client.php and returns an array instead
+		// in the v2 library.  Treating as an array for purposes of this functionality.
+		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77
 		try {
-			$ticket = $client->verifyIdToken( $token->id_token, $auth_settings['google_clientid'] );
+			$ticket = $client->verifyIdToken( $token['id_token'], $auth_settings['google_clientid'] );
 		} catch ( Google_Auth_Exception $e ) {
 			// Invalid ticket, so this in not a successful Google login.
 			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
@@ -310,8 +314,7 @@ class Authentication extends Static_Instance {
 		}
 
 		// Get email address.
-		$attributes   = $ticket->getAttributes();
-		$email        = Helper::lowercase( $attributes['payload']['email'] );
+		$email        = Helper::lowercase( $ticket['email'] );
 		$email_domain = substr( strrchr( $email, '@' ), 1 );
 		$username     = current( explode( '@', $email ) );
 
@@ -341,7 +344,7 @@ class Authentication extends Static_Instance {
 			'first_name'        => '',
 			'last_name'         => '',
 			'authenticated_by'  => 'google',
-			'google_attributes' => $attributes,
+			'google_attributes' => $ticket,
 		);
 	}
 
