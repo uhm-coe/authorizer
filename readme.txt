@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.4 =
+* Update google-api-php-client library to v2.2.4 to fix issues with OAuth calls. Props @sieumeo for notifying us about the change!
+
 = 2.9.3 =
 * Fix uncaught CAS exception triggering the new Fatal Error Recovery system (email to admins) in WordPress 5.2.
 * Fix spacing on Authorizer Settings page.
