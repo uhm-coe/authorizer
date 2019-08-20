@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.5 =
+* Move google-api-php-client due to svn delete issues on deploy.
+
 = 2.9.4 =
 * Update google-api-php-client library to v2.2.4 to fix issues with OAuth calls. Props @sieumeo for notifying us about the change!
 
