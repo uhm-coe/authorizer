@@ -333,13 +333,11 @@ class Authentication extends Static_Instance {
 		 * See: https://developers.google.com/identity/protocols/OpenIDConnect#hd-param
 		 * See: https://github.com/google/google-api-php-client/blob/v1-master/src/Google/Client.php#L407-L416
 		 *
-		 * Note: this only runs in the edge case where another plugin has already
-		 * defined the Google_Client class, and it's a version earlier than v2.
+		 * Note: this is a failsafe if the setHostedDomain() feature in v2 does not work above.
 		 */
 		if (
 			array_key_exists( 'google_hosteddomain', $auth_settings ) &&
-			strlen( $auth_settings['google_hosteddomain'] ) > 0 &&
-			$client::LIBVER < '2.0.0'
+			strlen( $auth_settings['google_hosteddomain'] ) > 0
 		) {
 			// Allow multiple whitelisted domains.
 			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
