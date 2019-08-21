@@ -59,7 +59,7 @@ class Ajax_Endpoints extends Static_Instance {
 
 		// Add Google API PHP Client.
 		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
-		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+		if ( ! class_exists( 'Google_Client' ) ) {
 			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/vendor/autoload.php';
 		}
 
@@ -86,18 +86,32 @@ class Ajax_Endpoints extends Static_Instance {
 
 		// Get one time use token (if it doesn't exist, we'll create one below).
 		session_start();
-		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
-
-		if ( empty( $token ) ) {
+		if ( empty( $_SESSION['token'] ) ) {
 			// Exchange the OAuth 2.0 authorization code for user credentials.
 			$client->authenticate( $code );
 
+			// Edge case: if another plugin has already defined the Google_Client class,
+			// and it's a version earlier than v2, then we need to handle $token as a
+			// json-encoded string instead of an array.
+			if ( $client::LIBVER < '2.0.0' ) {
+				$token = json_decode( $client->getAccessToken(), true );
+			} else {
+				$token = $client->getAccessToken();
+			}
+
 			// Store the token in the session for later use.
-			$_SESSION['token'] = $client->getAccessToken();
+			$_SESSION['token'] = wp_json_encode( $token );
 
 			$response = 'Successfully authenticated.';
 		} else {
-			$client->setAccessToken( $token );
+			// Edge case: if another plugin has already defined the Google_Client class,
+			// and it's a version earlier than v2, then we need to send a json-encoded
+			// string to setAccessToken() instead of an array.
+			if ( $client::LIBVER < '2.0.0' ) {
+				$client->setAccessToken( $_SESSION['token'] );
+			} else {
+				$client->setAccessToken( json_decode( $_SESSION['token'], true ) );
+			}
 
 			$response = 'Already authenticated.';
 		}

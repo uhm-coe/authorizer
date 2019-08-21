@@ -261,16 +261,16 @@ class Authentication extends Static_Instance {
 
 		// Get one time use token.
 		session_start();
-		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
+		$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'], true ) : null;
 
 		// No token, so this is not a succesful Google login.
-		if ( is_null( $token ) ) {
+		if ( empty( $token ) ) {
 			return null;
 		}
 
 		// Add Google API PHP Client.
 		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
-		if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+		if ( ! class_exists( 'Google_Client' ) ) {
 			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/vendor/autoload.php';
 		}
 
@@ -313,7 +313,16 @@ class Authentication extends Static_Instance {
 		}
 
 		// Get email address.
-		$email        = Helper::lowercase( $ticket['email'] );
+		// Edge case: if another plugin has already defined the Google_Client class,
+		// and it's a version earlier than v2, then we need to handle $token as a
+		// json-encoded string instead of an array.
+		if ( is_object( $ticket ) && method_exists( $ticket, 'getAttributes' ) ) {
+			$attributes = $ticket->getAttributes();
+			$email = Helper::lowercase( $attributes['payload']['email'] );
+		} else {
+			$email = Helper::lowercase( $ticket['email'] );
+		}
+
 		$email_domain = substr( strrchr( $email, '@' ), 1 );
 		$username     = current( explode( '@', $email ) );
 
@@ -758,11 +767,20 @@ class Authentication extends Static_Instance {
 
 		// If session token set, log out of Google.
 		if ( 'google' === $current_user_authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
-			$token = json_decode( $_SESSION['token'] )->access_token;
+			$token = $_SESSION['token'];
+
+			// Edge case: if another plugin has already defined the Google_Client class,
+			// and it's a version earlier than v2, then we need to handle $token as a
+			// json-encoded string instead of an array.
+			if ( ! is_array( $token ) ) {
+				$token = json_decode( $token, true );
+			}
+
+			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
 
 			// Add Google API PHP Client.
 			// @see https://github.com/google/google-api-php-client branch:v1-master.
-			if ( ! function_exists( 'google_api_php_client_autoload' ) ) {
+			if ( ! class_exists( 'Google_Client' ) ) {
 				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/src/Google/autoload.php';
 			}
 
@@ -774,7 +792,7 @@ class Authentication extends Static_Instance {
 			$client->setRedirectUri( 'postmessage' );
 
 			// Revoke the token.
-			$client->revokeToken( $token );
+			$client->revokeToken( $access_token );
 
 			// Remove the credentials from the user's session.
 			unset( $_SESSION['token'] );
