@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.6 =
+* Fix edge case where another plugin (e.g., Simple Calendar) has already required google-api-php-client v1.
+* Use setHostedDomain() included in google-api-php-client v2.
+
 = 2.9.5 =
 * Move google-api-php-client due to svn delete issues on deploy.
 
