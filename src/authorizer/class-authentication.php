@@ -615,8 +615,18 @@ class Authentication extends Static_Instance {
 			array_push( $ldap_attributes_to_retrieve, Helper::lowercase( $auth_settings['ldap_attr_email'] ) );
 		}
 
-		// Create default LDAP search filter (uid=$username).
-		$search_filter = '(' . $auth_settings['ldap_uid'] . '=' . $username . ')';
+		// Create default LDAP search filter. If LDAP email attribute is provided,
+		// use (|(uid=$username)(mail=$username)) instead (so logins with either a
+		// username or an email address will work). Otherwise use (uid=$username).
+		if ( array_key_exists( 'ldap_attr_email', $auth_settings ) && strlen( $auth_settings['ldap_attr_email'] ) > 0 && substr( $auth_settings['ldap_attr_email'], 0, 1 ) !== '@' ) {
+			$search_filter =
+				'(|' .
+					'(' . $auth_settings['ldap_uid'] . '=' . $username . ')' .
+					'(' . $auth_settings['ldap_attr_email'] . '=' . $username . ')' .
+				')';
+		} else {
+			$search_filter = '(' . $auth_settings['ldap_uid'] . '=' . $username . ')';
+		}
 
 		/**
 		 * Filter LDAP search filter.
