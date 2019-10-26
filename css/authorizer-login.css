@@ -1,6 +1,6 @@
 .login .button-external {
 	font-size: 18px;
-	height: 44px;
+	height: 50px;
 	margin: 0 0 20px 0;
 	padding-top: 8px;
 	text-align: center;
@@ -8,7 +8,6 @@
 }
 .login .button-external .dashicons {
 	font-size: 32px;
-	margin-top: -2px;
 }
 .login .button-external .label {
 	padding-left: 20px;
@@ -22,8 +21,8 @@
 	border-radius: 3px;
 	-webkit-box-shadow: 0 1px 0 rgba(0,0,0,0.20);
 	box-shadow: 0 1px 0 rgba(0,0,0,0.10);
-	height: 43px;
-	margin-bottom: 16px;
+	height: 50px;
+	margin-bottom: 20px;
 	text-shadow: none;
 	width: 270px;
 }

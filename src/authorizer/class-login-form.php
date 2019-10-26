@@ -57,7 +57,7 @@ class Login_Form extends Static_Instance {
 		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', plugin_root() ), array( 'jquery' ), '2.8.0', false );
 
 		// Enqueue styles appearing on wp-login.php.
-		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '2.8.0' );
+		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '2.9.8' );
 		wp_enqueue_style( 'authorizer-login-css' );
 
 		/**
