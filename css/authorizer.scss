@@ -99,6 +99,16 @@
 				display: inline;
 			}
 		}
+
+		// Make "Limit invalid login attempts" inputs inline so they read like a
+		// sentence.
+		#auth_settings_advanced_lockouts_attempts_1,
+		#auth_settings_advanced_lockouts_duration_1,
+		#auth_settings_advanced_lockouts_attempts_2,
+		#auth_settings_advanced_lockouts_duration_2,
+		#auth_settings_advanced_lockouts_reset_duration {
+			display: inline;
+		}
 	}
 
 	// Expand/collapse option sections.

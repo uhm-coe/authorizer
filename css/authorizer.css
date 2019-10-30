@@ -92,6 +92,17 @@
   .toplevel_page_authorizer .tablenav .current-page,
   .settings_page_authorizer .tablenav .current-page {
     width: auto;
+    display: inline; }
+  .toplevel_page_authorizer #auth_settings_advanced_lockouts_attempts_1,
+  .toplevel_page_authorizer #auth_settings_advanced_lockouts_duration_1,
+  .toplevel_page_authorizer #auth_settings_advanced_lockouts_attempts_2,
+  .toplevel_page_authorizer #auth_settings_advanced_lockouts_duration_2,
+  .toplevel_page_authorizer #auth_settings_advanced_lockouts_reset_duration,
+  .settings_page_authorizer #auth_settings_advanced_lockouts_attempts_1,
+  .settings_page_authorizer #auth_settings_advanced_lockouts_duration_1,
+  .settings_page_authorizer #auth_settings_advanced_lockouts_attempts_2,
+  .settings_page_authorizer #auth_settings_advanced_lockouts_duration_2,
+  .settings_page_authorizer #auth_settings_advanced_lockouts_reset_duration {
     display: inline; } }
 
 .toplevel_page_authorizer .form-table th.hide-animate,
