@@ -1182,7 +1182,7 @@
 	});
 
 	function fadeLogo() {
-		if ( getScrollPercent() < 80 ) {
+		if ( getScrollPercent() < 90 ) {
 			$( '#wpwrap' ).removeClass( 'not-faded' );
 		} else {
 			$( '#wpwrap' ).addClass( 'not-faded' );
