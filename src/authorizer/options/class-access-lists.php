@@ -405,7 +405,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 
 		$output = "<div class='tablenav-pages'>$output</div>";
 		?>
-		<div class="tablenav top">
+		<div class="tablenav">
 			<?php echo wp_kses( $output, Helper::$allowed_html ); ?>
 			<?php echo wp_kses( $search_form, Helper::$allowed_html ); ?>
 		</div>
@@ -514,7 +514,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 						value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
 						class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'usermeta', $is_multisite_user ) ); ?>"
 					/>
-					<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+					<a class="button button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 				<?php endif; ?>
 			<?php endif; ?>
 			<a class="button<?php echo $is_multisite_admin_page || $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
