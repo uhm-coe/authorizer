@@ -736,6 +736,14 @@ class Authentication extends Static_Instance {
 
 		$current_user_authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
 
+		// If we didn't find an authenticated method, check $_REQUEST (if this is a
+		// pending user facing the "no access" message, their logout link will
+		// include "external=?" since they don't have a WP_User to attach the
+		// "authenticated_by" usermeta to).
+		if ( empty( $current_user_authenticated_by ) && ! empty( $_REQUEST['external'] ) ) {
+			$current_user_authenticated_by = $_REQUEST['external'];
+		}
+
 		// If logged in to CAS, Log out of CAS.
 		if ( 'cas' === $current_user_authenticated_by && '1' === $auth_settings['cas'] ) {
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {

@@ -421,6 +421,13 @@ class Authorization extends Static_Instance {
 					}
 				}
 
+				// Fetch the external service this user authenticated with, and append
+				// it to the logout URL below (so we can fire custom logout routines in
+				// custom_logout() based on their external service. This is necessary
+				// because a pending user does not have a WP_User, and thus no
+				// "authenticated_by" usermeta that is normally used to do this.
+				$external_param = isset($user_data['authenticated_by']) ? '&external=' . $user_data['authenticated_by'] : '';
+
 				// Notify user about pending status and return without authenticating them.
 				// phpcs:ignore WordPress.Security.NonceVerification
 				$redirect_to   = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
@@ -429,7 +436,7 @@ class Authorization extends Static_Instance {
 					apply_filters( 'the_content', $auth_settings['access_pending_redirect_to_message'] ) .
 					'<hr />' .
 					'<p style="text-align: center;">' .
-					'<a class="button" href="' . wp_logout_url( $redirect_to ) . '">' .
+					'<a class="button" href="' . wp_logout_url( $redirect_to ) . $external_param . '">' .
 					__( 'Back', 'authorizer' ) .
 					'</a></p>';
 				update_option( 'auth_settings_advanced_login_error', $error_message );
