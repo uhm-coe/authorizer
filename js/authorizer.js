@@ -253,11 +253,10 @@
 				'z-index': 1,
 				opacity: 0.8,
 				position: 'absolute',
-				top: settings.position().top + 46,
-				left: settings.position().left - 20,
-				width: '100%',
-				height: settings.height() + 20,
-				'padding-left': 20,
+				top: settings.position().top,
+				left: settings.position().left,
+				width: settings.width(),
+				height: settings.height() + 50,
 			});
 			overlay.show();
 		}
