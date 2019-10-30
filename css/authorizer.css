@@ -105,6 +105,11 @@
   .settings_page_authorizer #auth_settings_advanced_lockouts_reset_duration {
     display: inline; } }
 
+@media screen and (max-width: 782px) and (max-width: 782px) {
+  .toplevel_page_authorizer .button-add-user,
+  .settings_page_authorizer .button-add-user {
+    line-height: 37px; } }
+
 .toplevel_page_authorizer .form-table th.hide-animate,
 .toplevel_page_authorizer .form-table td.hide-animate,
 .settings_page_authorizer .form-table th.hide-animate,
@@ -377,10 +382,15 @@
 #auth_dashboard_widget .dropdown-toggle {
   border-bottom: 0; }
 
-.toplevel_page_authorizer .dropdown-toggle + .dropdown-toggle,
-.settings_page_authorizer .dropdown-toggle + .dropdown-toggle,
-#auth_dashboard_widget .dropdown-toggle + .dropdown-toggle {
-  border-left: 1px solid white; }
+.toplevel_page_authorizer .dropdown-toggle-split,
+.settings_page_authorizer .dropdown-toggle-split,
+#auth_dashboard_widget .dropdown-toggle-split {
+  padding-right: .5625rem;
+  padding-left: .5625rem; }
+  .toplevel_page_authorizer .dropdown-toggle-split::after,
+  .settings_page_authorizer .dropdown-toggle-split::after,
+  #auth_dashboard_widget .dropdown-toggle-split::after {
+    margin-left: 0; }
 
 .toplevel_page_authorizer .sr-only,
 .settings_page_authorizer .sr-only,
@@ -429,7 +439,7 @@
   display: none;
   float: left;
   font-size: 14px;
-  left: 0;
+  right: 0;
   list-style: none;
   margin: 2px 0 0;
   min-width: 160px;
@@ -526,7 +536,9 @@
 .settings_page_authorizer .btn-group-vertical,
 #auth_dashboard_widget .btn-group,
 #auth_dashboard_widget .btn-group-vertical {
-  display: inline-block;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
   position: relative;
   vertical-align: middle; }
 
@@ -536,7 +548,9 @@
 .settings_page_authorizer .btn-group-vertical > .btn,
 #auth_dashboard_widget .btn-group > .btn,
 #auth_dashboard_widget .btn-group-vertical > .btn {
-  float: left;
+  -webkit-box-flex: 0;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
   position: relative; }
 
 .toplevel_page_authorizer .btn-group > .btn:hover,

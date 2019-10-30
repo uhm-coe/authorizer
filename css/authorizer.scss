@@ -109,6 +109,13 @@
 		#auth_settings_advanced_lockouts_reset_duration {
 			display: inline;
 		}
+
+		// Make Bootstrap button group label vertically centered.
+		@media screen and (max-width: 782px) {
+			.button-add-user {
+				line-height: 37px;
+			}
+		}
 	}
 
 	// Expand/collapse option sections.
@@ -323,8 +330,13 @@
 	.dropdown-toggle {
 		border-bottom: 0;
 	}
-	.dropdown-toggle + .dropdown-toggle {
-		border-left: 1px solid white;
+	.dropdown-toggle-split {
+		padding-right: .5625rem;
+		padding-left: .5625rem;
+
+		&::after {
+			margin-left: 0;
+  	}
 	}
 
 	// Portions below from Bootstrap.
@@ -367,7 +379,7 @@
 		display: none;
 		float: left;
 		font-size: 14px;
-		left: 0;
+		right: 0;
 		list-style: none;
 		margin: 2px 0 0;
 		min-width: 160px;
@@ -431,13 +443,13 @@
 
 	.btn-group,
 	.btn-group-vertical {
-		display: inline-block;
+		display: inline-flex;
 		position: relative;
 		vertical-align: middle;
 	}
 	.btn-group > .btn,
 	.btn-group-vertical > .btn {
-		float: left;
+		flex: 0 1 auto;
 		position: relative;
 	}
 	.btn-group > .btn:hover,

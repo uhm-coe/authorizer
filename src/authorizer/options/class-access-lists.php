@@ -221,8 +221,8 @@ class Access_Lists extends \Authorizer\Static_Instance {
 					<?php Helper::wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 				</select>
 				<div class="btn-group">
-					<a href="javascript:void(0);" class="btn button-primary dropdown-toggle button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-					<button type="button" class="btn button-primary dropdown-toggle" data-toggle="dropdown">
+					<a href="javascript:void(0);" class="btn button-primary button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+					<button type="button" class="btn button-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
 						<span class="caret"></span>
 						<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 					</button>
