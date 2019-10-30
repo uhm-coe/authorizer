@@ -199,7 +199,7 @@
 		}, function( response ) {
 			// Server responded, but if success isn't true it failed to save.
 			var succeeded = response.success;
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 
 			// Remove any new user entries that were rejected by the server.
@@ -207,7 +207,7 @@
 				for ( var i = 0; i < response.invalid_emails.length; i++ ) {
 					var duplicateEmail = response.invalid_emails[i];
 					$( 'li.new-user .auth-email[value="' + duplicateEmail + '"]' )
-						.siblings( '.spinner' ).addClass( 'duplicate' ).append( '<span class="spinner-text" style="color: red;">' + authL10n.duplicate + '.</span>' )
+						.siblings( '.spinner' ).addClass( 'duplicate' ).append( '<span class="spinner-text"><span class="attention">' + authL10n.duplicate + '.</span></span>' )
 						.parent().fadeOut( spinnerWait, function() { $( this ).remove(); }); // jshint ignore:line
 				}
 			}
@@ -223,7 +223,7 @@
 		}).fail( function() {
 			// Fail fires if the server doesn't respond or responds with 500 codes
 			var succeeded = false;
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 			$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
@@ -786,7 +786,7 @@
 			nonce: nonce,
 		}, function( response ) {
 			var succeeded = response === 'success';
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 
 			// Enable inputs, remove spinner.
@@ -800,7 +800,7 @@
 
 		}).fail( function() {
 			var succeeded = false;
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 
 			// Enable inputs, remove spinner.
@@ -1149,7 +1149,7 @@
 			advanced_widget_enabled: advanced_widget_enabled,
 		}, function( response ) {
 			var succeeded = response === 'success';
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 			$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
@@ -1161,7 +1161,7 @@
 		}).fail( function() {
 			// Fail fires if the server doesn't respond
 			var succeeded = false;
-			var spinnerText = succeeded ? authL10n.saved + '.' : '<span style="color: red;">' + authL10n.failed + '.</span>';
+			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
 			$( 'form .spinner:not(:has(.spinner-text))' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
