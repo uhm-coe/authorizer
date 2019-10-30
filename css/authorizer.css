@@ -103,7 +103,12 @@
   .settings_page_authorizer #auth_settings_advanced_lockouts_attempts_2,
   .settings_page_authorizer #auth_settings_advanced_lockouts_duration_2,
   .settings_page_authorizer #auth_settings_advanced_lockouts_reset_duration {
-    display: inline; } }
+    display: inline; }
+  .toplevel_page_authorizer textarea,
+  .settings_page_authorizer textarea {
+    padding: 3px 10px;
+    line-height: 2;
+    min-height: 40px; } }
 
 @media screen and (max-width: 782px) and (max-width: 782px) {
   .toplevel_page_authorizer .button-add-user,

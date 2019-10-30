@@ -110,6 +110,13 @@
 			display: inline;
 		}
 
+		// Textarea heights should match text/select heights on mobile.
+		textarea {
+			padding: 3px 10px;
+			line-height: 2;
+			min-height: 40px;
+		}
+
 		// Make Bootstrap button group label vertically centered.
 		@media screen and (max-width: 782px) {
 			.button-add-user {
