@@ -86,9 +86,6 @@
   .toplevel_page_authorizer #auth_settings_google_clientid,
   .settings_page_authorizer #auth_settings_google_clientid {
     width: 100%; }
-  .toplevel_page_authorizer br,
-  .settings_page_authorizer br {
-    display: none; }
   .toplevel_page_authorizer .tablenav .tablenav-pages,
   .settings_page_authorizer .tablenav .tablenav-pages {
     text-align: left; }

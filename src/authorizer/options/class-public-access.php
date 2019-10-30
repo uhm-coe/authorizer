@@ -61,8 +61,11 @@ class Public_Access extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone"><?php esc_html_e( 'Everyone can see the site', 'authorizer' ); ?></label><br />
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users"><?php esc_html_e( 'Only logged in users can see the site', 'authorizer' ); ?></label><br />
+		<fieldset>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_everyone" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="everyone"<?php checked( 'everyone' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Everyone can see the site', 'authorizer' ); ?></label>
+			<br>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_logged_in_users" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="logged_in_users"<?php checked( 'logged_in_users' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Only logged in users can see the site', 'authorizer' ); ?></label>
+		</fieldset>
 		<?php
 	}
 
@@ -81,8 +84,11 @@ class Public_Access extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login"><?php esc_html_e( 'Send them to the login screen', 'authorizer' ); ?></label><br />
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message"><?php esc_html_e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label>
+		<fieldset>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_login" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="login"<?php checked( 'login' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Send them to the login screen', 'authorizer' ); ?></label>
+			<br>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_to_message" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="message"<?php checked( 'message' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Show them the anonymous access message (below)', 'authorizer' ); ?></label>
+		</fieldset>
 		<?php
 	}
 
@@ -101,8 +107,11 @@ class Public_Access extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no"><?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), Helper::$allowed_html ); ?></label><br />
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>"><?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), Helper::$allowed_html ); ?></label>
+		<fieldset>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_no" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="no_warning"<?php checked( 'no_warning' === $auth_settings_option ); ?> /> <?php echo wp_kses( __( 'Show them the page <strong>without</strong> the anonymous access message', 'authorizer' ), Helper::$allowed_html ); ?></label>
+			<br>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="warning"<?php checked( 'warning' === $auth_settings_option ); ?> /> <?php echo wp_kses( __( 'Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href="http://getbootstrap.com/components/#alerts-dismissible" target="_blank">Bootstrap Dismissible Alert</a>)', 'authorizer' ), Helper::$allowed_html ); ?></label>
+		</fieldset>
 		<?php
 	}
 

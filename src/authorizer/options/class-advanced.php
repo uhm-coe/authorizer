@@ -99,43 +99,47 @@ class Advanced extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default"><?php esc_html_e( 'Default WordPress login screen', 'authorizer' ); ?></label><br />
-		<?php
+		<fieldset>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_default" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="default"<?php checked( 'default' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Default WordPress login screen', 'authorizer' ); ?></label>
+			<?php
 
-		/**
-		 * Developers can use the `authorizer_add_branding_option` filter
-		 * to add a radio button for "Custom WordPress login branding"
-		 * under the "Advanced" tab in Authorizer options. Example:
-		 * function my_authorizer_add_branding_option( $branding_options ) {
-		 *   $new_branding_option = array(
-		 *    'value' => 'your_brand'
-		 *    'description' => 'Custom Your Brand Login Screen',
-		 *    'css_url' => 'http://url/to/your_brand.css',
-		 *    'js_url' => 'http://url/to/your_brand.js',
-		 *   );
-		 *   array_push( $branding_options, $new_branding_option );
-		 *   return $branding_options;
-		 * }
-		 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
-		 */
-		$branding_options = array();
-		$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
-		foreach ( $branding_options as $branding_option ) {
-			// Make sure the custom brands have the required values.
-			if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
-				continue;
+			/**
+			 * Developers can use the `authorizer_add_branding_option` filter
+			 * to add a radio button for "Custom WordPress login branding"
+			 * under the "Advanced" tab in Authorizer options. Example:
+			 * function my_authorizer_add_branding_option( $branding_options ) {
+			 *   $new_branding_option = array(
+			 *    'value' => 'your_brand'
+			 *    'description' => 'Custom Your Brand Login Screen',
+			 *    'css_url' => 'http://url/to/your_brand.css',
+			 *    'js_url' => 'http://url/to/your_brand.js',
+			 *   );
+			 *   array_push( $branding_options, $new_branding_option );
+			 *   return $branding_options;
+			 * }
+			 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
+			 */
+			$branding_options = array();
+			$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
+			foreach ( $branding_options as $branding_option ) {
+				// Make sure the custom brands have the required values.
+				if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'description', $branding_option ) ) ) {
+					continue;
+				}
+				?>
+				<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $branding_option['value'] ); ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /> <?php echo esc_html( $branding_option['description'] ); ?></label>
+				<?php
+			}
+
+			// Print message about adding custom brands if there are none.
+			if ( count( $branding_options ) === 0 ) {
+				?>
+				<p class="description"><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></em></p>
+				<?php
 			}
 			?>
-			<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $branding_option['value'] ); ?>"<?php checked( $branding_option['value'] === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( sanitize_title( $branding_option['value'] ) ); ?>"><?php echo esc_html( $branding_option['description'] ); ?></label><br />
-			<?php
-		}
-
-		// Print message about adding custom brands if there are none.
-		if ( count( $branding_options ) === 0 ) {
-			?>
-			<p><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></em></p>
-			<?php
-		}
+		</fieldset>
+		<?php
 	}
 
 
@@ -153,8 +157,11 @@ class Advanced extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings"><?php esc_html_e( 'Show in Settings menu', 'authorizer' ); ?></label><br />
-		<input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /><label for="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top"><?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label><br />
+		<fieldset>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_settings" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="settings"<?php checked( 'settings' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Show in Settings menu', 'authorizer' ); ?></label>
+			<br>
+			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label>
+		</fieldset>
 		<?php
 
 	}
