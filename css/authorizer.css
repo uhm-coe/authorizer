@@ -336,12 +336,6 @@
 #auth_dashboard_widget .invisible {
   visibility: hidden; }
 
-.toplevel_page_authorizer .helper,
-.settings_page_authorizer .helper,
-#auth_dashboard_widget .helper {
-  font-size: 0.8em;
-  font-style: italic; }
-
 .toplevel_page_authorizer .auth_multisite_override_overlay .overlay-note,
 .settings_page_authorizer .auth_multisite_override_overlay .overlay-note,
 #auth_dashboard_widget .auth_multisite_override_overlay .overlay-note {

@@ -69,7 +69,7 @@ class Google extends \Authorizer\Static_Instance {
 			<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
 		</ol>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -89,7 +89,7 @@ class Google extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:220px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  sDNgX5_pr_5bly-frKmvp8jT', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -109,7 +109,7 @@ class Google extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:220px;"><?php echo esc_html( $auth_settings_option ); ?></textarea>
-		<br /><small><?php esc_html_e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?><br /><?php esc_html_e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></small>
+		<p class="description"><?php esc_html_e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?> <?php esc_html_e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></p>
 		<?php
 	}
 

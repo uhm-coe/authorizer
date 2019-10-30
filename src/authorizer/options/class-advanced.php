@@ -80,7 +80,7 @@ class Advanced extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
-		<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</small></p>
+		<p class="description"><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</p>
 			<?php
 	}
 
@@ -134,7 +134,7 @@ class Advanced extends \Authorizer\Static_Instance {
 			// Print message about adding custom brands if there are none.
 			if ( count( $branding_options ) === 0 ) {
 				?>
-				<p class="description"><em><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></em></p>
+				<p class="description"><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></p>
 				<?php
 			}
 			?>
@@ -337,7 +337,7 @@ class Advanced extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></label>
-		<p><small><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></small></p>
+		<p class="description"><?php esc_html_e( 'Note: Only users with the create_users capability will be able to see the dashboard widget.', 'authorizer' ); ?></p>
 		<?php
 	}
 

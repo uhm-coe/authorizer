@@ -55,7 +55,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-		<br /><small><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></small>
+		<p class="description"><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -75,8 +75,11 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  389', 'authorizer' ); ?></label>
-		<br /><small><?php esc_html_e( 'If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored.', 'authorizer' ); ?></small>
+		<p class="description">
+			<?php esc_html_e( 'Example:  389', 'authorizer' ); ?>
+			<br>
+			<small><?php esc_html_e( 'If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored.', 'authorizer' ); ?></small>
+		</p>
 		<?php
 	}
 
@@ -96,7 +99,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></label>
-		<br /><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small>
+		<p class="description"><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small></p>
 		<?php
 	}
 
@@ -116,8 +119,10 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?></label>
-		<br /><small><?php esc_html_e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
+		<p class="description"><?php esc_html_e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?>
+			<br>
+			<small><?php esc_html_e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
+		</p>
 		<?php
 	}
 
@@ -137,7 +142,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:80px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  uid', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  uid', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -157,8 +162,10 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-		<br /><small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
+		<p class="description"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?>
+			<br>
+			<small><?php echo wp_kses( __( "Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
+		</p>
 		<?php
 	}
 
@@ -178,7 +185,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -219,7 +226,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width: 400px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  https://myschool.example.edu:8888/am-forgot-password', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  https://myschool.example.edu:8888/am-forgot-password', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -239,7 +246,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenname', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  givenname', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -259,7 +266,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></p>
 		<?php
 	}
 

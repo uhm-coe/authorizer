@@ -89,7 +89,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  authn.example.edu', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  authn.example.edu', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -109,7 +109,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:50px;" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  443', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  443', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -129,7 +129,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  /cas', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  /cas', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -173,8 +173,11 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  mail', 'authorizer' ); ?></label>
-		<br /><small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
+		<p class="description">
+			<?php esc_html_e( 'Example:  mail', 'authorizer' ); ?>
+			<br>
+			<small><?php echo wp_kses( __( "Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field.", 'authorizer' ), Helper::$allowed_html ); ?></small>
+		</p>
 		<?php
 	}
 
@@ -194,7 +197,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  givenName', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  givenName', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -214,7 +217,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
-		<br /><label for="auth_settings_<?php echo esc_attr( $option ); ?>" class="helper"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Example:  sn', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -253,7 +256,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
-		<p><small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small></p>
+		<p class="description"><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -273,7 +276,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Link CAS accounts to WordPress accounts by their username (leave this off to link by email address)', 'authorizer' ); ?></label>
-		<p><small><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></small></p>
+		<p class="description"><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></p>
 		<?php
 	}
 
