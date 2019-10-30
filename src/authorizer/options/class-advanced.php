@@ -80,7 +80,7 @@ class Advanced extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Hide WordPress Logins', 'authorizer' ); ?></label>
-		<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</p>
+		<p><small><?php esc_html_e( 'Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ); ?><br /><a href="<?php echo esc_attr( wp_login_url() ); ?>?external=wordpress" target="_blank"><?php echo esc_html( wp_login_url() ); ?>?external=wordpress</a>.</small></p>
 			<?php
 	}
 
