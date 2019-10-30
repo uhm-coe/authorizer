@@ -274,14 +274,13 @@
 	function animateOption( action, option ) {
 		if ( action === 'show' ) {
 			$( 'div.animated_wrapper', option ).slideDown( animationSpeed );
-			$( 'th', option ).animate({ padding: '20px 10px 20px 0' }, { duration: animationSpeed });
-			$( 'td', option ).animate({ padding: '15px 10px' }, { duration: animationSpeed });
+			$( 'th, td', option ).removeClass( 'hide-animate hide-no-animate' );
 		} else if ( action === 'hide' ) {
 			$( 'div.animated_wrapper', option ).slideUp( animationSpeed );
-			$( 'td, th', option ).animate({ padding: '0px' }, { duration: animationSpeed });
+			$( 'td, th', option ).addClass( 'hide-animate' );
 		} else if ( action === 'hide_immediately' ) {
 			$( 'div.animated_wrapper', option ).hide();
-			$( 'td, th', option ).css({ padding: '0px' });
+			$( 'td, th', option ).addClass( 'hide-no-animate' );
 		}
 	}
 
