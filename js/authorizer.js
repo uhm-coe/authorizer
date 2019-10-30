@@ -728,6 +728,9 @@
 		// Save user's active tab to sessionStorage (so we can restore it on reload).
 		// Note: session storage persists until the browser tab is closed.
 		sessionStorage.setItem( 'tab', listName );
+
+		// Check whether to fade logo.
+		fadeLogo();
 	};
 
 	// Hide (with overlay) site options if overridden by a multisite option.
@@ -1172,6 +1175,27 @@
 		});
 	};
 	/* eslint-enable camelcase */
+
+	// Fade in/out Authorizer logo in bottom right on Settings.
+	$(document).on( 'scroll', function () {
+		fadeLogo();
+	});
+
+	function fadeLogo() {
+		if ( getScrollPercent() < 80 ) {
+			$( '#wpwrap' ).removeClass( 'not-faded' );
+		} else {
+			$( '#wpwrap' ).addClass( 'not-faded' );
+		}
+	}
+
+	function getScrollPercent() {
+		var h = document.documentElement,
+			b = document.body,
+			st = 'scrollTop',
+			sh = 'scrollHeight';
+		return ( h[st] || b[st] ) / ( ( h[sh] || b[sh] ) - h.clientHeight ) * 100;
+	}
 
 	/* ========================================================================
 	 * Portions below from Bootstrap.
