@@ -31,15 +31,15 @@ class Cas extends \Authorizer\Static_Instance {
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Make sure php5-curl extension is installed on server.
-		$curl_installed_message = ! function_exists( 'curl_init' ) ? __( '<a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: red;">PHP CURL extension</a> is not installed', 'authorizer' ) : '';
+		$curl_installed_message = ! function_exists( 'curl_init' ) ? __( '<a href="http://www.php.net//manual/en/curl.installation.php" target="_blank" style="color: #dc3232;">PHP CURL extension</a> is not installed', 'authorizer' ) : '';
 
 		// Make sure php_openssl extension is installed on server.
-		$openssl_installed_message = ! extension_loaded( 'openssl' ) ? __( '<a href="http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working" target="_blank" style="color: red;">PHP openssl extension</a> is not installed', 'authorizer' ) : '';
+		$openssl_installed_message = ! extension_loaded( 'openssl' ) ? __( '<a href="http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working" target="_blank" style="color: #dc3232;">PHP openssl extension</a> is not installed', 'authorizer' ) : '';
 
 		// Build error message string.
 		$error_message = '';
 		if ( strlen( $curl_installed_message ) > 0 || strlen( $openssl_installed_message ) > 0 ) {
-			$error_message = '<span style="color: red;">(' .
+			$error_message = '<span style="color: #dc3232;">(' .
 				__( 'Warning', 'authorizer' ) . ': ' .
 				$curl_installed_message .
 				( strlen( $curl_installed_message ) > 0 && strlen( $openssl_installed_message ) > 0 ? '; ' : '' ) .
@@ -69,7 +69,7 @@ class Cas extends \Authorizer\Static_Instance {
 		// Print option elements.
 		esc_html_e( 'The button on the login page will read:', 'authorizer' );
 		?>
-		<p><a class="button-primary button-large" style="padding: 3px 16px; height: 36px;"><span class="dashicons dashicons-lock" style="margin: 4px 4px 0 0;"></span> <strong><?php esc_html_e( 'Sign in with', 'authorizer' ); ?> </strong><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="CAS" style="width: 100px;" /></a></p>
+		<p><a class="button-primary button-large button-external"><span class="dashicons dashicons-lock"></span> <strong><?php esc_html_e( 'Sign in with', 'authorizer' ); ?> </strong><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="CAS" /></a></p>
 		<?php
 	}
 

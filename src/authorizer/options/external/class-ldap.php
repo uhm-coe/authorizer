@@ -31,7 +31,7 @@ class Ldap extends \Authorizer\Static_Instance {
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Make sure php5-ldap extension is installed on server.
-		$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: red;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: red;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
+		$ldap_installed_message = ! function_exists( 'ldap_connect' ) ? '<span style="color: #dc3232;">(' . __( 'Warning: <a href="http://www.php.net/manual/en/ldap.installation.php" target="_blank" style="color: #dc3232;">PHP LDAP extension</a> is <strong>not</strong> installed', 'authorizer' ) . ')</span>' : '';
 
 		// Print option elements.
 		?>

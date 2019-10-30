@@ -47,19 +47,19 @@ class Advanced extends \Authorizer\Static_Instance {
 		// Print option elements.
 		esc_html_e( 'After', 'authorizer' );
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_1]" value="<?php echo esc_attr( $auth_settings_option['attempts_1'] ); ?>" placeholder="10" style="width:30px;" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_1]" value="<?php echo esc_attr( $auth_settings_option['attempts_1'] ); ?>" placeholder="10" style="width:40px;" />
 		<?php esc_html_e( 'invalid password attempts, delay further attempts on that user for', 'authorizer' ); ?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_1]" value="<?php echo esc_attr( $auth_settings_option['duration_1'] ); ?>" placeholder="1" style="width:30px;" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_1" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_1]" value="<?php echo esc_attr( $auth_settings_option['duration_1'] ); ?>" placeholder="1" style="width:40px;" />
 		<?php esc_html_e( 'minute(s).', 'authorizer' ); ?>
 		<br />
 		<?php esc_html_e( 'After', 'authorizer' ); ?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_2]" value="<?php echo esc_attr( $auth_settings_option['attempts_2'] ); ?>" placeholder="10" style="width:30px;" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_attempts_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][attempts_2]" value="<?php echo esc_attr( $auth_settings_option['attempts_2'] ); ?>" placeholder="10" style="width:40px;" />
 		<?php esc_html_e( 'more invalid attempts, increase the delay to', 'authorizer' ); ?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_2]" value="<?php echo esc_attr( $auth_settings_option['duration_2'] ); ?>" placeholder="10" style="width:30px;" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_duration_2" name="auth_settings[<?php echo esc_attr( $option ); ?>][duration_2]" value="<?php echo esc_attr( $auth_settings_option['duration_2'] ); ?>" placeholder="10" style="width:40px;" />
 		<?php esc_html_e( 'minutes.', 'authorizer' ); ?>
 		<br />
 		<?php esc_html_e( 'Reset the delays after', 'authorizer' ); ?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_reset_duration" name="auth_settings[<?php echo esc_attr( $option ); ?>][reset_duration]" value="<?php echo esc_attr( $auth_settings_option['reset_duration'] ); ?>" placeholder="240" style="width:40px;" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_reset_duration" name="auth_settings[<?php echo esc_attr( $option ); ?>][reset_duration]" value="<?php echo esc_attr( $auth_settings_option['reset_duration'] ); ?>" placeholder="240" style="width:50px;" />
 		<?php esc_html_e( 'minutes with no invalid attempts.', 'authorizer' ); ?>
 		<?php
 	}

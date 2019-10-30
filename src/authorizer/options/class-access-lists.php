@@ -70,7 +70,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 		// Render wrapper div (for aligning pager to width of content).
 		?>
 		<div class="wrapper_<?php echo esc_attr( $option ); ?>">
-			<ul id="list_auth_settings_access_users_pending" style="margin:0;">
+			<ul id="list_auth_settings_access_users_pending">
 				<?php
 				if ( count( $auth_settings_option ) > 0 ) :
 					foreach ( $auth_settings_option as $key => $pending_user ) :
@@ -256,7 +256,7 @@ class Access_Lists extends \Authorizer\Static_Instance {
 		// Render wrapper div (for aligning pager to width of content).
 		?>
 		<div class="wrapper_<?php echo esc_attr( $option ); ?>">
-			<ul id="list_auth_settings_<?php echo esc_attr( $option ); ?>" style="margin:0;">
+			<ul id="list_auth_settings_<?php echo esc_attr( $option ); ?>">
 				<?php
 				foreach ( $auth_settings_option as $key => $blocked_user ) :
 					if ( empty( $blocked_user ) || count( $blocked_user ) < 1 ) :
