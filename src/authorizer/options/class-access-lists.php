@@ -517,12 +517,8 @@ class Access_Lists extends \Authorizer\Static_Instance {
 					<a class="button button-small button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
 				<?php endif; ?>
 			<?php endif; ?>
-			<?php if ( ! $is_current_user && ! $is_multisite_user ) : ?>
-				<?php if ( ! $is_multisite_admin_page ) : ?>
-					<a class="button" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
-				<?php endif; ?>
-				<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
-			<?php endif; ?>
+			<a class="button<?php echo $is_multisite_admin_page || $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
+			<a class="button<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 			<?php if ( $is_local_user ) : ?>
 				&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
 			<?php endif; ?>
