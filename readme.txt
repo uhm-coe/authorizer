@@ -63,6 +63,12 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.8 =
+* Allow emails for LDAP logins. Props @jthomae1 for the [suggestion](https://wordpress.org/support/topic/ldap-login-wordpress-docker/)!
+* Fix for pending users unable to log out of external service.
+* Update styles in Authorizer Settings for WordPress 5.3.
+* Better styles in Authorizer Settings for mobile screen sizes.
+
 = 2.9.7 =
 * Failsafe for restricting Google Logins to specific domain(s).
 
