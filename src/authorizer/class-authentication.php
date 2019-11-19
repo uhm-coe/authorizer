@@ -575,10 +575,12 @@ class Authentication extends Static_Instance {
 			// the form ldap://hostname:port or ldaps://hostname:port.
 			$ldap_port   = intval( $auth_settings['ldap_port'] );
 			$parsed_host = wp_parse_url( $ldap_host );
-			// Fail (fall back to WordPress auth) if invalid host is specified.
-			if ( false === $parsed_host || ! Helper::is_valid_domain_name( $ldap_host ) ) {
+
+			// Fail if invalid host is specified.
+			if ( false === $parsed_host ) {
 				continue;
 			}
+
 			// If a scheme is in the LDAP host, use full LDAP URI instead of just hostname.
 			if ( array_key_exists( 'scheme', $parsed_host ) ) {
 				// If the port isn't in the LDAP URI, use the one in the LDAP port field.
@@ -588,11 +590,18 @@ class Authentication extends Static_Instance {
 				$ldap_host = Helper::build_url( $parsed_host );
 			}
 
-			// Establish LDAP connection.
+			// Create LDAP connection.
 			$ldap = ldap_connect( $ldap_host, $ldap_port );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-			if ( 1 === intval( $auth_settings['ldap_tls'] ) ) {
-				if ( ! ldap_start_tls( $ldap ) ) {
+
+			// Fail if we don't have a plausible LDAP URI.
+			if ( false === $ldap ) {
+				continue;
+			}
+
+			// Attempt to start TLS if that setting is checked and we're not using ldaps protocol.
+			if ( 1 === intval( $auth_settings['ldap_tls'] ) && false === strpos( $ldap_host, 'ldaps://' ) ) {
+				if ( ! @ldap_start_tls( $ldap ) ) {
 					continue;
 				}
 			}
