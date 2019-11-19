@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.9 =
+* Allow multiple (failover) LDAP hosts. Props @basildane for the [suggestion](https://github.com/uhm-coe/authorizer/issues/85)!
+* Update translations.
+
 = 2.9.8 =
 * Allow emails for LDAP logins. Props @jthomae1 for the [suggestion](https://wordpress.org/support/topic/ldap-login-wordpress-docker/)!
 * Fix for pending users unable to log out of external service.
