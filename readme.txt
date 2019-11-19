@@ -64,7 +64,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 == Changelog ==
 
 = 2.9.10 =
-* Fix for some LDAP URIs failing validation check; this should address some users unable to connect after upgrading to version 2.9.9. Props @MamoulianDelacroix for the report!
+* Fix for some LDAP URIs failing validation check; this should address some users unable to connect after upgrading to version 2.9.9. Props @MamoulianDelacroix for the [report](https://github.com/uhm-coe/authorizer/issues/86)!
 
 = 2.9.9 =
 * Allow multiple (failover) LDAP hosts. Props @basildane for the [suggestion](https://github.com/uhm-coe/authorizer/issues/85)!
