@@ -959,7 +959,7 @@ class Admin_Page extends Static_Instance {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.8', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.9', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',

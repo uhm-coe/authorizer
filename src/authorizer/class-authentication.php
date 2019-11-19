@@ -499,6 +499,14 @@ class Authentication extends Static_Instance {
 	 *                               falling back to WP auth.
 	 */
 	protected function custom_authenticate_ldap( $auth_settings, $username, $password ) {
+		// Get LDAP host(s), and attempt each until we have a valid connection.
+		$ldap_hosts = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_host'] ) ) );
+
+		// Fail silently (fall back to WordPress authentication) if no LDAP host specified.
+		if ( count( $ldap_hosts ) < 1 ) {
+			return null;
+		}
+
 		// Get LDAP search base(s).
 		$search_bases = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_search_base'] ) ) );
 
@@ -523,7 +531,7 @@ class Authentication extends Static_Instance {
 		// just use the domain from the LDAP host. This will only be used if we
 		// can't discover the email address from an LDAP attribute.
 		if ( empty( $domain ) ) {
-			$domain = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['ldap_host'], $matches ) === 1 ? $matches[0] : '';
+			$domain = preg_match( '/[^.]*\.[^.]*$/', $ldap_hosts[0], $matches ) === 1 ? $matches[0] : '';
 		}
 
 		// remove @domain if it exists in the username (i.e., if user entered their email).
@@ -557,50 +565,63 @@ class Authentication extends Static_Instance {
 		$last_name    = '';
 		$email        = '';
 
-		// Construct LDAP connection parameters. ldap_connect() takes either a
-		// hostname or a full LDAP URI as its first parameter (works with OpenLDAP
-		// 2.x.x or later). If it's an LDAP URI, the second parameter, $port, is
-		// ignored, and port must be specified in the full URI. An LDAP URI is of
-		// the form ldap://hostname:port or ldaps://hostname:port.
-		$ldap_host   = $auth_settings['ldap_host'];
-		$ldap_port   = intval( $auth_settings['ldap_port'] );
-		$parsed_host = wp_parse_url( $ldap_host );
-		// Fail (fall back to WordPress auth) if invalid host is specified.
-		if ( false === $parsed_host ) {
+		// Attempt each LDAP host until we have a valid connection.
+		$ldap_valid = false;
+		foreach ( $ldap_hosts as $ldap_host ) {
+			// Construct LDAP connection parameters. ldap_connect() takes either a
+			// hostname or a full LDAP URI as its first parameter (works with OpenLDAP
+			// 2.x.x or later). If it's an LDAP URI, the second parameter, $port, is
+			// ignored, and port must be specified in the full URI. An LDAP URI is of
+			// the form ldap://hostname:port or ldaps://hostname:port.
+			$ldap_port   = intval( $auth_settings['ldap_port'] );
+			$parsed_host = wp_parse_url( $ldap_host );
+			// Fail (fall back to WordPress auth) if invalid host is specified.
+			if ( false === $parsed_host || ! Helper::is_valid_domain_name( $ldap_host ) ) {
+				continue;
+			}
+			// If a scheme is in the LDAP host, use full LDAP URI instead of just hostname.
+			if ( array_key_exists( 'scheme', $parsed_host ) ) {
+				// If the port isn't in the LDAP URI, use the one in the LDAP port field.
+				if ( ! array_key_exists( 'port', $parsed_host ) ) {
+					$parsed_host['port'] = $ldap_port;
+				}
+				$ldap_host = Helper::build_url( $parsed_host );
+			}
+
+			// Establish LDAP connection.
+			$ldap = ldap_connect( $ldap_host, $ldap_port );
+			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
+			if ( 1 === intval( $auth_settings['ldap_tls'] ) ) {
+				if ( ! ldap_start_tls( $ldap ) ) {
+					continue;
+				}
+			}
+
+			// Set bind credentials; attempt an anonymous bind if not provided.
+			$bind_rdn      = null;
+			$bind_password = null;
+			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
+				$bind_rdn      = $auth_settings['ldap_user'];
+				$bind_password = Helper::decrypt( $auth_settings['ldap_password'] );
+			}
+
+			// Attempt LDAP bind.
+			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) ); // phpcs:ignore
+			if ( ! $result ) {
+				// Can't connect to LDAP, so fall back to WordPress authentication.
+				continue;
+			}
+
+			// If we've reached this, we have a valid ldap connection and bind.
+			$ldap_valid = true;
+			break;
+		}
+
+		// Move to next authentication method if we don't have a valid LDAP connection.
+		if ( ! $ldap_valid ) {
 			return null;
 		}
-		// If a scheme is in the LDAP host, use full LDAP URI instead of just hostname.
-		if ( array_key_exists( 'scheme', $parsed_host ) ) {
-			// If the port isn't in the LDAP URI, use the one in the LDAP port field.
-			if ( ! array_key_exists( 'port', $parsed_host ) ) {
-				$parsed_host['port'] = $ldap_port;
-			}
-			$ldap_host = Helper::build_url( $parsed_host );
-		}
 
-		// Establish LDAP connection.
-		$ldap = ldap_connect( $ldap_host, $ldap_port );
-		ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
-		if ( 1 === intval( $auth_settings['ldap_tls'] ) ) {
-			if ( ! ldap_start_tls( $ldap ) ) {
-				return null;
-			}
-		}
-
-		// Set bind credentials; attempt an anonymous bind if not provided.
-		$bind_rdn      = null;
-		$bind_password = null;
-		if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
-			$bind_rdn      = $auth_settings['ldap_user'];
-			$bind_password = Helper::decrypt( $auth_settings['ldap_password'] );
-		}
-
-		// Attempt LDAP bind.
-		$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) ); // phpcs:ignore
-		if ( ! $result ) {
-			// Can't connect to LDAP, so fall back to WordPress authentication.
-			return null;
-		}
 		// Look up the bind DN (and first/last name) of the user trying to
 		// log in by performing an LDAP search for the login username in
 		// the field specified in the LDAP settings. This setup is common.

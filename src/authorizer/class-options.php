@@ -668,9 +668,6 @@ class Options extends Static_Instance {
 		// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
 
-		// Sanitize LDAP Host setting.
-		$auth_settings['ldap_host'] = filter_var( $auth_settings['ldap_host'], FILTER_SANITIZE_URL );
-
 		// Sanitize LDAP Port (int).
 		$auth_settings['ldap_port'] = filter_var( $auth_settings['ldap_port'], FILTER_SANITIZE_NUMBER_INT );
 

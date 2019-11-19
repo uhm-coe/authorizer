@@ -54,8 +54,11 @@ class Ldap extends \Authorizer\Static_Instance {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-		<p class="description"><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?></p>
+		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636).', 'authorizer' ); ?>
+			<br>
+			<small><?php esc_html_e( 'If you have multiple LDAP servers (failover or high-availability configuration), separate them by newlines (one per line).', 'authorizer' ); ?></small>
+		</p>
 		<?php
 	}
 

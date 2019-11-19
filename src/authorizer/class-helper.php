@@ -382,6 +382,24 @@ class Helper {
 
 
 	/**
+	 * Determine whether a domain name is valid.
+	 *
+	 * @param  string  $domain_name Name to test.
+	 * @return boolean              Whether the domain is valid.
+	 */
+	public static function is_valid_domain_name($domain_name) {
+		return (
+			// Valid characters check.
+			preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $domain_name) &&
+			// Overall length check.
+			preg_match("/^.{1,253}$/", $domain_name) &&
+			// Length of each label check.
+			preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $domain_name)
+		);
+	}
+
+
+	/**
 	 * Helper function to get a single user info array from one of the access
 	 * control lists (pending, approved, or blocked).
 	 *
