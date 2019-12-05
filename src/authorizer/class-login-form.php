@@ -216,6 +216,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 						padding-bottom: 8px;
 					}
 					body.login-action-login form p > label,
+					body.login-action-login form #user_login,
+					body.login-action-login form .user-pass-wrap,
 					body.login-action-login form .forgetmenot,
 					body.login-action-login form .submit,
 					body.login-action-login #nav { /* csslint allow: ids */
