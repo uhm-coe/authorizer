@@ -521,9 +521,13 @@ class Access_Lists extends \Authorizer\Static_Instance {
 			<a class="button<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
 			<?php if ( $is_local_user ) : ?>
 				&nbsp;<a title="Local WordPress user" class="auth-local-user"><span class="glyphicon glyphicon-user"></span></a>
+			<?php else: ?>
+				&nbsp;<span class="glyphicon glyphicon-remove" aria-hidden="true" style="visibility: hidden;"></span>
 			<?php endif; ?>
 			<?php if ( $is_multisite_user ) : ?>
 				&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user"><span class="glyphicon glyphicon-globe"></span></a>
+			<?php else: ?>
+				&nbsp;<span class="glyphicon glyphicon-remove" aria-hidden="true" style="visibility: hidden;"></span>
 			<?php endif; ?>
 		</li>
 		<?php
