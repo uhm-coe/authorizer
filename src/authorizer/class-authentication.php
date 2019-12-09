@@ -593,6 +593,7 @@ class Authentication extends Static_Instance {
 			// Create LDAP connection.
 			$ldap = ldap_connect( $ldap_host, $ldap_port );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
+			ldap_set_option( $ldap, LDAP_OPT_REFERRALS, 0 );
 
 			// Fail if we don't have a plausible LDAP URI.
 			if ( false === $ldap ) {
