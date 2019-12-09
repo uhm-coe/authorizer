@@ -63,6 +63,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.11 =
+* Fix for CAS logout issue introduced in WordPress 5.3. Props @jespersundstrom for the [report](https://wordpress.org/support/topic/logout-does-not-work-2/)!
+* Fix for Active Directory LDAP connections using the domain root as the search base. Props @aszele for the [report and testing](https://wordpress.org/support/topic/unable-to-authenticate-against-active-directory/)!
+* Fix hiding WordPress logins in WordPress 5.3. Props @ubercow for the [report](https://wordpress.org/support/topic/hide-wordpress-logins/)!
+* Fix Approved User list spacing with multisite and local users.
+* Update translations. Props @julienlusson for the [pull request](https://github.com/uhm-coe/authorizer/pull/87)!
+
 = 2.9.10 =
 * Fix for some LDAP URIs failing validation check; this should address some users unable to connect after upgrading to version 2.9.9. Props @MamoulianDelacroix for the [report](https://github.com/uhm-coe/authorizer/issues/86)!
 
