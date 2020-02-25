@@ -66,6 +66,7 @@ class Authentication extends Static_Instance {
 		// pretend they don't exist).
 		if ( $unauthenticated_user_is_blocked ) {
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+			remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 			return new \WP_Error( 'empty_password', __( '<strong>ERROR</strong>: Incorrect username or password.', 'authorizer' ) );
 		}
 
@@ -99,6 +100,7 @@ class Authentication extends Static_Instance {
 			// trigger the wp_login_failed hook, which would continue to
 			// increment the failed attempt count.
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+			remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 			return new \WP_Error(
 				'empty_password',
 				sprintf(
@@ -116,6 +118,7 @@ class Authentication extends Static_Instance {
 			// trigger the wp_login_failed hook, which would continue to
 			// increment the failed attempt count.
 			remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+			remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 			return new \WP_Error(
 				'empty_password',
 				sprintf(
