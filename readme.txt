@@ -63,6 +63,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.12 =
+* Add feature to disable WordPress logins (only allow logins from configured external services).
+* Fix for compatibility issue with User Switching plugin introduced in 2.9.11. Props @ocager for the [report](https://github.com/uhm-coe/authorizer/issues/91)!
+* Fix for Sign in button styling on small screen sizes.
+
 = 2.9.11 =
 * Fix for CAS logout issue introduced in WordPress 5.3. Props @jespersundstrom for the [report](https://wordpress.org/support/topic/logout-does-not-work-2/)!
 * Fix for Active Directory LDAP connections using the domain root as the search base. Props @aszele for the [report and testing](https://wordpress.org/support/topic/unable-to-authenticate-against-active-directory/)!
