@@ -177,6 +177,9 @@ class Options extends Static_Instance {
 				// Override Hide WordPress login.
 				$auth_settings['advanced_hide_wp_login'] = $auth_multisite_settings['advanced_hide_wp_login'];
 
+				// Override Disable WordPress login.
+				$auth_settings['advanced_disable_wp_login'] = $auth_multisite_settings['advanced_disable_wp_login'];
+
 				// Override Users per page.
 				$auth_settings['advanced_users_per_page'] = $auth_multisite_settings['advanced_users_per_page'];
 
@@ -387,6 +390,9 @@ class Options extends Static_Instance {
 		if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_settings ) ) {
 			$auth_settings['advanced_hide_wp_login'] = '';
 		}
+		if ( ! array_key_exists( 'advanced_disable_wp_login', $auth_settings ) ) {
+			$auth_settings['advanced_disable_wp_login'] = '';
+		}
 		if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 			$auth_settings['advanced_branding'] = 'default';
 		}
@@ -553,6 +559,9 @@ class Options extends Static_Instance {
 			if ( ! array_key_exists( 'advanced_hide_wp_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_hide_wp_login'] = '';
 			}
+			if ( ! array_key_exists( 'advanced_disable_wp_login', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['advanced_disable_wp_login'] = '';
+			}
 			if ( ! array_key_exists( 'advanced_users_per_page', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_users_per_page'] = 20;
 			}
@@ -704,6 +713,9 @@ class Options extends Static_Instance {
 
 		// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['advanced_hide_wp_login'] = array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_hide_wp_login'] ) > 0 ? '1' : '';
+
+		// Sanitize Disable WordPress logins (checkbox: value can only be '1' or empty string).
+		$auth_settings['advanced_disable_wp_login'] = array_key_exists( 'advanced_disable_wp_login', $auth_settings ) && strlen( $auth_settings['advanced_disable_wp_login'] ) > 0 ? '1' : '';
 
 		// Sanitize Users per page (text: value can only int from 1 to MAX_INT).
 		$auth_settings['advanced_users_per_page'] = array_key_exists( 'advanced_users_per_page', $auth_settings ) && intval( $auth_settings['advanced_users_per_page'] ) > 0 ? intval( $auth_settings['advanced_users_per_page'] ) : 1;

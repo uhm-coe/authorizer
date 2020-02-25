@@ -191,9 +191,27 @@ class Authentication extends Static_Instance {
 			}
 		}
 
-		// Skip to WordPress authentication if we don't have an externally
-		// authenticated user.
+		// If we don't have an externally authenticated user, either skip to
+		// WordPress authentication (if WordPress logins are enabled), or return
+		// an error (if WordPress logins are disabled).
 		if ( count( array_filter( $externally_authenticated_emails ) ) < 1 ) {
+			if ( array_key_exists( 'advanced_disable_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_disable_wp_login'] ) {
+				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
+				remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
+
+				$error = new \WP_Error();
+
+				if ( empty( $username ) ) {
+					$error->add( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.' ) );
+				}
+
+				if ( empty( $password ) ) {
+					$error->add( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.' ) );
+				}
+
+				return $error;
+			}
+
 			return $result;
 		}
 

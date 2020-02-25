@@ -91,6 +91,26 @@ class Advanced extends \Authorizer\Static_Instance {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_checkbox_auth_advanced_disable_wp_login( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'advanced_disable_wp_login';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Disable WordPress Logins', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Warning: Disabling WordPress logins means you will not be able to access WordPress administration if your external service(s) are not working. Use with caution.' ); ?></p>
+			<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_radio_auth_advanced_branding( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();

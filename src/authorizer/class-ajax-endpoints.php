@@ -192,6 +192,7 @@ class Ajax_Endpoints extends Static_Instance {
 			'ldap_attr_update_on_login',
 			'advanced_lockouts',
 			'advanced_hide_wp_login',
+			'advanced_disable_wp_login',
 			'advanced_users_per_page',
 			'advanced_users_sort_by',
 			'advanced_users_sort_order',

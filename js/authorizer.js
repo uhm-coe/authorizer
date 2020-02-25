@@ -1102,6 +1102,7 @@
 			reset_duration: $( '#auth_settings_advanced_lockouts_reset_duration' ).val(),
 		};
 		var advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
+		var advanced_disable_wp_login = $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ? '1' : '';
 		var advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
 		var advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
 		var advanced_users_sort_by = $( '#auth_settings_advanced_users_sort_by' ).val();
@@ -1146,6 +1147,7 @@
 			ldap_attr_update_on_login: ldap_attr_update_on_login,
 			advanced_lockouts: advanced_lockouts,
 			advanced_hide_wp_login: advanced_hide_wp_login,
+			advanced_disable_wp_login: advanced_disable_wp_login,
 			advanced_users_per_page: advanced_users_per_page,
 			advanced_users_sort_by: advanced_users_sort_by,
 			advanced_users_sort_order: advanced_users_sort_order,

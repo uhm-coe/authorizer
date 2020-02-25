@@ -210,7 +210,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 				</a></p>
 			<?php endif; ?>
 
-			<?php if ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) :  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
+			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
 				<style type="text/css">
 					body.login-action-login form {
 						padding-bottom: 8px;
