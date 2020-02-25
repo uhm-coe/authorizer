@@ -193,9 +193,18 @@ class Authentication extends Static_Instance {
 
 		// If we don't have an externally authenticated user, either skip to
 		// WordPress authentication (if WordPress logins are enabled), or return
-		// an error (if WordPress logins are disabled).
+		// an error (if WordPress logins are disabled and at least one external
+		// service is enabled).
 		if ( count( array_filter( $externally_authenticated_emails ) ) < 1 ) {
-			if ( array_key_exists( 'advanced_disable_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_disable_wp_login'] ) {
+			if (
+				array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
+				'1' === $auth_settings['advanced_disable_wp_login'] &&
+				(
+					'1' === $auth_settings['cas'] ||
+					'1' === $auth_settings['google'] ||
+					'1' === $auth_settings['ldap']
+				)
+			) {
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 
