@@ -20,6 +20,12 @@ use Authorizer\Authorization;
 class Authentication extends Static_Instance {
 
 	/**
+	 * Tracks the external service used by the user currently logging out.
+	 * @var string
+	 */
+	private static $authenticated_by = '';
+
+	/**
 	 * Authenticate against an external service.
 	 *
 	 * Filter: authenticate
@@ -747,6 +753,26 @@ class Authentication extends Static_Instance {
 
 
 	/**
+	 * Fetch the logging out user's external service (so we can log out of it
+	 * below in the wp_logout hook).
+	 *
+	 * Action: clear_auth_cookie
+	 *
+	 * @return void
+	 */
+	public function pre_logout() {
+		self::$authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
+
+		// If we didn't find an authenticated method, check $_REQUEST (if this is a
+		// pending user facing the "no access" message, their logout link will
+		// include "external=?" since they don't have a WP_User to attach the
+		// "authenticated_by" usermeta to).
+		if ( empty( self::$authenticated_by ) && ! empty( $_REQUEST['external'] ) ) {
+			self::$authenticated_by = $_REQUEST['external'];
+		}
+	}
+
+	/**
 	 * Log out of the attached external service.
 	 *
 	 * Action: wp_logout
@@ -765,18 +791,8 @@ class Authentication extends Static_Instance {
 			session_start();
 		}
 
-		$current_user_authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
-
-		// If we didn't find an authenticated method, check $_REQUEST (if this is a
-		// pending user facing the "no access" message, their logout link will
-		// include "external=?" since they don't have a WP_User to attach the
-		// "authenticated_by" usermeta to).
-		if ( empty( $current_user_authenticated_by ) && ! empty( $_REQUEST['external'] ) ) {
-			$current_user_authenticated_by = $_REQUEST['external'];
-		}
-
 		// If logged in to CAS, Log out of CAS.
-		if ( 'cas' === $current_user_authenticated_by && '1' === $auth_settings['cas'] ) {
+		if ( 'cas' === self::$authenticated_by && '1' === $auth_settings['cas'] ) {
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 
 				/**
@@ -813,7 +829,7 @@ class Authentication extends Static_Instance {
 		}
 
 		// If session token set, log out of Google.
-		if ( 'google' === $current_user_authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
+		if ( 'google' === self::$authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
 
 			// Edge case: if another plugin has already defined the Google_Client class,
