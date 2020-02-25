@@ -100,7 +100,7 @@ class Advanced extends \Authorizer\Static_Instance {
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Disable WordPress Logins', 'authorizer' ); ?></label>
-		<p class="description"><?php esc_html_e( 'Warning: Disabling WordPress logins means you will not be able to access WordPress administration if your external service(s) are not working. Use with caution.' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Warning: Disabling WordPress logins means you will not be able to access WordPress administration if your external service(s) are not working. Use with caution. Note: If no external services are enabled, WordPress logins will not be disabled.', 'authorizer' ); ?></p>
 			<?php
 	}
 

@@ -127,7 +127,7 @@ class Admin_Page extends Static_Instance {
 		$help_auth_settings_advanced_content = '
 			<p>' . __( '<strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ) . ' <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
-			<p>' . __( '<strong>Disable WordPress Logins</strong>: If you want to prevent users from logging in with their WordPress passwords and instead only allow logins from external services, enable this option. Note: enabling this will also hide WordPress logins unless the LDAP external service is enabled.' ) . '</p>
+			<p>' . __( '<strong>Disable WordPress Logins</strong>: If you want to prevent users from logging in with their WordPress passwords and instead only allow logins from external services, enable this option. Note: enabling this will also hide WordPress logins unless the LDAP external service is enabled.', 'authorizer' ) . '</p>
 			<p>' . __( "<strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.", 'authorizer' ) . '</p>
 		';
 		$screen->add_help_tab(
@@ -606,7 +606,7 @@ class Admin_Page extends Static_Instance {
 		);
 		add_settings_field(
 			'auth_settings_advanced_disable_wp_login',
-			__( 'Disable WordPress Login', 'authorizer' ),
+			__( 'Disable WordPress Logins', 'authorizer' ),
 			array( Advanced::get_instance(), 'print_checkbox_auth_advanced_disable_wp_login' ),
 			'authorizer',
 			'auth_settings_advanced'
