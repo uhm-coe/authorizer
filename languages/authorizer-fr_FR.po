@@ -605,7 +605,7 @@ msgstr "Rôle par défaut pour les nouveaux utilisateurs"
 #: src/authorizer/class-admin-page.php:384
 #: src/authorizer/class-admin-page.php:755
 msgid "Google Logins"
-msgstr "Identifiants de connexion Google"
+msgstr "Authentification Google"
 
 #: src/authorizer/class-admin-page.php:391
 #: src/authorizer/class-admin-page.php:759
@@ -625,7 +625,7 @@ msgstr "Domaine hébergé par Google"
 #: src/authorizer/class-admin-page.php:412
 #: src/authorizer/class-admin-page.php:771
 msgid "CAS Logins"
-msgstr "Identifiants de connexion CAS"
+msgstr "Authentification CAS"
 
 #: src/authorizer/class-admin-page.php:419
 msgid "CAS custom label"
@@ -663,7 +663,7 @@ msgstr "Attribut CAS contenant le nom"
 #: src/authorizer/class-admin-page.php:475
 #: src/authorizer/class-admin-page.php:807
 msgid "CAS attribute update"
-msgstr "Mise à jour des attributs CAS"
+msgstr "CAS Mise à jour des attributs"
 
 #: src/authorizer/class-admin-page.php:482
 #: src/authorizer/class-admin-page.php:811
@@ -678,7 +678,7 @@ msgstr "Utilisateurs CAS liés via leur identifiant"
 #: src/authorizer/class-admin-page.php:496
 #: src/authorizer/class-admin-page.php:819
 msgid "LDAP Logins"
-msgstr "Identifiants de connexion LDAP"
+msgstr "Authentification LDAP"
 
 #: src/authorizer/class-admin-page.php:503
 #: src/authorizer/class-admin-page.php:823
@@ -738,7 +738,7 @@ msgstr "Attribut LDAP contenant le nom"
 #: src/authorizer/class-admin-page.php:580
 #: src/authorizer/class-admin-page.php:867
 msgid "LDAP attribute update"
-msgstr "Mise à jour des attributs LDAP"
+msgstr "LDAP Mise à jour des attributs"
 
 #: src/authorizer/class-admin-page.php:595
 #: src/authorizer/class-admin-page.php:875
@@ -857,12 +857,12 @@ msgstr "Attribut CAS contenant le courriel"
 
 #: src/authorizer/class-admin-page.php:843
 msgid "LDAP attribute containing email"
-msgstr "Attribut LDAP contenant le courriel"
+msgstr "Attribut LDAP contenant l’adresse électronique"
 
 #: src/authorizer/class-admin-page.php:879
 #: src/authorizer/options/class-advanced.php:82
 msgid "Hide WordPress Logins"
-msgstr "Masquer les identifiants WordPress"
+msgstr "Masquer l’authentification WordPress"
 
 #: src/authorizer/class-admin-page.php:899
 #: src/authorizer/options/class-advanced.php:359
@@ -1239,7 +1239,7 @@ msgstr "Après"
 #: src/authorizer/options/class-advanced.php:51
 msgid "invalid password attempts, delay further attempts on that user for"
 msgstr ""
-"tentatives de mot de passe invalide, retarde les tentatives suivantes de cet "
+"essais de mot de passe invalide, délai des tentatives suivantes de cet "
 "utilisateur de"
 
 #: src/authorizer/options/class-advanced.php:53
@@ -1278,8 +1278,8 @@ msgid ""
 "with caution. Note: If no external services are enabled, WordPress logins "
 "will not be disabled."
 msgstr ""
-"Attention : la désactivation des connexions WordPress signifie que vous ne "
-"pourrez pas accéder à l’administration WordPress si le(s) service(s) "
+"Attention : la désactivation de l’authentification WordPress signifie que "
+"vous ne pourrez pas accéder à l’administration WordPress si le(s) service(s) "
 "externe(s) ne fonctionne(nt) pas. À utiliser avec précaution. Remarque : Si "
 "aucun service externe n’est activé, les connexions WordPress ne seront pas "
 "désactivées."
@@ -1604,7 +1604,7 @@ msgid ""
 "can name it whatever you want."
 msgstr ""
 "Cliquez sur <strong>Créer un projet</strong> sur <a href=\"https://cloud."
-"google.com/console\" target=\"_blank\">Google Cloup Platform</a>. Vous "
+"google.com/console\" target=\"_blank\">Google Cloud Platform</a>. Vous "
 "pouvez le nommer comme vous le souhaitez."
 
 #: src/authorizer/options/external/class-google.php:60
