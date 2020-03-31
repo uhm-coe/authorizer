@@ -315,6 +315,27 @@ class Updates extends Static_Instance {
 			$needs_updating = true;
 		}
 
+		// Update: Set default value for newly added option advanced_disable_wp_login.
+		$update_if_older_than = 20200331;
+		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
+			// Provide default values for any $auth_settings options that don't exist.
+			if ( is_multisite() ) {
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+				foreach ( $sites as $site ) {
+					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					switch_to_blog( $blog_id );
+					$options->set_default_options();
+					restore_current_blog();
+				}
+			} else {
+				$options->set_default_options();
+			}
+			// Update version to reflect this change has been made.
+			$auth_version   = $update_if_older_than;
+			$needs_updating = true;
+		}
+
 		/* phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		// Update: TEMPLATE
 		$update_if_older_than = YYYYMMDD;
