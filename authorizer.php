@@ -7,7 +7,7 @@
  * Text Domain: authorizer
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.9.12
+ * Version: 2.9.13
  *
  * Portions forked from Restricted Site Access plugin:
  *   http://wordpress.org/plugins/restricted-site-access/

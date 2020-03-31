@@ -63,6 +63,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.13 =
+* Successfully tested on WordPress 5.4.
+* Fix warnings about missing variable after last update.
+* Update translations. Props @julienlusson for the [pull request](https://github.com/uhm-coe/authorizer/pull/92)!
+
 = 2.9.12 =
 * Add feature to disable WordPress logins (only allow logins from configured external services).
 * Fix for compatibility issue with User Switching plugin introduced in 2.9.11. Props @ocager for the [report](https://github.com/uhm-coe/authorizer/issues/91)!
