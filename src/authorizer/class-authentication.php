@@ -682,6 +682,15 @@ class Authentication extends Static_Instance {
 			array_push( $ldap_attributes_to_retrieve, Helper::lowercase( $auth_settings['ldap_attr_email'] ) );
 		}
 
+		/**
+		 * Specify additional LDAP user attributes to retrieve during authentication.
+		 * May be used by plugins in `authorizer_user_register`.
+		 *
+		 * @param array $attributes LDAP attributes to retrieve in addition to first name, last name and email.
+		 */
+		$additional_ldap_attributes_to_retrieve = apply_filters( 'authorizer_additional_ldap_attributes_to_retrieve', array() );
+		$ldap_attributes_to_retrieve = array_merge($ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve);
+
 		// Create default LDAP search filter. If LDAP email attribute is provided,
 		// use (|(uid=$username)(mail=$username)) instead (so logins with either a
 		// username or an email address will work). Otherwise use (uid=$username).
