@@ -113,7 +113,7 @@ class Login_Form extends Static_Instance {
 		$ajaxurl       = admin_url( 'admin-ajax.php' );
 		if ( '1' === $auth_settings['google'] ) :
 			?>
-<script type="text/javascript">
+<script>
 /* global location, window */
 // Reload login page if reauth querystring param exists,
 // since reauth interrupts external logins (e.g., google).
