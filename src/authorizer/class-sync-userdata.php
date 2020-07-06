@@ -17,7 +17,7 @@ use Authorizer\Authorization;
  * Contains functions for interfacing with WordPress users and syncing between
  * them and users in the Authorizer lists.
  */
-class Sync_Userdata extends Static_Instance {
+class Sync_Userdata extends Singleton {
 
 	/**
 	 * Adds all WordPress users in the current site to the approved list,

@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Run any database migrations or plugin updates when installing a new version.
  */
-class Updates extends Static_Instance {
+class Updates extends Singleton {
 
 	/**
 	 * Plugin Update Routines.

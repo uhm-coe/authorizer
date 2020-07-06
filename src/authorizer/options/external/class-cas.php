@@ -16,7 +16,7 @@ use Authorizer\Options;
  * Contains functions for rendering the CAS options in the External Service
  * tab in Authorizer Settings.
  */
-class Cas extends \Authorizer\Static_Instance {
+class Cas extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

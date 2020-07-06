@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains modifications to the WordPress login form.
  */
-class Login_Form extends Static_Instance {
+class Login_Form extends Singleton {
 
 	/**
 	 * Load external resources for the public-facing site.

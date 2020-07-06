@@ -18,7 +18,7 @@ use Authorizer\Sync_Userdata;
 /**
  * Contains endpoints for any AJAX methods.
  */
-class Ajax_Endpoints extends Static_Instance {
+class Ajax_Endpoints extends Singleton {
 
 	/**
 	 * Verify the Google login and set a session token.

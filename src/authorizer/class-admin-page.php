@@ -24,7 +24,7 @@ use Authorizer\Options\Advanced;
  * Contains functions for creating the Authorizer Settings page and adding it to
  * the WordPress Dashboard menu.
  */
-class Admin_Page extends Static_Instance {
+class Admin_Page extends Singleton {
 
 	/**
 	 * Add help documentation to the options page.

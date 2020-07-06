@@ -17,7 +17,7 @@ use Authorizer\Authorization;
  * Implements the authentication (is user who they say they are?) features of
  * the plugin.
  */
-class Authentication extends Static_Instance {
+class Authentication extends Singleton {
 
 	/**
 	 * Tracks the external service used by the user currently logging out.

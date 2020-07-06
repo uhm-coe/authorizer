@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Implements the authorization (roles and permissions) features of the plugin.
  */
-class Authorization extends Static_Instance {
+class Authorization extends Singleton {
 
 	/**
 	 * This function will fail with a wp_die() message to the user if they

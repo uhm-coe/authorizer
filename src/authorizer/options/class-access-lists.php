@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains functions for rendering the Access Lists tab in Authorizer Settings.
  */
-class Access_Lists extends \Authorizer\Static_Instance {
+class Access_Lists extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

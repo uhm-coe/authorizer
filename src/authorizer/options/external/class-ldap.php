@@ -16,7 +16,7 @@ use Authorizer\Options;
  * Contains functions for rendering the LDAP options in the External Service
  * tab in Authorizer Settings.
  */
-class Ldap extends \Authorizer\Static_Instance {
+class Ldap extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

@@ -14,7 +14,7 @@ use Authorizer\Helper;
 /**
  * Contains functions for rendering the Access Lists tab in Authorizer Settings.
  */
-class Options extends Static_Instance {
+class Options extends Singleton {
 
 	/**
 	 * Retrieves a specific plugin option from db. Multisite enabled.

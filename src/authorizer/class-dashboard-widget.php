@@ -17,7 +17,7 @@ use Authorizer\Options\Login_Access;
 /**
  * Builds the Dashboard widget.
  */
-class Dashboard_Widget extends Static_Instance {
+class Dashboard_Widget extends Singleton {
 
 	/**
 	 * Load Authorizer dashboard widget if it's enabled.

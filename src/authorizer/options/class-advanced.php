@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains functions for rendering the Advanced tab in Authorizer Settings.
  */
-class Advanced extends \Authorizer\Static_Instance {
+class Advanced extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.
