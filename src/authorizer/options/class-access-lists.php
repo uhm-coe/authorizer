@@ -501,8 +501,18 @@ class Access_Lists extends \Authorizer\Singleton {
 							onchange="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );"
 						>
 							<option value=""<?php selected( empty( $approved_user['usermeta'] ) ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-							<?php foreach ( $field_object['choices'] as $key => $label ) : ?>
-								<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo esc_html( $label ); ?></option>
+							<?php foreach ( $field_object['choices'] as $key => $labels ) : ?>
+								<?php if ( is_array( $labels ) ) : // Handle ACF select with optgroups. ?>
+									<optgroup label="<?php echo esc_attr( $key ); ?>">
+								<?php else : ?>
+									<?php $labels = array( $key => $labels ); ?>
+								<?php endif; ?>
+								<?php foreach ( $labels as $key => $label ) : ?>
+									<option value="<?php echo esc_attr( $key ); ?>"<?php selected( $key === $approved_user['usermeta'] || ( isset( $approved_user['usermeta']['meta_value'] ) && $key === $approved_user['usermeta']['meta_value'] ) ); ?>><?php echo esc_html( $label ); ?></option>
+								<?php endforeach; ?>
+								<?php if ( is_array( $labels ) ) : ?>
+									</optgroup>
+								<?php endif; ?>
 							<?php endforeach; ?>
 						</select>
 					<?php endif; ?>
