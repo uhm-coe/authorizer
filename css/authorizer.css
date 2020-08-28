@@ -272,6 +272,31 @@
     #auth_dashboard_widget #new_auth_settings_access_users_blocked .auth-role {
       max-width: 140px; } }
 
+#auth_dashboard_widget #list_auth_settings_access_users_approved li {
+  -ms-flex-wrap: nowrap;
+  flex-wrap: nowrap; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > * {
+    -webkit-box-flex: 0;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > :nth-child(1) {
+    -ms-flex-negative: 1;
+    flex-shrink: 1; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > :nth-child(2) {
+    -ms-flex-negative: 1;
+    flex-shrink: 1; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > :nth-child(3) {
+    -ms-flex-negative: 2;
+    flex-shrink: 2; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > :nth-child(4) {
+    -ms-flex-negative: 2;
+    flex-shrink: 2; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li > :nth-child(5) {
+    -ms-flex-negative: 1;
+    flex-shrink: 1; }
+  #auth_dashboard_widget #list_auth_settings_access_users_approved li input, #auth_dashboard_widget #list_auth_settings_access_users_approved li select {
+    min-width: 0; }
+
 .toplevel_page_authorizer #wpbody-content,
 .settings_page_authorizer #wpbody-content,
 #auth_dashboard_widget #wpbody-content {

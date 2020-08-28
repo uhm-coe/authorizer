@@ -238,6 +238,18 @@
 		@media only screen and (max-width: 1800px) and (min-width:1500px) {
 		}
 	}
+
+	// Use flexbox to keep everything on one line in approved list.
+	#list_auth_settings_access_users_approved li {
+		flex-wrap: nowrap;
+		& > * { flex: 0 0 auto; }
+		& > :nth-child(1) { flex-shrink: 1; }
+		& > :nth-child(2) { flex-shrink: 1; }
+		& > :nth-child(3) { flex-shrink: 2; }
+		& > :nth-child(4) { flex-shrink: 2; }
+		& > :nth-child(5) { flex-shrink: 1; }
+		input, select { min-width: 0; }
+	}
 }
 
 
