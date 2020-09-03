@@ -473,7 +473,7 @@ class Admin_Page extends Singleton {
 		add_settings_field(
 			'auth_settings_cas_attr_update_on_login',
 			__( 'CAS attribute update', 'authorizer' ),
-			array( Cas::get_instance(), 'print_checkbox_cas_attr_update_on_login' ),
+			array( Cas::get_instance(), 'print_select_cas_attr_update_on_login' ),
 			'authorizer',
 			'auth_settings_external'
 		);
@@ -578,7 +578,7 @@ class Admin_Page extends Singleton {
 		add_settings_field(
 			'auth_settings_ldap_attr_update_on_login',
 			__( 'LDAP attribute update', 'authorizer' ),
-			array( Ldap::get_instance(), 'print_checkbox_ldap_attr_update_on_login' ),
+			array( Ldap::get_instance(), 'print_select_ldap_attr_update_on_login' ),
 			'authorizer',
 			'auth_settings_external'
 		);
@@ -805,7 +805,7 @@ class Admin_Page extends Singleton {
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS attribute update', 'authorizer' ); ?></th>
-							<td><?php $cas->print_checkbox_cas_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							<td><?php $cas->print_select_cas_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS automatic login', 'authorizer' ); ?></th>
@@ -865,7 +865,7 @@ class Admin_Page extends Singleton {
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP attribute update', 'authorizer' ); ?></th>
-							<td><?php $ldap->print_checkbox_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							<td><?php $ldap->print_select_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 					</tbody></table>
 
@@ -971,7 +971,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.12', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.14', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',

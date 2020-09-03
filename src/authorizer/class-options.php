@@ -665,8 +665,10 @@ class Options extends Singleton {
 		// Sanitize CAS Port (int).
 		$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
-		// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string).
-		$auth_settings['cas_attr_update_on_login'] = array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ? '1' : '';
+		// Sanitize CAS attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+		if ( ! isset( $auth_settings['cas_attr_update_on_login'] ) || ! in_array( $auth_settings['cas_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
+			$auth_settings['cas_attr_update_on_login'] = '';
+		}
 
 		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
@@ -695,8 +697,10 @@ class Options extends Singleton {
 			$auth_settings['ldap_password'] = Helper::encrypt( $auth_settings['ldap_password'] );
 		}
 
-		// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string).
-		$auth_settings['ldap_attr_update_on_login'] = array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ? '1' : '';
+		// Sanitize LDAP attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+		if ( ! isset( $auth_settings['ldap_attr_update_on_login'] ) || ! in_array( $auth_settings['ldap_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
+			$auth_settings['ldap_attr_update_on_login'] = '';
+		}
 
 		// Make sure public pages is an empty array if it's empty.
 		// Note: this option doesn't exist in multisite options, so we first

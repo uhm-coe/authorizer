@@ -228,15 +228,24 @@ class Cas extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
-	public function print_checkbox_cas_attr_update_on_login( $args = '' ) {
+	public function print_select_cas_attr_update_on_login( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
 		$option               = 'cas_attr_update_on_login';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$values               = array(
+			''                => __( 'Do not update first and last name fields on login', 'authorizer' ),
+			'1'               => __( 'Update first and last name fields on login', 'authorizer' ),
+			'update-if-empty' => __( 'Update first and last name fields on login only if they are empty', 'authorizer' ),
+		);
 
 		// Print option elements.
 		?>
-		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Update first and last name fields on login (will overwrite any name the user has supplied in their profile)', 'authorizer' ); ?></label>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<?php foreach ( $values as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $auth_settings_option, $value ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
 		<?php
 	}
 

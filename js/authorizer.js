@@ -1076,7 +1076,7 @@
 		var cas_attr_email = $( '#auth_settings_cas_attr_email' ).val();
 		var cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
 		var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
-		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
+		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
 		var cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
 		var cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
@@ -1092,7 +1092,7 @@
 		var ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).val();
 		var ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
 		var ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
-		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
+		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).val();
 
 		var advanced_lockouts = {
 			attempts_1: $( '#auth_settings_advanced_lockouts_attempts_1' ).val(),

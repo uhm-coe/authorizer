@@ -321,25 +321,35 @@ class Authorization extends Singleton {
 						}
 					}
 				} else {
-					// Update first/last names of WordPress user from external
-					// service if that option is set.
-					if ( ( array_key_exists( 'authenticated_by', $user_data ) && 'cas' === $user_data['authenticated_by'] && array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['cas_attr_update_on_login'] ) ) || ( array_key_exists( 'authenticated_by', $user_data ) && 'ldap' === $user_data['authenticated_by'] && array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['ldap_attr_update_on_login'] ) ) ) {
-						if ( array_key_exists( 'first_name', $user_data ) && 0 < strlen( $user_data['first_name'] ) ) {
-							wp_update_user(
-								array(
-									'ID'         => $user->ID,
-									'first_name' => $user_data['first_name'],
-								)
-							);
-						}
-						if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
-							wp_update_user(
-								array(
-									'ID'        => $user->ID,
-									'last_name' => $user_data['last_name'],
-								)
-							);
-						}
+					// Update first name from CAS/LDAP if the external service provides a
+					// different value and the option is set to update it (if the option
+					// says to only update if empty, also check that it is empty before
+					// updating).
+					if ( ! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name && (
+						! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] && ! empty( $auth_settings['cas_attr_update_on_login'] ) && ( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->first_name ) ) ) ||
+						! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] && ! empty( $auth_settings['ldap_attr_update_on_login'] ) && ( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
+					) ) {
+						wp_update_user(
+							array(
+								'ID'         => $user->ID,
+								'first_name' => $user_data['first_name'],
+							)
+						);
+					}
+					// Update last name from CAS/LDAP if the external service provides a
+					// different value and the option is set to update it (if the option
+					// says to only update if empty, also check that it is empty before
+					// updating).
+					if ( ! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name && (
+						! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] && ! empty( $auth_settings['cas_attr_update_on_login'] ) && ( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->last_name ) ) ) ||
+						! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] && ! empty( $auth_settings['ldap_attr_update_on_login'] ) && ( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
+					) ) {
+						wp_update_user(
+							array(
+								'ID'        => $user->ID,
+								'last_name' => $user_data['last_name'],
+							)
+						);
 					}
 
 					// Update this user's role if it was modified in the
