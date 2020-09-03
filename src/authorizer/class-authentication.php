@@ -446,6 +446,7 @@ class Authentication extends Singleton {
 
 		// Authenticate against CAS.
 		try {
+			// \phpCAS::setDebug( dirname( __FILE__ ) . '/../../debug.log' );
 			\phpCAS::forceAuthentication();
 		} catch ( \CAS_AuthenticationException $e ) {
 			// CAS server threw an error in isAuthenticated(), potentially because
