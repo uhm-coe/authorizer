@@ -34,6 +34,11 @@ class Admin_Page extends Singleton {
 	public function admin_head() {
 		$screen = get_current_screen();
 
+		// Don't print any help items if not on the Authorizer Settings page.
+		if ( empty( $screen->id ) || ! in_array( $screen->id, array( 'toplevel_page_authorizer-network', 'toplevel_page_authorizer', 'settings_page_authorizer' ) ) ) {
+			return;
+		}
+
 		// Add help tab for Access Lists Settings.
 		$help_auth_settings_access_lists_content = '
 			<p>' . __( "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you.", 'authorizer' ) . '</p>
