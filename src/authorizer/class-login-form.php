@@ -349,8 +349,8 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 		// Log a lockout if we hit the configured limit (via Simple History plugin).
 		$lockouts                   = $auth_settings['advanced_lockouts'];
-		$num_attempts_long_lockout  = $lockouts['attempts_1'] + $lockouts['attempts_2'];
 		$num_attempts_short_lockout = $lockouts['attempts_1'];
+		$num_attempts_long_lockout  = $lockouts['attempts_1'] + $lockouts['attempts_2'];
 		if ( $num_attempts >= $num_attempts_short_lockout ) {
 			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? $lockouts['duration_2'] * 60 : $lockouts['duration_1'] * 60;
 			apply_filters(
