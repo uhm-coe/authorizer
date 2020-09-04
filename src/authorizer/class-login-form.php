@@ -346,6 +346,29 @@ function signInCallback( authResult ) { // jshint ignore:line
 			update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
 			update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
 		}
+
+		// Log a lockout if we hit the configured limit (via Simple History plugin).
+		$lockouts                   = $auth_settings['advanced_lockouts'];
+		$num_attempts_long_lockout  = $lockouts['attempts_1'] + $lockouts['attempts_2'];
+		$num_attempts_short_lockout = $lockouts['attempts_1'];
+		if ( $num_attempts >= $num_attempts_short_lockout ) {
+			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? $lockouts['duration_2'] * 60 : $lockouts['duration_1'] * 60;
+			apply_filters(
+				'simple_history_log_warning',
+				sprintf(
+					/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+					__( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' ),
+					Helper::seconds_as_sentence( $lockout_length_in_seconds ),
+					$username,
+					Helper::ordinal( $num_attempts )
+				),
+				array(
+					'seconds'  => $lockout_length_in_seconds,
+					'username' => $username,
+					'attempts' => $num_attempts,
+				)
+			);
+		}
 	}
 
 

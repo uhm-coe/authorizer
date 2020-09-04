@@ -453,6 +453,24 @@ class Helper {
 
 
 	/**
+	 * Helper function to show a number as an ordinal (e.g., 5 as 5th).
+	 *
+	 * @see: https://stackoverflow.com/questions/3109978/display-numbers-with-ordinal-suffix-in-php
+	 *
+	 * @param  int    $number Number to show as an ordinal.
+	 * @return string         Number as an ordinal string.
+	 */
+	public static function ordinal( $number = 0 ) {
+		$ends = array( 'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th' );
+		if ( $number % 100 >= 11 && $number % 100 <= 13 ) {
+			return $number . 'th';
+		} else {
+			return $number . $ends[ $number % 10 ];
+		}
+	}
+
+
+	/**
 	 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
 	 * and external=cas added).
 	 */
