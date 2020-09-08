@@ -305,9 +305,9 @@ class Authentication extends Singleton {
 		}
 
 		// Add Google API PHP Client.
-		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
+		// @see https://github.com/googleapis/google-api-php-client/releases
 		if ( ! class_exists( 'Google_Client' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/vendor/autoload.php';
+			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2.7.1-PHP5.6/vendor/autoload.php';
 		}
 
 		// Build the Google Client.
@@ -882,9 +882,9 @@ class Authentication extends Singleton {
 			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
 
 			// Add Google API PHP Client.
-			// @see https://github.com/google/google-api-php-client branch:v1-master.
+			// @see https://github.com/googleapis/google-api-php-client/releases
 			if ( ! class_exists( 'Google_Client' ) ) {
-				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/src/Google/autoload.php';
+				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2.7.1-PHP5.6/src/Google/autoload.php';
 			}
 
 			// Build the Google Client.
