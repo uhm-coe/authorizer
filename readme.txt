@@ -63,6 +63,17 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 2.9.14 =
+* Add `authorizer_additional_ldap_attributes_to_retrieve` filter hook to specify an array of other LDAP attributes to fetch. Props @schtiefel for the [pull request](https://github.com/uhm-coe/authorizer/pull/94)!
+* Fix W3C validator errors related to type="text/javascript" in script tags.
+* Support ACF Select fields with optgroups in custom usermeta list.
+* Better row styling on dashboard widget.
+* Add option to update first and last names from CAS/LDAP only if they are empty.
+* Don’t print Authorizer help items outside of Authorizer Settings page.
+* Log a lockout if we hit the configured limit (via Simple History plugin).
+* Fix PHP notice when adding a new user via Dashboard > Users > Add New.
+* Tested up to WordPress 5.5.1.
+
 = 2.9.13 =
 * Successfully tested on WordPress 5.4.
 * Fix warnings about missing variable after last update.
