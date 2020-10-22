@@ -46,6 +46,39 @@ class Authorization extends Singleton {
 			)
 		);
 
+		// Detect whether this user's first and last name should be updated below
+		// (if the external CAS/LDAP service provides a different value, the option
+		// is set to update it, and it's empty if the option to only set it if empty
+		// is enabled).
+		$should_update_first_name =
+			! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name &&
+			(
+				(
+					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->first_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
+				)
+			)
+		;
+		$should_update_last_name =
+			! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
+			(
+				(
+					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->last_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
+				)
+			)
+		;
+
 		/**
 		 * Filter whether to block the currently logging in user based on any of
 		 * their user attributes.
@@ -104,6 +137,20 @@ class Authorization extends Singleton {
 			}
 		}
 
+		// If this externally-authenticated user is an existing administrator (admin
+		// in single site mode, or super admin in network mode), and isn't blocked,
+		// let them in. Update their first/last name if needed (CAS/LDAP).
+		if ( $user && is_super_admin( $user->ID ) ) {
+			if ( $should_update_first_name ) {
+				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
+			}
+			if ( $should_update_last_name ) {
+				update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
+			}
+
+			return $user;
+		}
+
 		// Get the default role for this user (or their current role, if they
 		// already have an account).
 		$default_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
@@ -134,13 +181,6 @@ class Authorization extends Singleton {
 		reset( $user_emails );
 		foreach ( $user_emails as $user_email ) {
 			$is_newly_approved_user = false;
-
-			// If this externally authenticated user is an existing administrator
-			// (administrator in single site mode, or super admin in network mode),
-			// and is not in the blocked list, let them in.
-			if ( $user && is_super_admin( $user->ID ) ) {
-				return $user;
-			}
 
 			// If this externally authenticated user isn't in the approved list
 			// and login access is set to "All authenticated users," or if they were
@@ -321,35 +361,12 @@ class Authorization extends Singleton {
 						}
 					}
 				} else {
-					// Update first name from CAS/LDAP if the external service provides a
-					// different value and the option is set to update it (if the option
-					// says to only update if empty, also check that it is empty before
-					// updating).
-					if ( ! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name && (
-						! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] && ! empty( $auth_settings['cas_attr_update_on_login'] ) && ( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->first_name ) ) ) ||
-						! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] && ! empty( $auth_settings['ldap_attr_update_on_login'] ) && ( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
-					) ) {
-						wp_update_user(
-							array(
-								'ID'         => $user->ID,
-								'first_name' => $user_data['first_name'],
-							)
-						);
+					// Update first/last name from CAS/LDAP if needed.
+					if ( $should_update_first_name ) {
+						update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
 					}
-					// Update last name from CAS/LDAP if the external service provides a
-					// different value and the option is set to update it (if the option
-					// says to only update if empty, also check that it is empty before
-					// updating).
-					if ( ! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name && (
-						! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] && ! empty( $auth_settings['cas_attr_update_on_login'] ) && ( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->last_name ) ) ) ||
-						! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] && ! empty( $auth_settings['ldap_attr_update_on_login'] ) && ( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
-					) ) {
-						wp_update_user(
-							array(
-								'ID'        => $user->ID,
-								'last_name' => $user_data['last_name'],
-							)
-						);
+					if ( $should_update_last_name ) {
+						update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
 					}
 
 					// Update this user's role if it was modified in the
