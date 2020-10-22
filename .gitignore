@@ -1,1 +1,5 @@
+# Ignore MacOS metadata.
 .DS_Store
+
+# Ignore SCSS compiler config (local development).
+prepros-6.config
