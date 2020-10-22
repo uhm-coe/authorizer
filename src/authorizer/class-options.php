@@ -709,10 +709,13 @@ class Options extends Singleton {
 			$auth_settings['access_public_pages'] = array();
 		}
 
-		// Make sure all lockout options are integers (attempts_1,
-		// duration_1, attempts_2, duration_2, reset_duration).
+		// Make sure all lockout options are integers (attempts_1, duration_1,
+		// attempts_2, duration_2, reset_duration). Default to 0 if not.
 		foreach ( $auth_settings['advanced_lockouts'] as $key => $value ) {
 			$auth_settings['advanced_lockouts'][ $key ] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
+			if ( empty( $auth_settings['advanced_lockouts'][ $key ] ) ) {
+				$auth_settings['advanced_lockouts'][ $key ] = 0;
+			}
 		}
 
 		// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string).
