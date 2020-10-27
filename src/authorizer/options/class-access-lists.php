@@ -84,9 +84,9 @@ class Access_Lists extends \Authorizer\Singleton {
 							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 								<?php Helper::wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<a href="javascript:void(0);" class="button-primary" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button-primary" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-secondary" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span> <?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-insert" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );"><?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-remove" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );"><?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-secondary dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else : ?>
@@ -221,8 +221,8 @@ class Access_Lists extends \Authorizer\Singleton {
 					<?php Helper::wp_dropdown_permitted_roles( $access_default_role, 'not disabled', $admin_mode ); ?>
 				</select>
 				<div class="btn-group">
-					<a href="javascript:void(0);" class="btn button-primary button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><span class="glyphicon glyphicon-ok"></span> <?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-					<button type="button" class="btn button-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
+					<a href="javascript:void(0);" class="btn button button-primary dashicons-before dashicons-insert button-add-user" id="approve_user_new" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser(this, 'approved' );"><?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
+					<button type="button" class="btn button button-primary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown">
 						<span class="caret"></span>
 						<span class="sr-only"><?php esc_html_e( 'Toggle Dropdown', 'authorizer' ); ?></span>
 					</button>
@@ -278,7 +278,7 @@ class Access_Lists extends \Authorizer\Singleton {
 							<?php Helper::wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
 						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
-						<a class="button" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
+						<a class="button dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
 					</li>
 				<?php endforeach; ?>
 			</ul>
@@ -287,7 +287,7 @@ class Access_Lists extends \Authorizer\Singleton {
 				<select id="new_blocked_user_role" class="auth-role">
 					<option value="<?php echo esc_attr( $access_default_role ); ?>"><?php echo esc_html( ucfirst( $access_default_role ) ); ?></option>
 				</select>
-				<a href="javascript:void(0);" class="button-primary button-add-user" id="block_user_new" onclick="authAddUser( this, 'blocked' );"><span class="glyphicon glyphicon-ban-circle"></span> <?php esc_html_e( 'Block', 'authorizer' ); ?></a>
+				<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-remove button-add-user" id="block_user_new" onclick="authAddUser( this, 'blocked' );"><?php esc_html_e( 'Block', 'authorizer' ); ?></a>
 			</div>
 		</div>
 		<?php
@@ -524,15 +524,15 @@ class Access_Lists extends \Authorizer\Singleton {
 						value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
 						class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'usermeta', $is_multisite_user ) ); ?>"
 					/>
-					<a class="button button-primary update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"><span class="glyphicon glyphicon-floppy-saved"></span></a>
+					<a class="button button-primary dashicons-before dashicons-edit update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"></a>
 				<?php endif; ?>
 			<?php endif; ?>
 			<?php if ( ! $is_multisite_admin_page ) : ?>
-				<a class="button<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-ban-circle"></span></a>
+				<a class="button button-primary dashicons-before dashicons-remove<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"></a>
 			<?php endif; ?>
-			<a class="button<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"><span class="glyphicon glyphicon-remove"></span></a>
-			&nbsp;<a title="Local WordPress user" class="auth-local-user<?php echo $is_local_user ? '' : ' invisible'; ?>"><span class="glyphicon glyphicon-user"></span></a>
-			&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user<?php echo $is_multisite_user || $is_multisite_admin_page ? '' : ' invisible'; ?>"><span class="glyphicon glyphicon-globe"></span></a>
+			<a class="button dashicons-before dashicons-no<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
+			&nbsp;<a title="Local WordPress user" class="button disabled auth-local-user dashicons-before dashicons-businessperson<?php echo $is_local_user ? '' : ' invisible'; ?>"></a>
+			&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site<?php echo $is_multisite_user || $is_multisite_admin_page ? '' : ' invisible'; ?>"></a>
 		</li>
 		<?php
 	}

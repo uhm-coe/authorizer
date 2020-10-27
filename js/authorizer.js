@@ -925,10 +925,10 @@
 
 			// Add the new item.
 			var authJsPrefix = isMultisite ? 'authMultisite' : 'auth';
-			var banButton = ! isMultisite ? '<a class="button' + ( list === 'approved' ? '' : ' invisible' ) + '" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
-			var ignoreButton = '<a class="button" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a>';
-			var localIcon = '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="auth-local-user' + ( shouldCreateLocalAccount ? '' : ' invisible' ) + '"><span class="glyphicon glyphicon-user"></span></a>';
-			var multisiteIcon = '&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user'+ ( isMultisite ? '' : ' invisible' ) + '"><span class="glyphicon glyphicon-globe"></span></a>';
+			var banButton = ! isMultisite ? '<a class="button button-primary dashicons-before dashicons-remove' + ( list === 'approved' ? '' : ' invisible' ) + '" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"></a>' : '';
+			var ignoreButton = '<a class="button dashicons-before dashicons-no" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"></a>';
+			var localIcon = '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="button disabled auth-local-user dashicons-before dashicons-businessperson' + ( shouldCreateLocalAccount ? '' : ' invisible' ) + '"></a>';
+			var multisiteIcon = '&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site'+ ( isMultisite ? '' : ' invisible' ) + '"></a>';
 			$( ' \
 				<li id="new_user_' + nextId + '" class="new-user" style="display: none;"> \
 					<input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
