@@ -795,7 +795,6 @@
 			// Enable inputs, remove spinner.
 			$caller.removeAttr( 'disabled' );
 			$usermeta.removeAttr( 'disabled' );
-			$caller.css( 'display', 'none' );
 			$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
 			});
@@ -809,7 +808,6 @@
 			// Enable inputs, remove spinner.
 			$caller.removeAttr( 'disabled' );
 			$usermeta.removeAttr( 'disabled' );
-			$caller.css( 'display', 'none' );
 			$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
 			});
