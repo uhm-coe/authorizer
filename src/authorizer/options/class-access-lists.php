@@ -437,6 +437,22 @@ class Access_Lists extends \Authorizer\Singleton {
 
 		if ( ! $approved_wp_user ) :
 			$approved_user['is_wp_user'] = false;
+
+			// Check if this user (who doesn't yet have a WordPress user) has any
+			// stored usermeta (from an admin adding it via the approved list).
+			if ( ! empty( $approved_user['usermeta']['meta_key'] ) && ! empty( $advanced_usermeta ) ) :
+				if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) && $approved_user['usermeta']['meta_key'] === str_replace( 'acf___', '', $advanced_usermeta ) ) :
+					// Get stored value for the user.
+					$approved_user['usermeta'] = $approved_user['usermeta']['meta_value'];
+				elseif ( $approved_user['usermeta']['meta_key'] === $advanced_usermeta ) :
+					// Get regular usermeta value for the user.
+					$approved_user['usermeta'] = $approved_user['usermeta']['meta_value'];
+				endif;
+				if ( is_array( $approved_user['usermeta'] ) || is_object( $approved_user['usermeta'] ) ) :
+					$approved_user['usermeta'] = serialize( $approved_user['usermeta'] );
+				endif;
+			endif;
+
 		else :
 			$approved_user['is_wp_user'] = true;
 			$approved_user['email']      = $approved_wp_user->user_email;
