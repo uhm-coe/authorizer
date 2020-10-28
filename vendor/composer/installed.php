@@ -6,19 +6,19 @@
     'aliases' => 
     array (
     ),
-    'reference' => 'ca4afbfcd0d5e1be86bcf1c2092ef68d964f904c',
+    'reference' => '44f694d6bc89d1f2a39bfb2d757828828624417e',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
   array (
     'apereo/phpcas' => 
     array (
-      'pretty_version' => '1.3.6',
-      'version' => '1.3.6.0',
+      'pretty_version' => '1.3.8',
+      'version' => '1.3.8.0',
       'aliases' => 
       array (
       ),
-      'reference' => '7972833e84f6ee5fa41f1479eab5d855109627f5',
+      'reference' => '40c0769ce05a30c8172b36ceab11124375c8366e',
     ),
     'components/jquery' => 
     array (
@@ -192,7 +192,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => 'ca4afbfcd0d5e1be86bcf1c2092ef68d964f904c',
+      'reference' => '44f694d6bc89d1f2a39bfb2d757828828624417e',
     ),
   ),
 );
