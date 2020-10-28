@@ -51,12 +51,17 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
 
 /**
- * Add phpCAS library if it's not included.
+ * Add composer libraries.
+ */
+require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+
+/**
+ * Add phpCAS library (registers the phpCAS constants).
  *
  * @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
  */
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/phpCAS-1.3.6/CAS.php';
+	require_once dirname( __FILE__ ) . '/vendor/apereo/phpcas/CAS.php';
 }
 
 /**

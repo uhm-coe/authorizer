@@ -57,12 +57,6 @@ class Ajax_Endpoints extends Singleton {
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
-		// Add Google API PHP Client.
-		// @see https://github.com/googleapis/google-api-php-client/releases
-		if ( ! class_exists( 'Google_Client' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2.7.1-PHP5.6/vendor/autoload.php';
-		}
-
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );

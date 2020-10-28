@@ -304,12 +304,6 @@ class Authentication extends Singleton {
 			return null;
 		}
 
-		// Add Google API PHP Client.
-		// @see https://github.com/googleapis/google-api-php-client/releases
-		if ( ! class_exists( 'Google_Client' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2.7.1-PHP5.6/vendor/autoload.php';
-		}
-
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
@@ -332,7 +326,7 @@ class Authentication extends Singleton {
 		}
 
 		// Verify this is a successful Google authentication.
-		// NOTE:  verifyIdToken originally returned an object as per vendor/google/auth/src/OAuth2.php.
+		// NOTE:  verifyIdToken originally returned an object as per src/OAuth2.php.
 		// However, it looks as though this function is overridden by src/Google/Client.php and returns an array instead
 		// in the v2 library.  Treating as an array for purposes of this functionality.
 		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77
@@ -880,12 +874,6 @@ class Authentication extends Singleton {
 			}
 
 			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
-
-			// Add Google API PHP Client.
-			// @see https://github.com/googleapis/google-api-php-client/releases
-			if ( ! class_exists( 'Google_Client' ) ) {
-				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2.7.1-PHP5.6/src/Google/autoload.php';
-			}
 
 			// Build the Google Client.
 			$client = new \Google_Client();

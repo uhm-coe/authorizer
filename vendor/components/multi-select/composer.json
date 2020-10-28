@@ -1,0 +1,44 @@
+{
+    "name" : "components/multi-select",
+    "description" : "This is a user-friendlier drop-in replacement for the standard <select> with multiple attribute activated.",
+    "type" : "component",
+    "homepage" : "http://loudev.com/",
+    "license" : "wtfpl",
+    "authors" : [{
+            "name" : "lou",
+            "email" : "louiscuny@gmail.com"
+        }
+    ],
+    "support" : {
+        "source" : "https://github.com/lou/multi-select"
+    },
+    "keywords" : [
+        "multiselect",
+        "jquery",
+        "select",
+        "multiple",
+        "form",
+        "double list"
+    ],
+    "require" : {
+        "components/jquery" : ">= 1.8"
+    },
+    "suggest": {
+        "robloach/component-installer": "Allows installation of Components via Composer"
+    },
+    "extra" : {
+        "component" : {
+            "scripts" : [
+                "js/jquery.multi-select.js"
+            ],
+            "styles" : [
+                "css/multi-select.css"
+            ],
+            "files" : [
+                "css/multi-select*.css",
+                "js/jquery.multi-select*.js",
+                "img/switch.png"
+            ]
+        }
+    }
+}
