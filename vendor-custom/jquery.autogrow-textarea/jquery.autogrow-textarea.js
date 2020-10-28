@@ -24,7 +24,6 @@
 				fontWeight: $self.css('fontWeight'),
 				lineHeight: $self.css('lineHeight'),
 				resize: 'none',
-    			'word-wrap': 'break-word'
 			}).appendTo( document.body );
 
 			var update = function ( event ) {
