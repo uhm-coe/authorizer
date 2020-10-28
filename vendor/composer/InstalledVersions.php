@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '44f694d6bc89d1f2a39bfb2d757828828624417e',
+    'reference' => 'af07cbf679c06b31cda393c02aab60aac2cc396a',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
@@ -62,12 +62,12 @@ private static $installed = array (
     ),
     'google/apiclient' => 
     array (
-      'pretty_version' => 'v2.7.1',
-      'version' => '2.7.1.0',
+      'pretty_version' => 'v2.8.1',
+      'version' => '2.8.1.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'e748d1d5a51166754f13809d35f1fa162cbec530',
+      'reference' => 'c8f6d09f50f859fa9457104bb0fb72c893804ede',
     ),
     'google/apiclient-services' => 
     array (
@@ -205,7 +205,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '44f694d6bc89d1f2a39bfb2d757828828624417e',
+      'reference' => 'af07cbf679c06b31cda393c02aab60aac2cc396a',
     ),
   ),
 );

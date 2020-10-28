@@ -15,7 +15,11 @@
  * limitations under the License.
  */
 
-class Google_Service_Exception extends Google_Exception
+namespace Google\Service;
+
+use Google\Exception as GoogleException;
+
+class Exception extends GoogleException
 {
   /**
    * Optional list of errors returned in a JSON body of an HTTP error response.
@@ -28,7 +32,7 @@ class Google_Service_Exception extends Google_Exception
    *
    * @param string $message
    * @param int $code
-   * @param Exception|null $previous
+   * @param \Exception|null $previous
    * @param [{string, string}] errors List of errors returned in an HTTP
    * response.  Defaults to [].
    */

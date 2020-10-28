@@ -51,7 +51,6 @@ return array(
     'CAS_Request_RequestInterface' => $vendorDir . '/apereo/phpcas/source/CAS/Request/RequestInterface.php',
     'CAS_TypeMismatchException' => $vendorDir . '/apereo/phpcas/source/CAS/TypeMismatchException.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
-    'Google_Service_Exception' => $vendorDir . '/google/apiclient/src/Google/Service/Exception.php',
-    'Google_Service_Resource' => $vendorDir . '/google/apiclient/src/Google/Service/Resource.php',
+    'Google_Task_Composer' => $vendorDir . '/google/apiclient/src/aliases.php',
     'phpCAS' => $vendorDir . '/apereo/phpcas/source/CAS.php',
 );

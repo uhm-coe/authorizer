@@ -15,15 +15,18 @@
  * limitations under the License.
  */
 
+namespace Google\AuthHandler;
+
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
+use Exception;
 
-class Google_AuthHandler_AuthHandlerFactory
+class AuthHandlerFactory
 {
   /**
    * Builds out a default http handler for the installed version of guzzle.
    *
-   * @return Google_AuthHandler_Guzzle5AuthHandler|Google_AuthHandler_Guzzle6AuthHandler
+   * @return Guzzle5AuthHandler|Guzzle6AuthHandler|Guzzle7AuthHandler
    * @throws Exception
    */
   public static function build($cache = null, array $cacheConfig = [])
@@ -37,11 +40,11 @@ class Google_AuthHandler_AuthHandlerFactory
 
     switch ($guzzleVersion) {
       case 5:
-        return new Google_AuthHandler_Guzzle5AuthHandler($cache, $cacheConfig);
+        return new Guzzle5AuthHandler($cache, $cacheConfig);
       case 6:
-        return new Google_AuthHandler_Guzzle6AuthHandler($cache, $cacheConfig);
+        return new Guzzle6AuthHandler($cache, $cacheConfig);
       case 7:
-        return new Google_AuthHandler_Guzzle7AuthHandler($cache, $cacheConfig);
+        return new Guzzle7AuthHandler($cache, $cacheConfig);
       default:
         throw new Exception('Version not supported');
     }
