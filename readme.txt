@@ -63,6 +63,17 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.0 =
+* Authenticate with more providers via OAuth2. Let us [know](https://github.com/uhm-coe/authorizer/issues) if you have any troubles integrating your OAuth2 provider.
+* Add filter `authorizer_oauth2_generic_authorization_parameters` for targeting the specifics of generic oauth2 providers. Provide an array with options, such as `array( 'scope' => 'user:email' )`, to customize your generic oauth2 provider.
+* Add filter `authorizer_oauth2_generic_authenticated_email` for manually inspecting the results returned from the oauth2 provider to find the resource owner's email to give to WordPress for the authenticated user. Use this for oauth2 providers that release email addresses in nonstandard places.
+* Fix first/last names not getting updated for admins on a CAS or LDAP login.
+* Fix PHP warning if invalid login attempt settings are empty (also prevent the “Authorizer lockout triggered for 0 seconds on user after the 0th invalid attempt” simple history log message).
+* Fix update usermeta button disappearing in Approved Users list after clicking it.
+* Fix serialization of usermeta in Approved Users list for unregistered users.
+* Remove bootstrap dependency (replace glyphicons with WordPress dashicons).
+* Update translatable strings.
+
 = 2.10.0 =
 * Update google-api-php-client from v2.2.4 to v2.7.1. Note: extra Google Services have been removed from the vendor library to support hosts that don't like the large vendor library (12,659 files were removed). If you have any problems with your Google sign-ins, please downgrade to 2.9.14 and open a support request!
 

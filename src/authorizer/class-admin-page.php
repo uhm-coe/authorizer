@@ -1074,7 +1074,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '2.9.14', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.0.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
@@ -1102,7 +1102,7 @@ class Admin_Page extends Singleton {
 
 		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor/components/multi-select/js/jquery.multi-select.min.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
 
-		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '2.9.8' );
+		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '3.0.0' );
 		wp_enqueue_style( 'authorizer-css' );
 
 		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/components/multi-select/css/multi-select.min.css', plugin_root() ), array(), '0.9.12' );
