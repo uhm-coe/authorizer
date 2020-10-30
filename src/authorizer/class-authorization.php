@@ -24,7 +24,8 @@ class Authorization extends Singleton {
 	 * @param WP_User $user        User to check.
 	 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 	 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
-	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes.
+	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes,
+	 *                             oauth2_attributes.
 	 * @return WP_Error|WP_User
 	 *                             WP_Error if there was an error on user creation / adding user to blog.
 	 *                             WP_Error / wp_die() if user does not have access.

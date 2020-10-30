@@ -44,6 +44,7 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-login-access.p
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
 
+require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-oauth2.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-google.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';

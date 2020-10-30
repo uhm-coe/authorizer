@@ -134,6 +134,14 @@ class Options extends Singleton {
 				 */
 
 				// Override external services (google, cas, or ldap) and associated options.
+				$auth_settings['oauth2']                    = $auth_multisite_settings['oauth2'];
+				$auth_settings['oauth2_provider']           = $auth_multisite_settings['oauth2_provider'];
+				$auth_settings['oauth2_custom_label']       = $auth_multisite_settings['oauth2_custom_label'];
+				$auth_settings['oauth2_clientid']           = $auth_multisite_settings['oauth2_clientid'];
+				$auth_settings['oauth2_clientsecret']       = $auth_multisite_settings['oauth2_clientsecret'];
+				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
+				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
+				$auth_settings['oauth2_url_resource']       = $auth_multisite_settings['oauth2_url_resource'];
 				$auth_settings['google']                    = $auth_multisite_settings['google'];
 				$auth_settings['google_clientid']           = $auth_multisite_settings['google_clientid'];
 				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
@@ -286,6 +294,9 @@ class Options extends Singleton {
 			}
 		}
 
+		if ( ! array_key_exists( 'oauth2', $auth_settings ) ) {
+			$auth_settings['oauth2'] = '';
+		}
 		if ( ! array_key_exists( 'google', $auth_settings ) ) {
 			$auth_settings['google'] = '';
 		}
@@ -304,6 +315,28 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'google_hosteddomain', $auth_settings ) ) {
 			$auth_settings['google_hosteddomain'] = '';
+		}
+
+		if ( ! array_key_exists( 'oauth2_provider', $auth_settings ) ) {
+			$auth_settings['oauth2_provider'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_custom_label', $auth_settings ) ) {
+			$auth_settings['oauth2_custom_label'] = 'OAuth2';
+		}
+		if ( ! array_key_exists( 'oauth2_clientid', $auth_settings ) ) {
+			$auth_settings['oauth2_clientid'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_clientsecret', $auth_settings ) ) {
+			$auth_settings['oauth2_clientsecret'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_authorize', $auth_settings ) ) {
+			$auth_settings['oauth2_url_authorize'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_token', $auth_settings ) ) {
+			$auth_settings['oauth2_url_token'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_resource', $auth_settings ) ) {
+			$auth_settings['oauth2_url_resource'] = '';
 		}
 
 		if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
@@ -459,6 +492,9 @@ class Options extends Singleton {
 					$auth_multisite_settings['access_default_role'] = 'subscriber';
 				}
 			}
+			if ( ! array_key_exists( 'oauth2', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2'] = '';
+			}
 			if ( ! array_key_exists( 'google', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google'] = '';
 			}
@@ -467,6 +503,27 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'ldap', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_provider', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_provider'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_custom_label', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_custom_label'] = 'OAuth2';
+			}
+			if ( ! array_key_exists( 'oauth2_clientid', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_clientid'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_clientsecret', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_clientsecret'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_authorize', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_authorize'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_token', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_token'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_resource', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_resource'] = '';
 			}
 			if ( ! array_key_exists( 'google_clientid', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google_clientid'] = '';
@@ -652,6 +709,9 @@ class Options extends Singleton {
 
 		// Sanitize Send welcome email (checkbox: value can only be '1' or empty string).
 		$auth_settings['access_should_email_approved_users'] = array_key_exists( 'access_should_email_approved_users', $auth_settings ) && strlen( $auth_settings['access_should_email_approved_users'] ) > 0 ? '1' : '';
+
+		// Sanitize Enable OAuth2 Logins (checkbox: value can only be '1' or empty string).
+		$auth_settings['oauth2'] = array_key_exists( 'oauth2', $auth_settings ) && strlen( $auth_settings['oauth2'] ) > 0 ? '1' : '';
 
 		// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['google'] = array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ? '1' : '';

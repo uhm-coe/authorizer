@@ -344,6 +344,26 @@ class Helper {
 
 
 	/**
+	 * Helper function to discover the email addresses in a value in a
+	 * multidimensional array.
+	 *
+	 * @param  array  $haystack Multidimensional array, possibly containing an email.
+	 * @return array            Array of Discovered emails, or empty array.
+	 */
+	public static function find_emails_in_multi_array( $haystack, &$emails = array() ) {
+		if ( is_array( $haystack ) ) {
+			foreach ( $haystack as $key => $value ) {
+				self::find_emails_in_multi_array( $value, $emails );
+			}
+		} elseif ( filter_var( $haystack, FILTER_VALIDATE_EMAIL ) ) {
+			$emails[] = $haystack;
+		}
+
+		return $emails;
+	}
+
+
+	/**
 	 * Helper function to determine if an URL is accessible.
 	 *
 	 * @param  string $url URL that should be publicly reachable.
@@ -474,7 +494,7 @@ class Helper {
 	 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
 	 * and external=cas added).
 	 */
-	public static function modify_current_url_for_cas_login() {
+	public static function modify_current_url_for_external_login( $provider = 'cas' ) {
 		// Construct the URL of the current page (wp-login.php).
 		$url = '';
 		if ( isset( $_SERVER['HTTP_HOST'], $_SERVER['REQUEST_URI'] ) ) {
@@ -490,7 +510,7 @@ class Helper {
 			parse_str( $parsed_url['query'], $querystring );
 		}
 		unset( $querystring['reauth'] );
-		$querystring['external'] = 'cas';
+		$querystring['external'] = $provider;
 		$parsed_url['query']     = http_build_query( $querystring );
 
 		// Return the URL as a string.

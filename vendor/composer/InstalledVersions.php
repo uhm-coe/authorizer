@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'af07cbf679c06b31cda393c02aab60aac2cc396a',
+    'reference' => 'caaa107ff0f2da93f87a2a14b4bd94c07f51a558',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
@@ -114,6 +114,24 @@ private static $installed = array (
       ),
       'reference' => '53330f47520498c0ae1f61f7e2c90f55690c06a3',
     ),
+    'league/oauth2-client' => 
+    array (
+      'pretty_version' => '2.6.0',
+      'version' => '2.6.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'badb01e62383430706433191b82506b6df24ad98',
+    ),
+    'league/oauth2-github' => 
+    array (
+      'pretty_version' => '2.0.0',
+      'version' => '2.0.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => 'e63d64f3ec167c09232d189c6b0c397458a99357',
+    ),
     'monolog/monolog' => 
     array (
       'pretty_version' => '2.1.1',
@@ -122,6 +140,15 @@ private static $installed = array (
       array (
       ),
       'reference' => 'f9eee5cec93dfb313a38b6b288741e84e53f02d5',
+    ),
+    'paragonie/random_compat' => 
+    array (
+      'pretty_version' => 'v9.99.100',
+      'version' => '9.99.100.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '996434e5492cb4c3edcb9168db6fbb1359ef965a',
     ),
     'phpseclib/phpseclib' => 
     array (
@@ -205,7 +232,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'af07cbf679c06b31cda393c02aab60aac2cc396a',
+      'reference' => 'caaa107ff0f2da93f87a2a14b4bd94c07f51a558',
     ),
   ),
 );

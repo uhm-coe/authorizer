@@ -15,6 +15,7 @@ use Authorizer\Options\Access_Lists;
 use Authorizer\Options\Login_Access;
 use Authorizer\Options\Public_Access;
 use Authorizer\Options\External;
+use Authorizer\Options\External\OAuth2;
 use Authorizer\Options\External\Google;
 use Authorizer\Options\External\Cas;
 use Authorizer\Options\External\Ldap;
@@ -87,10 +88,19 @@ class Admin_Page extends Singleton {
 		// Add help tab for External Service (CAS, LDAP) Settings.
 		$help_auth_settings_external_content = '
 			<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
+			<p>' . __( '<strong>Enable OAuth2 Logins</strong>: Choose if you want to allow users to log in with one of the supported OAuth2 providers. You will need to enter your API Client ID and Secret to enable these logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
+			<p><strong><em>' . __( 'If you enable OAuth2 logins:', 'authorizer' ) . '</em></strong></p>
+			<ul>
+				<li>' . __( "<strong>Client ID</strong>: You can generate this ID following the instructions for your specific provider.", 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Client Secret</strong>: You can generate this secret by following the instructions for your specific provider.", 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Authorization URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the first: the endpoint first contacted to initiate the authentication.", 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Access Token URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the second: the endpoint that is contacted after initiation to retrieve an access token for the user that just authenticated.", 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Resource Owner URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the third: the endpoint that is contacted after successfully receiving an authentication token to retrieve details on the user that just authenticated.", 'authorizer' ) . '</li>
+			</ul>
 			<p><strong><em>' . __( 'If you enable Google logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
 				<li>' . __( "<strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com", 'authorizer' ) . '</li>
@@ -385,6 +395,62 @@ class Admin_Page extends Singleton {
 			'auth_settings_external'
 		);
 		add_settings_field(
+			'auth_settings_external_oauth2',
+			__( 'OAuth2 Logins', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_checkbox_auth_external_oauth2' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_provider',
+			__( 'Provider', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_select_oauth2_provider' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_custom_label',
+			__( 'Custom label', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_custom_label' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_clientid',
+			__( 'Client ID', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_clientid' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_clientsecret',
+			__( 'Client Secret', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_clientsecret' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_url_authorize',
+			__( 'Authorization URL', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_url_authorize' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_url_token',
+			__( 'Access Token URL', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_url_token' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_url_resource',
+			__( 'Resource Owner URL', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_url_resource' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
 			'auth_settings_external_google',
 			__( 'Google Logins', 'authorizer' ),
 			array( Google::get_instance(), 'print_checkbox_auth_external_google' ),
@@ -449,7 +515,7 @@ class Admin_Page extends Singleton {
 		);
 		add_settings_field(
 			'auth_settings_cas_version',
-			'CAS server version',
+			__( 'CAS server protocol', 'authorizer' ),
 			array( Cas::get_instance(), 'print_select_cas_version' ),
 			'authorizer',
 			'auth_settings_external'
@@ -755,6 +821,38 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Default role for new users', 'authorizer' ); ?></th>
 							<td><?php $external->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 Logins', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_checkbox_auth_external_oauth2( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 Provider', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_select_oauth2_provider( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Custom Label', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_cas_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Client ID', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Client Secret', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Authorization URL', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_url_authorize( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Access Token URL', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_url_token( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Resource Owner URL', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_url_resource( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>

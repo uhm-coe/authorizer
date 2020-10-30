@@ -193,8 +193,25 @@ function signInCallback( authResult ) { // jshint ignore:line
 				<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . Helper::get_cookie_value() ); ?>
 			<?php endif; ?>
 
+			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
+				<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2' ) ); ?>">
+					<span class="dashicons dashicons-lock"></span>
+					<span class="label">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* TRANSLATORS: %s: Custom OAuth2 label from authorizer options */
+								__( 'Sign in with %s', 'authorizer' ),
+								$auth_settings['oauth2_custom_label']
+							)
+						);
+						?>
+					</span>
+				</a></p>
+			<?php endif; ?>
+
 			<?php if ( '1' === $auth_settings['cas'] ) : ?>
-				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_cas_login() ); ?>">
+				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'cas' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
 					<span class="label">
 						<?php
@@ -224,7 +241,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						display: none;
 					}
 				</style>
-			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) : ?>
+			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oauth2'] ) : ?>
 				<h3> &mdash; <?php esc_html_e( 'or', 'authorizer' ); ?> &mdash; </h3>
 			<?php endif; ?>
 		</div>
@@ -259,9 +276,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
+			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_cas_login() ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 
