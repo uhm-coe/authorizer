@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains modifications to the WordPress login form.
  */
-class Login_Form extends Static_Instance {
+class Login_Form extends Singleton {
 
 	/**
 	 * Load external resources for the public-facing site.
@@ -113,7 +113,7 @@ class Login_Form extends Static_Instance {
 		$ajaxurl       = admin_url( 'admin-ajax.php' );
 		if ( '1' === $auth_settings['google'] ) :
 			?>
-<script type="text/javascript">
+<script>
 /* global location, window */
 // Reload login page if reauth querystring param exists,
 // since reauth interrupts external logins (e.g., google).
@@ -193,8 +193,25 @@ function signInCallback( authResult ) { // jshint ignore:line
 				<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . Helper::get_cookie_value() ); ?>
 			<?php endif; ?>
 
+			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
+				<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2' ) ); ?>">
+					<span class="dashicons dashicons-lock"></span>
+					<span class="label">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* TRANSLATORS: %s: Custom OAuth2 label from authorizer options */
+								__( 'Sign in with %s', 'authorizer' ),
+								$auth_settings['oauth2_custom_label']
+							)
+						);
+						?>
+					</span>
+				</a></p>
+			<?php endif; ?>
+
 			<?php if ( '1' === $auth_settings['cas'] ) : ?>
-				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_cas_login() ); ?>">
+				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'cas' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
 					<span class="label">
 						<?php
@@ -224,7 +241,7 @@ function signInCallback( authResult ) { // jshint ignore:line
 						display: none;
 					}
 				</style>
-			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) : ?>
+			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oauth2'] ) : ?>
 				<h3> &mdash; <?php esc_html_e( 'or', 'authorizer' ); ?> &mdash; </h3>
 			<?php endif; ?>
 		</div>
@@ -259,9 +276,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 			array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
+			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_cas_login() ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 
@@ -345,6 +363,29 @@ function signInCallback( authResult ) { // jshint ignore:line
 		} else {
 			update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
 			update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+		}
+
+		// Log a lockout if we hit the configured limit (via Simple History plugin).
+		$lockouts                   = $auth_settings['advanced_lockouts'];
+		$num_attempts_short_lockout = $lockouts['attempts_1'];
+		$num_attempts_long_lockout  = $lockouts['attempts_1'] + $lockouts['attempts_2'];
+		if ( $num_attempts >= $num_attempts_short_lockout ) {
+			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? $lockouts['duration_2'] * 60 : $lockouts['duration_1'] * 60;
+			apply_filters(
+				'simple_history_log_warning',
+				sprintf(
+					/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+					__( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' ),
+					Helper::seconds_as_sentence( $lockout_length_in_seconds ),
+					$username,
+					Helper::ordinal( $num_attempts )
+				),
+				array(
+					'seconds'  => $lockout_length_in_seconds,
+					'username' => $username,
+					'attempts' => $num_attempts,
+				)
+			);
 		}
 	}
 

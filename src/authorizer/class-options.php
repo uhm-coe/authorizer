@@ -14,7 +14,7 @@ use Authorizer\Helper;
 /**
  * Contains functions for rendering the Access Lists tab in Authorizer Settings.
  */
-class Options extends Static_Instance {
+class Options extends Singleton {
 
 	/**
 	 * Retrieves a specific plugin option from db. Multisite enabled.
@@ -134,6 +134,14 @@ class Options extends Static_Instance {
 				 */
 
 				// Override external services (google, cas, or ldap) and associated options.
+				$auth_settings['oauth2']                    = $auth_multisite_settings['oauth2'];
+				$auth_settings['oauth2_provider']           = $auth_multisite_settings['oauth2_provider'];
+				$auth_settings['oauth2_custom_label']       = $auth_multisite_settings['oauth2_custom_label'];
+				$auth_settings['oauth2_clientid']           = $auth_multisite_settings['oauth2_clientid'];
+				$auth_settings['oauth2_clientsecret']       = $auth_multisite_settings['oauth2_clientsecret'];
+				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
+				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
+				$auth_settings['oauth2_url_resource']       = $auth_multisite_settings['oauth2_url_resource'];
 				$auth_settings['google']                    = $auth_multisite_settings['google'];
 				$auth_settings['google_clientid']           = $auth_multisite_settings['google_clientid'];
 				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
@@ -286,6 +294,9 @@ class Options extends Static_Instance {
 			}
 		}
 
+		if ( ! array_key_exists( 'oauth2', $auth_settings ) ) {
+			$auth_settings['oauth2'] = '';
+		}
 		if ( ! array_key_exists( 'google', $auth_settings ) ) {
 			$auth_settings['google'] = '';
 		}
@@ -304,6 +315,28 @@ class Options extends Static_Instance {
 		}
 		if ( ! array_key_exists( 'google_hosteddomain', $auth_settings ) ) {
 			$auth_settings['google_hosteddomain'] = '';
+		}
+
+		if ( ! array_key_exists( 'oauth2_provider', $auth_settings ) ) {
+			$auth_settings['oauth2_provider'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_custom_label', $auth_settings ) ) {
+			$auth_settings['oauth2_custom_label'] = 'OAuth2';
+		}
+		if ( ! array_key_exists( 'oauth2_clientid', $auth_settings ) ) {
+			$auth_settings['oauth2_clientid'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_clientsecret', $auth_settings ) ) {
+			$auth_settings['oauth2_clientsecret'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_authorize', $auth_settings ) ) {
+			$auth_settings['oauth2_url_authorize'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_token', $auth_settings ) ) {
+			$auth_settings['oauth2_url_token'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_url_resource', $auth_settings ) ) {
+			$auth_settings['oauth2_url_resource'] = '';
 		}
 
 		if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
@@ -459,6 +492,9 @@ class Options extends Static_Instance {
 					$auth_multisite_settings['access_default_role'] = 'subscriber';
 				}
 			}
+			if ( ! array_key_exists( 'oauth2', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2'] = '';
+			}
 			if ( ! array_key_exists( 'google', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google'] = '';
 			}
@@ -467,6 +503,27 @@ class Options extends Static_Instance {
 			}
 			if ( ! array_key_exists( 'ldap', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_provider', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_provider'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_custom_label', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_custom_label'] = 'OAuth2';
+			}
+			if ( ! array_key_exists( 'oauth2_clientid', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_clientid'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_clientsecret', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_clientsecret'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_authorize', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_authorize'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_token', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_token'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_url_resource', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_url_resource'] = '';
 			}
 			if ( ! array_key_exists( 'google_clientid', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google_clientid'] = '';
@@ -653,6 +710,9 @@ class Options extends Static_Instance {
 		// Sanitize Send welcome email (checkbox: value can only be '1' or empty string).
 		$auth_settings['access_should_email_approved_users'] = array_key_exists( 'access_should_email_approved_users', $auth_settings ) && strlen( $auth_settings['access_should_email_approved_users'] ) > 0 ? '1' : '';
 
+		// Sanitize Enable OAuth2 Logins (checkbox: value can only be '1' or empty string).
+		$auth_settings['oauth2'] = array_key_exists( 'oauth2', $auth_settings ) && strlen( $auth_settings['oauth2'] ) > 0 ? '1' : '';
+
 		// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['google'] = array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ? '1' : '';
 
@@ -665,8 +725,10 @@ class Options extends Static_Instance {
 		// Sanitize CAS Port (int).
 		$auth_settings['cas_port'] = filter_var( $auth_settings['cas_port'], FILTER_SANITIZE_NUMBER_INT );
 
-		// Sanitize CAS attribute update (checkbox: value can only be '1' or empty string).
-		$auth_settings['cas_attr_update_on_login'] = array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['cas_attr_update_on_login'] ) > 0 ? '1' : '';
+		// Sanitize CAS attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+		if ( ! isset( $auth_settings['cas_attr_update_on_login'] ) || ! in_array( $auth_settings['cas_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
+			$auth_settings['cas_attr_update_on_login'] = '';
+		}
 
 		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
@@ -695,8 +757,10 @@ class Options extends Static_Instance {
 			$auth_settings['ldap_password'] = Helper::encrypt( $auth_settings['ldap_password'] );
 		}
 
-		// Sanitize LDAP attribute update (checkbox: value can only be '1' or empty string).
-		$auth_settings['ldap_attr_update_on_login'] = array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && strlen( $auth_settings['ldap_attr_update_on_login'] ) > 0 ? '1' : '';
+		// Sanitize LDAP attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+		if ( ! isset( $auth_settings['ldap_attr_update_on_login'] ) || ! in_array( $auth_settings['ldap_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
+			$auth_settings['ldap_attr_update_on_login'] = '';
+		}
 
 		// Make sure public pages is an empty array if it's empty.
 		// Note: this option doesn't exist in multisite options, so we first
@@ -705,10 +769,13 @@ class Options extends Static_Instance {
 			$auth_settings['access_public_pages'] = array();
 		}
 
-		// Make sure all lockout options are integers (attempts_1,
-		// duration_1, attempts_2, duration_2, reset_duration).
+		// Make sure all lockout options are integers (attempts_1, duration_1,
+		// attempts_2, duration_2, reset_duration). Default to 0 if not.
 		foreach ( $auth_settings['advanced_lockouts'] as $key => $value ) {
 			$auth_settings['advanced_lockouts'][ $key ] = filter_var( $value, FILTER_SANITIZE_NUMBER_INT );
+			if ( empty( $auth_settings['advanced_lockouts'][ $key ] ) ) {
+				$auth_settings['advanced_lockouts'][ $key ] = 0;
+			}
 		}
 
 		// Sanitize Hide WordPress logins (checkbox: value can only be '1' or empty string).

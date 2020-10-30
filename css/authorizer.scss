@@ -46,7 +46,7 @@
 	}
 
 	// Demo CAS login button sizing.
-	.button-external {
+	.button.button-external {
 		padding: 3px 16px;
 		height: 40px;
 	}
@@ -238,6 +238,18 @@
 		@media only screen and (max-width: 1800px) and (min-width:1500px) {
 		}
 	}
+
+	// Use flexbox to keep everything on one line in approved list.
+	#list_auth_settings_access_users_approved li {
+		flex-wrap: nowrap;
+		& > * { flex: 0 0 auto; }
+		& > :nth-child(1) { flex-shrink: 1; }
+		& > :nth-child(2) { flex-shrink: 1; }
+		& > :nth-child(3) { flex-shrink: 2; }
+		& > :nth-child(4) { flex-shrink: 2; }
+		& > :nth-child(5) { flex-shrink: 1; }
+		input, select { min-width: 0; }
+	}
 }
 
 
@@ -246,6 +258,13 @@
 .toplevel_page_authorizer,
 .settings_page_authorizer,
 #auth_dashboard_widget {
+	// Dashicons in buttons.
+	.button.dashicons-before:before {
+		vertical-align: middle;
+		padding-right: 2px;
+		font-size: 16px;
+	}
+
 	// Room at the bottom for logo.
 	#wpbody-content {
 		padding-bottom: 240px;
@@ -538,45 +557,6 @@
 	.btn .caret {
 		margin-left: 0;
 	}
-}
-
-// Bootstrap icons.
-@font-face {
-	font-family: 'Glyphicons Halflings';
-	src: url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot');
-	src: url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.woff') format('woff'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('../vendor/bootstrap/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
-}
-.glyphicon {
-	display: inline-block;
-	font-family: 'Glyphicons Halflings';
-	-webkit-font-smoothing: antialiased;
-	font-style: normal;
-	font-weight: normal;
-	line-height: 2;
-	-moz-osx-font-smoothing: grayscale;
-	position: relative;
-	top: 2px;
-}
-.glyphicon-user:before {
-	content: "\e008";
-}
-.glyphicon-globe:before {
-	content: "\e135";
-}
-.glyphicon-ok:before {
-	content: "\e013";
-}
-.glyphicon-ban-circle:before {
-	content: "\e090";
-}
-.glyphicon-remove-circle:before {
-	content: "\e088";
-}
-.glyphicon-remove:before {
-	content: "\e014";
-}
-.glyphicon-floppy-saved:before {
-	content: "\e173";
 }
 
 // Busy cursor for ajax calls.

@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Implements the authorization (roles and permissions) features of the plugin.
  */
-class Authorization extends Static_Instance {
+class Authorization extends Singleton {
 
 	/**
 	 * This function will fail with a wp_die() message to the user if they
@@ -24,7 +24,8 @@ class Authorization extends Static_Instance {
 	 * @param WP_User $user        User to check.
 	 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 	 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
-	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes.
+	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes,
+	 *                             oauth2_attributes.
 	 * @return WP_Error|WP_User
 	 *                             WP_Error if there was an error on user creation / adding user to blog.
 	 *                             WP_Error / wp_die() if user does not have access.
@@ -45,6 +46,39 @@ class Authorization extends Static_Instance {
 				$auth_settings_access_users_approved_multi
 			)
 		);
+
+		// Detect whether this user's first and last name should be updated below
+		// (if the external CAS/LDAP service provides a different value, the option
+		// is set to update it, and it's empty if the option to only set it if empty
+		// is enabled).
+		$should_update_first_name =
+			! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name &&
+			(
+				(
+					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->first_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
+				)
+			)
+		;
+		$should_update_last_name =
+			! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
+			(
+				(
+					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->last_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
+				)
+			)
+		;
 
 		/**
 		 * Filter whether to block the currently logging in user based on any of
@@ -104,6 +138,20 @@ class Authorization extends Static_Instance {
 			}
 		}
 
+		// If this externally-authenticated user is an existing administrator (admin
+		// in single site mode, or super admin in network mode), and isn't blocked,
+		// let them in. Update their first/last name if needed (CAS/LDAP).
+		if ( $user && is_super_admin( $user->ID ) ) {
+			if ( $should_update_first_name ) {
+				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
+			}
+			if ( $should_update_last_name ) {
+				update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
+			}
+
+			return $user;
+		}
+
 		// Get the default role for this user (or their current role, if they
 		// already have an account).
 		$default_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
@@ -134,13 +182,6 @@ class Authorization extends Static_Instance {
 		reset( $user_emails );
 		foreach ( $user_emails as $user_email ) {
 			$is_newly_approved_user = false;
-
-			// If this externally authenticated user is an existing administrator
-			// (administrator in single site mode, or super admin in network mode),
-			// and is not in the blocked list, let them in.
-			if ( $user && is_super_admin( $user->ID ) ) {
-				return $user;
-			}
 
 			// If this externally authenticated user isn't in the approved list
 			// and login access is set to "All authenticated users," or if they were
@@ -321,25 +362,12 @@ class Authorization extends Static_Instance {
 						}
 					}
 				} else {
-					// Update first/last names of WordPress user from external
-					// service if that option is set.
-					if ( ( array_key_exists( 'authenticated_by', $user_data ) && 'cas' === $user_data['authenticated_by'] && array_key_exists( 'cas_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['cas_attr_update_on_login'] ) ) || ( array_key_exists( 'authenticated_by', $user_data ) && 'ldap' === $user_data['authenticated_by'] && array_key_exists( 'ldap_attr_update_on_login', $auth_settings ) && 1 === intval( $auth_settings['ldap_attr_update_on_login'] ) ) ) {
-						if ( array_key_exists( 'first_name', $user_data ) && 0 < strlen( $user_data['first_name'] ) ) {
-							wp_update_user(
-								array(
-									'ID'         => $user->ID,
-									'first_name' => $user_data['first_name'],
-								)
-							);
-						}
-						if ( array_key_exists( 'last_name', $user_data ) && strlen( $user_data['last_name'] ) > 0 ) {
-							wp_update_user(
-								array(
-									'ID'        => $user->ID,
-									'last_name' => $user_data['last_name'],
-								)
-							);
-						}
+					// Update first/last name from CAS/LDAP if needed.
+					if ( $should_update_first_name ) {
+						update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
+					}
+					if ( $should_update_last_name ) {
+						update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
 					}
 
 					// Update this user's role if it was modified in the

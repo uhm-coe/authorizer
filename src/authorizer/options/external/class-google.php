@@ -16,7 +16,7 @@ use Authorizer\Options;
  * Contains functions for rendering the Google options in the External Service
  * tab in Authorizer Settings.
  */
-class Google extends \Authorizer\Static_Instance {
+class Google extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

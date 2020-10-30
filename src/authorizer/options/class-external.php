@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains functions for rendering the External Service tab in Authorizer Settings.
  */
-class External extends \Authorizer\Static_Instance {
+class External extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 4.4
-Tested up to: 5.3
+Tested up to: 5.5.1
 Requires PHP: 5.6.20
 Stable tag: trunk
 License: GPLv2 or later
@@ -14,7 +14,7 @@ Authorizer limits login attempts, restricts access to specified users, and authe
 
 *Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
-View or contribute to the plugin source on Github: [https://github.com/uhm-coe/authorizer](https://github.com/uhm-coe/authorizer)
+View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/authorizer](https://github.com/uhm-coe/authorizer)
 
 *Authorizer* requires the following:
 
@@ -62,6 +62,25 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 2.10.0 =
+* Update google-api-php-client from v2.2.4 to v2.7.1. Note: extra Google Services have been removed from the vendor library to support hosts that don't like the large vendor library (12,659 files were removed). If you have any problems with your Google sign-ins, please downgrade to 2.9.14 and open a support request!
+
+= 2.9.14 =
+* Add `authorizer_additional_ldap_attributes_to_retrieve` filter hook to specify an array of other LDAP attributes to fetch. Props @schtiefel for the [pull request](https://github.com/uhm-coe/authorizer/pull/94)!
+* Fix W3C validator errors related to type="text/javascript" in script tags.
+* Support ACF Select fields with optgroups in custom usermeta list.
+* Better row styling on dashboard widget.
+* Add option to update first and last names from CAS/LDAP only if they are empty.
+* Don’t print Authorizer help items outside of Authorizer Settings page.
+* Log a lockout if we hit the configured limit (via Simple History plugin).
+* Fix PHP notice when adding a new user via Dashboard > Users > Add New.
+* Tested up to WordPress 5.5.1.
+
+= 2.9.13 =
+* Successfully tested on WordPress 5.4.
+* Fix warnings about missing variable after last update.
+* Update translations. Props @julienlusson for the [pull request](https://github.com/uhm-coe/authorizer/pull/92)!
 
 = 2.9.12 =
 * Add feature to disable WordPress logins (only allow logins from configured external services).

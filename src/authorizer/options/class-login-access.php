@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains functions for rendering the Login Access tab in Authorizer Settings.
  */
-class Login_Access extends \Authorizer\Static_Instance {
+class Login_Access extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

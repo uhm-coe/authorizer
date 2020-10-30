@@ -17,7 +17,7 @@ use Authorizer\Authorization;
  * Contains functions for interfacing with WordPress users and syncing between
  * them and users in the Authorizer lists.
  */
-class Sync_Userdata extends Static_Instance {
+class Sync_Userdata extends Singleton {
 
 	/**
 	 * Adds all WordPress users in the current site to the approved list,
@@ -211,7 +211,7 @@ class Sync_Userdata extends Static_Instance {
 	 */
 	public function edit_user_profile_update_role( &$errors, $update, &$user ) {
 		// Do nothing if we're not updating role.
-		if ( ! property_exists( $user, 'role' ) ) {
+		if ( ! property_exists( $user, 'role' ) || ! property_exists( $user, 'ID' ) ) {
 			return;
 		}
 

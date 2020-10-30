@@ -17,7 +17,7 @@ use Authorizer\Authorization;
  * Implements the authentication (is user who they say they are?) features of
  * the plugin.
  */
-class Authentication extends Static_Instance {
+class Authentication extends Singleton {
 
 	/**
 	 * Tracks the external service used by the user currently logging out.
@@ -137,6 +137,24 @@ class Authentication extends Static_Instance {
 		$authenticated_by                = '';
 		$result                          = null;
 
+		// Try OAuth2 authentication if it's enabled and we don't have a
+		// successful login yet.
+		if (
+			'1' === $auth_settings['oauth2'] &&
+			0 === count( $externally_authenticated_emails ) &&
+			! is_wp_error( $result )
+		) {
+			$result = $this->custom_authenticate_oauth2( $auth_settings );
+			if ( ! is_null( $result ) && ! is_wp_error( $result ) ) {
+				if ( is_array( $result['email'] ) ) {
+					$externally_authenticated_emails = $result['email'];
+				} else {
+					$externally_authenticated_emails[] = $result['email'];
+				}
+				$authenticated_by = $result['authenticated_by'];
+			}
+		}
+
 		// Try Google authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
@@ -201,6 +219,7 @@ class Authentication extends Static_Instance {
 				'1' === $auth_settings['advanced_disable_wp_login'] &&
 				(
 					'1' === $auth_settings['cas'] ||
+					'1' === $auth_settings['oauth2'] ||
 					'1' === $auth_settings['google'] ||
 					'1' === $auth_settings['ldap']
 				)
@@ -280,6 +299,223 @@ class Authentication extends Static_Instance {
 
 
 	/**
+	 * Validate this user's credentials against selected OAuth2 provider.
+	 *
+	 * @param  array $auth_settings Plugin settings.
+	 * @return array|WP_Error       Array containing email, authenticated_by, first_name,
+	 *                              last_name, and username strings for the successfully
+	 *                              authenticated user, or WP_Error() object on failure,
+	 *                              or null if not attempting an oauth2 login.
+	 */
+	protected function custom_authenticate_oauth2( $auth_settings ) {
+		// Move on if Google auth hasn't been requested here.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] ) {
+			return null;
+		}
+
+		// Move on if required params aren't specified in settings.
+		if (
+			empty( $auth_settings['oauth2_clientid'] ) ||
+			empty( $auth_settings['oauth2_clientsecret'] )
+		) {
+			return null;
+		}
+
+		// Authenticate with GitHub. See: https://github.com/thephpleague/oauth2-github.
+		if ( 'github' === $auth_settings['oauth2_provider'] ) {
+			session_start();
+			$provider = new \League\OAuth2\Client\Provider\Github( array(
+				'clientId'     => $auth_settings['oauth2_clientid'],
+				'clientSecret' => $auth_settings['oauth2_clientsecret'],
+				'redirectUri'  => site_url( '/wp-login.php?external=oauth2' ),
+			) );
+
+			// If we don't have an authorization code, then get one.
+			if ( ! isset( $_REQUEST['code'] ) ) {
+				$auth_url = $provider->getAuthorizationUrl( array(
+					'scope' => 'user:email',
+				) );
+				$_SESSION['oauth2state'] = $provider->getState();
+				header( 'Location: ' . $auth_url );
+				exit;
+
+			// Check state against previously stored one to mitigate CSRF attacks.
+			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				unset( $_SESSION['oauth2state'] );
+				exit;
+
+			// Try to get an access token (using the authorization code grant).
+			} else {
+				try {
+					$token = $provider->getAccessToken( 'authorization_code', array(
+						'code' => $_REQUEST['code'],
+					) );
+				} catch ( \Exception $e ) {
+					// Failed to get token; try again from the beginning. Usually a
+					// bad_verification_code error. See: https://docs.github.com/en/free-pro-team@latest/developers/apps/troubleshooting-oauth-app-access-token-request-errors#bad-verification-code.
+					$auth_url = $provider->getAuthorizationUrl( array(
+						'scope' => 'user:email',
+					) );
+					$_SESSION['oauth2state'] = $provider->getState();
+					header( 'Location: ' . $auth_url );
+					exit;
+				}
+
+				try {
+					// Look up user using token.
+					$user = $provider->getResourceOwner( $token );
+
+					$email      = $user->getEmail();
+					$username   = $user->getNickname();
+					$attributes = $user->toArray();
+
+					// If user has no public email, fetch all emails and use those.
+					if ( empty( $email ) ) {
+						$request = $provider->getAuthenticatedRequest(
+							'GET',
+							$provider->getResourceOwnerDetailsUrl( $token ) . '/emails',
+							$token
+						);
+						$attributes['emails'] = array_filter( array_map(
+							function ( $entry ) {
+								return empty( $entry['email'] ) ? '' : $entry['email'];
+							},
+							(array) $provider->getParsedResponse( $request )
+						) );
+						$email                = $attributes['emails'];
+					}
+				} catch ( \Exception $e ) {
+					// Failed to get user details.
+					return null;
+				}
+			}
+
+		// Authenticate with the generic oauth2 client. See: https://github.com/thephpleague/oauth2-client.
+		} elseif ( 'generic' === $auth_settings['oauth2_provider'] ) {
+			// Move on if required params aren't specified in settings.
+			if (
+				empty( $auth_settings['oauth2_url_authorize'] ) ||
+				empty( $auth_settings['oauth2_url_token'] ) ||
+				empty( $auth_settings['oauth2_url_resource'] )
+			) {
+				return null;
+			}
+
+			session_start();
+			$provider = new \League\OAuth2\Client\Provider\GenericProvider( array(
+				'clientId'                => $auth_settings['oauth2_clientid'],
+				'clientSecret'            => $auth_settings['oauth2_clientsecret'],
+				'redirectUri'             => site_url( '/wp-login.php?external=oauth2' ),
+				'urlAuthorize'            => $auth_settings['oauth2_url_authorize'],
+				'urlAccessToken'          => $auth_settings['oauth2_url_token'],
+				'urlResourceOwnerDetails' => $auth_settings['oauth2_url_resource'],
+			) );
+
+			// If we don't have an authorization code, then get one.
+			if ( ! isset( $_REQUEST['code'] ) ) {
+				$auth_url = $provider->getAuthorizationUrl(
+					/**
+					 * Filter the parameters passed to the generic oauth2 authorization endpoint.
+					 *
+					 * @param array() $params Array of key/value pairs where keys represent
+					 *                        a GET param and value is its value.
+					 */
+					apply_filters( 'authorizer_oauth2_generic_authorization_parameters', array() )
+				);
+				$_SESSION['oauth2state'] = $provider->getState();
+				header( 'Location: ' . $auth_url );
+				exit;
+
+			// Check state against previously stored one to mitigate CSRF attacks.
+			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				unset( $_SESSION['oauth2state'] );
+				exit;
+
+			// Try to get an access token (using the authorization code grant).
+			} else {
+				try {
+					$token = $provider->getAccessToken( 'authorization_code', array(
+						'code' => $_REQUEST['code'],
+					) );
+				} catch ( \Exception $e ) {
+					// Failed to get token; try again from the beginning. Usually a
+					// bad_verification_code error. See: https://docs.github.com/en/free-pro-team@latest/developers/apps/troubleshooting-oauth-app-access-token-request-errors#bad-verification-code.
+					$auth_url = $provider->getAuthorizationUrl(
+						/**
+						 * Filter the parameters passed to the generic oauth2 authorization endpoint.
+						 *
+						 * @param array() $params Array of key/value pairs where keys represent
+						 *                        a GET param and value is its value.
+						 */
+						apply_filters( 'authorizer_oauth2_generic_authorization_parameters', array() )
+					);
+					$_SESSION['oauth2state'] = $provider->getState();
+					header( 'Location: ' . $auth_url );
+					exit;
+				}
+
+				try {
+					// Look up user using token.
+					$user = $provider->getResourceOwner( $token );
+
+					$email      = '';
+					$username   = '';
+					$attributes = $user->toArray();
+
+					// Attempt to find an email address in the resource owner attributes.
+					$email = Helper::find_emails_in_multi_array( $attributes );
+				} catch ( \Exception $e ) {
+					// Failed to get user details.
+					return null;
+				}
+
+				/**
+				 * Filter the generic oauth2 authenticated user email.
+				 *
+				 * @param  string $email      Discovered email (or empty string).
+				 *
+				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 */
+				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
+
+				// Set the username to the email prefix (if we don't have one).
+				if ( ! empty( $email ) && empty( $username ) ) {
+					$username = current( explode( '@', $email ) );
+				}
+			}
+
+		// Move on if a supported providers wasn't selected.
+		} else {
+			return null;
+		}
+
+		// Make sure email is lowercase.
+		if ( is_array( $email ) ) {
+			$externally_authenticated_email = array();
+			foreach ( $email as $external_email ) {
+				$externally_authenticated_email[] = Helper::lowercase( $external_email );
+			}
+		} else {
+			$externally_authenticated_email = array_filter( array( Helper::lowercase( $email ) ) );
+		}
+
+		// Move on if no emails were found.
+		if ( empty( $externally_authenticated_email ) ) {
+			return null;
+		}
+
+		return array(
+			'email'             => $externally_authenticated_email,
+			'username'          => sanitize_user( $username ),
+			'first_name'        => '',
+			'last_name'         => '',
+			'authenticated_by'  => 'oauth2' . ' ' . $auth_settings['oauth2_provider'],
+			'oauth2_attributes' => $attributes,
+		);
+	}
+
+	/**
 	 * Validate this user's credentials against Google.
 	 *
 	 * @param  array $auth_settings Plugin settings.
@@ -304,12 +540,6 @@ class Authentication extends Static_Instance {
 			return null;
 		}
 
-		// Add Google API PHP Client.
-		// @see https://github.com/googleapis/google-api-php-client/releases v2.2.4_PHP54
-		if ( ! class_exists( 'Google_Client' ) ) {
-			require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/vendor/autoload.php';
-		}
-
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
@@ -332,7 +562,7 @@ class Authentication extends Static_Instance {
 		}
 
 		// Verify this is a successful Google authentication.
-		// NOTE:  verifyIdToken originally returned an object as per vendor/google/auth/src/OAuth2.php.
+		// NOTE:  verifyIdToken originally returned an object as per src/OAuth2.php.
 		// However, it looks as though this function is overridden by src/Google/Client.php and returns an array instead
 		// in the v2 library.  Treating as an array for purposes of this functionality.
 		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77
@@ -446,6 +676,7 @@ class Authentication extends Static_Instance {
 
 		// Authenticate against CAS.
 		try {
+			// \phpCAS::setDebug( dirname( __FILE__ ) . '/../../debug.log' );
 			\phpCAS::forceAuthentication();
 		} catch ( \CAS_AuthenticationException $e ) {
 			// CAS server threw an error in isAuthenticated(), potentially because
@@ -682,6 +913,15 @@ class Authentication extends Static_Instance {
 			array_push( $ldap_attributes_to_retrieve, Helper::lowercase( $auth_settings['ldap_attr_email'] ) );
 		}
 
+		/**
+		 * Specify additional LDAP user attributes to retrieve during authentication.
+		 * May be used by plugins in `authorizer_user_register`.
+		 *
+		 * @param array $attributes LDAP attributes to retrieve in addition to first name, last name and email.
+		 */
+		$additional_ldap_attributes_to_retrieve = apply_filters( 'authorizer_additional_ldap_attributes_to_retrieve', array() );
+		$ldap_attributes_to_retrieve = array_merge($ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve);
+
 		// Create default LDAP search filter. If LDAP email attribute is provided,
 		// use (|(uid=$username)(mail=$username)) instead (so logins with either a
 		// username or an email address will work). Otherwise use (uid=$username).
@@ -870,12 +1110,6 @@ class Authentication extends Static_Instance {
 			}
 
 			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
-
-			// Add Google API PHP Client.
-			// @see https://github.com/google/google-api-php-client branch:v1-master.
-			if ( ! class_exists( 'Google_Client' ) ) {
-				require_once dirname( plugin_root() ) . '/vendor/google-api-php-client-v2/src/Google/autoload.php';
-			}
 
 			// Build the Google Client.
 			$client = new \Google_Client();

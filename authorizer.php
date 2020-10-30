@@ -7,7 +7,7 @@
  * Text Domain: authorizer
  * Domain Path: /languages
  * License: GPL2
- * Version: 2.9.12
+ * Version: 2.10.0
  *
  * Portions forked from Restricted Site Access plugin:
  *   http://wordpress.org/plugins/restricted-site-access/
@@ -21,7 +21,7 @@
 
 namespace Authorizer;
 
-require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-static-instance.php';
+require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-singleton.php';
 
 require_once dirname( __FILE__ ) . '/src/authorizer/class-wp-plugin-authorizer.php';
 
@@ -44,6 +44,7 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-login-access.p
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
 
+require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-oauth2.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-google.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.php';
 require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';
@@ -51,12 +52,17 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.
 require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
 
 /**
- * Add phpCAS library if it's not included.
+ * Add composer libraries.
+ */
+require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+
+/**
+ * Add phpCAS library (registers the phpCAS constants).
  *
  * @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
  */
 if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/phpCAS-1.3.6/CAS.php';
+	require_once dirname( __FILE__ ) . '/vendor/apereo/phpcas/CAS.php';
 }
 
 /**

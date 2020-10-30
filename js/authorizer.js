@@ -383,6 +383,13 @@
 		var auth_settings_access_redirect_to_login = $( '#radio_auth_settings_access_redirect_to_login' ).closest( 'tr' );
 		var auth_settings_access_public_warning = $( '#radio_auth_settings_access_public_warning' ).closest( 'tr' );
 		var auth_settings_access_redirect_to_message = $( '#wp-auth_settings_access_redirect_to_message-wrap' ).closest( 'tr' );
+		var auth_settings_external_oauth2_provider = $( '#auth_settings_oauth2_provider' ).closest( 'tr' );
+		var auth_settings_external_oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).closest( 'tr' );
+		var auth_settings_external_oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).closest( 'tr' );
+		var auth_settings_external_oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).closest( 'tr' );
+		var auth_settings_external_oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).closest( 'tr' );
+		var auth_settings_external_oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).closest( 'tr' );
+		var auth_settings_external_oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).closest( 'tr' );
 		var auth_settings_external_google_clientid = $( '#auth_settings_google_clientid' ).closest( 'tr' );
 		var auth_settings_external_google_clientsecret = $( '#auth_settings_google_clientsecret' ).closest( 'tr' );
 		var auth_settings_external_google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).closest( 'tr' );
@@ -422,6 +429,13 @@
 		$( 'th, td', auth_settings_access_redirect_to_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_access_public_warning ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_access_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_provider ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_custom_label ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_clientid ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_url_authorize ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_url_token ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_url_resource ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_google_clientid ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_google_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_google_hosteddomain ).wrapInner( '<div class="animated_wrapper" />' );
@@ -476,6 +490,21 @@
 			animateOption( 'hide_immediately', auth_settings_access_redirect_to_login );
 			animateOption( 'hide_immediately', auth_settings_access_public_warning );
 			animateOption( 'hide_immediately', auth_settings_access_redirect_to_message );
+		}
+
+		// Hide OAuth2 options if unchecked.
+		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) ) {
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_provider );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_custom_label );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientid );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientsecret );
+		}
+
+		// Hide OAuth2 generic options if generic isn't chosen.
+		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'generic' !== $( '#auth_settings_oauth2_provider' ).val() ) {
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_authorize );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_token );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_resource );
 		}
 
 		// Hide Google options if unchecked
@@ -543,6 +572,23 @@
 			animateOption( action, auth_settings_access_redirect_to_message );
 			animateOption( action, auth_settings_access_public_pages );
 			animateOption( action, auth_settings_access_public_warning );
+		});
+
+		// Event handler: Show/hide OAuth2 options based on checkbox.
+		$( 'input[name="auth_settings[oauth2]"]' ).change( function() {
+			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+			animateOption( action, auth_settings_external_oauth2_provider );
+			animateOption( action, auth_settings_external_oauth2_custom_label );
+			animateOption( action, auth_settings_external_oauth2_clientid );
+			animateOption( action, auth_settings_external_oauth2_clientsecret );
+		});
+
+		// Event handler: Show/hide OAuth2 generic options based on provider.
+		$( 'select[name="auth_settings[oauth2_provider]"]' ).change( function() {
+			var action = 'generic' === $( this ).val() ? 'show' : 'hide';
+			animateOption( action, auth_settings_external_oauth2_url_authorize );
+			animateOption( action, auth_settings_external_oauth2_url_token );
+			animateOption( action, auth_settings_external_oauth2_url_resource );
 		});
 
 		// Event handler: Show/hide Google options based on checkbox
@@ -795,7 +841,6 @@
 			// Enable inputs, remove spinner.
 			$caller.removeAttr( 'disabled' );
 			$usermeta.removeAttr( 'disabled' );
-			$caller.css( 'display', 'none' );
 			$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
 			});
@@ -809,7 +854,6 @@
 			// Enable inputs, remove spinner.
 			$caller.removeAttr( 'disabled' );
 			$usermeta.removeAttr( 'disabled' );
-			$caller.css( 'display', 'none' );
 			$( 'form .spinner:not(:has(.spinner-text))' ).animate( { width: '60px' }, 'fast' ).append( '<span class="spinner-text">' + spinnerText + '</span>' ).delay( spinnerWait ).hide( animationSpeed, function() {
 				$( this ).remove();
 			});
@@ -925,10 +969,10 @@
 
 			// Add the new item.
 			var authJsPrefix = isMultisite ? 'authMultisite' : 'auth';
-			var banButton = ! isMultisite ? '<a class="button' + ( list === 'approved' ? '' : ' invisible' ) + '" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"><span class="glyphicon glyphicon-ban-circle"></span></a>' : '';
-			var ignoreButton = '<a class="button" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"><span class="glyphicon glyphicon-remove"></span></a>';
-			var localIcon = '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="auth-local-user' + ( shouldCreateLocalAccount ? '' : ' invisible' ) + '"><span class="glyphicon glyphicon-user"></span></a>';
-			var multisiteIcon = '&nbsp;<a title="WordPress Multisite user" class="auth-multisite-user'+ ( isMultisite ? '' : ' invisible' ) + '"><span class="glyphicon glyphicon-globe"></span></a>';
+			var banButton = ! isMultisite ? '<a class="button button-primary dashicons-before dashicons-remove' + ( list === 'approved' ? '' : ' invisible' ) + '" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"></a>' : '';
+			var ignoreButton = '<a class="button dashicons-before dashicons-no" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"></a>';
+			var localIcon = '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="button disabled auth-local-user dashicons-before dashicons-businessperson' + ( shouldCreateLocalAccount ? '' : ' invisible' ) + '"></a>';
+			var multisiteIcon = '&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site'+ ( isMultisite ? '' : ' invisible' ) + '"></a>';
 			$( ' \
 				<li id="new_user_' + nextId + '" class="new-user" style="display: none;"> \
 					<input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
@@ -1062,6 +1106,15 @@
 
 		var access_default_role = $( '#auth_settings_access_default_role' ).val();
 
+		var oauth2 = $( '#auth_settings_oauth2' ).is( ':checked' ) ? '1' : '';
+		var oauth2_provider = $( '#auth_settings_oauth2_provider' ).val();
+		var oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).val();
+		var oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).val();
+		var oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).val();
+		var oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).val();
+		var oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).val();
+		var oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).val();
+
 		var google = $( '#auth_settings_google' ).is( ':checked' ) ? '1' : '';
 		var google_clientid = $( '#auth_settings_google_clientid' ).val();
 		var google_clientsecret = $( '#auth_settings_google_clientsecret' ).val();
@@ -1076,7 +1129,7 @@
 		var cas_attr_email = $( '#auth_settings_cas_attr_email' ).val();
 		var cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
 		var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
-		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
+		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
 		var cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
 		var cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
@@ -1092,7 +1145,7 @@
 		var ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).val();
 		var ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
 		var ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
-		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).is( ':checked' ) ? '1' : '';
+		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).val();
 
 		var advanced_lockouts = {
 			attempts_1: $( '#auth_settings_advanced_lockouts_attempts_1' ).val(),
@@ -1116,6 +1169,14 @@
 			access_who_can_view: access_who_can_view,
 			access_users_approved: access_users_approved,
 			access_default_role: access_default_role,
+			oauth2: oauth2,
+			oauth2_provider: oauth2_provider,
+			oauth2_custom_label: oauth2_custom_label,
+			oauth2_clientid: oauth2_clientid,
+			oauth2_clientsecret: oauth2_clientsecret,
+			oauth2_url_authorize: oauth2_url_authorize,
+			oauth2_url_token: oauth2_url_token,
+			oauth2_url_resource: oauth2_url_resource,
 			google: google,
 			google_clientid: google_clientid,
 			google_clientsecret: google_clientsecret,

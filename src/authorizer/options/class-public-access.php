@@ -15,7 +15,7 @@ use Authorizer\Options;
 /**
  * Contains functions for rendering the Public Access tab in Authorizer Settings.
  */
-class Public_Access extends \Authorizer\Static_Instance {
+class Public_Access extends \Authorizer\Singleton {
 
 	/**
 	 * Settings print callback.

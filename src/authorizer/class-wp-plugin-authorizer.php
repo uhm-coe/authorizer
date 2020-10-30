@@ -23,7 +23,7 @@ use Authorizer\Dashboard_Widget;
 /**
  * Main plugin class. Activates/deactivates the plugin, and registers all hooks.
  */
-class WP_Plugin_Authorizer extends Static_Instance {
+class WP_Plugin_Authorizer extends Singleton {
 
 	/**
 	 * Constructor.
