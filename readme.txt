@@ -73,6 +73,8 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 * Fix serialization of usermeta in Approved Users list for unregistered users.
 * Remove bootstrap dependency (replace glyphicons with WordPress dashicons).
 * Update translatable strings.
+* Update phpCAS from 1.3.6 to 1.3.8.
+* Update Google API PHP Client from 2.7.1 to 2.8.1.
 
 = 2.10.0 =
 * Update google-api-php-client from v2.2.4 to v2.7.1. Note: extra Google Services have been removed from the vendor library to support hosts that don't like the large vendor library (12,659 files were removed). If you have any problems with your Google sign-ins, please downgrade to 2.9.14 and open a support request!
