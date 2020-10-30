@@ -1105,7 +1105,7 @@ class Admin_Page extends Singleton {
 		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '2.9.8' );
 		wp_enqueue_style( 'authorizer-css' );
 
-		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/components/multi-select/css/multi-select.min.css', plugin_root() ), array(), '1.8' );
+		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/components/multi-select/css/multi-select.min.css', plugin_root() ), array(), '0.9.12' );
 		wp_enqueue_style( 'jquery-multi-select-css' );
 
 		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
