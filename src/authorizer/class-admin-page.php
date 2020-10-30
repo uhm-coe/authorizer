@@ -891,7 +891,7 @@ class Admin_Page extends Singleton {
 							<td><?php $cas->print_text_cas_path( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'CAS server version', 'authorizer' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'CAS server protocol', 'authorizer' ); ?></th>
 							<td><?php $cas->print_select_cas_version( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
