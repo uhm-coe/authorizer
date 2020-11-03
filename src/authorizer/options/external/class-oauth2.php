@@ -31,7 +31,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		// ),
 		'azure' => array(
 			'name'             => 'Microsoft Azure',
-			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow',
+			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols',
 		),
 		'github' => array(
 			'name'             => 'GitHub',
