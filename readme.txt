@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.1 =
+* Add Microsoft Azure oauth2 provider.
+* Updated French translations. Props @julienlusson for the [pull request](https://github.com/uhm-coe/authorizer/pull/96)!
+
 = 3.0.0 =
 * Authenticate with more providers via OAuth2. Let us [know](https://github.com/uhm-coe/authorizer/issues) if you have any troubles integrating your OAuth2 provider.
 * Add filter `authorizer_oauth2_generic_authorization_parameters` for targeting the specifics of generic oauth2 providers. Provide an array with options, such as `array( 'scope' => 'user:email' )`, to customize your generic oauth2 provider.
