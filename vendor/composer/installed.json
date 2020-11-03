@@ -1313,6 +1313,64 @@
                 "source": "https://github.com/ralouphie/getallheaders/tree/develop"
             },
             "install-path": "../ralouphie/getallheaders"
+        },
+        {
+            "name": "thenetworg/oauth2-azure",
+            "version": "v2.0.0",
+            "version_normalized": "2.0.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TheNetworg/oauth2-azure.git",
+                "reference": "0d28aaa681d1044525418c27843f65d7946f67c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/TheNetworg/oauth2-azure/zipball/0d28aaa681d1044525418c27843f65d7946f67c6",
+                "reference": "0d28aaa681d1044525418c27843f65d7946f67c6",
+                "shasum": ""
+            },
+            "require": {
+                "firebase/php-jwt": "~3.0||~4.0||~5.0",
+                "league/oauth2-client": "~2.0",
+                "php": "^5.6|^7.0"
+            },
+            "time": "2020-07-04T08:21:17+00:00",
+            "type": "library",
+            "installation-source": "dist",
+            "autoload": {
+                "psr-4": {
+                    "TheNetworg\\OAuth2\\Client\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Hajek",
+                    "email": "jan.hajek@thenetw.org",
+                    "homepage": "https://thenetw.org"
+                }
+            ],
+            "description": "Azure Active Directory OAuth 2.0 Client Provider for The PHP League OAuth2-Client",
+            "keywords": [
+                "SSO",
+                "aad",
+                "authorization",
+                "azure",
+                "azure active directory",
+                "client",
+                "microsoft",
+                "oauth",
+                "oauth2",
+                "windows azure"
+            ],
+            "support": {
+                "issues": "https://github.com/TheNetworg/oauth2-azure/issues",
+                "source": "https://github.com/TheNetworg/oauth2-azure/tree/master"
+            },
+            "install-path": "../thenetworg/oauth2-azure"
         }
     ],
     "dev": true

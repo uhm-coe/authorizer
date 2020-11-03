@@ -29,11 +29,10 @@ class OAuth2 extends \Authorizer\Singleton {
 		// 	'composer'         => '"luchianenco/oauth2-amazon": "^1.1"',
 		// 	'instructions_url' => 'https://aws.amazon.com/blogs/security/how-to-add-authentication-single-page-web-application-with-amazon-cognito-oauth2-implementation/',
 		// ),
-		// 'azure' => array(
-		// 	'name'             => 'Microsoft Azure',
-		// 	'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow',
-		// 	'composer'         => '"thenetworg/oauth2-azure": "^2.0"',
-		// ),
+		'azure' => array(
+			'name'             => 'Microsoft Azure',
+			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow',
+		),
 		'github' => array(
 			'name'             => 'GitHub',
 			'instructions_url' => 'https://github.com/settings/applications/new',
@@ -127,6 +126,10 @@ class OAuth2 extends \Authorizer\Singleton {
 			<?php esc_html_e( 'Generate your Client ID and Secret for your selected provider by following their specific instructions.', 'authorizer' ); ?>
 			<?php esc_html_e( 'If asked for a redirect or callback URL, use:' ); ?>
 			<strong><?php echo esc_html( site_url( '/wp-login.php?external=oauth2' ) ); ?></strong>
+		</p>
+		<p>
+			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:' ); ?>
+			<strong><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 		</p>
 		<ol>
 			<?php foreach ( $this->providers as $provider => $provider_data ) : ?>

@@ -20,6 +20,10 @@ class ComposerStaticInit3afe4a77f11b1a9be67c8c9e1abad910
         array (
             'phpseclib\\' => 10,
         ),
+        'T' => 
+        array (
+            'TheNetworg\\OAuth2\\Client\\' => 25,
+        ),
         'P' => 
         array (
             'Psr\\Log\\' => 8,
@@ -53,6 +57,10 @@ class ComposerStaticInit3afe4a77f11b1a9be67c8c9e1abad910
         'phpseclib\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib',
+        ),
+        'TheNetworg\\OAuth2\\Client\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/thenetworg/oauth2-azure/src',
         ),
         'Psr\\Log\\' => 
         array (

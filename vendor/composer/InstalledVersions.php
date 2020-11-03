@@ -19,7 +19,7 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => 'caaa107ff0f2da93f87a2a14b4bd94c07f51a558',
+    'reference' => '3ada48f66e35fc44046ac688d47dc264468384c3',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
@@ -225,6 +225,15 @@ private static $installed = array (
       ),
       'reference' => '120b605dfeb996808c31b6477290a714d356e822',
     ),
+    'thenetworg/oauth2-azure' => 
+    array (
+      'pretty_version' => 'v2.0.0',
+      'version' => '2.0.0.0',
+      'aliases' => 
+      array (
+      ),
+      'reference' => '0d28aaa681d1044525418c27843f65d7946f67c6',
+    ),
     'uhm-coe/authorizer' => 
     array (
       'pretty_version' => 'dev-master',
@@ -232,7 +241,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => 'caaa107ff0f2da93f87a2a14b4bd94c07f51a558',
+      'reference' => '3ada48f66e35fc44046ac688d47dc264468384c3',
     ),
   ),
 );

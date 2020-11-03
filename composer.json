@@ -8,7 +8,8 @@
         "google/apiclient": "^2.7",
         "components/multi-select": "^0.9.12",
         "league/oauth2-client": "^2.6",
-        "league/oauth2-github": "^2.0"
+        "league/oauth2-github": "^2.0",
+        "thenetworg/oauth2-azure": "^2.0"
     },
     "license": "GPL-2.0-or-later",
     "authors": [

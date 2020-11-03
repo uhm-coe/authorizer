@@ -308,10 +308,17 @@ class Authentication extends Singleton {
 	 *                              or null if not attempting an oauth2 login.
 	 */
 	protected function custom_authenticate_oauth2( $auth_settings ) {
-		// Move on if Google auth hasn't been requested here.
+		// Move on if oauth2 hasn't been requested here.
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] ) {
-			return null;
+			// Note: because Azure oauth2 provider doesn't let us specify a querystring
+			// in the redirect_uri, we have to detect those redirects separately because
+			// we can't include external=oauth2 in the redirect_uri. Instead, detect the
+			// absence of the `external` param, and the presence of `code` and `state`
+			// params.
+			if ( ! empty( $_GET['external'] ) || ( empty( $_GET['code'] ) && empty( $_GET['state'] ) ) ) {
+				return null;
+			}
 		}
 
 		// Move on if required params aren't specified in settings.
@@ -322,7 +329,8 @@ class Authentication extends Singleton {
 			return null;
 		}
 
-		// Authenticate with GitHub. See: https://github.com/thephpleague/oauth2-github.
+		// Authenticate with GitHub.
+		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $auth_settings['oauth2_provider'] ) {
 			session_start();
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
@@ -391,7 +399,88 @@ class Authentication extends Singleton {
 				}
 			}
 
-		// Authenticate with the generic oauth2 client. See: https://github.com/thephpleague/oauth2-client.
+		// Authenticate with the Microsoft Azure oauth2 client.
+		// See: https://github.com/thenetworg/oauth2-azure.
+		} elseif ( 'azure' === $auth_settings['oauth2_provider'] ) {
+			session_start();
+			$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
+				'clientId'                => $auth_settings['oauth2_clientid'],
+				'clientSecret'            => $auth_settings['oauth2_clientsecret'],
+				'redirectUri'             => site_url( '/wp-login.php' ),
+			) );
+
+			// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
+			$provider->defaultEndPointVersion = \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
+
+			$baseGraphUri    = $provider->getRootMicrosoftGraphUri( null );
+			$provider->scope = 'openid profile email offline_access ' . $baseGraphUri . '/User.Read';
+
+			// If we don't have an authorization code, then get one.
+			if ( ! isset( $_REQUEST['code'] ) ) {
+				$auth_url = $provider->getAuthorizationUrl( array(
+					'scope' => $provider->scope,
+				) );
+				$_SESSION['oauth2state'] = $provider->getState();
+				header( 'Location: ' . $auth_url );
+				exit;
+
+			// Check state against previously stored one to mitigate CSRF attacks.
+			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				unset( $_SESSION['oauth2state'] );
+				exit;
+
+			// Try to get an access token (using the authorization code grant).
+			} else {
+				try {
+					$token = $provider->getAccessToken( 'authorization_code', array(
+						'code'  => $_REQUEST['code'],
+						'scope' => $provider->scope,
+					) );
+				} catch ( \Exception $e ) {
+					// Failed to get token; try again from the beginning.
+					$auth_url = $provider->getAuthorizationUrl( array(
+						'scope' => $provider->scope,
+					) );
+					$_SESSION['oauth2state'] = $provider->getState();
+					header( 'Location: ' . $auth_url );
+					exit;
+				}
+
+				try {
+					// Look up user using token.
+					$user = $provider->getResourceOwner( $token );
+
+					$attributes = $user->toArray();
+					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
+					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];;
+
+					// Attempt to find an email address in the resource owner attributes
+					// if we couldn't find one in the `email` attribute.
+					if ( empty( $email ) ) {
+						$email = Helper::find_emails_in_multi_array( $attributes );
+					}
+				} catch ( \Exception $e ) {
+					// Failed to get user details.
+					return null;
+				}
+
+				/**
+				 * Filter the generic oauth2 authenticated user email.
+				 *
+				 * @param  string $email      Discovered email (or empty string).
+				 *
+				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 */
+				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
+
+				// Set the username to the email prefix (if we don't have one).
+				if ( ! empty( $email ) && empty( $username ) ) {
+					$username = current( explode( '@', $email ) );
+				}
+			}
+
+		// Authenticate with the generic oauth2 client.
+		// See: https://github.com/thephpleague/oauth2-client.
 		} elseif ( 'generic' === $auth_settings['oauth2_provider'] ) {
 			// Move on if required params aren't specified in settings.
 			if (
@@ -439,8 +528,7 @@ class Authentication extends Singleton {
 						'code' => $_REQUEST['code'],
 					) );
 				} catch ( \Exception $e ) {
-					// Failed to get token; try again from the beginning. Usually a
-					// bad_verification_code error. See: https://docs.github.com/en/free-pro-team@latest/developers/apps/troubleshooting-oauth-app-access-token-request-errors#bad-verification-code.
+					// Failed to get token; try again from the beginning.
 					$auth_url = $provider->getAuthorizationUrl(
 						/**
 						 * Filter the parameters passed to the generic oauth2 authorization endpoint.
@@ -510,7 +598,8 @@ class Authentication extends Singleton {
 			'username'          => sanitize_user( $username ),
 			'first_name'        => '',
 			'last_name'         => '',
-			'authenticated_by'  => 'oauth2' . ' ' . $auth_settings['oauth2_provider'],
+			'authenticated_by'  => 'oauth2',
+			'oauth2_provider'   => $auth_settings['oauth2_provider'],
 			'oauth2_attributes' => $attributes,
 		);
 	}
