@@ -31,7 +31,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		// ),
 		'azure' => array(
 			'name'             => 'Microsoft Azure',
-			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols',
+			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app',
 		),
 		'github' => array(
 			'name'             => 'GitHub',
