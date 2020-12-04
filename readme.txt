@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.2 =
+* Add tenant-specific configuration option to Microsoft Azure oauth2 provider.
+
 = 3.0.1 =
 * Add Microsoft Azure oauth2 provider.
 * Updated French translations. Props @julienlusson for the [pull request](https://github.com/uhm-coe/authorizer/pull/96)!
