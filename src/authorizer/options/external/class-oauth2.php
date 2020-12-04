@@ -168,6 +168,26 @@ class OAuth2 extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_text_oauth2_tenant_id( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'oauth2_tenant_id';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="common" />
+		<p class="description"><?php esc_html_e( 'Example:  "common", or a specific Azure Directory Tenant ID', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_text_oauth2_url_authorize( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();

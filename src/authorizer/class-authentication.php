@@ -403,26 +403,38 @@ class Authentication extends Singleton {
 		// See: https://github.com/thenetworg/oauth2-azure.
 		} elseif ( 'azure' === $auth_settings['oauth2_provider'] ) {
 			session_start();
-			$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
-				'clientId'                => $auth_settings['oauth2_clientid'],
-				'clientSecret'            => $auth_settings['oauth2_clientsecret'],
-				'redirectUri'             => site_url( '/wp-login.php' ),
-			) );
+			try {
+				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
+					'clientId'     => $auth_settings['oauth2_clientid'],
+					'clientSecret' => $auth_settings['oauth2_clientsecret'],
+					'redirectUri'  => site_url( '/wp-login.php' ),
+					'tenant'       => empty( $auth_settings['oauth2_tenant_id'] ) ? 'common' : $auth_settings['oauth2_tenant_id'],
+				) );
+				// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
+				$provider->defaultEndPointVersion = \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
 
-			// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
-			$provider->defaultEndPointVersion = \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
-
-			$baseGraphUri    = $provider->getRootMicrosoftGraphUri( null );
-			$provider->scope = 'openid profile email offline_access ' . $baseGraphUri . '/User.Read';
+				$baseGraphUri    = $provider->getRootMicrosoftGraphUri( null );
+				$provider->scope = 'openid profile email offline_access ' . $baseGraphUri . '/User.Read';
+			} catch ( \Exception $e ) {
+				// Invalid configuration, so this in not a successful login. Show error
+				// message to user.
+				return new \WP_Error( 'empty_username', $e->getMessage() );
+			}
 
 			// If we don't have an authorization code, then get one.
 			if ( ! isset( $_REQUEST['code'] ) ) {
-				$auth_url = $provider->getAuthorizationUrl( array(
-					'scope' => $provider->scope,
-				) );
-				$_SESSION['oauth2state'] = $provider->getState();
-				header( 'Location: ' . $auth_url );
-				exit;
+				try {
+					$auth_url = $provider->getAuthorizationUrl( array(
+						'scope' => $provider->scope,
+					) );
+					$_SESSION['oauth2state'] = $provider->getState();
+					header( 'Location: ' . $auth_url );
+					exit;
+			} catch ( \Exception $e ) {
+				// Invalid configuration, so this in not a successful login. Show error
+				// message to user.
+				return new \WP_Error( 'empty_username', $e->getMessage() );
+			}
 
 			// Check state against previously stored one to mitigate CSRF attacks.
 			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
