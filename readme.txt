@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Requires at least: 4.4
-Tested up to: 5.5.1
+Tested up to: 5.6
 Requires PHP: 5.6.20
 Stable tag: trunk
 License: GPLv2 or later
