@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.3 =
+* Fix php errors causing authorizer.js and some vendor assets not to load on network admin. Props @julienlusson for finding this bug!
+
 = 3.0.2 =
 * Add tenant-specific configuration option to Microsoft Azure oauth2 provider.
 
