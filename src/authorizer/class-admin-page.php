@@ -787,6 +787,7 @@ class Admin_Page extends Singleton {
 		$google        = Google::get_instance();
 		$cas           = Cas::get_instance();
 		$ldap          = Ldap::get_instance();
+		$oauth2        = OAuth2::get_instance();
 		$advanced      = Advanced::get_instance();
 		$auth_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 		?>
@@ -839,7 +840,7 @@ class Admin_Page extends Singleton {
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Custom Label', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_cas_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							<td><?php $oauth2->print_text_oauth2_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Client ID', 'authorizer' ); ?></th>
