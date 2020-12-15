@@ -50,10 +50,4 @@ abstract class Singleton {
 	private function __clone() {
 	}
 
-	/**
-	 * Disable unserializing class.
-	 */
-	private function __wakeup() {
-	}
-
 }
