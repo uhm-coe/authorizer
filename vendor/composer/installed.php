@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '3ada48f66e35fc44046ac688d47dc264468384c3',
+    'reference' => 'c8a38f107303558808e85bee3e4e606dbbf7cc55',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
@@ -49,21 +49,21 @@
     ),
     'google/apiclient' => 
     array (
-      'pretty_version' => 'v2.8.1',
-      'version' => '2.8.1.0',
+      'pretty_version' => 'v2.8.3',
+      'version' => '2.8.3.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'c8f6d09f50f859fa9457104bb0fb72c893804ede',
+      'reference' => '81696e6206322e38c643cfcc96c4494ccfef8a32',
     ),
     'google/apiclient-services' => 
     array (
-      'pretty_version' => 'v0.152',
-      'version' => '0.152.0.0',
+      'pretty_version' => 'v0.156',
+      'version' => '0.156.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'e1cc05269e852d62677387f831271ad984b245f8',
+      'reference' => '2f5e54fdef034f856208328126bddd8376dae4b3',
     ),
     'google/auth' => 
     array (
@@ -121,12 +121,12 @@
     ),
     'monolog/monolog' => 
     array (
-      'pretty_version' => '2.1.1',
-      'version' => '2.1.1.0',
+      'pretty_version' => '2.2.0',
+      'version' => '2.2.0.0',
       'aliases' => 
       array (
       ),
-      'reference' => 'f9eee5cec93dfb313a38b6b288741e84e53f02d5',
+      'reference' => '1cb1cde8e8dd0f70cc0fe51354a59acad9302084',
     ),
     'paragonie/random_compat' => 
     array (
@@ -139,12 +139,12 @@
     ),
     'phpseclib/phpseclib' => 
     array (
-      'pretty_version' => '2.0.29',
-      'version' => '2.0.29.0',
+      'pretty_version' => '2.0.30',
+      'version' => '2.0.30.0',
       'aliases' => 
       array (
       ),
-      'reference' => '497856a8d997f640b4a516062f84228a772a48a8',
+      'reference' => '136b9ca7eebef78be14abf90d65c5e57b6bc5d36',
     ),
     'psr/cache' => 
     array (
@@ -228,7 +228,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '3ada48f66e35fc44046ac688d47dc264468384c3',
+      'reference' => 'c8a38f107303558808e85bee3e4e606dbbf7cc55',
     ),
   ),
 );
