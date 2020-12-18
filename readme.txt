@@ -63,6 +63,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.4 =
+* PHP 8 compatibility.
+* Fix warnings about uninitialized oauth2 options.
+* Update Google API PHP Client from 2.8.1 to 2.8.3 (composer update google/apiclient).
+* Update Google API PHP Client Services from 0.152 to 0.156 (composer update google/apiclient-services).
+* Update composer dependencies (monolog 2.1.1 => 2.2.0; phpseclib 2.0.29 => 2.0.30).
+
 = 3.0.3 =
 * Fix php errors causing authorizer.js and some vendor assets not to load on network admin. Props @julienlusson for finding this bug!
 
