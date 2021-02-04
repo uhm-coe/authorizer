@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.5 =
+* Fix REST API access restriction (allow app passwords introduced in WordPress 5.6).
+
 = 3.0.4 =
 * PHP 8 compatibility.
 * Fix warnings about uninitialized oauth2 options.
