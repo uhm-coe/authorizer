@@ -504,13 +504,9 @@ class Authorization extends Singleton {
 			( 'everyone' === $auth_settings['access_who_can_view'] ) ||
 			// Allow access to approved external users and logged in users if option is set to 'logged_in_users'.
 			( 'logged_in_users' === $auth_settings['access_who_can_view'] && Helper::is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
-			// Allow access for requests to /wp-json/oauth1 so oauth clients can authenticate to use the REST API.
-			( property_exists( $wp, 'matched_query' ) && stripos( $wp->matched_query, 'rest_oauth1=' ) === 0 ) ||
-			// Allow access for non-GET requests to /wp-json/*, since REST API authentication already covers them.
-			( property_exists( $wp, 'matched_query' ) && 0 === stripos( $wp->matched_query, 'rest_route=' ) && isset( $_SERVER['REQUEST_METHOD'] ) && 'GET' !== $_SERVER['REQUEST_METHOD'] ) ||
-			// Allow access for GET requests to /wp-json/ (root), since REST API discovery calls rely on this.
-			( property_exists( $wp, 'matched_query' ) && 'rest_route=/' === $wp->matched_query )
-			// Note that GET requests to a rest endpoint will be restricted by authorizer. In that case, error messages will be returned as JSON.
+			// Allow REST API requests (access is determined later in the rest_authentication_errors hook).
+			// See: https://github.com/WordPress/WordPress/blob/8e41746cb11271d063608a63e3f6091a8685e677/wp-includes/rest-api.php#L131-L133
+			( ! empty( $GLOBALS['wp']->query_vars['rest_route'] ) )
 		);
 
 		/**
@@ -650,6 +646,45 @@ class Authorization extends Singleton {
 
 		// Sanity check: we should never get here.
 		wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
+	}
+
+
+	/**
+	 * Prevent REST API access if user isn't authenticated and "only logged in
+	 * users can see the site" is enabled.
+	 *
+	 * Filter: rest_authentication_errors
+	 *
+	 * @param  WP_Error|null|true $errors WP_Error if authentication error, null if authentication method wasn't used, true if authentication succeeded.
+	 * @return WP_Error|null|true         WP_Error if not logged in and "only logged in users can see the site" is enabled.
+	 */
+	public function restrict_rest_api( $errors ) {
+		// If there is already an error, just return that.
+		if ( ! empty( $errors ) ) {
+			return $errors;
+		}
+
+		// If user isn't logged in, check for "only logged in users can see the site."
+		if ( ! is_user_logged_in() ) {
+			// Grab plugin settings.
+			$options       = Options::get_instance();
+			$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+			if (
+				'logged_in_users' === $auth_settings['access_who_can_view'] &&
+				false === apply_filters( 'authorizer_has_access', false, $GLOBALS['wp'] )
+			) {
+				return new \WP_Error(
+					'rest_cannot_view',
+					wp_strip_all_tags( $auth_settings['access_redirect_to_message'] ),
+					array(
+						'status' => 401,
+					)
+				);
+			}
+		}
+
+		return $errors;
 	}
 
 

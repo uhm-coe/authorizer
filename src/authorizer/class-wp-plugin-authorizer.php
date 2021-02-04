@@ -109,6 +109,10 @@ class WP_Plugin_Authorizer extends Singleton {
 		add_action( 'parse_request', array( Authorization::get_instance(), 'restrict_access' ), 9 );
 		add_action( 'init', array( Sync_Userdata::get_instance(), 'init__maybe_add_network_approved_user' ) );
 
+		// Prevent REST API access if user isn't authenticated and "only logged in
+		// users can see the site" is enabled.
+		add_action( 'rest_authentication_errors', array( Authorization::get_instance(), 'restrict_rest_api' ), 10, 1 );
+
 		// AJAX: Save options from dashboard widget.
 		add_action( 'wp_ajax_update_auth_user', array( Ajax_Endpoints::get_instance(), 'ajax_update_auth_user' ) );
 
