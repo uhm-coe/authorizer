@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 
 /*
  * This file is part of the Monolog package.
@@ -22,7 +22,7 @@ class ScalarFormatter extends NormalizerFormatter
     /**
      * {@inheritdoc}
      */
-    public function format(array $record): array
+    public function format(array $record)
     {
         foreach ($record as $key => $value) {
             $record[$key] = $this->normalizeValue($value);
@@ -33,13 +33,13 @@ class ScalarFormatter extends NormalizerFormatter
 
     /**
      * @param  mixed $value
-     * @return string|int|bool|null
+     * @return mixed
      */
     protected function normalizeValue($value)
     {
         $normalized = $this->normalize($value);
 
-        if (is_array($normalized)) {
+        if (is_array($normalized) || is_object($normalized)) {
             return $this->toJson($normalized, true);
         }
 
