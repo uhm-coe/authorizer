@@ -61,8 +61,8 @@
 				}
 			}
 
-			$self.change( update ).keyup( update ).keydown({ event:'keydown' }, update );
-			$( window ).resize( update );
+			$self.on( 'change', update ).on( 'keyup', update ).on( 'keydown', { event:'keydown' }, update );
+			$( window ).on( 'resize', update );
 			update();
 		});
 	};

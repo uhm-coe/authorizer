@@ -1086,7 +1086,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.0.2', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.0.7', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
@@ -1110,7 +1110,7 @@ class Admin_Page extends Singleton {
 			)
 		);
 
-		wp_enqueue_script( 'jquery-autogrow-textarea', plugins_url( 'vendor-custom/jquery.autogrow-textarea/jquery.autogrow-textarea.js', plugin_root() ), array( 'jquery' ), '2.7.0', true );
+		wp_enqueue_script( 'jquery-autogrow-textarea', plugins_url( 'vendor-custom/jquery.autogrow-textarea/jquery.autogrow-textarea.js', plugin_root() ), array( 'jquery' ), '3.0.7', true );
 
 		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor/components/multi-select/js/jquery.multi-select.min.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
 

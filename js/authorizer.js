@@ -553,7 +553,7 @@
 		}
 
 		// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
-		$( 'input[name="auth_settings[access_who_can_login]"]' ).change( function() {
+		$( 'input[name="auth_settings[access_who_can_login]"]' ).on( 'change', function() {
 			// Hide settings unless "Only approved users" is checked
 			var action = $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_access_role_receive_pending_emails );
@@ -566,14 +566,14 @@
 		});
 
 		// Event handler: Hide Welcome email body/subject options if "Send welcome email" is off.
-		$( 'input[name="auth_settings[access_should_email_approved_users]"]' ).change( function() {
+		$( 'input[name="auth_settings[access_should_email_approved_users]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_access_email_approved_users_subject );
 			animateOption( action, auth_settings_access_email_approved_users_body );
 		});
 
 		// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
-		$( 'input[name="auth_settings[access_who_can_view]"]' ).change( function() {
+		$( 'input[name="auth_settings[access_who_can_view]"]' ).on( 'change', function() {
 			var action = $( '#radio_auth_settings_access_who_can_view_everyone' ).is( ':checked' ) ? 'hide' : 'show';
 			animateOption( action, auth_settings_access_redirect_to_login );
 			animateOption( action, auth_settings_access_redirect_to_message );
@@ -582,7 +582,7 @@
 		});
 
 		// Event handler: Show/hide OAuth2 options based on checkbox.
-		$( 'input[name="auth_settings[oauth2]"]' ).change( function() {
+		$( 'input[name="auth_settings[oauth2]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_oauth2_provider );
 			animateOption( action, auth_settings_external_oauth2_custom_label );
@@ -591,7 +591,7 @@
 		});
 
 		// Event handler: Show/hide OAuth2 generic options based on provider.
-		$( 'select[name="auth_settings[oauth2_provider]"]' ).change( function() {
+		$( 'select[name="auth_settings[oauth2_provider]"]' ).on( 'change', function() {
 			var action = 'generic' === $( this ).val() ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_oauth2_url_authorize );
 			animateOption( action, auth_settings_external_oauth2_url_token );
@@ -601,7 +601,7 @@
 		});
 
 		// Event handler: Show/hide Google options based on checkbox
-		$( 'input[name="auth_settings[google]"]' ).change( function() {
+		$( 'input[name="auth_settings[google]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_google_clientid );
 			animateOption( action, auth_settings_external_google_clientsecret );
@@ -609,7 +609,7 @@
 		});
 
 		// Event handler: Show/hide CAS options based on checkbox
-		$( 'input[name="auth_settings[cas]"]' ).change( function() {
+		$( 'input[name="auth_settings[cas]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_cas_custom_label );
 			animateOption( action, auth_settings_external_cas_host );
@@ -625,7 +625,7 @@
 		});
 
 		// Event handler: Show/hide LDAP options based on checkbox
-		$( 'input[name="auth_settings[ldap]"]' ).change( function() {
+		$( 'input[name="auth_settings[ldap]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_ldap_host );
 			animateOption( action, auth_settings_external_ldap_port );
@@ -694,7 +694,7 @@
 		window.chooseTab( tab, animationSpeed );
 
 		// Hide/show multisite settings based on override checkbox.
-		$( 'input[name="auth_settings[multisite_override]"]' ).change( function() {
+		$( 'input[name="auth_settings[multisite_override]"]' ).on( 'change', function() {
 			hideMultisiteSettingsIfDisabled();
 		});
 		hideMultisiteSettingsIfDisabled();
