@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.7 =
+* Fix jQuery deprecation notices in WordPress 5.7.
+* Tested up to WordPress 5.7.
+
 = 3.0.6 =
 * Restore PHP 5.6 compatibility.
 
