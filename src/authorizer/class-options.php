@@ -60,10 +60,20 @@ class Options extends Singleton {
 			//
 			$name = "auth_settings[$option]";
 			$id   = "auth_settings_$option";
+			// Get category of option so we can link directly to the appropriate tab
+			// in multisite options (most options are on the External Service tab;
+			// only access_who_can_login and access_who_can_view are on the Access
+			// Lists tab; all options on the Advanced tab start with "advanced_").
+			$tab = '&tab=external';
+			if ( 'access_who_can_login' === $option || 'access_who_can_view' === $option ) {
+				$tab = '&tab=access_lists';
+			} elseif ( 0 === strpos( $option, 'advanced_' ) ) {
+				$tab = '&tab=advanced';
+			}
 			?>
 			<div id="overlay-hide-auth_settings_<?php echo esc_attr( $option ); ?>" class="auth_multisite_override_overlay">
 				<span class="overlay-note">
-					<?php esc_html_e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo esc_attr( network_admin_url( 'admin.php?page=authorizer' ) ); ?>"><?php esc_html_e( 'multisite option', 'authorizer' ); ?></a>.
+					<?php esc_html_e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo esc_attr( network_admin_url( 'admin.php?page=authorizer' . $tab ) ); ?>"><?php esc_html_e( 'multisite option', 'authorizer' ); ?></a>.
 				</span>
 			</div>
 			<?php
