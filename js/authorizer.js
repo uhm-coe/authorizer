@@ -800,8 +800,6 @@
 					'z-index': 1,
 					opacity: 0.8,
 					position: 'absolute',
-					top: optionContainerToHide.position().top,
-					left: optionContainerToHide.position().left,
 					width: '100%',
 					height: optionContainerToHide.height(),
 				});

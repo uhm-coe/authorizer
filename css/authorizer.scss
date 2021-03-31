@@ -319,6 +319,9 @@
 	}
 
 	// Multisite overlays.
+	form table.form-table td {
+		position: relative;
+	}
 	.auth_multisite_override_overlay {
 		.overlay-note {
 			background: white;
@@ -328,6 +331,8 @@
 			opacity: 0;
 			padding: 8px;
 			position: absolute;
+			top: 0;
+			left: 0;
 			-webkit-transition: opacity 0.1s ease-in-out;
 			-moz-transition: opacity 0.1s ease-in-out;
 			transition: opacity 0.1s ease-in-out;
