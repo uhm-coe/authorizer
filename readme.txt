@@ -63,6 +63,12 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.8 =
+* Fix misplaced "This setting is overridden by a multisite option" in subsite settings within a multisite (caused by change in wp-admin core styles).
+* Link to appropriate tab in multisite settings when clicking "This setting is overridden by a multisite option."
+* Fix for warnings setting first/last name on new pending user.
+* Use [standardized WordPress 5.7 admin colors](https://make.wordpress.org/core/2021/02/23/standardization-of-wp-admin-colors-in-wordpress-5-7/).
+
 = 3.0.7 =
 * Fix jQuery deprecation notices in WordPress 5.7.
 * Tested up to WordPress 5.7.
