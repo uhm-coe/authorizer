@@ -52,7 +52,7 @@ class Authorization extends Singleton {
 		// is set to update it, and it's empty if the option to only set it if empty
 		// is enabled).
 		$should_update_first_name =
-			! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name &&
+			$user && ! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name &&
 			(
 				(
 					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
@@ -66,7 +66,7 @@ class Authorization extends Singleton {
 			)
 		;
 		$should_update_last_name =
-			! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
+			$user && ! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
 			(
 				(
 					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
