@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '0ba2f5daf9ad543effd0c72d171b32299e27954f',
+    'reference' => '858c12a475d3bbf2ed81cc3f5966fed6f2d7d2b8',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
@@ -139,12 +139,12 @@
     ),
     'phpseclib/phpseclib' => 
     array (
-      'pretty_version' => '2.0.30',
-      'version' => '2.0.30.0',
+      'pretty_version' => '2.0.31',
+      'version' => '2.0.31.0',
       'aliases' => 
       array (
       ),
-      'reference' => '136b9ca7eebef78be14abf90d65c5e57b6bc5d36',
+      'reference' => '233a920cb38636a43b18d428f9a8db1f0a1a08f4',
     ),
     'psr/cache' => 
     array (
@@ -248,7 +248,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '0ba2f5daf9ad543effd0c72d171b32299e27954f',
+      'reference' => '858c12a475d3bbf2ed81cc3f5966fed6f2d7d2b8',
     ),
   ),
 );
