@@ -63,6 +63,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.9 =
+* Update phpseclib 2.0.30 => 2.0.31 (CVE-2021-30130).
+
 = 3.0.8 =
 * Fix misplaced "This setting is overridden by a multisite option" in subsite settings within a multisite (caused by change in wp-admin core styles).
 * Link to appropriate tab in multisite settings when clicking "This setting is overridden by a multisite option."
