@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.0.10 =
+* Sync role to approved list if edited via bulk action on All Users page. Props @lukeislucas for discovering that edge case!
+* Remove unused params in sanitize_user_list().
+
 = 3.0.9 =
 * Update phpseclib 2.0.30 => 2.0.31 (CVE-2021-30130).
 
