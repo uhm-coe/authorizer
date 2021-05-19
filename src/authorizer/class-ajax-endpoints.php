@@ -617,6 +617,14 @@ class Ajax_Endpoints extends Singleton {
 							$approved_user['date_added']         = date( 'M Y' );
 							array_push( $auth_settings_access_users_approved, $approved_user );
 							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							// Edge case: if added user already exists in WordPress, make sure
+							// their role matches the one just set here when adding to the
+							// approved list. Note: this will also trigger a redundant role
+							// sync in action set_user_role, but it shouldn't do anything
+							// since we just updated the role in the approved list above.
+							if ( false !== $new_user && ! in_array( $approved_user['role'], $new_user->roles, true ) ) {
+								$new_user->set_role( $approved_user['role'] );
+							}
 						} else {
 							$invalid_emails[] = $approved_user['email'];
 						}
@@ -668,14 +676,19 @@ class Ajax_Endpoints extends Singleton {
 						$auth_settings_access_users_approved = $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT );
 						foreach ( $auth_settings_access_users_approved as $key => $existing_user ) {
 							if ( 0 === strcasecmp( $approved_user['email'], $existing_user['email'] ) ) {
-								// Remove role of the associated WordPress user (but don't delete the user).
+								// Remove role of the associated WordPress user (but don't
+								// delete the user). Note: User will be removed from the
+								// approved list via hook `set_user_role` in WP_User::set_role().
 								$user = get_user_by( 'email', $approved_user['email'] );
 								if ( false !== $user ) {
 									$user->set_role( '' );
+								} else {
+									// User isn't in WordPress, so they won't be removed from the
+									// approved list in the set_user_role action above. Remove
+									// them from the Approved Users list here.
+									unset( $auth_settings_access_users_approved[ $key ] );
+									update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 								}
-								// Remove entry from Approved Users list.
-								unset( $auth_settings_access_users_approved[ $key ] );
-								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 								break;
 							}
 						}
@@ -684,15 +697,18 @@ class Ajax_Endpoints extends Singleton {
 					$changed_user = get_user_by( 'email', $approved_user['email'] );
 					if ( $changed_user ) {
 						if ( is_multisite() && 'false' !== $approved_user['multisite_user'] ) {
+							// Make sure the multisite user's role is updated on all subsites.
 							foreach ( get_blogs_of_user( $changed_user->ID ) as $blog ) {
 								add_user_to_blog( $blog->userblog_id, $changed_user->ID, $approved_user['role'] );
 							}
 						} else {
+							// Update user's role in WordPress. Note: User's role will be changed
+							// in the approved list via hook `set_user_role` in WP_User::set_role().
 							$changed_user->set_role( $approved_user['role'] );
 						}
 					}
-
-					if ( 'false' !== $approved_user['multisite_user'] ) {
+					// Update the user's role in the multisite approved list if needed.
+					if ( is_multisite() && 'false' !== $approved_user['multisite_user'] ) {
 						if ( Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved', 'multisite' ) ) {
 							$auth_multisite_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::NETWORK_CONTEXT )
@@ -705,8 +721,11 @@ class Ajax_Endpoints extends Singleton {
 							}
 							update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 						}
-					} else {
-						// Update user's role in approved list and save.
+					} elseif ( false === $changed_user ) {
+						// Update user's role in approved list and save. Note: only do this
+						// if there isn't already a WordPress user. If there is, this role
+						// sync will happen above in WP_User::set_role()
+						// (set_user_role action).
 						if ( Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved' ) ) {
 							$auth_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )

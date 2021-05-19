@@ -373,17 +373,9 @@ class Authorization extends Singleton {
 					// Update this user's role if it was modified in the
 					// authorizer_custom_role filter.
 					if ( $default_role !== $approved_role ) {
-						// Update user's role in WordPress.
+						// Update user's role in WordPress. Note: User's role will be changed
+						// in the approved list via hook `set_user_role` in WP_User::set_role().
 						$user->set_role( $approved_role );
-
-						// Update user's role in this site's approved list and save.
-						foreach ( $auth_settings_access_users_approved_single as $key => $existing_user ) {
-							if ( 0 === strcasecmp( $user->user_email, $existing_user['email'] ) ) {
-								$auth_settings_access_users_approved_single[ $key ]['role'] = $approved_role;
-								break;
-							}
-						}
-						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
 					}
 				}
 
