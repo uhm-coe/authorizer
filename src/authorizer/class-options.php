@@ -660,12 +660,10 @@ class Options extends Singleton {
 	/**
 	 * List sanitizer.
 	 *
-	 * @param  array  $list           Array of users to sanitize.
-	 * @param  string $side_effect    Set to 'update roles' if role syncing should be performed.
-	 * @param  string $multisite_mode Set to 'multisite' to sync roles on all sites the user belongs to.
-	 * @return array                  Array of sanitized users.
+	 * @param  array $list Array of users to sanitize.
+	 * @return array       Array of sanitized users.
 	 */
-	public function sanitize_user_list( $list, $side_effect = 'none', $multisite_mode = 'single' ) {
+	public function sanitize_user_list( $list ) {
 		// If it's not a list, make it so.
 		if ( ! is_array( $list ) ) {
 			$list = array();
@@ -674,19 +672,6 @@ class Options extends Singleton {
 			if ( strlen( $user_info['email'] ) < 1 ) {
 				// Make sure there are no empty entries in the list.
 				unset( $list[ $key ] );
-			} elseif ( 'update roles' === $side_effect ) {
-				// Make sure the WordPress user accounts have the same role
-				// as that indicated in the list.
-				$wp_user = get_user_by( 'email', $user_info['email'] );
-				if ( $wp_user ) {
-					if ( is_multisite() && 'multisite' === $multisite_mode ) {
-						foreach ( get_blogs_of_user( $wp_user->ID ) as $blog ) {
-							add_user_to_blog( $blog->userblog_id, $wp_user->ID, $user_info['role'] );
-						}
-					} else {
-						$wp_user->set_role( $user_info['role'] );
-					}
-				}
 			}
 		}
 		return $list;
