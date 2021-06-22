@@ -20,6 +20,8 @@ use Composer\Semver\VersionParser;
 
 
 
+
+
 class InstalledVersions
 {
 private static $installed = array (
@@ -30,19 +32,19 @@ private static $installed = array (
     'aliases' => 
     array (
     ),
-    'reference' => '858c12a475d3bbf2ed81cc3f5966fed6f2d7d2b8',
+    'reference' => 'ca704e9c0fb62ffe678f6ca7dc7c8aa498561d39',
     'name' => 'uhm-coe/authorizer',
   ),
   'versions' => 
   array (
     'apereo/phpcas' => 
     array (
-      'pretty_version' => '1.3.8',
-      'version' => '1.3.8.0',
+      'pretty_version' => '1.3.9',
+      'version' => '1.3.9.0',
       'aliases' => 
       array (
       ),
-      'reference' => '40c0769ce05a30c8172b36ceab11124375c8366e',
+      'reference' => '7325865c4cfb5005ed4e4c5cf01823be1726a2a0',
     ),
     'components/jquery' => 
     array (
@@ -272,7 +274,7 @@ private static $installed = array (
       'aliases' => 
       array (
       ),
-      'reference' => '858c12a475d3bbf2ed81cc3f5966fed6f2d7d2b8',
+      'reference' => 'ca704e9c0fb62ffe678f6ca7dc7c8aa498561d39',
     ),
   ),
 );
@@ -291,7 +293,6 @@ $packages = array();
 foreach (self::getInstalled() as $installed) {
 $packages[] = array_keys($installed['versions']);
 }
-
 
 if (1 === \count($packages)) {
 return $packages[0];
@@ -456,9 +457,23 @@ return $installed[0]['root'];
 
 
 
+
 public static function getRawData()
 {
+@trigger_error('getRawData only returns the first dataset loaded, which may not be what you expect. Use getAllRawData() instead which returns all datasets for all autoloaders present in the process.', E_USER_DEPRECATED);
+
 return self::$installed;
+}
+
+
+
+
+
+
+
+public static function getAllRawData()
+{
+return self::getInstalled();
 }
 
 
@@ -484,6 +499,7 @@ public static function reload($data)
 self::$installed = $data;
 self::$installedByVendor = array();
 }
+
 
 
 
