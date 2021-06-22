@@ -149,6 +149,7 @@ class Options extends Singleton {
 				$auth_settings['oauth2_custom_label']       = $auth_multisite_settings['oauth2_custom_label'];
 				$auth_settings['oauth2_clientid']           = $auth_multisite_settings['oauth2_clientid'];
 				$auth_settings['oauth2_clientsecret']       = $auth_multisite_settings['oauth2_clientsecret'];
+				$auth_settings['oauth2_hosteddomain']       = $auth_multisite_settings['oauth2_hosteddomain'];
 				$auth_settings['oauth2_tenant_id']          = $auth_multisite_settings['oauth2_tenant_id'];
 				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
 				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
@@ -340,6 +341,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'oauth2_clientsecret', $auth_settings ) ) {
 			$auth_settings['oauth2_clientsecret'] = '';
 		}
+		if ( ! array_key_exists( 'oauth2_hosteddomain', $auth_settings ) ) {
+			$auth_settings['oauth2_hosteddomain'] = '';
+		}
 		if ( ! array_key_exists( 'oauth2_tenant_id', $auth_settings ) ) {
 			$auth_settings['oauth2_tenant_id'] = 'common';
 		}
@@ -529,6 +533,9 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'oauth2_clientsecret', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_clientsecret'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_hosteddomain', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_hosteddomain'] = '';
 			}
 			if ( ! array_key_exists( 'oauth2_tenant_id', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_tenant_id'] = 'common';
