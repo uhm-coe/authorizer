@@ -160,6 +160,7 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_custom_label',
 			'oauth2_clientid',
 			'oauth2_clientsecret',
+			'oauth2_hosteddomain',
 			'oauth2_tenant_id',
 			'oauth2_url_authorize',
 			'oauth2_url_token',

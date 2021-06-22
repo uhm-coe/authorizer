@@ -605,6 +605,29 @@ class Authentication extends Singleton {
 			return null;
 		}
 
+		/**
+		 * Fail if hosteddomain param is set and the logging in user's email address
+		 * doesn't match the allowed hosted domain.
+		 */
+		if (
+			array_key_exists( 'oauth2_hosteddomain', $auth_settings ) &&
+			strlen( $auth_settings['oauth2_hosteddomain'] ) > 0
+		) {
+			// Allow multiple whitelisted domains.
+			$oauth2_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['oauth2_hosteddomain'] ) );
+			$valid_domain         = false;
+			foreach ( $externally_authenticated_email as $email ) {
+				$email_domain = substr( strrchr( $email, '@' ), 1 );
+				if ( in_array( $email_domain, $oauth2_hosteddomains, true ) ) {
+					$valid_domain = true;
+				}
+			}
+			if ( ! $valid_domain ) {
+				$this->custom_logout();
+				return new \WP_Error( 'invalid_oauth2_login', __( 'Email address does not match the allowed hosted domain', 'authorizer' ) );
+			}
+		}
+
 		return array(
 			'email'             => $externally_authenticated_email,
 			'username'          => sanitize_user( $username ),

@@ -387,6 +387,7 @@
 		var auth_settings_external_oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).closest( 'tr' );
 		var auth_settings_external_oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).closest( 'tr' );
 		var auth_settings_external_oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).closest( 'tr' );
+		var auth_settings_external_oauth2_hosteddomain = $( '#auth_settings_oauth2_hosteddomain' ).closest( 'tr' );
 		var auth_settings_external_oauth2_tenant_id = $( '#auth_settings_oauth2_tenant_id' ).closest( 'tr' );
 		var auth_settings_external_oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).closest( 'tr' );
 		var auth_settings_external_oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).closest( 'tr' );
@@ -434,6 +435,7 @@
 		$( 'th, td', auth_settings_external_oauth2_custom_label ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_oauth2_clientid ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_oauth2_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_oauth2_hosteddomain ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_oauth2_tenant_id ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_oauth2_url_authorize ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_oauth2_url_token ).wrapInner( '<div class="animated_wrapper" />' );
@@ -500,6 +502,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_custom_label );
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientid );
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientsecret );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_hosteddomain );
 		}
 
 		// Hide OAuth2 generic options if generic isn't chosen.
@@ -588,6 +591,7 @@
 			animateOption( action, auth_settings_external_oauth2_custom_label );
 			animateOption( action, auth_settings_external_oauth2_clientid );
 			animateOption( action, auth_settings_external_oauth2_clientsecret );
+			animateOption( action, auth_settings_external_oauth2_hosteddomain );
 		});
 
 		// Event handler: Show/hide OAuth2 generic options based on provider.
@@ -748,6 +752,7 @@
 		// Enable growable textarea for config fields.
 		$( 'textarea#auth_settings_ldap_host' ).autogrow();
 		$( 'textarea#auth_settings_ldap_search_base' ).autogrow();
+		$( 'textarea#auth_settings_oauth2_hosteddomain' ).autogrow();
 		$( 'textarea#auth_settings_google_hosteddomain' ).autogrow();
 
 	});
@@ -1118,6 +1123,7 @@
 		var oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).val();
 		var oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).val();
 		var oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).val();
+		var oauth2_hosteddomain = $( '#auth_settings_oauth2_hosteddomain' ).val();
 		var oauth2_tenant_id = $( '#auth_settings_oauth2_tenant_id' ).val();
 		var oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).val();
 		var oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).val();
@@ -1182,6 +1188,7 @@
 			oauth2_custom_label: oauth2_custom_label,
 			oauth2_clientid: oauth2_clientid,
 			oauth2_clientsecret: oauth2_clientsecret,
+			oauth2_hosteddomain: oauth2_hosteddomain,
 			oauth2_tenant_id: oauth2_tenant_id,
 			oauth2_url_authorize: oauth2_url_authorize,
 			oauth2_url_token: oauth2_url_token,

@@ -430,6 +430,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_external'
 		);
 		add_settings_field(
+			'auth_settings_oauth2_hosteddomain',
+			__( 'OAuth2 Hosted Domain', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_hosteddomain' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
 			'auth_settings_oauth2_tenant_id',
 			__( 'Tenant ID', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_text_oauth2_tenant_id' ),
@@ -851,6 +858,10 @@ class Admin_Page extends Singleton {
 							<td><?php $oauth2->print_text_oauth2_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 Hosted Domain', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'Tenant ID', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_text_oauth2_tenant_id( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -1086,7 +1097,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.0.8', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.1.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
