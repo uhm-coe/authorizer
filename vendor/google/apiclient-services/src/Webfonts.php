@@ -15,6 +15,10 @@
  * the License.
  */
 
+namespace Google\Service;
+
+use Google\Client;
+
 /**
  * Service definition for Webfonts (v1).
  *
@@ -29,7 +33,7 @@
  *
  * @author Google, Inc.
  */
-class Google_Service_Webfonts extends Google_Service
+class Webfonts extends \Google\Service
 {
 
 
@@ -38,36 +42,40 @@ class Google_Service_Webfonts extends Google_Service
   /**
    * Constructs the internal representation of the Webfonts service.
    *
-   * @param Google_Client $client The client used to deliver requests.
+   * @param Client|array $clientOrConfig The client used to deliver requests, or a
+   *                                     config array to pass to a new Client instance.
    * @param string $rootUrl The root URL used for requests to the service.
    */
-  public function __construct(Google_Client $client, $rootUrl = null)
+  public function __construct($clientOrConfig = [], $rootUrl = null)
   {
-    parent::__construct($client);
+    parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://webfonts.googleapis.com/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'webfonts';
 
-    $this->webfonts = new Google_Service_Webfonts_Resource_Webfonts(
+    $this->webfonts = new Webfonts\Resource\Webfonts(
         $this,
         $this->serviceName,
         'webfonts',
-        array(
-          'methods' => array(
-            'list' => array(
+        [
+          'methods' => [
+            'list' => [
               'path' => 'v1/webfonts',
               'httpMethod' => 'GET',
-              'parameters' => array(
-                'sort' => array(
+              'parameters' => [
+                'sort' => [
                   'location' => 'query',
                   'type' => 'string',
-                ),
-              ),
-            ),
-          )
-        )
+                ],
+              ],
+            ],
+          ]
+        ]
     );
   }
 }
+
+// Adding a class alias for backwards compatibility with the previous class name.
+class_alias(Webfonts::class, 'Google_Service_Webfonts');

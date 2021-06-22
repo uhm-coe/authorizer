@@ -15,22 +15,24 @@
  * the License.
  */
 
-class Google_Service_Webfonts_WebfontList extends Google_Collection
+namespace Google\Service\Webfonts;
+
+class WebfontList extends \Google\Collection
 {
   protected $collection_key = 'items';
-  protected $itemsType = 'Google_Service_Webfonts_Webfont';
+  protected $itemsType = Webfont::class;
   protected $itemsDataType = 'array';
   public $kind;
 
   /**
-   * @param Google_Service_Webfonts_Webfont[]
+   * @param Webfont[]
    */
   public function setItems($items)
   {
     $this->items = $items;
   }
   /**
-   * @return Google_Service_Webfonts_Webfont[]
+   * @return Webfont[]
    */
   public function getItems()
   {
@@ -45,3 +47,6 @@ class Google_Service_Webfonts_WebfontList extends Google_Collection
     return $this->kind;
   }
 }
+
+// Adding a class alias for backwards compatibility with the previous class name.
+class_alias(WebfontList::class, 'Google_Service_Webfonts_WebfontList');

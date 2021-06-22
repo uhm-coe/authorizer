@@ -15,7 +15,9 @@
  * the License.
  */
 
-class Google_Service_Webfonts_Webfont extends Google_Collection
+namespace Google\Service\Webfonts;
+
+class Webfont extends \Google\Collection
 {
   protected $collection_key = 'variants';
   public $category;
@@ -92,3 +94,6 @@ class Google_Service_Webfonts_Webfont extends Google_Collection
     return $this->version;
   }
 }
+
+// Adding a class alias for backwards compatibility with the previous class name.
+class_alias(Webfont::class, 'Google_Service_Webfonts_Webfont');

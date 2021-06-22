@@ -15,15 +15,19 @@
  * the License.
  */
 
+namespace Google\Service\Webfonts\Resource;
+
+use Google\Service\Webfonts\WebfontList;
+
 /**
  * The "webfonts" collection of methods.
  * Typical usage is:
  *  <code>
- *   $webfontsService = new Google_Service_Webfonts(...);
+ *   $webfontsService = new Google\Service\Webfonts(...);
  *   $webfonts = $webfontsService->webfonts;
  *  </code>
  */
-class Google_Service_Webfonts_Resource_Webfonts extends Google_Service_Resource
+class Webfonts extends \Google\Service\Resource
 {
   /**
    * Retrieves the list of fonts currently served by the Google Fonts Developer
@@ -32,12 +36,15 @@ class Google_Service_Webfonts_Resource_Webfonts extends Google_Service_Resource
    * @param array $optParams Optional parameters.
    *
    * @opt_param string sort Enables sorting of the list.
-   * @return Google_Service_Webfonts_WebfontList
+   * @return WebfontList
    */
-  public function listWebfonts($optParams = array())
+  public function listWebfonts($optParams = [])
   {
-    $params = array();
+    $params = [];
     $params = array_merge($params, $optParams);
-    return $this->call('list', array($params), "Google_Service_Webfonts_WebfontList");
+    return $this->call('list', [$params], WebfontList::class);
   }
 }
+
+// Adding a class alias for backwards compatibility with the previous class name.
+class_alias(Webfonts::class, 'Google_Service_Webfonts_Resource_Webfonts');
