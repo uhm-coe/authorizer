@@ -63,6 +63,18 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.1.0 =
+* Note: the next minor version of Authorizer, 3.2, will drop support for PHP 5.6 in order to stay current with phpCAS releases, which now require a minimum of PHP 7.0.
+* Update phpCAS dependency from 1.3.8 to 1.3.9.
+* Allow restricting OAuth2 logins to a specific domain (of the email address of users authenticating).
+* Update oauth2-azure dependency from 2.0.0 to 2.0.1.
+* Update Google APIs Client Library for PHP dependency from 2.8.3 to 2.9.2.
+* Update Google PHP API Client Services dependency from 0.156 to 0.201.0.
+* Update dependencies of dependencies (firebase/php-jwt 5.2.0 => 5.3.0; google/auth 1.14.3 => 1.15.1; guzzlehttp/promises 1.4.0 => 1.4.1; guzzlehttp/psr7 1.7.0 => 1.8.2
+monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phpseclib/phpseclib 2.0.31 => 2.0.32; psr/log 1.1.3 => 1.1.4).
+* Update translatable strings.
+
+
 = 3.0.10 =
 * Sync role to approved list if edited via bulk action on All Users page. Props @lukeislucas for discovering that edge case!
 * Remove unused params in sanitize_user_list().
