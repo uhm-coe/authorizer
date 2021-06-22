@@ -63,6 +63,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.1.1 =
+* Update French translations. Props @julienlusson!
+* Note: the next minor version of Authorizer, 3.2, will drop support for PHP 5.6 in order to stay current with phpCAS releases, which now require a minimum of PHP 7.0.
+
 = 3.1.0 =
 * Note: the next minor version of Authorizer, 3.2, will drop support for PHP 5.6 in order to stay current with phpCAS releases, which now require a minimum of PHP 7.0.
 * Update phpCAS dependency from 1.3.8 to 1.3.9.
