@@ -1158,10 +1158,6 @@ class Authentication extends Singleton {
 		// Reset option containing old error messages.
 		delete_option( 'auth_settings_advanced_login_error' );
 
-		if ( session_id() === '' ) {
-			session_start();
-		}
-
 		// If logged in to CAS, Log out of CAS.
 		if ( 'cas' === self::$authenticated_by && '1' === $auth_settings['cas'] ) {
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
@@ -1200,6 +1196,9 @@ class Authentication extends Singleton {
 		}
 
 		// If session token set, log out of Google.
+		if ( session_id() === '' ) {
+			session_start();
+		}
 		if ( 'google' === self::$authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
 
