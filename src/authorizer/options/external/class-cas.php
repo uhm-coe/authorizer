@@ -145,16 +145,51 @@ class Cas extends \Authorizer\Singleton {
 		$options              = Options::get_instance();
 		$option               = 'cas_version';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$auth_settings_option = $this->sanitize_cas_version( $auth_settings_option );
 
 		// Print option elements.
 		?>
 		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-			<option value="SAML_VERSION_1_1" <?php selected( $auth_settings_option, 'SAML_VERSION_1_1' ); ?>>SAML_VERSION_1_1</option>
-			<option value="CAS_VERSION_3_0" <?php selected( $auth_settings_option, 'CAS_VERSION_3_0' ); ?>>CAS_VERSION_3_0</option>
-			<option value="CAS_VERSION_2_0" <?php selected( $auth_settings_option, 'CAS_VERSION_2_0' ); ?>>CAS_VERSION_2_0</option>
-			<option value="CAS_VERSION_1_0" <?php selected( $auth_settings_option, 'CAS_VERSION_1_0' ); ?>>CAS_VERSION_1_0</option>
+			<?php foreach ( array_reverse( \phpCAS::getSupportedProtocols() ) as $version => $label ) : ?>
+				<option value="<?php echo esc_attr( $version ); ?>" <?php selected( $auth_settings_option, $version ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
 		</select>
 		<?php
+	}
+
+
+	/**
+	 * Validate supplied CAS version against phpCAS. Older versions of Authorizer
+	 * stored custom protocol version strings, so we handle converting those here.
+	 *
+	 * @param  string $cas_version CAS protocol string.
+	 *
+	 * @return string              CAS protocol string supported by phpCAS::client().
+	 */
+	public function sanitize_cas_version( $cas_version = '' ) {
+		if ( ! class_exists( 'phpCAS' ) ) {
+			return '';
+		}
+
+		$cas_versions = \phpCAS::getSupportedProtocols();
+		if ( empty( $cas_version ) ) {
+			$cas_version = array_key_last( $cas_versions ); // Should be SAML 1.1.
+		} elseif ( ! in_array( $cas_version, array_keys( $cas_versions ) ) ) {
+			// Backwards compatibility with constant strings from Authorizer < 3.0.11.
+			if ( 'SAML_VERSION_1_1' === $cas_version ) {
+				$cas_version = 'S1';
+			} elseif ( 'CAS_VERSION_3_0' === $cas_version ) {
+				$cas_version = '3.0';
+			} elseif ( 'CAS_VERSION_2_0' === $cas_version ) {
+				$cas_version = '2.0';
+			} elseif ( 'CAS_VERSION_1_0' === $cas_version ) {
+				$cas_version = '1.0';
+			} else {
+				$cas_version = array_key_last( $cas_versions );
+			}
+		}
+
+		return $cas_version;
 	}
 
 

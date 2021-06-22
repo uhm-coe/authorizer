@@ -366,7 +366,7 @@ class Options extends Singleton {
 			$auth_settings['cas_path'] = '';
 		}
 		if ( ! array_key_exists( 'cas_version', $auth_settings ) ) {
-			$auth_settings['cas_version'] = 'SAML_VERSION_1_1';
+			$auth_settings['cas_version'] = Options\External\Cas::get_instance()->sanitize_cas_version();
 		}
 		if ( ! array_key_exists( 'cas_attr_email', $auth_settings ) ) {
 			$auth_settings['cas_attr_email'] = '';
@@ -564,7 +564,7 @@ class Options extends Singleton {
 				$auth_multisite_settings['cas_path'] = '';
 			}
 			if ( ! array_key_exists( 'cas_version', $auth_multisite_settings ) ) {
-				$auth_multisite_settings['cas_version'] = 'SAML_VERSION_1_1';
+				$auth_multisite_settings['cas_version'] = Options\External\Cas::get_instance()->sanitize_cas_version();
 			}
 			if ( ! array_key_exists( 'cas_attr_email', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_attr_email'] = '';

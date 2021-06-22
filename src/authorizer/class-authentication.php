@@ -741,18 +741,11 @@ class Authentication extends Singleton {
 		}
 
 		/**
-		 * Get the CAS server version (default to SAML_VERSION_1_1).
+		 * Get the CAS server protocol version (default to SAML 1.1).
 		 *
-		 * @see: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+		 * @see: https://apereo.github.io/phpCAS/api/group__public.html#gadea9415f40b8d2afc39f140c9be83bbe
 		 */
-		$cas_version = SAML_VERSION_1_1;
-		if ( 'CAS_VERSION_3_0' === $auth_settings['cas_version'] ) {
-			$cas_version = CAS_VERSION_3_0;
-		} elseif ( 'CAS_VERSION_2_0' === $auth_settings['cas_version'] ) {
-			$cas_version = CAS_VERSION_2_0;
-		} elseif ( 'CAS_VERSION_1_0' === $auth_settings['cas_version'] ) {
-			$cas_version = CAS_VERSION_1_0;
-		}
+		$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
 		// Set the CAS client configuration.
 		\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
@@ -1163,18 +1156,11 @@ class Authentication extends Singleton {
 			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
 
 				/**
-				 * Get the CAS server version (default to SAML_VERSION_1_1).
+				 * Get the CAS server protocol version (default to SAML 1.1).
 				 *
-				 * @see: https://developer.jasig.org/cas-clients/php/1.3.4/docs/api/group__public.html
+				 * @see: https://apereo.github.io/phpCAS/api/group__public.html#gadea9415f40b8d2afc39f140c9be83bbe
 				 */
-				$cas_version = SAML_VERSION_1_1;
-				if ( 'CAS_VERSION_3_0' === $auth_settings['cas_version'] ) {
-					$cas_version = CAS_VERSION_3_0;
-				} elseif ( 'CAS_VERSION_2_0' === $auth_settings['cas_version'] ) {
-					$cas_version = CAS_VERSION_2_0;
-				} elseif ( 'CAS_VERSION_1_0' === $auth_settings['cas_version'] ) {
-					$cas_version = CAS_VERSION_1_0;
-				}
+				$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
 				// Set the CAS client configuration if it hasn't been set already.
 				\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );

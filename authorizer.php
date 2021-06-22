@@ -57,15 +57,6 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
 require_once dirname( __FILE__ ) . '/vendor/autoload.php';
 
 /**
- * Add phpCAS library (registers the phpCAS constants).
- *
- * @see https://wiki.jasig.org/display/CASC/phpCAS+installation+guide
- */
-if ( ! defined( 'PHPCAS_VERSION' ) ) {
-	require_once dirname( __FILE__ ) . '/vendor/apereo/phpcas/CAS.php';
-}
-
-/**
  * Helper function to always return the path to the plugin's entry point. Used
  * when locating asset paths using plugins_url().
  */
