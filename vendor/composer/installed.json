@@ -240,35 +240,35 @@
         },
         {
             "name": "google/apiclient",
-            "version": "v2.8.3",
-            "version_normalized": "2.8.3.0",
+            "version": "v2.9.2",
+            "version_normalized": "2.9.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client.git",
-                "reference": "81696e6206322e38c643cfcc96c4494ccfef8a32"
+                "reference": "e9ef4c26a044b8d39a46bcf296be795fe24a1849"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client/zipball/81696e6206322e38c643cfcc96c4494ccfef8a32",
-                "reference": "81696e6206322e38c643cfcc96c4494ccfef8a32",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client/zipball/e9ef4c26a044b8d39a46bcf296be795fe24a1849",
+                "reference": "e9ef4c26a044b8d39a46bcf296be795fe24a1849",
                 "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "~2.0||~3.0||~4.0||~5.0",
                 "google/apiclient-services": "~0.13",
                 "google/auth": "^1.10",
-                "guzzlehttp/guzzle": "~5.3.1||~6.0||~7.0",
+                "guzzlehttp/guzzle": "~5.3.3||~6.0||~7.0",
                 "guzzlehttp/psr7": "^1.2",
                 "monolog/monolog": "^1.17|^2.0",
-                "php": ">=5.4",
-                "phpseclib/phpseclib": "~0.3.10||~2.0"
+                "php": "^5.6|^7.0|^8.0",
+                "phpseclib/phpseclib": "~2.0||^3.0.2"
             },
             "require-dev": {
-                "cache/filesystem-adapter": "^0.3.2",
-                "composer/composer": "^1.10",
+                "cache/filesystem-adapter": "^0.3.2|^1.1",
+                "composer/composer": "^1.10.22",
                 "dealerdirect/phpcodesniffer-composer-installer": "^0.7",
                 "phpcompatibility/php-compatibility": "^9.2",
-                "phpunit/phpunit": "^4.8.36|^5.0",
+                "phpunit/phpunit": "^5.7||^8.5.13",
                 "squizlabs/php_codesniffer": "~2.3",
                 "symfony/css-selector": "~2.1",
                 "symfony/dom-crawler": "~2.1"
@@ -276,7 +276,7 @@
             "suggest": {
                 "cache/filesystem-adapter": "For caching certs and tokens (using Google\\Client::setCache)"
             },
-            "time": "2020-11-17T17:33:35+00:00",
+            "time": "2021-06-09T22:15:08+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -306,7 +306,7 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client/issues",
-                "source": "https://github.com/googleapis/google-api-php-client/tree/v2.8.3"
+                "source": "https://github.com/googleapis/google-api-php-client/tree/v2.9.2"
             },
             "install-path": "../google/apiclient"
         },
