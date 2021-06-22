@@ -1567,25 +1567,25 @@
         },
         {
             "name": "thenetworg/oauth2-azure",
-            "version": "v2.0.0",
-            "version_normalized": "2.0.0.0",
+            "version": "v2.0.1",
+            "version_normalized": "2.0.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/TheNetworg/oauth2-azure.git",
-                "reference": "0d28aaa681d1044525418c27843f65d7946f67c6"
+                "reference": "2649422a0dc74af32d21d9d738d37abcd5b03998"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/TheNetworg/oauth2-azure/zipball/0d28aaa681d1044525418c27843f65d7946f67c6",
-                "reference": "0d28aaa681d1044525418c27843f65d7946f67c6",
+                "url": "https://api.github.com/repos/TheNetworg/oauth2-azure/zipball/2649422a0dc74af32d21d9d738d37abcd5b03998",
+                "reference": "2649422a0dc74af32d21d9d738d37abcd5b03998",
                 "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "~3.0||~4.0||~5.0",
                 "league/oauth2-client": "~2.0",
-                "php": "^5.6|^7.0"
+                "php": "^5.6|^7.0|^8.0"
             },
-            "time": "2020-07-04T08:21:17+00:00",
+            "time": "2021-01-11T12:20:12+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -1619,7 +1619,7 @@
             ],
             "support": {
                 "issues": "https://github.com/TheNetworg/oauth2-azure/issues",
-                "source": "https://github.com/TheNetworg/oauth2-azure/tree/master"
+                "source": "https://github.com/TheNetworg/oauth2-azure/tree/v2.0.1"
             },
             "install-path": "../thenetworg/oauth2-azure"
         }
