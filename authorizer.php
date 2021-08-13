@@ -21,6 +21,8 @@
 
 namespace Authorizer;
 
+require_once dirname( __FILE__ ) . '/polyfills.php';
+
 require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-singleton.php';
 
 require_once dirname( __FILE__ ) . '/src/authorizer/class-wp-plugin-authorizer.php';
