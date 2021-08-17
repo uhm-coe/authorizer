@@ -1,13 +1,15 @@
 <?php
 /**
- * Plugin Name: Authorizer
- * Description: Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
- * Author: Paul Ryan <prar@hawaii.edu>
- * Plugin URI: https://github.com/uhm-coe/authorizer
- * Text Domain: authorizer
- * Domain Path: /languages
- * License: GPL2
- * Version: 3.1.2
+ * Plugin Name:       Authorizer
+ * Plugin URI:        https://github.com/uhm-coe/authorizer
+ * Description:       Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
+ * Version:           3.1.2
+ * Requires at least: 4.4
+ * Requires PHP:      5.6.20
+ * Author:            Paul Ryan <prar@hawaii.edu>
+ * License:           GPL v2 or later
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       authorizer
  *
  * Portions forked from Restricted Site Access plugin:
  *   http://wordpress.org/plugins/restricted-site-access/
