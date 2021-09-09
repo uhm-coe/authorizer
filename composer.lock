@@ -311,16 +311,16 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.208.0",
+            "version": "v0.211.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "77fdacfc99f582970dcb3c41233158b02cc4ba5e"
+                "reference": "01b020d4d7f120a5ac3c12e1d7e3a6067bc93881"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/77fdacfc99f582970dcb3c41233158b02cc4ba5e",
-                "reference": "77fdacfc99f582970dcb3c41233158b02cc4ba5e",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/01b020d4d7f120a5ac3c12e1d7e3a6067bc93881",
+                "reference": "01b020d4d7f120a5ac3c12e1d7e3a6067bc93881",
                 "shasum": ""
             },
             "require": {
@@ -349,28 +349,28 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.208.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.211.0"
             },
-            "time": "2021-08-15T11:18:25+00:00"
+            "time": "2021-09-03T11:20:26+00:00"
         },
         {
             "name": "google/auth",
-            "version": "v1.17.0",
+            "version": "v1.18.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-auth-library-php.git",
-                "reference": "4da3a850e9d1045918099b6561165d829efbe2b7"
+                "reference": "21dd478e77b0634ed9e3a68613f74ed250ca9347"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/4da3a850e9d1045918099b6561165d829efbe2b7",
-                "reference": "4da3a850e9d1045918099b6561165d829efbe2b7",
+                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/21dd478e77b0634ed9e3a68613f74ed250ca9347",
+                "reference": "21dd478e77b0634ed9e3a68613f74ed250ca9347",
                 "shasum": ""
             },
             "require": {
                 "firebase/php-jwt": "~2.0|~3.0|~4.0|~5.0",
                 "guzzlehttp/guzzle": "^5.3.1|^6.2.1|^7.0",
-                "guzzlehttp/psr7": "^1.2",
+                "guzzlehttp/psr7": "^1.7|^2.0",
                 "php": ">=5.4",
                 "psr/cache": "^1.0|^2.0",
                 "psr/http-message": "^1.0"
@@ -405,9 +405,9 @@
             "support": {
                 "docs": "https://googleapis.github.io/google-auth-library-php/master/",
                 "issues": "https://github.com/googleapis/google-auth-library-php/issues",
-                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.17.0"
+                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.18.0"
             },
-            "time": "2021-08-18T16:10:00+00:00"
+            "time": "2021-08-24T18:03:18+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
