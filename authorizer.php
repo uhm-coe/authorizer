@@ -58,7 +58,7 @@ require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
 /**
  * Add composer libraries.
  */
-require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+require_once dirname( __FILE__ ) . '/build/vendor/scoper-autoload.php';
 
 /**
  * Helper function to always return the path to the plugin's entry point. Used

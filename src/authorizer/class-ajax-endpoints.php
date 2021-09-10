@@ -15,6 +15,8 @@ use Authorizer\Options\Access_Lists;
 use Authorizer\Authorization;
 use Authorizer\Sync_Userdata;
 
+use Authorizer\Vendor\Google_Client;
+
 /**
  * Contains endpoints for any AJAX methods.
  */
@@ -58,7 +60,7 @@ class Ajax_Endpoints extends Singleton {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Build the Google Client.
-		$client = new \Google_Client();
+		$client = new Google_Client();
 		$client->setApplicationName( 'WordPress' );
 		$client->setClientId( $auth_settings['google_clientid'] );
 		$client->setClientSecret( $auth_settings['google_clientsecret'] );

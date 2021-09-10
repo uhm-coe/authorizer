@@ -12,6 +12,8 @@ namespace Authorizer\Options\External;
 use Authorizer\Helper;
 use Authorizer\Options;
 
+use Authorizer\Vendor\phpCAS;
+
 /**
  * Contains functions for rendering the CAS options in the External Service
  * tab in Authorizer Settings.
@@ -150,7 +152,7 @@ class Cas extends \Authorizer\Singleton {
 		// Print option elements.
 		?>
 		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-			<?php foreach ( array_reverse( \phpCAS::getSupportedProtocols() ) as $version => $label ) : ?>
+			<?php foreach ( array_reverse( phpCAS::getSupportedProtocols() ) as $version => $label ) : ?>
 				<option value="<?php echo esc_attr( $version ); ?>" <?php selected( $auth_settings_option, $version ); ?>><?php echo esc_html( $label ); ?></option>
 			<?php endforeach; ?>
 		</select>
@@ -167,11 +169,11 @@ class Cas extends \Authorizer\Singleton {
 	 * @return string              CAS protocol string supported by phpCAS::client().
 	 */
 	public function sanitize_cas_version( $cas_version = '' ) {
-		if ( ! class_exists( 'phpCAS' ) ) {
+		if ( ! class_exists( 'Authorizer\Vendor\phpCAS' ) ) {
 			return '';
 		}
 
-		$cas_versions = \phpCAS::getSupportedProtocols();
+		$cas_versions = phpCAS::getSupportedProtocols();
 		if ( empty( $cas_version ) ) {
 			$cas_version = array_key_last( $cas_versions ); // Should be SAML 1.1.
 		} elseif ( ! in_array( $cas_version, array_keys( $cas_versions ) ) ) {

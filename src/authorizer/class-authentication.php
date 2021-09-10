@@ -13,6 +13,11 @@ use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
 
+use Authorizer\Vendor\phpCAS;
+use Authorizer\Vendor\League;
+use Authorizer\Vendor\TheNetworg;
+use Authorizer\Vendor\CAS_AuthenticationException;
+
 /**
  * Implements the authentication (is user who they say they are?) features of
  * the plugin.
@@ -333,7 +338,7 @@ class Authentication extends Singleton {
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $auth_settings['oauth2_provider'] ) {
 			session_start();
-			$provider = new \League\OAuth2\Client\Provider\Github( array(
+			$provider = new League\OAuth2\Client\Provider\Github( array(
 				'clientId'     => $auth_settings['oauth2_clientid'],
 				'clientSecret' => $auth_settings['oauth2_clientsecret'],
 				'redirectUri'  => site_url( '/wp-login.php?external=oauth2' ),
@@ -404,14 +409,14 @@ class Authentication extends Singleton {
 		} elseif ( 'azure' === $auth_settings['oauth2_provider'] ) {
 			session_start();
 			try {
-				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
+				$provider = new TheNetworg\OAuth2\Client\Provider\Azure( array(
 					'clientId'     => $auth_settings['oauth2_clientid'],
 					'clientSecret' => $auth_settings['oauth2_clientsecret'],
 					'redirectUri'  => site_url( '/wp-login.php' ),
 					'tenant'       => empty( $auth_settings['oauth2_tenant_id'] ) ? 'common' : $auth_settings['oauth2_tenant_id'],
 				) );
 				// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
-				$provider->defaultEndPointVersion = \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
+				$provider->defaultEndPointVersion = TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
 
 				$baseGraphUri    = $provider->getRootMicrosoftGraphUri( null );
 				$provider->scope = 'openid profile email offline_access ' . $baseGraphUri . '/User.Read';
@@ -504,7 +509,7 @@ class Authentication extends Singleton {
 			}
 
 			session_start();
-			$provider = new \League\OAuth2\Client\Provider\GenericProvider( array(
+			$provider = new League\OAuth2\Client\Provider\GenericProvider( array(
 				'clientId'                => $auth_settings['oauth2_clientid'],
 				'clientSecret'            => $auth_settings['oauth2_clientsecret'],
 				'redirectUri'             => site_url( '/wp-login.php?external=oauth2' ),
@@ -665,7 +670,7 @@ class Authentication extends Singleton {
 		}
 
 		// Build the Google Client.
-		$client = new \Google_Client();
+		$client = new Google_Client();
 		$client->setApplicationName( 'WordPress' );
 		$client->setClientId( $auth_settings['google_clientid'] );
 		$client->setClientSecret( $auth_settings['google_clientsecret'] );
@@ -771,14 +776,14 @@ class Authentication extends Singleton {
 		$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
 		// Set the CAS client configuration.
-		\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+		phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 
 		// Allow redirects at the CAS server endpoint (e.g., allow connections
 		// at an old CAS URL that redirects to a newer CAS URL).
-		\phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
+		phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
 
 		// Use the WordPress certificate bundle at /wp-includes/certificates/ca-bundle.crt.
-		\phpCAS::setCasServerCACert( ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
+		phpCAS::setCasServerCACert( ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
 
 		// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
 		$cas_service_url   = site_url( '/wp-login.php?external=cas' );
@@ -789,13 +794,13 @@ class Authentication extends Singleton {
 		if ( isset( $login_querystring['redirect_to'] ) ) {
 			$cas_service_url .= '&redirect_to=' . rawurlencode( $login_querystring['redirect_to'] );
 		}
-		\phpCAS::setFixedServiceURL( $cas_service_url );
+		phpCAS::setFixedServiceURL( $cas_service_url );
 
 		// Authenticate against CAS.
 		try {
-			// \phpCAS::setDebug( dirname( __FILE__ ) . '/../../debug.log' );
-			\phpCAS::forceAuthentication();
-		} catch ( \CAS_AuthenticationException $e ) {
+			// phpCAS::setDebug( dirname( __FILE__ ) . '/../../debug.log' );
+			phpCAS::forceAuthentication();
+		} catch ( CAS_AuthenticationException $e ) {
 			// CAS server threw an error in isAuthenticated(), potentially because
 			// the cached ticket is outdated. Try renewing the authentication.
 			error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) ); // phpcs:ignore
@@ -803,12 +808,12 @@ class Authentication extends Singleton {
 
 			// CAS server is throwing errors on this login, so try logging the
 			// user out of CAS and redirecting them to the login page.
-			\phpCAS::logoutWithRedirectService( wp_login_url() );
+			phpCAS::logoutWithRedirectService( wp_login_url() );
 			die();
 		}
 
 		// Get username (as specified by the CAS server).
-		$username = \phpCAS::getUser();
+		$username = phpCAS::getUser();
 
 		// Get email that successfully authenticated against the external service (CAS).
 		$externally_authenticated_email = strtolower( $username );
@@ -821,7 +826,7 @@ class Authentication extends Singleton {
 		}
 
 		// Retrieve the user attributes (e.g., email address, first name, last name) from the CAS server.
-		$cas_attributes = \phpCAS::getAttributes();
+		$cas_attributes = phpCAS::getAttributes();
 
 		// Get user email if it is specified in another field.
 		if ( array_key_exists( 'cas_attr_email', $auth_settings ) && strlen( $auth_settings['cas_attr_email'] ) > 0 ) {
@@ -1186,21 +1191,21 @@ class Authentication extends Singleton {
 				$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
 				// Set the CAS client configuration if it hasn't been set already.
-				\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
 				// Allow redirects at the CAS server endpoint (e.g., allow connections
 				// at an old CAS URL that redirects to a newer CAS URL).
-				\phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
+				phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
 				// Restrict logout request origin to the CAS server only (prevent DDOS).
-				\phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
+				phpCAS::handleLogoutRequests( true, array( $auth_settings['cas_host'] ) );
 			}
-			if ( \phpCAS::isAuthenticated() || \phpCAS::isInitialized() ) {
+			if ( phpCAS::isAuthenticated() || phpCAS::isInitialized() ) {
 				// Redirect to home page, or specified page if it's been provided.
 				$redirect_to = site_url( '/' );
 				if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 					$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 				}
 
-				\phpCAS::logoutWithRedirectService( $redirect_to );
+				phpCAS::logoutWithRedirectService( $redirect_to );
 			}
 		}
 
@@ -1221,7 +1226,7 @@ class Authentication extends Singleton {
 			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
 
 			// Build the Google Client.
-			$client = new \Google_Client();
+			$client = new Google_Client();
 			$client->setApplicationName( 'WordPress' );
 			$client->setClientId( $auth_settings['google_clientid'] );
 			$client->setClientSecret( $auth_settings['google_clientsecret'] );
