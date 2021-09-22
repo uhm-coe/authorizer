@@ -409,6 +409,7 @@
 		var auth_settings_external_ldap_host = $( '#auth_settings_ldap_host' ).closest( 'tr' );
 		var auth_settings_external_ldap_port = $( '#auth_settings_ldap_port' ).closest( 'tr' );
 		var auth_settings_external_ldap_search_base = $( '#auth_settings_ldap_search_base' ).closest( 'tr' );
+		var auth_settings_external_ldap_search_filter = $( '#auth_settings_ldap_search_filter' ).closest( 'tr' );
 		var auth_settings_external_ldap_uid = $( '#auth_settings_ldap_uid' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_email = $( '#auth_settings_ldap_attr_email' ).closest( 'tr' );
 		var auth_settings_external_ldap_user = $( '#auth_settings_ldap_user' ).closest( 'tr' );
@@ -457,6 +458,7 @@
 		$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_search_base ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_ldap_search_filter ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_uid ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_attr_email ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_user ).wrapInner( '<div class="animated_wrapper" />' );
@@ -544,6 +546,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_ldap_host );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_port );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_search_base );
+			animateOption( 'hide_immediately', auth_settings_external_ldap_search_filter );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_uid );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_email );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_user );
@@ -634,6 +637,7 @@
 			animateOption( action, auth_settings_external_ldap_host );
 			animateOption( action, auth_settings_external_ldap_port );
 			animateOption( action, auth_settings_external_ldap_search_base );
+			animateOption( action, auth_settings_external_ldap_search_filter );
 			animateOption( action, auth_settings_external_ldap_uid );
 			animateOption( action, auth_settings_external_ldap_attr_email );
 			animateOption( action, auth_settings_external_ldap_user );
@@ -752,6 +756,7 @@
 		// Enable growable textarea for config fields.
 		$( 'textarea#auth_settings_ldap_host' ).autogrow();
 		$( 'textarea#auth_settings_ldap_search_base' ).autogrow();
+		$( 'textarea#auth_settings_ldap_search_filter' ).autogrow();
 		$( 'textarea#auth_settings_oauth2_hosteddomain' ).autogrow();
 		$( 'textarea#auth_settings_google_hosteddomain' ).autogrow();
 
@@ -1151,6 +1156,7 @@
 		var ldap_host = $( '#auth_settings_ldap_host' ).val();
 		var ldap_port = $( '#auth_settings_ldap_port' ).val();
 		var ldap_search_base = $( '#auth_settings_ldap_search_base' ).val();
+		var ldap_search_filter = $( '#auth_settings_ldap_search_filter' ).val();
 		var ldap_uid = $( '#auth_settings_ldap_uid' ).val();
 		var ldap_attr_email = $( '#auth_settings_ldap_attr_email' ).val();
 		var ldap_user = $( '#auth_settings_ldap_user' ).val();
@@ -1213,6 +1219,7 @@
 			ldap_host: ldap_host,
 			ldap_port: ldap_port,
 			ldap_search_base: ldap_search_base,
+			ldap_search_filter: ldap_search_filter,
 			ldap_uid: ldap_uid,
 			ldap_attr_email: ldap_attr_email,
 			ldap_user: ldap_user,

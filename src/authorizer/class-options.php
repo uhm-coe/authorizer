@@ -175,6 +175,7 @@ class Options extends Singleton {
 				$auth_settings['ldap_port']                 = $auth_multisite_settings['ldap_port'];
 				$auth_settings['ldap_tls']                  = $auth_multisite_settings['ldap_tls'];
 				$auth_settings['ldap_search_base']          = $auth_multisite_settings['ldap_search_base'];
+				$auth_settings['ldap_search_filter']        = $auth_multisite_settings['ldap_search_filter'];
 				$auth_settings['ldap_uid']                  = $auth_multisite_settings['ldap_uid'];
 				$auth_settings['ldap_attr_email']           = $auth_multisite_settings['ldap_attr_email'];
 				$auth_settings['ldap_user']                 = $auth_multisite_settings['ldap_user'];
@@ -403,6 +404,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'ldap_search_base', $auth_settings ) ) {
 			$auth_settings['ldap_search_base'] = '';
 		}
+		if ( ! array_key_exists( 'ldap_search_filter', $auth_settings ) ) {
+			$auth_settings['ldap_search_filter'] = '';
+		}
 		if ( ! array_key_exists( 'ldap_uid', $auth_settings ) ) {
 			$auth_settings['ldap_uid'] = 'uid';
 		}
@@ -602,6 +606,9 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'ldap_search_base', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap_search_base'] = '';
+			}
+			if ( ! array_key_exists( 'ldap_search_filter', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['ldap_search_filter'] = '';
 			}
 			if ( ! array_key_exists( 'ldap_uid', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap_uid'] = 'uid';
