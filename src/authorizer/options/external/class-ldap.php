@@ -107,29 +107,6 @@ class Ldap extends \Authorizer\Singleton {
 	}
 
 
-	/**                                             
-	* Settings print callback.             
-	*                                      
-	* @param  string $args Args (e.g., multisite admin mode).
-	* @return void                                 
-	*/                                     
-	public function print_text_ldap_search_filter( $args = '' ) {
-		// Get plugin option.                   
-		$options              = Options::get_instance();
-		$option               = 'ldap_search_filter';
-		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
-		// Print option elements.
-		?>                      
-		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>                                           
-		<p class="description"><?php esc_html_e( 'Example:  (memberOf=cn=wp_users,ou=people,dc=example,dc=edu)', 'authorizer' ); ?>
-		<br>
-		<small><?php esc_html_e( 'If you wish to use an LDAP search filter, enter it here.  Otherwise leave this field blank.', 'authorizer' ); ?></small>
-		</p>
-		<?php
-	}
-
-
 	/**
 	 * Settings print callback.
 	 *
@@ -148,6 +125,29 @@ class Ldap extends \Authorizer\Singleton {
 		<p class="description"><?php esc_html_e( 'Example:  ou=people,dc=example,dc=edu', 'authorizer' ); ?>
 			<br>
 			<small><?php esc_html_e( 'If you have multiple search bases, separate them by newlines (one per line).', 'authorizer' ); ?></small>
+		</p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_text_ldap_search_filter( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'ldap_search_filter';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:330px;"><?php echo esc_attr( $auth_settings_option ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'Example:  (memberOf=cn=wp_users,ou=people,dc=example,dc=edu)', 'authorizer' ); ?>
+		<br>
+		<small><?php esc_html_e( 'If you wish to use an LDAP search filter, enter it here. Otherwise leave this field blank.', 'authorizer' ); ?></small>
 		</p>
 		<?php
 	}
