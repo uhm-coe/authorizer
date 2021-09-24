@@ -186,6 +186,7 @@ class Ajax_Endpoints extends Singleton {
 			'ldap_port',
 			'ldap_tls',
 			'ldap_search_base',
+			'ldap_search_filter',
 			'ldap_uid',
 			'ldap_attr_email',
 			'ldap_user',

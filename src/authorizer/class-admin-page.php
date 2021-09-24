@@ -120,6 +120,7 @@ class Admin_Page extends Singleton {
 				<li>' . __( '<strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>LDAP Search Filter</strong>: Enter the optional LDAP string that represents the search filter, e.g., (memberOf=cn=wp_users,ou=people,dc=example,dc=edu)', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.', 'authorizer' ) . '</li>
@@ -612,6 +613,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_external'
 		);
 		add_settings_field(
+			'auth_settings_ldap_search_filter',
+			__( 'LDAP Search Filter', 'authorizer' ),
+			array( Ldap::get_instance(), 'print_text_ldap_search_filter' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
 			'auth_settings_ldap_uid',
 			__( 'LDAP attribute containing username', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_uid' ),
@@ -960,6 +968,10 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP Search Base', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_text_ldap_search_base( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'LDAP Search Filter', 'authorizer' ); ?></th>
+							<td><?php $ldap->print_text_ldap_search_filter( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP attribute containing username', 'authorizer' ); ?></th>
