@@ -62,6 +62,14 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.2.0 =
+* Tested up to WordPress 5.8.
+* Authorizer now requires PHP 7.2.5 or higher to support its dependencies. See: [this](https://wordpress.org/about/requirements/) and [this](https://www.php.net/supported-versions.php) if you are running an outdated version of PHP.
+* Fix for PHP versions below 7.3 (`array_key_last()` is not available for older PHP versions and was added in the last update). Props @ianchan-1 for reporting the issue!
+* Update dependencies (apereo/phpcas 1.3.9 => 1.4.0; components/jquery 3.5.1 => 3.6.0; firebase/php-jwt v5.3.0 => v5.4.0; google/auth v1.16.0 => v1.18.0; google/apiclient v2.9.2 => v2.11.0; google/apiclient-services v0.201.0 => v0.213.0; google/auth v1.15.1 => v1.17.0; guzzlehttp/guzzle 6.5.5 => 7.3.0; guzzlehttp/psr7 1.8.2 => 2.0.0; monolog/monolog 1.26.1 => 2.3.4; paragonie/random_compat v2.0.20 => v9.99.100; phpseclib/phpseclib 2.0.32 => 3.0.10).
+* Add LDAP Search Filter to plugin settings. Props @hbjusa for the [pull request](https://github.com/uhm-coe/authorizer/pull/102)!
+* Add [authorizer_login_form] shortcode. Props @shredderwoods and @hilfans for the suggestions!
+
 = 3.1.2 =
 * Fix PHP warnings about uninitialized oauth2_hosteddomain option.
 
@@ -592,6 +600,9 @@ add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );
 * Wed Apr 10, 2013
 
 == Upgrade Notice ==
+
+= 3.2.0 =
+Authorizer now requires PHP 7.2.5 or higher (phpCAS 1.4.0 requirement).
 
 = 1.0 =
 Upgrade now to get the latest features.
