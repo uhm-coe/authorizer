@@ -25,6 +25,7 @@ View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/a
 * **Login Access**: All authenticated users (all local and all external can log in); Only specific users (all local and approved external users can log in)
 * **View Access**: Everyone (open access); Only logged in users
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
+* **Shortcode**: Use the `[authorizer_login_form]` shortcode to embed a wp_login_form() outside of wp-login.php.
 
 == Installation ==
 
