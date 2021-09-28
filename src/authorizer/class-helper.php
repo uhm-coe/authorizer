@@ -501,6 +501,13 @@ class Helper {
 			$url = set_url_scheme( esc_url_raw( wp_unslash( $_SERVER['HTTP_HOST'] ) ) . esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) );
 		}
 
+		// If we have a login form embedded elsewhere than wp-login.php, alter the
+		// URL to point to wp-login.php with a redirect to the current page. This
+		// will happen if the [authorizer_login_form] shortcode is used.
+		if ( false === strpos( $url, 'wp-login.php' ) ) {
+			$url = wp_login_url( $url );
+		}
+
 		// Parse the URL into its components.
 		$parsed_url = wp_parse_url( $url );
 

@@ -1,4 +1,4 @@
-.login .button-external {
+#loginform .button-external {
 	font-size: 18px;
 	height: 50px;
 	margin: 0 0 20px 0;
@@ -6,25 +6,25 @@
 	text-align: center;
 	width: 100%;
 }
-.login .button-external .dashicons {
+#loginform .button-external .dashicons {
 	font-size: 32px;
 }
-.login .button-external .label {
+#loginform .button-external .label {
 	padding-left: 20px;
 }
 
 @media screen and (max-width: 782px) {
-	.login .button-external {
+	#loginform .button-external {
 		padding: 0 14px;
 		line-height: 2.7143;
 		min-height: 40px;
 	}
-	.login .button-external .dashicons {
+	#loginform .button-external .dashicons {
 		padding-top: 7px;
 	}
 }
 
-.login .button-google {
+#loginform .button-google {
 	background-color: #dd4b39;
 	border-bottom: 1px solid #bb3f30;
 	border-color: transparent;
@@ -37,13 +37,13 @@
 	text-shadow: none;
 	width: 270px;
 }
-.login .button-google:hover {
+#loginform .button-google:hover {
 	background-color: #e74b37;
 	border-color: transparent;
 	-webkit-box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
 	box-shadow: inset 0 -2px 0 rgba(0,0,0,.20);
 }
-.login .button-google:active {
+#loginform .button-google:active {
 	background-color: #be3e2e;
 	-webkit-box-shadow: inset 0 2px 0 rgba(0,0,0,.20);
 	box-shadow: inset 0 2px 0 rgba(0,0,0,.20);

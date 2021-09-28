@@ -57,7 +57,7 @@ class Login_Form extends Singleton {
 		wp_enqueue_script( 'auth_login_scripts', plugins_url( '/js/authorizer-login.js', plugin_root() ), array( 'jquery' ), '2.8.0', false );
 
 		// Enqueue styles appearing on wp-login.php.
-		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '2.9.12' );
+		wp_register_style( 'authorizer-login-css', plugins_url( '/css/authorizer-login.css', plugin_root() ), array(), '3.2.0' );
 		wp_enqueue_style( 'authorizer-login-css' );
 
 		/**
@@ -151,6 +151,13 @@ function signInCallback( authResult ) { // jshint ignore:line
 
 			// Reload wp-login.php to continue the authentication process.
 			var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
+
+			// If we have a login form embedded via [authorizer_login_form], we are
+			// not on wp-login.php, so change the location to wp-login.php.
+			if ( 'undefined' !== typeof auth && auth.hasOwnProperty( 'wpLoginUrl' ) ) {
+				newHref = authUpdateQuerystringParam( auth.wpLoginUrl, 'external', 'google' );
+			}
+
 			if ( location.href === newHref ) {
 				location.reload();
 			} else {
@@ -428,6 +435,24 @@ function signInCallback( authResult ) { // jshint ignore:line
 		delete_option( 'auth_settings_advanced_login_error' );
 		$errors = '    ' . $error . "<br />\n";
 		return $errors;
+	}
+
+
+	/**
+	 * Render the [authorizer_login_form] shortcode.
+	 *
+	 * Shortcode: authorizer_login_form
+	 */
+	public function shortcode_authorizer_login_form() {
+		ob_start();
+
+		$this->login_enqueue_scripts_and_styles();
+		$this->login_form_add_external_service_links();
+		$this->load_login_footer_js();
+
+		wp_login_form();
+
+		return ob_get_clean();
 	}
 
 }

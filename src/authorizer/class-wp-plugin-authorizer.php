@@ -144,6 +144,9 @@ class WP_Plugin_Authorizer extends Singleton {
 			add_action( 'network_admin_notices', array( Admin_Page::get_instance(), 'show_advanced_admin_notice' ) );
 		}
 
+		// Add [authorizer_login_form] shortcode to render the login form.
+		add_shortcode( 'authorizer_login_form', array( Login_Form::get_instance(), 'shortcode_authorizer_login_form' ) );
+
 		// Load custom javascript for the main site (e.g., for displaying alerts).
 		add_action( 'wp_enqueue_scripts', array( Login_Form::get_instance(), 'auth_public_scripts' ), 20 );
 
