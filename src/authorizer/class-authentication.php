@@ -894,9 +894,6 @@ class Authentication extends Singleton {
 		// Get LDAP search base(s).
 		$search_bases = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_search_base'] ) ) );
 
-		// Get optional LDAP filter
-		$ldap_filter = trim( $auth_settings['ldap_search_filter'] );
-
 		// Fail silently (fall back to WordPress authentication) if no search base specified.
 		if ( count( $search_bases ) < 1 ) {
 			return null;
@@ -1055,9 +1052,10 @@ class Authentication extends Singleton {
 			$search_filter = '(' . $auth_settings['ldap_uid'] . '=' . $username . ')';
 		}
 
-		// Add optional LDAP filters
-		if ( ! empty($ldap_filter) ) {
-			$search_filter = '(&' . $search_filter . $ldap_filter . ')';
+		// Merge LDAP search filter from plugin settings if it exists.
+		$ldap_search_filter = trim( $auth_settings['ldap_search_filter'] );
+		if ( ! empty( $ldap_search_filter ) ) {
+			$search_filter = '(&' . $search_filter . $ldap_search_filter . ')';
 		}
 
 		/**
