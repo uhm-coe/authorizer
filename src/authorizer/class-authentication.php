@@ -487,7 +487,11 @@ class Authentication extends Singleton {
 
 				// Set the username to the email prefix (if we don't have one).
 				if ( ! empty( $email ) && empty( $username ) ) {
-					$username = current( explode( '@', $email ) );
+					if ( is_array( $email ) && ! empty( $email[0] ) ) {
+						$username = current( explode( '@', $email[0] ) );
+					} else {
+						$username = current( explode( '@', $email ) );
+					}
 				}
 			}
 
@@ -581,7 +585,11 @@ class Authentication extends Singleton {
 
 				// Set the username to the email prefix (if we don't have one).
 				if ( ! empty( $email ) && empty( $username ) ) {
-					$username = current( explode( '@', $email ) );
+					if ( is_array( $email ) && ! empty( $email[0] ) ) {
+						$username = current( explode( '@', $email[0] ) );
+					} else {
+						$username = current( explode( '@', $email ) );
+					}
 				}
 			}
 
