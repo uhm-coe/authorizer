@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.2.1 =
+* Fix generic OAuth2 connector unable to create username from email. Props @abnerjacobsen for the [bug report](https://github.com/uhm-coe/authorizer/issues/106)!
+* Redirect to home page after logging in if using custom login url via the WPS Hide Login plugin. Props @wixaw for the [report](https://github.com/uhm-coe/authorizer/issues/103).
+
 = 3.2.0 =
 * Tested up to WordPress 5.8.
 * Authorizer now requires PHP 7.2.5 or higher to support its dependencies. See: [this](https://wordpress.org/about/requirements/) and [this](https://www.php.net/supported-versions.php) if you are running an outdated version of PHP.
