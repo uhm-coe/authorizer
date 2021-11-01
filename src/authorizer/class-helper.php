@@ -508,6 +508,13 @@ class Helper {
 			$url = wp_login_url( $url );
 		}
 
+		// Edge case: If the WPS Hide Login plugin is installed, redirect to home
+		// page after logging in instead of the plugin's login endpoint, which will
+		// redirect to /wp-admin.
+		if ( class_exists( '\WPS\WPS_Hide_Login\Plugin' ) ) {
+			$url = wp_login_url( home_url() );
+		}
+
 		// Parse the URL into its components.
 		$parsed_url = wp_parse_url( $url );
 
