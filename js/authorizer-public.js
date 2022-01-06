@@ -8,17 +8,13 @@
 ( function( $ ) {
 
 	$( document ).ready( function() {
-		auth.wpLoginUrl = 'undefined' !== typeof auth.wpLoginUrl ? auth.wpLoginUrl : '/wp-login.php';
-		auth.publicWarning = 'undefined' !== typeof auth.publicWarning ? auth.publicWarning : false;
-		if ( auth.publicWarning ) {
-			$( '#main' ).prepend(' \
-				<div id="alert" class="alert alert-info auth-alert"> \
-					<button type="button" class="close" data-dismiss="alert">&times;</button> \
-					' + auth.anonymousNotice + ' \
-					<a class="button" href="' + auth.wpLoginUrl + '">' + auth.logIn + '</a> \
-				</div> \
-			');
-		}
-	});
+		$( '#main' ).prepend(
+			'<div id="alert" class="alert alert-info auth-alert" style="margin: 0 0 20px;">' +
+				'<button type="button" class="close" data-dismiss="alert">&times;</button>' +
+				auth.anonymousNotice +
+				'<a class="button" href="' + auth.wpLoginUrl + '">' + auth.logIn + '</a>' +
+			'</div>'
+		);
+	} );
 
 } )( jQuery );
