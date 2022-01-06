@@ -592,7 +592,8 @@ class Authorization extends Singleton {
 		// Check to see if the requested category is public. If so, show it.
 		$current_category_name = property_exists( $wp, 'query_vars' ) && array_key_exists( 'category_name', $wp->query_vars ) && strlen( $wp->query_vars['category_name'] ) > 0 ? $wp->query_vars['category_name'] : '';
 		if ( $current_category_name ) {
-			$current_category_name = end( explode( '/', $current_category_name ) );
+			$current_category_name_pieces = explode( '/', $current_category_name );
+			$current_category_name        = end( $current_category_name_pieces );
 			if ( in_array( 'cat_' . $current_category_name, $auth_settings['access_public_pages'], true ) ) {
 				if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
 					update_option( 'auth_settings_advanced_public_notice', false );
