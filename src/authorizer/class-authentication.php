@@ -885,17 +885,31 @@ class Authentication extends Singleton {
 	 * @param  array  $auth_settings Plugin settings.
 	 * @param  string $username      Attempted username from authenticate action.
 	 * @param  string $password      Attempted password from authenticate action.
+	 * @param  array  $debug         If provided, filled with an array of debug
+	 *                               messages. Defaults to null.
+	 *
 	 * @return array|WP_Error        Array containing 'email' and 'authenticated_by' strings
 	 *                               for the successfully authenticated user, or WP_Error()
 	 *                               object on failure, or null if skipping LDAP auth and
 	 *                               falling back to WP auth.
 	 */
-	protected function custom_authenticate_ldap( $auth_settings, $username, $password ) {
+	public function custom_authenticate_ldap( $auth_settings, $username, $password, &$debug = null ) {
+		// Initialize debug array if a variable was passed in.
+		if ( ! is_null( $debug ) ) {
+			$debug = array(
+				/* translators: Current time */
+				sprintf( __( '[%s] Attempting to authenticate via LDAP.', 'authorizer' ), wp_date( get_option( 'time_format' ) ) ),
+			);
+		}
+
 		// Get LDAP host(s), and attempt each until we have a valid connection.
 		$ldap_hosts = explode( "\n", str_replace( "\r", '', trim( $auth_settings['ldap_host'] ) ) );
 
 		// Fail silently (fall back to WordPress authentication) if no LDAP host specified.
 		if ( count( $ldap_hosts ) < 1 ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: no LDAP Host(s) specified.', 'authorizer' );
+			}
 			return null;
 		}
 
@@ -904,6 +918,9 @@ class Authentication extends Singleton {
 
 		// Fail silently (fall back to WordPress authentication) if no search base specified.
 		if ( count( $search_bases ) < 1 ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: no LDAP Search Base(s) specified.', 'authorizer' );
+			}
 			return null;
 		}
 
@@ -934,19 +951,31 @@ class Authentication extends Singleton {
 		// for the first time, or when clicking the Log In button without filling
 		// out either field.
 		if ( empty( $username ) && empty( $password ) ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: empty username and password.', 'authorizer' );
+			}
 			return null;
 		}
 
 		// Fail with error message if username or password is blank.
 		if ( empty( $username ) ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: empty username.', 'authorizer' );
+			}
 			return new \WP_Error( 'empty_username', __( 'You must provide a username or email.', 'authorizer' ) );
 		}
 		if ( empty( $password ) ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: empty password.', 'authorizer' );
+			}
 			return new \WP_Error( 'empty_password', __( 'You must provide a password.', 'authorizer' ) );
 		}
 
 		// If php5-ldap extension isn't installed on server, fall back to WP auth.
 		if ( ! function_exists( 'ldap_connect' ) ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: php-ldap extension not installed.', 'authorizer' );
+			}
 			return null;
 		}
 
@@ -970,6 +999,10 @@ class Authentication extends Singleton {
 
 			// Fail if invalid host is specified.
 			if ( false === $parsed_host ) {
+				if ( is_array( $debug ) ) {
+					/* translators: LDAP Host */
+					$debug[] = sprintf( __( 'Warning: could not parse host %s with wp_parse_url().', 'authorizer' ), $ldap_host );
+				}
 				continue;
 			}
 
@@ -989,12 +1022,21 @@ class Authentication extends Singleton {
 
 			// Fail if we don't have a plausible LDAP URI.
 			if ( false === $ldap ) {
+				if ( is_array( $debug ) ) {
+					/* translators: LDAP Host */
+					$debug[] = sprintf( __( 'Warning: syntax check failed on host %s in ldap_connect().', 'authorizer' ), $ldap_host );
+				}
 				continue;
 			}
 
 			// Attempt to start TLS if that setting is checked and we're not using ldaps protocol.
 			if ( 1 === intval( $auth_settings['ldap_tls'] ) && false === strpos( $ldap_host, 'ldaps://' ) ) {
 				if ( ! @ldap_start_tls( $ldap ) ) {
+					if ( is_array( $debug ) ) {
+						/* translators: LDAP Host */
+						$debug[] = sprintf( __( 'Warning: unable to start TLS on host %s:', 'authorizer' ), $ldap_host );
+						$debug[] = ldap_error( $ldap );
+					}
 					continue;
 				}
 			}
@@ -1011,16 +1053,28 @@ class Authentication extends Singleton {
 			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) ); // phpcs:ignore
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
+				if ( is_array( $debug ) ) {
+					/* translators: LDAP Host */
+					$debug[] = sprintf( __( 'Warning: unable to bind on host %1$s using directory user:', 'authorizer' ), $ldap_host );
+					$debug[] = ldap_error( $ldap );
+				}
 				continue;
 			}
 
 			// If we've reached this, we have a valid ldap connection and bind.
 			$ldap_valid = true;
+			if ( is_array( $debug ) ) {
+				/* translators: LDAP Host */
+				$debug[] = sprintf( __( 'Connected to LDAP host %s.', 'authorizer' ), $ldap_host );
+			}
 			break;
 		}
 
 		// Move to next authentication method if we don't have a valid LDAP connection.
 		if ( ! $ldap_valid ) {
+			if ( is_array( $debug ) ) {
+				$debug[] = __( 'Failed: unable to connect to any LDAP host.', 'authorizer' );
+			}
 			return null;
 		}
 
@@ -1045,7 +1099,7 @@ class Authentication extends Singleton {
 		 * @param array $attributes LDAP attributes to retrieve in addition to first name, last name and email.
 		 */
 		$additional_ldap_attributes_to_retrieve = apply_filters( 'authorizer_additional_ldap_attributes_to_retrieve', array() );
-		$ldap_attributes_to_retrieve = array_merge($ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve);
+		$ldap_attributes_to_retrieve            = array_merge($ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve);
 
 		// Create default LDAP search filter. If LDAP email attribute is provided,
 		// use (|(uid=$username)(mail=$username)) instead (so logins with either a
@@ -1078,6 +1132,11 @@ class Authentication extends Singleton {
 		 */
 		$search_filter = apply_filters( 'authorizer_ldap_search_filter', $search_filter, $auth_settings['ldap_uid'], $username );
 
+		if ( is_array( $debug ) ) {
+			/* translators: LDAP search filter */
+			$debug[] = sprintf( __( 'Using LDAP search filter: %s', 'authorizer' ), $search_filter );
+		}
+
 		// Multiple search bases can be provided, so iterate through them until a match is found.
 		foreach ( $search_bases as $search_base ) {
 			$ldap_search  = ldap_search(
@@ -1088,12 +1147,23 @@ class Authentication extends Singleton {
 			);
 			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 			if ( $ldap_entries['count'] > 0 ) {
+				if ( is_array( $debug ) ) {
+					/* translators: 1: LDAP user 2: LDAP search base */
+					$debug[] = sprintf( __( 'Found user %1$s in search base: %2$s', 'authorizer' ), $username, $search_base );
+				}
 				break;
+			} elseif ( is_array( $debug ) ) {
+				/* translators: 1: LDAP user 2: LDAP search base */
+				$debug[] = sprintf( __( 'Failed to find user %1$s in %2$s. Trying next search base.', 'authorizer' ), $username, $search_base );
 			}
 		}
 
 		// If we didn't find any users in ldap, fall back to WordPress authentication.
 		if ( $ldap_entries['count'] < 1 ) {
+			if ( is_array( $debug ) ) {
+				/* translators: LDAP User */
+				$debug[] = sprintf( __( 'Failed: no LDAP user %s found.', 'authorizer' ), $username );
+			}
 			return null;
 		}
 
@@ -1127,6 +1197,10 @@ class Authentication extends Singleton {
 
 		$result = @ldap_bind( $ldap, $ldap_user_dn, stripslashes( $password ) ); // phpcs:ignore
 		if ( ! $result ) {
+			if ( is_array( $debug ) ) {
+				/* translators: LDAP User */
+				$debug[] = sprintf( __( 'Failed: password incorrect for LDAP user %s.', 'authorizer' ), $username );
+			}
 			// We have a real ldap user, but an invalid password. Pass
 			// through to wp authentication after failing LDAP (since
 			// this could be a local account that happens to be the
@@ -1140,6 +1214,11 @@ class Authentication extends Singleton {
 		// If an LDAP attribute has been specified as containing the email address, use that instead.
 		if ( strlen( $email ) > 0 ) {
 			$externally_authenticated_email = Helper::lowercase( $email );
+		}
+
+		if ( is_array( $debug ) ) {
+			/* translators: 1: Current time 2: LDAP User 3: LDAP user email */
+			$debug[] = sprintf( __( '[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP.', 'authorizer' ), wp_date( get_option( 'time_format' ) ), $username, $externally_authenticated_email );
 		}
 
 		return array(

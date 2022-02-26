@@ -133,6 +133,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// AJAX: Refresh approved user list.
 		add_action( 'wp_ajax_refresh_approved_user_list', array( Ajax_Endpoints::get_instance(), 'ajax_refresh_approved_user_list' ) );
 
+		// AJAX: Test LDAP user.
+		add_action( 'wp_ajax_auth_settings_ldap_test_user', array( Ajax_Endpoints::get_instance(), 'ajax_auth_settings_ldap_test_user' ) );
+
 		// Add dashboard widget so instructors can add/edit users with access.
 		// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 		add_action( 'wp_dashboard_setup', array( Dashboard_Widget::get_instance(), 'add_dashboard_widgets' ) );

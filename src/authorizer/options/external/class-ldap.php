@@ -324,4 +324,30 @@ class Ldap extends \Authorizer\Singleton {
 		<?php
 	}
 
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_text_button_ldap_test_user( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'ldap_test_user';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="<?php esc_attr_e( 'username', 'authorizer' ); ?>" />
+		<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
+		<input type="password" id="auth_settings_ldap_test_pass" name="auth_settings[ldap_test_pass]" value="" autocomplete="new-password" placeholder="<?php esc_attr_e( 'password', 'authorizer' ); ?>" />
+		<input type="button" id="<?php echo esc_attr( $option ); ?>_submit" class="button button-secondary" value="<?php esc_attr_e( 'Test', 'authorizer' ); ?>" />
+		<span class="spinner" id="<?php echo esc_attr( $option ); ?>_spinner"></span>
+		<p class="description">
+			<small><?php esc_html_e( 'Note: Make sure to save any changes to LDAP settings before clicking the Test button.', 'authorizer' ); ?></small>
+		</p>
+		<textarea id="<?php echo esc_attr( $option ); ?>_result" readonly="readonly" style="display: none;" rows="8"></textarea>
+		<?php
+	}
 }

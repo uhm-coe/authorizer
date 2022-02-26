@@ -812,4 +812,56 @@ class Ajax_Endpoints extends Singleton {
 		exit;
 	}
 
+
+
+	/**
+	 * Test LDAP settings by attempting to search for the provided LDAP user.
+	 *
+	 * Action: wp_ajax_auth_settings_ldap_test_user
+	 *
+	 * @return void
+	 */
+	public function ajax_auth_settings_ldap_test_user() {
+		// Fail silently if current user doesn't have permissions.
+		if ( ! current_user_can( 'create_users' ) ) {
+			die( '' );
+		}
+
+		// Nonce check.
+		if ( empty( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
+			die( '' );
+		}
+
+		// Fail if required post data doesn't exist.
+		if ( ! array_key_exists( 'username', $_POST ) || ! array_key_exists( 'password', $_POST ) ) {
+			die( '' );
+		}
+
+		// Get defaults.
+		$success = true;
+		$message = '';
+
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		// Attempt to authenticate in debug mode.
+		$username = sanitize_text_field( wp_unslash( $_POST['username'] ) );
+		$password = sanitize_text_field( wp_unslash( $_POST['password'] ) );
+		$debug    = array();
+		$result   = Authentication::get_instance()->custom_authenticate_ldap( $auth_settings, $username, $password, $debug );
+
+		// Parse results.
+		$success = is_array( $result ) && ! empty( $result['email'] );
+		$message = wp_kses_post( implode( PHP_EOL, $debug ) );
+
+		// Send response to client.
+		$response = array(
+			'success' => $success,
+			'message' => $message,
+		);
+		wp_send_json( $response );
+		exit;
+	}
+
 }

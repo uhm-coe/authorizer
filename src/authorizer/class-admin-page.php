@@ -675,6 +675,13 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
+		add_settings_field(
+			'auth_settings_ldap_test_user',
+			__( 'LDAP test connection', 'authorizer' ),
+			array( Ldap::get_instance(), 'print_text_button_ldap_test_user' ),
+			'authorizer',
+			'auth_settings_external'
+		);
 
 		// Create Advanced Settings section.
 		add_settings_section(

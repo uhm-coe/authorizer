@@ -419,6 +419,7 @@
 		var auth_settings_external_ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
+		var auth_settings_external_ldap_test_user = $( '#auth_settings_ldap_test_user' ).closest( 'tr' );
 		/* eslint-enable */
 
 		// Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
@@ -468,6 +469,7 @@
 		$( 'th, td', auth_settings_external_ldap_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_ldap_test_user ).wrapInner( '<div class="animated_wrapper" />' );
 
 		// If we're viewing the dashboard widget, reset a couple of the relevant
 		// option variables (since they aren't nested in table rows).
@@ -556,6 +558,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_first_name );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_last_name );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_update_on_login );
+			animateOption( 'hide_immediately', auth_settings_external_ldap_test_user );
 		}
 
 		// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -647,7 +650,27 @@
 			animateOption( action, auth_settings_external_ldap_attr_first_name );
 			animateOption( action, auth_settings_external_ldap_attr_last_name );
 			animateOption( action, auth_settings_external_ldap_attr_update_on_login );
+			animateOption( action, auth_settings_external_ldap_test_user );
 		});
+
+		// Event handler: Test LDAP settings.
+		$( '#ldap_test_user_submit' ).on( 'click', function( event ) {
+			event.preventDefault();
+			$( 'html' ).addClass( 'busy' );
+			$( '#ldap_test_user_spinner' ).addClass( 'is-active' );
+
+			$.post( ajaxurl, {
+				action: 'auth_settings_ldap_test_user',
+				username: $( 'input[name="auth_settings[ldap_test_user]"]' ).val(),
+				password: $( 'input[name="auth_settings[ldap_test_pass]"]' ).val(),
+				nonce: $( '#nonce_save_auth_settings' ).val(),
+			}).done( function ( data ) {
+				$( '#ldap_test_user_result' ).show().val( data.message );
+			}).always( function () {
+				$( 'html' ).removeClass( 'busy' );
+				$( '#ldap_test_user_spinner' ).removeClass( 'is-active' );
+			});
+		} );
 
 		// Show save button if usermeta field is modified.
 		$( 'form input.auth-usermeta' ).on( 'keyup', function( event ) {
@@ -1166,6 +1189,7 @@
 		var ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
 		var ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
 		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).val();
+		var ldap_test_user = $( '#auth_settings_ldap_test_user' ).val();
 
 		var advanced_lockouts = {
 			attempts_1: $( '#auth_settings_advanced_lockouts_attempts_1' ).val(),
@@ -1229,6 +1253,7 @@
 			ldap_attr_first_name: ldap_attr_first_name,
 			ldap_attr_last_name: ldap_attr_last_name,
 			ldap_attr_update_on_login: ldap_attr_update_on_login,
+			ldap_test_user: ldap_test_user,
 			advanced_lockouts: advanced_lockouts,
 			advanced_hide_wp_login: advanced_hide_wp_login,
 			advanced_disable_wp_login: advanced_disable_wp_login,

@@ -76,6 +76,17 @@
 		}
 	}
 
+	// LDAP connection test.
+	#ldap_test_user_spinner {
+		float: none;
+	}
+	#ldap_test_user_result {
+		font-family: monospace;
+		width: 100%;
+		opacity: 0.8;
+		color: black;
+	}
+
 	// Mobile screen sizing.
 	@media screen and (max-width: 782px) {
 		.animated_wrapper {
