@@ -3,3 +3,6 @@
 
 # Ignore SCSS compiler config (local development).
 prepros-6.config
+
+# Ignore development depenedencies.
+node_modules

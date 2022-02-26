@@ -1,0 +1,10 @@
+{
+  "name": "authorizer",
+  "license": "GPL3",
+  "devDependencies": {
+    "sass": "^1.49.8"
+  },
+  "scripts": {
+    "build-styles": "./node_modules/sass/sass.js --watch --style=compressed css:css"
+  }
+}
