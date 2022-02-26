@@ -216,7 +216,7 @@ class WP_Plugin_Authorizer extends Singleton {
 					$approved_user = array(
 						'email'      => Helper::lowercase( $user->user_email ),
 						'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
-						'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+						'date_added' => wp_date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
 					);
 					array_push( $auth_multisite_settings_access_users_approved, $approved_user );

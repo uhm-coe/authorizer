@@ -347,7 +347,8 @@ class Helper {
 	 * Helper function to discover the email addresses in a value in a
 	 * multidimensional array.
 	 *
-	 * @param  array  $haystack Multidimensional array, possibly containing an email.
+	 * @param  array $haystack Multidimensional array, possibly containing an email.
+	 * @param  array $emails   Array of email addresses found.
 	 * @return array            Array of Discovered emails, or empty array.
 	 */
 	public static function find_emails_in_multi_array( $haystack, &$emails = array() ) {
@@ -406,7 +407,7 @@ class Helper {
 	 * control lists (pending, approved, or blocked).
 	 *
 	 * @param  string $email Email address to retrieve info for.
-	 * @param  string $list  List to get info from.
+	 * @param  array  $list  List to get info from.
 	 * @return mixed         false if not found, otherwise: array(
 	 *                         'email' => '',
 	 *                         'role' => '',
@@ -477,8 +478,8 @@ class Helper {
 	 *
 	 * @see: https://stackoverflow.com/questions/3109978/display-numbers-with-ordinal-suffix-in-php
 	 *
-	 * @param  int    $number Number to show as an ordinal.
-	 * @return string         Number as an ordinal string.
+	 * @param  int $number Number to show as an ordinal.
+	 * @return string      Number as an ordinal string.
 	 */
 	public static function ordinal( $number = 0 ) {
 		$ends = array( 'th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th' );
@@ -493,6 +494,8 @@ class Helper {
 	/**
 	 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
 	 * and external=cas added).
+	 *
+	 * @param string $provider External service provider type.
 	 */
 	public static function modify_current_url_for_external_login( $provider = 'cas' ) {
 		// Construct the URL of the current page (wp-login.php).

@@ -21,6 +21,7 @@ class Authentication extends Singleton {
 
 	/**
 	 * Tracks the external service used by the user currently logging out.
+	 *
 	 * @var string
 	 */
 	private static $authenticated_by = '';
@@ -341,20 +342,20 @@ class Authentication extends Singleton {
 
 			// If we don't have an authorization code, then get one.
 			if ( ! isset( $_REQUEST['code'] ) ) {
-				$auth_url = $provider->getAuthorizationUrl( array(
+				$auth_url                = $provider->getAuthorizationUrl( array(
 					'scope' => 'user:email',
 				) );
 				$_SESSION['oauth2state'] = $provider->getState();
 				header( 'Location: ' . $auth_url );
 				exit;
 
-			// Check state against previously stored one to mitigate CSRF attacks.
 			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				// Check state against previously stored one to mitigate CSRF attacks.
 				unset( $_SESSION['oauth2state'] );
 				exit;
 
-			// Try to get an access token (using the authorization code grant).
 			} else {
+				// Try to get an access token (using the authorization code grant).
 				try {
 					$token = $provider->getAccessToken( 'authorization_code', array(
 						'code' => $_REQUEST['code'],
@@ -362,7 +363,7 @@ class Authentication extends Singleton {
 				} catch ( \Exception $e ) {
 					// Failed to get token; try again from the beginning. Usually a
 					// bad_verification_code error. See: https://docs.github.com/en/free-pro-team@latest/developers/apps/troubleshooting-oauth-app-access-token-request-errors#bad-verification-code.
-					$auth_url = $provider->getAuthorizationUrl( array(
+					$auth_url                = $provider->getAuthorizationUrl( array(
 						'scope' => 'user:email',
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
@@ -380,7 +381,7 @@ class Authentication extends Singleton {
 
 					// If user has no public email, fetch all emails and use those.
 					if ( empty( $email ) ) {
-						$request = $provider->getAuthenticatedRequest(
+						$request              = $provider->getAuthenticatedRequest(
 							'GET',
 							$provider->getResourceOwnerDetailsUrl( $token ) . '/emails',
 							$token
@@ -398,10 +399,9 @@ class Authentication extends Singleton {
 					return null;
 				}
 			}
-
-		// Authenticate with the Microsoft Azure oauth2 client.
-		// See: https://github.com/thenetworg/oauth2-azure.
 		} elseif ( 'azure' === $auth_settings['oauth2_provider'] ) {
+			// Authenticate with the Microsoft Azure oauth2 client.
+			// See: https://github.com/thenetworg/oauth2-azure.
 			session_start();
 			try {
 				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
@@ -424,25 +424,23 @@ class Authentication extends Singleton {
 			// If we don't have an authorization code, then get one.
 			if ( ! isset( $_REQUEST['code'] ) ) {
 				try {
-					$auth_url = $provider->getAuthorizationUrl( array(
+					$auth_url                = $provider->getAuthorizationUrl( array(
 						'scope' => $provider->scope,
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
 					header( 'Location: ' . $auth_url );
 					exit;
-			} catch ( \Exception $e ) {
-				// Invalid configuration, so this in not a successful login. Show error
-				// message to user.
-				return new \WP_Error( 'empty_username', $e->getMessage() );
-			}
-
-			// Check state against previously stored one to mitigate CSRF attacks.
+				} catch ( \Exception $e ) {
+					// Invalid configuration, so this in not a successful login. Show error
+					// message to user.
+					return new \WP_Error( 'empty_username', $e->getMessage() );
+				}
 			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				// Check state against previously stored one to mitigate CSRF attacks.
 				unset( $_SESSION['oauth2state'] );
 				exit;
-
-			// Try to get an access token (using the authorization code grant).
 			} else {
+				// Try to get an access token (using the authorization code grant).
 				try {
 					$token = $provider->getAccessToken( 'authorization_code', array(
 						'code'  => $_REQUEST['code'],
@@ -450,7 +448,7 @@ class Authentication extends Singleton {
 					) );
 				} catch ( \Exception $e ) {
 					// Failed to get token; try again from the beginning.
-					$auth_url = $provider->getAuthorizationUrl( array(
+					$auth_url                = $provider->getAuthorizationUrl( array(
 						'scope' => $provider->scope,
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
@@ -464,7 +462,7 @@ class Authentication extends Singleton {
 
 					$attributes = $user->toArray();
 					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
-					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];;
+					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];
 
 					// Attempt to find an email address in the resource owner attributes
 					// if we couldn't find one in the `email` attribute.
@@ -494,10 +492,9 @@ class Authentication extends Singleton {
 					}
 				}
 			}
-
-		// Authenticate with the generic oauth2 client.
-		// See: https://github.com/thephpleague/oauth2-client.
 		} elseif ( 'generic' === $auth_settings['oauth2_provider'] ) {
+			// Authenticate with the generic oauth2 client.
+			// See: https://github.com/thephpleague/oauth2-client.
 			// Move on if required params aren't specified in settings.
 			if (
 				empty( $auth_settings['oauth2_url_authorize'] ) ||
@@ -531,14 +528,12 @@ class Authentication extends Singleton {
 				$_SESSION['oauth2state'] = $provider->getState();
 				header( 'Location: ' . $auth_url );
 				exit;
-
-			// Check state against previously stored one to mitigate CSRF attacks.
 			} elseif ( empty( $_REQUEST['state'] ) || empty( $_SESSION['oauth2state'] ) || $_REQUEST['state'] !== $_SESSION['oauth2state'] ) {
+				// Check state against previously stored one to mitigate CSRF attacks.
 				unset( $_SESSION['oauth2state'] );
 				exit;
-
-			// Try to get an access token (using the authorization code grant).
 			} else {
+				// Try to get an access token (using the authorization code grant).
 				try {
 					$token = $provider->getAccessToken( 'authorization_code', array(
 						'code' => $_REQUEST['code'],
@@ -592,9 +587,8 @@ class Authentication extends Singleton {
 					}
 				}
 			}
-
-		// Move on if a supported providers wasn't selected.
 		} else {
+			// Move on if a supported providers wasn't selected.
 			return null;
 		}
 
@@ -689,7 +683,7 @@ class Authentication extends Singleton {
 			$client::LIBVER >= '2.0.0'
 		) {
 			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-			$google_hosteddomain = trim( $google_hosteddomains[0] );
+			$google_hosteddomain  = trim( $google_hosteddomains[0] );
 			$client->setHostedDomain( $google_hosteddomain );
 		}
 
@@ -697,7 +691,7 @@ class Authentication extends Singleton {
 		// NOTE:  verifyIdToken originally returned an object as per src/OAuth2.php.
 		// However, it looks as though this function is overridden by src/Google/Client.php and returns an array instead
 		// in the v2 library.  Treating as an array for purposes of this functionality.
-		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77
+		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77.
 		try {
 			$ticket = $client->verifyIdToken( $token['id_token'], $auth_settings['google_clientid'] );
 		} catch ( Google_Auth_Exception $e ) {
@@ -716,7 +710,7 @@ class Authentication extends Singleton {
 		// json-encoded string instead of an array.
 		if ( is_object( $ticket ) && method_exists( $ticket, 'getAttributes' ) ) {
 			$attributes = $ticket->getAttributes();
-			$email = Helper::lowercase( $attributes['payload']['email'] );
+			$email      = Helper::lowercase( $attributes['payload']['email'] );
 		} else {
 			$email = Helper::lowercase( $ticket['email'] );
 		}
@@ -801,6 +795,7 @@ class Authentication extends Singleton {
 
 		// Authenticate against CAS.
 		try {
+			// phpcs:ignore Squiz.PHP.CommentedOutCode
 			// \phpCAS::setDebug( dirname( __FILE__ ) . '/../../debug.log' );
 			\phpCAS::forceAuthentication();
 		} catch ( \CAS_AuthenticationException $e ) {
@@ -1031,6 +1026,7 @@ class Authentication extends Singleton {
 
 			// Attempt to start TLS if that setting is checked and we're not using ldaps protocol.
 			if ( 1 === intval( $auth_settings['ldap_tls'] ) && false === strpos( $ldap_host, 'ldaps://' ) ) {
+				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				if ( ! @ldap_start_tls( $ldap ) ) {
 					if ( is_array( $debug ) ) {
 						/* translators: LDAP Host */
@@ -1099,7 +1095,7 @@ class Authentication extends Singleton {
 		 * @param array $attributes LDAP attributes to retrieve in addition to first name, last name and email.
 		 */
 		$additional_ldap_attributes_to_retrieve = apply_filters( 'authorizer_additional_ldap_attributes_to_retrieve', array() );
-		$ldap_attributes_to_retrieve            = array_merge($ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve);
+		$ldap_attributes_to_retrieve            = array_merge( $ldap_attributes_to_retrieve, $additional_ldap_attributes_to_retrieve );
 
 		// Create default LDAP search filter. If LDAP email attribute is provided,
 		// use (|(uid=$username)(mail=$username)) instead (so logins with either a

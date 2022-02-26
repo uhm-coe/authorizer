@@ -24,16 +24,18 @@ class OAuth2 extends \Authorizer\Singleton {
 	 * @var array
 	 */
 	private $providers = array(
-		// 'amazon' => array(
-		// 	'name'             => 'Amazon',
-		// 	'composer'         => '"luchianenco/oauth2-amazon": "^1.1"',
-		// 	'instructions_url' => 'https://aws.amazon.com/blogs/security/how-to-add-authentication-single-page-web-application-with-amazon-cognito-oauth2-implementation/',
-		// ),
-		'azure' => array(
+		/**
+		 * 'amazon' => array(
+		 *   'name'             => 'Amazon',
+		 *   'composer'         => '"luchianenco/oauth2-amazon": "^1.1"',
+		 *   'instructions_url' => 'https://aws.amazon.com/blogs/security/how-to-add-authentication-single-page-web-application-with-amazon-cognito-oauth2-implementation/',
+		 * ),
+		 */
+		'azure'   => array(
 			'name'             => 'Microsoft Azure',
 			'instructions_url' => 'https://docs.microsoft.com/en-us/azure/active-directory/develop/quickstart-register-app',
 		),
-		'github' => array(
+		'github'  => array(
 			'name'             => 'GitHub',
 			'instructions_url' => 'https://github.com/settings/applications/new',
 		),

@@ -57,7 +57,7 @@ class Sync_Userdata extends Singleton {
 				$approved_user = array(
 					'email'      => Helper::lowercase( $user->user_email ),
 					'role'       => count( $user->roles ) > 0 ? $user->roles[0] : '',
-					'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+					'date_added' => wp_date( 'M Y', strtotime( $user->user_registered ) ),
 					'local_user' => true,
 				);
 				array_push( $auth_settings_access_users_approved, $approved_user );
@@ -509,7 +509,7 @@ class Sync_Userdata extends Singleton {
 			$approved_user = array(
 				'email'      => Helper::lowercase( $user_email ),
 				'role'       => $user_role,
-				'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+				'date_added' => wp_date( 'M Y', strtotime( $user->user_registered ) ),
 				'local_user' => true,
 			);
 			array_push( $auth_settings_access_users_approved, $approved_user );
@@ -648,7 +648,7 @@ class Sync_Userdata extends Singleton {
 			$approved_user = array(
 				'email'      => Helper::lowercase( $user_email ),
 				'role'       => is_array( $user_roles ) && count( $user_roles ) > 0 ? $user_roles[0] : $default_role,
-				'date_added' => date( 'M Y', strtotime( $date_registered ) ),
+				'date_added' => wp_date( 'M Y', strtotime( $date_registered ) ),
 				'local_user' => true,
 			);
 			array_push( $auth_settings_access_users_approved, $approved_user );
@@ -685,7 +685,7 @@ class Sync_Userdata extends Singleton {
 			$multisite_approved_user = array(
 				'email'      => Helper::lowercase( $user_email ),
 				'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
-				'date_added' => date( 'M Y', strtotime( $user->user_registered ) ),
+				'date_added' => wp_date( 'M Y', strtotime( $user->user_registered ) ),
 				'local_user' => true,
 			);
 			array_push( $auth_multisite_settings_access_users_approved, $multisite_approved_user );

@@ -63,8 +63,8 @@ class Authorization extends Singleton {
 					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
 				)
-			)
-		;
+			);
+
 		$should_update_last_name =
 			$user && ! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
 			(
@@ -77,8 +77,7 @@ class Authorization extends Singleton {
 					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
 				)
-			)
-		;
+			);
 
 		/**
 		 * Filter whether to block the currently logging in user based on any of
@@ -105,7 +104,7 @@ class Authorization extends Singleton {
 						$auth_settings_access_users_blocked,
 						array(
 							'email'      => Helper::lowercase( $user_email ),
-							'date_added' => date( 'M Y' ),
+							'date_added' => wp_date( 'M Y' ),
 						)
 					);
 					update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
@@ -210,7 +209,7 @@ class Authorization extends Singleton {
 				$approved_user = array(
 					'email'      => Helper::lowercase( $user_email ),
 					'role'       => $approved_role,
-					'date_added' => date( 'Y-m-d H:i:s' ),
+					'date_added' => wp_date( 'Y-m-d H:i:s' ),
 				);
 				array_push( $auth_settings_access_users_approved, $approved_user );
 				array_push( $auth_settings_access_users_approved_single, $approved_user );
@@ -252,7 +251,7 @@ class Authorization extends Singleton {
 							'first_name'      => array_key_exists( 'first_name', $user_data ) ? $user_data['first_name'] : '',
 							'last_name'       => array_key_exists( 'last_name', $user_data ) ? $user_data['last_name'] : '',
 							'user_email'      => Helper::lowercase( $user_info['email'] ),
-							'user_registered' => date( 'Y-m-d H:i:s' ),
+							'user_registered' => wp_date( 'Y-m-d H:i:s' ),
 							'role'            => $user_info['role'],
 						)
 					);
@@ -446,7 +445,7 @@ class Authorization extends Singleton {
 				// custom_logout() based on their external service. This is necessary
 				// because a pending user does not have a WP_User, and thus no
 				// "authenticated_by" usermeta that is normally used to do this.
-				$external_param = isset($user_data['authenticated_by']) ? '&external=' . $user_data['authenticated_by'] : '';
+				$external_param = isset( $user_data['authenticated_by'] ) ? '&external=' . $user_data['authenticated_by'] : '';
 
 				// Notify user about pending status and return without authenticating them.
 				// phpcs:ignore WordPress.Security.NonceVerification
@@ -475,7 +474,7 @@ class Authorization extends Singleton {
 	 *
 	 * Action: parse_request
 	 *
-	 * @param  array $wp WordPress object.
+	 * @param  WP $wp WordPress object.
 	 * @return WP|void   WP object when passing through to WordPress authentication, or void.
 	 */
 	public function restrict_access( $wp ) {
@@ -497,7 +496,7 @@ class Authorization extends Singleton {
 			// Allow access to approved external users and logged in users if option is set to 'logged_in_users'.
 			( 'logged_in_users' === $auth_settings['access_who_can_view'] && Helper::is_user_logged_in_and_blog_user() && $this->is_email_in_list( $current_user->user_email, 'approved' ) ) ||
 			// Allow REST API requests (access is determined later in the rest_authentication_errors hook).
-			// See: https://github.com/WordPress/WordPress/blob/8e41746cb11271d063608a63e3f6091a8685e677/wp-includes/rest-api.php#L131-L133
+			// See: https://github.com/WordPress/WordPress/blob/8e41746cb11271d063608a63e3f6091a8685e677/wp-includes/rest-api.php#L131-L133.
 			( ! empty( $GLOBALS['wp']->query_vars['rest_route'] ) )
 		);
 
@@ -529,7 +528,7 @@ class Authorization extends Singleton {
 		}
 
 		// Allow HEAD requests to the root (usually discovery from a REST client).
-		if ( 'HEAD' === $_SERVER['REQUEST_METHOD'] && empty( $wp->request ) && empty( $wp->matched_query ) ) {
+		if ( ! empty( $_SERVER['REQUEST_METHOD'] ) && 'HEAD' === $_SERVER['REQUEST_METHOD'] && empty( $wp->request ) && empty( $wp->matched_query ) ) {
 			return $wp;
 		}
 
@@ -657,7 +656,7 @@ class Authorization extends Singleton {
 			return $errors;
 		}
 
-		// If user isn't logged in, check for "only logged in users can see the site."
+		// If user isn't logged in, check for "only logged in users can see the site".
 		if ( ! is_user_logged_in() ) {
 			// Grab plugin settings.
 			$options       = Options::get_instance();

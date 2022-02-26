@@ -164,7 +164,7 @@ class Access_Lists extends \Authorizer\Singleton {
 		if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 			foreach ( $auth_settings_option as $key => $user ) {
 				if ( 'date_added' === $sort_by ) {
-					$sort_dimension[ $key ] = date( 'Ymd', strtotime( $user[ $sort_by ] ) );
+					$sort_dimension[ $key ] = wp_date( 'Ymd', strtotime( $user[ $sort_by ] ) );
 				} else {
 					$sort_dimension[ $key ] = strtolower( $user[ $sort_by ] );
 				}
@@ -277,7 +277,7 @@ class Access_Lists extends \Authorizer\Singleton {
 						<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 							<?php Helper::wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
 						</select>
-						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
+						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( wp_date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
 						<a class="button dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
 					</li>
 				<?php endforeach; ?>
@@ -441,7 +441,7 @@ class Access_Lists extends \Authorizer\Singleton {
 			// Check if this user (who doesn't yet have a WordPress user) has any
 			// stored usermeta (from an admin adding it via the approved list).
 			if ( ! empty( $approved_user['usermeta']['meta_key'] ) && ! empty( $advanced_usermeta ) ) :
-				if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) && $approved_user['usermeta']['meta_key'] === str_replace( 'acf___', '', $advanced_usermeta ) ) :
+				if ( strpos( $advanced_usermeta, 'acf___' ) === 0 && class_exists( 'acf' ) && str_replace( 'acf___', '', $advanced_usermeta ) === $approved_user['usermeta']['meta_key'] ) :
 					// Get stored value for the user.
 					$approved_user['usermeta'] = $approved_user['usermeta']['meta_value'];
 				elseif ( $approved_user['usermeta']['meta_key'] === $advanced_usermeta ) :
@@ -499,7 +499,7 @@ class Access_Lists extends \Authorizer\Singleton {
 			<input
 				type="text"
 				id="<?php echo esc_attr( $option_id ); ?>_date_added"
-				value="<?php echo esc_attr( date( 'M Y', strtotime( $approved_user['date_added'] ) ) ); ?>"
+				value="<?php echo esc_attr( wp_date( 'M Y', strtotime( $approved_user['date_added'] ) ) ); ?>"
 				readonly="true"
 				class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'date-added', $is_multisite_user ) ); ?>"
 			/>
@@ -537,7 +537,7 @@ class Access_Lists extends \Authorizer\Singleton {
 					<input
 						type="text"
 						id="<?php echo esc_attr( $option_id ); ?>_usermeta"
-						value="<?php echo esc_attr( $approved_user['usermeta'], ENT_COMPAT ); ?>"
+						value="<?php echo esc_attr( $approved_user['usermeta'] ); ?>"
 						class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'usermeta', $is_multisite_user ) ); ?>"
 					/>
 					<a class="button button-primary dashicons-before dashicons-edit update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"></a>

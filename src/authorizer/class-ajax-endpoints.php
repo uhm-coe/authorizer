@@ -74,7 +74,7 @@ class Ajax_Endpoints extends Singleton {
 			$client::LIBVER >= '2.0.0'
 		) {
 			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-			$google_hosteddomain = trim( $google_hosteddomains[0] );
+			$google_hosteddomain  = trim( $google_hosteddomains[0] );
 			$client->setHostedDomain( $google_hosteddomain );
 		}
 
@@ -296,7 +296,7 @@ class Ajax_Endpoints extends Singleton {
 		if ( in_array( $sort_by, array( 'email', 'role', 'date_added' ), true ) ) {
 			foreach ( $auth_settings_option as $key => $user ) {
 				if ( 'date_added' === $sort_by ) {
-					$sort_dimension[ $key ] = date( 'Ymd', strtotime( $user[ $sort_by ] ) );
+					$sort_dimension[ $key ] = wp_date( 'Ymd', strtotime( $user[ $sort_by ] ) );
 				} else {
 					$sort_dimension[ $key ] = strtolower( $user[ $sort_by ] );
 				}
@@ -584,7 +584,7 @@ class Ajax_Endpoints extends Singleton {
 									'first_name'      => '',
 									'last_name'       => '',
 									'user_email'      => Helper::lowercase( $approved_user['email'] ),
-									'user_registered' => date( 'Y-m-d H:i:s' ),
+									'user_registered' => wp_date( 'Y-m-d H:i:s' ),
 									'role'            => $approved_user['role'],
 								)
 							);
@@ -605,7 +605,7 @@ class Ajax_Endpoints extends Singleton {
 							$auth_multisite_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::NETWORK_CONTEXT )
 							);
-							$approved_user['date_added']                   = date( 'M Y' );
+							$approved_user['date_added']                   = wp_date( 'M Y' );
 							array_push( $auth_multisite_settings_access_users_approved, $approved_user );
 							update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 						} else {
@@ -616,7 +616,7 @@ class Ajax_Endpoints extends Singleton {
 							$auth_settings_access_users_approved = $options->sanitize_user_list(
 								$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )
 							);
-							$approved_user['date_added']         = date( 'M Y' );
+							$approved_user['date_added']         = wp_date( 'M Y' );
 							array_push( $auth_settings_access_users_approved, $approved_user );
 							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 							// Edge case: if added user already exists in WordPress, make sure
@@ -775,7 +775,7 @@ class Ajax_Endpoints extends Singleton {
 						$auth_settings_access_users_blocked = $options->sanitize_user_list(
 							$options->get( 'access_users_blocked', Helper::SINGLE_CONTEXT )
 						);
-						$blocked_user['date_added']         = date( 'M Y' );
+						$blocked_user['date_added']         = wp_date( 'M Y' );
 						array_push( $auth_settings_access_users_blocked, $blocked_user );
 						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
 					} else {

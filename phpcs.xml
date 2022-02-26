@@ -11,12 +11,21 @@
 		<exclude name="WordPress.WP.CapitalPDangit"/>
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_serialize"/>
 		<exclude name="WordPress.PHP.DiscouragedPHPFunctions.serialize_unserialize"/>
+
+		<!-- Allow function( 'something', array(
+			'something',
+		) ); -->
+		<exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+		<exclude name="PEAR.Functions.FunctionCallSignature.MultipleArguments"/>
 	</rule>
 
 	<!-- Add custom sanitizing function(s). -->
 	<rule ref="WordPress.Security.ValidatedSanitizedInput">
 		<properties>
-			<property name="customSanitizingFunctions" value="sanitize_update_auth_users" type="array" />
+			<property name="customSanitizingFunctions" type="array">
+				<element value="sanitize_update_auth_users" />
+			</property>
 		</properties>
 	</rule>
 </ruleset>

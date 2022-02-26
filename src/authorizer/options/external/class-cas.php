@@ -174,7 +174,7 @@ class Cas extends \Authorizer\Singleton {
 		$cas_versions = \phpCAS::getSupportedProtocols();
 		if ( empty( $cas_version ) ) {
 			$cas_version = array_key_last( $cas_versions ); // Should be SAML 1.1.
-		} elseif ( ! in_array( $cas_version, array_keys( $cas_versions ) ) ) {
+		} elseif ( ! in_array( $cas_version, array_keys( $cas_versions ), true ) ) {
 			// Backwards compatibility with constant strings from Authorizer < 3.0.11.
 			if ( 'SAML_VERSION_1_1' === $cas_version ) {
 				$cas_version = 'S1';

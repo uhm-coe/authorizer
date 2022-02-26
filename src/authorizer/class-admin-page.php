@@ -36,7 +36,7 @@ class Admin_Page extends Singleton {
 		$screen = get_current_screen();
 
 		// Don't print any help items if not on the Authorizer Settings page.
-		if ( empty( $screen->id ) || ! in_array( $screen->id, array( 'toplevel_page_authorizer-network', 'toplevel_page_authorizer', 'settings_page_authorizer' ) ) ) {
+		if ( empty( $screen->id ) || ! in_array( $screen->id, array( 'toplevel_page_authorizer-network', 'toplevel_page_authorizer', 'settings_page_authorizer' ), true ) ) {
 			return;
 		}
 
@@ -95,11 +95,11 @@ class Admin_Page extends Singleton {
 			<p>' . __( '<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p><strong><em>' . __( 'If you enable OAuth2 logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
-				<li>' . __( "<strong>Client ID</strong>: You can generate this ID following the instructions for your specific provider.", 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Client Secret</strong>: You can generate this secret by following the instructions for your specific provider.", 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Authorization URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the first: the endpoint first contacted to initiate the authentication.", 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Access Token URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the second: the endpoint that is contacted after initiation to retrieve an access token for the user that just authenticated.", 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Resource Owner URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the third: the endpoint that is contacted after successfully receiving an authentication token to retrieve details on the user that just authenticated.", 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Client ID</strong>: You can generate this ID following the instructions for your specific provider.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Client Secret</strong>: You can generate this secret by following the instructions for your specific provider.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Authorization URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the first: the endpoint first contacted to initiate the authentication.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Access Token URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the second: the endpoint that is contacted after initiation to retrieve an access token for the user that just authenticated.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Resource Owner URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the third: the endpoint that is contacted after successfully receiving an authentication token to retrieve details on the user that just authenticated.', 'authorizer' ) . '</li>
 			</ul>
 			<p><strong><em>' . __( 'If you enable Google logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
