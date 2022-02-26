@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Authorizer 2.9.12\n"
-"POT-Creation-Date: 2022-02-25 15:13-1000\n"
+"POT-Creation-Date: 2022-02-25 15:17-1000\n"
 "PO-Revision-Date: 2020-02-25 10:18-1000\n"
 "Last-Translator: Paul Ryan <paul.ryan@hawaii.edu>\n"
 "Language-Team: University of Hawaii <dcdc@hawaii.edu>\n"
@@ -927,6 +927,7 @@ msgstr ""
 msgid "CAS server returned an Authentication Exception. Details:"
 msgstr ""
 
+#. TRANSLATORS: Current time
 #: src/authorizer/class-authentication.php:896
 #, php-format
 msgid "[%s] Attempting to authenticate via LDAP."
@@ -964,26 +965,31 @@ msgstr ""
 msgid "Failed: php-ldap extension not installed."
 msgstr ""
 
+#. TRANSLATORS: LDAP Host
 #: src/authorizer/class-authentication.php:999
 #, php-format
 msgid "Warning: could not parse host %s with wp_parse_url()."
 msgstr ""
 
+#. TRANSLATORS: LDAP Host
 #: src/authorizer/class-authentication.php:1022
 #, php-format
 msgid "Warning: syntax check failed on host %s in ldap_connect()."
 msgstr ""
 
+#. TRANSLATORS: LDAP Host
 #: src/authorizer/class-authentication.php:1033
 #, php-format
 msgid "Warning: unable to start TLS on host %s:"
 msgstr ""
 
+#. TRANSLATORS: LDAP Host
 #: src/authorizer/class-authentication.php:1054
 #, php-format
 msgid "Warning: unable to bind on host %1$s using directory user:"
 msgstr ""
 
+#. TRANSLATORS: LDAP Host
 #: src/authorizer/class-authentication.php:1064
 #, php-format
 msgid "Connected to LDAP host %s."
@@ -993,31 +999,37 @@ msgstr ""
 msgid "Failed: unable to connect to any LDAP host."
 msgstr ""
 
+#. TRANSLATORS: LDAP search filter
 #: src/authorizer/class-authentication.php:1133
 #, php-format
 msgid "Using LDAP search filter: %s"
 msgstr ""
 
+#. TRANSLATORS: 1: LDAP user 2: LDAP search base
 #: src/authorizer/class-authentication.php:1148
 #, php-format
 msgid "Found user %1$s in search base: %2$s"
 msgstr ""
 
+#. TRANSLATORS: 1: LDAP user 2: LDAP search base
 #: src/authorizer/class-authentication.php:1153
 #, php-format
 msgid "Failed to find user %1$s in %2$s. Trying next search base."
 msgstr ""
 
+#. TRANSLATORS: LDAP User
 #: src/authorizer/class-authentication.php:1161
 #, php-format
 msgid "Failed: no LDAP user %s found."
 msgstr ""
 
+#. TRANSLATORS: LDAP User
 #: src/authorizer/class-authentication.php:1198
 #, php-format
 msgid "Failed: password incorrect for LDAP user %s."
 msgstr ""
 
+#. TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email
 #: src/authorizer/class-authentication.php:1217
 #, php-format
 msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
