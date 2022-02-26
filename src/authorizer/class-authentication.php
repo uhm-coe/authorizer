@@ -892,7 +892,7 @@ class Authentication extends Singleton {
 		// Initialize debug array if a variable was passed in.
 		if ( ! is_null( $debug ) ) {
 			$debug = array(
-				/* translators: Current time */
+				/* TRANSLATORS: Current time */
 				sprintf( __( '[%s] Attempting to authenticate via LDAP.', 'authorizer' ), wp_date( get_option( 'time_format' ) ) ),
 			);
 		}
@@ -995,7 +995,7 @@ class Authentication extends Singleton {
 			// Fail if invalid host is specified.
 			if ( false === $parsed_host ) {
 				if ( is_array( $debug ) ) {
-					/* translators: LDAP Host */
+					/* TRANSLATORS: LDAP Host */
 					$debug[] = sprintf( __( 'Warning: could not parse host %s with wp_parse_url().', 'authorizer' ), $ldap_host );
 				}
 				continue;
@@ -1018,7 +1018,7 @@ class Authentication extends Singleton {
 			// Fail if we don't have a plausible LDAP URI.
 			if ( false === $ldap ) {
 				if ( is_array( $debug ) ) {
-					/* translators: LDAP Host */
+					/* TRANSLATORS: LDAP Host */
 					$debug[] = sprintf( __( 'Warning: syntax check failed on host %s in ldap_connect().', 'authorizer' ), $ldap_host );
 				}
 				continue;
@@ -1029,7 +1029,7 @@ class Authentication extends Singleton {
 				// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				if ( ! @ldap_start_tls( $ldap ) ) {
 					if ( is_array( $debug ) ) {
-						/* translators: LDAP Host */
+						/* TRANSLATORS: LDAP Host */
 						$debug[] = sprintf( __( 'Warning: unable to start TLS on host %s:', 'authorizer' ), $ldap_host );
 						$debug[] = ldap_error( $ldap );
 					}
@@ -1050,7 +1050,7 @@ class Authentication extends Singleton {
 			if ( ! $result ) {
 				// Can't connect to LDAP, so fall back to WordPress authentication.
 				if ( is_array( $debug ) ) {
-					/* translators: LDAP Host */
+					/* TRANSLATORS: LDAP Host */
 					$debug[] = sprintf( __( 'Warning: unable to bind on host %1$s using directory user:', 'authorizer' ), $ldap_host );
 					$debug[] = ldap_error( $ldap );
 				}
@@ -1060,7 +1060,7 @@ class Authentication extends Singleton {
 			// If we've reached this, we have a valid ldap connection and bind.
 			$ldap_valid = true;
 			if ( is_array( $debug ) ) {
-				/* translators: LDAP Host */
+				/* TRANSLATORS: LDAP Host */
 				$debug[] = sprintf( __( 'Connected to LDAP host %s.', 'authorizer' ), $ldap_host );
 			}
 			break;
@@ -1129,7 +1129,7 @@ class Authentication extends Singleton {
 		$search_filter = apply_filters( 'authorizer_ldap_search_filter', $search_filter, $auth_settings['ldap_uid'], $username );
 
 		if ( is_array( $debug ) ) {
-			/* translators: LDAP search filter */
+			/* TRANSLATORS: LDAP search filter */
 			$debug[] = sprintf( __( 'Using LDAP search filter: %s', 'authorizer' ), $search_filter );
 		}
 
@@ -1144,12 +1144,12 @@ class Authentication extends Singleton {
 			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
 			if ( $ldap_entries['count'] > 0 ) {
 				if ( is_array( $debug ) ) {
-					/* translators: 1: LDAP user 2: LDAP search base */
+					/* TRANSLATORS: 1: LDAP user 2: LDAP search base */
 					$debug[] = sprintf( __( 'Found user %1$s in search base: %2$s', 'authorizer' ), $username, $search_base );
 				}
 				break;
 			} elseif ( is_array( $debug ) ) {
-				/* translators: 1: LDAP user 2: LDAP search base */
+				/* TRANSLATORS: 1: LDAP user 2: LDAP search base */
 				$debug[] = sprintf( __( 'Failed to find user %1$s in %2$s. Trying next search base.', 'authorizer' ), $username, $search_base );
 			}
 		}
@@ -1157,7 +1157,7 @@ class Authentication extends Singleton {
 		// If we didn't find any users in ldap, fall back to WordPress authentication.
 		if ( $ldap_entries['count'] < 1 ) {
 			if ( is_array( $debug ) ) {
-				/* translators: LDAP User */
+				/* TRANSLATORS: LDAP User */
 				$debug[] = sprintf( __( 'Failed: no LDAP user %s found.', 'authorizer' ), $username );
 			}
 			return null;
@@ -1194,7 +1194,7 @@ class Authentication extends Singleton {
 		$result = @ldap_bind( $ldap, $ldap_user_dn, stripslashes( $password ) ); // phpcs:ignore
 		if ( ! $result ) {
 			if ( is_array( $debug ) ) {
-				/* translators: LDAP User */
+				/* TRANSLATORS: LDAP User */
 				$debug[] = sprintf( __( 'Failed: password incorrect for LDAP user %s.', 'authorizer' ), $username );
 			}
 			// We have a real ldap user, but an invalid password. Pass
@@ -1213,7 +1213,7 @@ class Authentication extends Singleton {
 		}
 
 		if ( is_array( $debug ) ) {
-			/* translators: 1: Current time 2: LDAP User 3: LDAP user email */
+			/* TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email */
 			$debug[] = sprintf( __( '[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP.', 'authorizer' ), wp_date( get_option( 'time_format' ) ), $username, $externally_authenticated_email );
 		}
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Authorizer 2.9.12\n"
-"POT-Creation-Date: 2021-09-24 09:38-1000\n"
+"POT-Creation-Date: 2022-02-25 15:13-1000\n"
 "PO-Revision-Date: 2020-02-25 10:18-1000\n"
 "Last-Translator: Paul Ryan <paul.ryan@hawaii.edu>\n"
 "Language-Team: University of Hawaii <dcdc@hawaii.edu>\n"
@@ -49,8 +49,8 @@ msgid ""
 "list."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:53 src/authorizer/class-options.php:903
-#: src/authorizer/class-options.php:909
+#: src/authorizer/class-admin-page.php:53 src/authorizer/class-options.php:910
+#: src/authorizer/class-options.php:916
 msgid "Access Lists"
 msgstr ""
 
@@ -81,7 +81,7 @@ msgid ""
 "once they try to log in to the site for the first time."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:67 src/authorizer/class-options.php:910
+#: src/authorizer/class-admin-page.php:67 src/authorizer/class-options.php:917
 msgid "Login Access"
 msgstr ""
 
@@ -127,7 +127,7 @@ msgid ""
 "here."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:83 src/authorizer/class-options.php:911
+#: src/authorizer/class-admin-page.php:83 src/authorizer/class-options.php:918
 msgid "Public Access"
 msgstr ""
 
@@ -370,8 +370,8 @@ msgid ""
 "set, this only happens the first time they log in."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:137 src/authorizer/class-options.php:904
-#: src/authorizer/class-options.php:912
+#: src/authorizer/class-admin-page.php:137 src/authorizer/class-options.php:911
+#: src/authorizer/class-options.php:919
 msgid "External Service"
 msgstr ""
 
@@ -409,8 +409,8 @@ msgid ""
 "directory under sample-theme-add-branding."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:152 src/authorizer/class-options.php:905
-#: src/authorizer/class-options.php:913
+#: src/authorizer/class-admin-page.php:152 src/authorizer/class-options.php:912
+#: src/authorizer/class-options.php:920
 msgid "Advanced"
 msgstr ""
 
@@ -483,12 +483,12 @@ msgid "What message should people without access see?"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:393
-#: src/authorizer/class-admin-page.php:845
+#: src/authorizer/class-admin-page.php:852
 msgid "Default role for new users"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:400
-#: src/authorizer/class-admin-page.php:849
+#: src/authorizer/class-admin-page.php:856
 msgid "OAuth2 Logins"
 msgstr ""
 
@@ -501,62 +501,62 @@ msgid "Custom label"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:421
-#: src/authorizer/class-admin-page.php:861
+#: src/authorizer/class-admin-page.php:868
 msgid "Client ID"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:428
-#: src/authorizer/class-admin-page.php:865
+#: src/authorizer/class-admin-page.php:872
 msgid "Client Secret"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:435
-#: src/authorizer/class-admin-page.php:869
+#: src/authorizer/class-admin-page.php:876
 msgid "OAuth2 Hosted Domain"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:442
-#: src/authorizer/class-admin-page.php:873
+#: src/authorizer/class-admin-page.php:880
 msgid "Tenant ID"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:449
-#: src/authorizer/class-admin-page.php:877
+#: src/authorizer/class-admin-page.php:884
 msgid "Authorization URL"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:456
-#: src/authorizer/class-admin-page.php:881
+#: src/authorizer/class-admin-page.php:888
 msgid "Access Token URL"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:463
-#: src/authorizer/class-admin-page.php:885
+#: src/authorizer/class-admin-page.php:892
 msgid "Resource Owner URL"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:470
-#: src/authorizer/class-admin-page.php:889
+#: src/authorizer/class-admin-page.php:896
 msgid "Google Logins"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:477
-#: src/authorizer/class-admin-page.php:893
+#: src/authorizer/class-admin-page.php:900
 msgid "Google Client ID"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:484
-#: src/authorizer/class-admin-page.php:897
+#: src/authorizer/class-admin-page.php:904
 msgid "Google Client Secret"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:491
-#: src/authorizer/class-admin-page.php:901
+#: src/authorizer/class-admin-page.php:908
 msgid "Google Hosted Domain"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:498
-#: src/authorizer/class-admin-page.php:905
+#: src/authorizer/class-admin-page.php:912
 msgid "CAS Logins"
 msgstr ""
 
@@ -565,22 +565,22 @@ msgid "CAS custom label"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:512
-#: src/authorizer/class-admin-page.php:913
+#: src/authorizer/class-admin-page.php:920
 msgid "CAS server hostname"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:519
-#: src/authorizer/class-admin-page.php:917
+#: src/authorizer/class-admin-page.php:924
 msgid "CAS server port"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:526
-#: src/authorizer/class-admin-page.php:921
+#: src/authorizer/class-admin-page.php:928
 msgid "CAS server path/context"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:533
-#: src/authorizer/class-admin-page.php:925
+#: src/authorizer/class-admin-page.php:932
 msgid "CAS server protocol"
 msgstr ""
 
@@ -589,63 +589,63 @@ msgid "CAS attribute containing email address"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:547
-#: src/authorizer/class-admin-page.php:933
+#: src/authorizer/class-admin-page.php:940
 msgid "CAS attribute containing first name"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:554
-#: src/authorizer/class-admin-page.php:937
+#: src/authorizer/class-admin-page.php:944
 msgid "CAS attribute containing last name"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:561
-#: src/authorizer/class-admin-page.php:941
+#: src/authorizer/class-admin-page.php:948
 msgid "CAS attribute update"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:568
-#: src/authorizer/class-admin-page.php:945
+#: src/authorizer/class-admin-page.php:952
 msgid "CAS automatic login"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:575
-#: src/authorizer/class-admin-page.php:949
+#: src/authorizer/class-admin-page.php:956
 msgid "CAS users linked by username"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:582
-#: src/authorizer/class-admin-page.php:953
+#: src/authorizer/class-admin-page.php:960
 msgid "LDAP Logins"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:589
-#: src/authorizer/class-admin-page.php:957
+#: src/authorizer/class-admin-page.php:964
 msgid "LDAP Host"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:596
-#: src/authorizer/class-admin-page.php:961
+#: src/authorizer/class-admin-page.php:968
 msgid "LDAP Port"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:603
-#: src/authorizer/class-admin-page.php:965
+#: src/authorizer/class-admin-page.php:972
 #: src/authorizer/options/external/class-ldap.php:104
 msgid "Use TLS"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:610
-#: src/authorizer/class-admin-page.php:969
+#: src/authorizer/class-admin-page.php:976
 msgid "LDAP Search Base"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:617
-#: src/authorizer/class-admin-page.php:973
+#: src/authorizer/class-admin-page.php:980
 msgid "LDAP Search Filter"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:624
-#: src/authorizer/class-admin-page.php:977
+#: src/authorizer/class-admin-page.php:984
 msgid "LDAP attribute containing username"
 msgstr ""
 
@@ -654,96 +654,100 @@ msgid "LDAP attribute containing email address"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:638
-#: src/authorizer/class-admin-page.php:985
+#: src/authorizer/class-admin-page.php:992
 msgid "LDAP Directory User"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:645
-#: src/authorizer/class-admin-page.php:989
+#: src/authorizer/class-admin-page.php:996
 msgid "LDAP Directory User Password"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:652
-#: src/authorizer/class-admin-page.php:993
+#: src/authorizer/class-admin-page.php:1000
 msgid "Custom lost password URL"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:659
-#: src/authorizer/class-admin-page.php:997
+#: src/authorizer/class-admin-page.php:1004
 msgid "LDAP attribute containing first name"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:666
-#: src/authorizer/class-admin-page.php:1001
+#: src/authorizer/class-admin-page.php:1008
 msgid "LDAP attribute containing last name"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:673
-#: src/authorizer/class-admin-page.php:1005
+#: src/authorizer/class-admin-page.php:1012
 msgid "LDAP attribute update"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:688
-#: src/authorizer/class-admin-page.php:1013
-msgid "Limit invalid login attempts"
+#: src/authorizer/class-admin-page.php:680
+msgid "LDAP test connection"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:695
-msgid "Hide WordPress Login"
+#: src/authorizer/class-admin-page.php:1020
+msgid "Limit invalid login attempts"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:702
-#: src/authorizer/class-admin-page.php:1021
+msgid "Hide WordPress Login"
+msgstr ""
+
+#: src/authorizer/class-admin-page.php:709
+#: src/authorizer/class-admin-page.php:1028
 #: src/authorizer/options/class-advanced.php:102
 msgid "Disable WordPress Logins"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:709
+#: src/authorizer/class-admin-page.php:716
 msgid "Custom WordPress login branding"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:716
+#: src/authorizer/class-admin-page.php:723
 msgid "Authorizer admin menu item location"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:723
+#: src/authorizer/class-admin-page.php:730
 msgid "Show custom usermeta in user list"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:730
-#: src/authorizer/class-admin-page.php:1025
+#: src/authorizer/class-admin-page.php:737
+#: src/authorizer/class-admin-page.php:1032
 msgid "Number of users per page"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:737
-#: src/authorizer/class-admin-page.php:1029
+#: src/authorizer/class-admin-page.php:744
+#: src/authorizer/class-admin-page.php:1036
 msgid "Approved users sort method"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:744
-#: src/authorizer/class-admin-page.php:1033
+#: src/authorizer/class-admin-page.php:751
+#: src/authorizer/class-admin-page.php:1040
 msgid "Approved users sort order"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:751
+#: src/authorizer/class-admin-page.php:758
 msgid "Show dashboard widget to admin users"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:760
+#: src/authorizer/class-admin-page.php:767
 msgid "Override multisite options"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:775
-#: src/authorizer/class-admin-page.php:811
+#: src/authorizer/class-admin-page.php:782
+#: src/authorizer/class-admin-page.php:818
 #: src/authorizer/class-dashboard-widget.php:34
 msgid "Authorizer Settings"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:795
+#: src/authorizer/class-admin-page.php:802
 msgid "You do not have sufficient permissions to access this page."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:812
+#: src/authorizer/class-admin-page.php:819
 msgid ""
 "Most <strong>Authorizer</strong> settings are set in the individual sites, "
 "but you can specify a few options here that apply to <strong>all sites in "
@@ -751,124 +755,124 @@ msgid ""
 "individual sites."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:814
+#: src/authorizer/class-admin-page.php:821
 msgid "Override individual site settings with the settings below"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:825
+#: src/authorizer/class-admin-page.php:832
 msgid "Manage who has access to all sites in the network."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:829
+#: src/authorizer/class-admin-page.php:836
 msgid "Who can log in to sites in this network?"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:833
+#: src/authorizer/class-admin-page.php:840
 msgid "Who can view sites in this network?"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:837
+#: src/authorizer/class-admin-page.php:844
 msgid "Approved Users (All Sites)"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:837
+#: src/authorizer/class-admin-page.php:844
 msgid ""
 "Note: these users will <strong>not</strong> receive welcome emails when "
 "approved. Only users approved from individual sites can receive these "
 "messages."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:853
+#: src/authorizer/class-admin-page.php:860
 msgid "OAuth2 Provider"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:857
+#: src/authorizer/class-admin-page.php:864
 msgid "Custom Label"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:909
+#: src/authorizer/class-admin-page.php:916
 msgid "CAS Custom Label"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:929
+#: src/authorizer/class-admin-page.php:936
 msgid "CAS attribute containing email"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:981
+#: src/authorizer/class-admin-page.php:988
 msgid "LDAP attribute containing email"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1017
+#: src/authorizer/class-admin-page.php:1024
 #: src/authorizer/options/class-advanced.php:82
 msgid "Hide WordPress Logins"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1037
+#: src/authorizer/class-admin-page.php:1044
 #: src/authorizer/options/class-advanced.php:359
 msgid "Show Dashboard Widget"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1044
-#: src/authorizer/class-admin-page.php:1125
+#: src/authorizer/class-admin-page.php:1051
+#: src/authorizer/class-admin-page.php:1132
 msgid "Save Changes"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1118
+#: src/authorizer/class-admin-page.php:1125
 msgid "Saved"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1119
+#: src/authorizer/class-admin-page.php:1126
 msgid "Duplicate"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1120
+#: src/authorizer/class-admin-page.php:1127
 msgid "Failed"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1121
+#: src/authorizer/class-admin-page.php:1128
 msgid "Local WordPress user"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1122
+#: src/authorizer/class-admin-page.php:1129
 #: src/authorizer/options/class-access-lists.php:547
 msgid "Block/Ban user"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1123
+#: src/authorizer/class-admin-page.php:1130
 #: src/authorizer/options/class-access-lists.php:89
 #: src/authorizer/options/class-access-lists.php:281
 #: src/authorizer/options/class-access-lists.php:549
 msgid "Remove user"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1124
+#: src/authorizer/class-admin-page.php:1131
 msgid "No users in"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1126
+#: src/authorizer/class-admin-page.php:1133
 msgid "Private Pages"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1127
+#: src/authorizer/class-admin-page.php:1134
 msgid "Public Pages"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1128
+#: src/authorizer/class-admin-page.php:1135
 #: src/authorizer/options/class-access-lists.php:337
 msgid "First page"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1129
+#: src/authorizer/class-admin-page.php:1136
 #: src/authorizer/options/class-access-lists.php:348
 msgid "Previous page"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1130
+#: src/authorizer/class-admin-page.php:1137
 #: src/authorizer/options/class-access-lists.php:375
 msgid "Next page"
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:1131
+#: src/authorizer/class-admin-page.php:1138
 #: src/authorizer/options/class-access-lists.php:386
 msgid "Last page"
 msgstr ""
@@ -882,13 +886,13 @@ msgid_plural "%s users"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/authorizer/class-authentication.php:70
+#: src/authorizer/class-authentication.php:71
 msgid "<strong>ERROR</strong>: Incorrect username or password."
 msgstr ""
 
 #. TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of lockout as a phrase 4: lost password URL
-#: src/authorizer/class-authentication.php:108
-#: src/authorizer/class-authentication.php:126
+#: src/authorizer/class-authentication.php:109
+#: src/authorizer/class-authentication.php:127
 #, php-format
 msgid ""
 "<strong>ERROR</strong>: There have been too many invalid login attempts for "
@@ -898,64 +902,152 @@ msgid ""
 "password</a>?"
 msgstr ""
 
-#: src/authorizer/class-authentication.php:233
+#: src/authorizer/class-authentication.php:234
 msgid "<strong>ERROR</strong>: The username field is empty."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:237
+#: src/authorizer/class-authentication.php:238
 msgid "<strong>ERROR</strong>: The password field is empty."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:627
+#: src/authorizer/class-authentication.php:629
 msgid "Email address does not match the allowed hosted domain"
 msgstr ""
 
-#: src/authorizer/class-authentication.php:697
-#: src/authorizer/class-authentication.php:702
+#: src/authorizer/class-authentication.php:699
+#: src/authorizer/class-authentication.php:704
 msgid "Invalid Google credentials provided."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:736
+#: src/authorizer/class-authentication.php:738
 msgid "Google credentials do not match the allowed hosted domain"
 msgstr ""
 
-#: src/authorizer/class-authentication.php:801
+#: src/authorizer/class-authentication.php:804
 msgid "CAS server returned an Authentication Exception. Details:"
 msgstr ""
 
-#: src/authorizer/class-authentication.php:937
+#: src/authorizer/class-authentication.php:896
+#, php-format
+msgid "[%s] Attempting to authenticate via LDAP."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:906
+msgid "Failed: no LDAP Host(s) specified."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:917
+msgid "Failed: no LDAP Search Base(s) specified."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:950
+msgid "Failed: empty username and password."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:958
+msgid "Failed: empty username."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:960
 msgid "You must provide a username or email."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:940
+#: src/authorizer/class-authentication.php:964
+msgid "Failed: empty password."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:966
 msgid "You must provide a password."
 msgstr ""
 
+#: src/authorizer/class-authentication.php:972
+msgid "Failed: php-ldap extension not installed."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:999
+#, php-format
+msgid "Warning: could not parse host %s with wp_parse_url()."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1022
+#, php-format
+msgid "Warning: syntax check failed on host %s in ldap_connect()."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1033
+#, php-format
+msgid "Warning: unable to start TLS on host %s:"
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1054
+#, php-format
+msgid "Warning: unable to bind on host %1$s using directory user:"
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1064
+#, php-format
+msgid "Connected to LDAP host %s."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1072
+msgid "Failed: unable to connect to any LDAP host."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1133
+#, php-format
+msgid "Using LDAP search filter: %s"
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1148
+#, php-format
+msgid "Found user %1$s in search base: %2$s"
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1153
+#, php-format
+msgid "Failed to find user %1$s in %2$s. Trying next search base."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1161
+#, php-format
+msgid "Failed: no LDAP user %s found."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1198
+#, php-format
+msgid "Failed: password incorrect for LDAP user %s."
+msgstr ""
+
+#: src/authorizer/class-authentication.php:1217
+#, php-format
+msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
+msgstr ""
+
 #. TRANSLATORS: %s: Name of blog
-#: src/authorizer/class-authorization.php:125
+#: src/authorizer/class-authorization.php:124
 #: src/authorizer/class-authorization.php:623
 #, php-format
 msgid "%s - Access Restricted"
 msgstr ""
 
-#: src/authorizer/class-authorization.php:133
-#: src/authorizer/class-authorization.php:460
+#: src/authorizer/class-authorization.php:132
+#: src/authorizer/class-authorization.php:459
 msgid "Back"
 msgstr ""
 
-#: src/authorizer/class-authorization.php:137
-#: src/authorizer/class-authorization.php:468
+#: src/authorizer/class-authorization.php:136
+#: src/authorizer/class-authorization.php:467
 msgid "Invalid login attempted."
 msgstr ""
 
 #. TRANSLATORS: 1: User email 2: Name of site
-#: src/authorizer/class-authorization.php:428
+#: src/authorizer/class-authorization.php:427
 #, php-format
 msgid "Action required: Pending user %1$s at %2$s"
 msgstr ""
 
 #. TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer
-#: src/authorizer/class-authorization.php:434
+#: src/authorizer/class-authorization.php:433
 #, php-format
 msgid ""
 "A new user has tried to access the %1$s site you manage at:\n"
@@ -966,7 +1058,7 @@ msgid ""
 msgstr ""
 
 #: src/authorizer/class-authorization.php:631
-#: src/authorizer/class-login-form.php:34
+#: src/authorizer/class-login-form.php:40
 msgid "Log In"
 msgstr ""
 
@@ -989,24 +1081,24 @@ msgstr ""
 msgid "&mdash; No role for this site &mdash;"
 msgstr ""
 
-#: src/authorizer/class-login-form.php:192
+#: src/authorizer/class-login-form.php:202
 msgid "Sign in with Google"
 msgstr ""
 
 #. TRANSLATORS: %s: Custom OAuth2 label from authorizer options
 #. TRANSLATORS: %s: Custom CAS label from authorizer options
-#: src/authorizer/class-login-form.php:204
-#: src/authorizer/class-login-form.php:221
+#: src/authorizer/class-login-form.php:214
+#: src/authorizer/class-login-form.php:231
 #, php-format
 msgid "Sign in with %s"
 msgstr ""
 
-#: src/authorizer/class-login-form.php:245
+#: src/authorizer/class-login-form.php:255
 msgid "or"
 msgstr ""
 
 #. TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts
-#: src/authorizer/class-login-form.php:378
+#: src/authorizer/class-login-form.php:388
 #, php-format
 msgid ""
 "Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid "
@@ -1021,27 +1113,27 @@ msgstr ""
 msgid "multisite option"
 msgstr ""
 
-#: src/authorizer/class-options.php:256
+#: src/authorizer/class-options.php:257
 msgid ""
 "You're not currently allowed to view this site. Your administrator has been "
 "notified, and once he/she has approved your request, you will be able to log "
 "in. If you need any other help, please contact your administrator."
 msgstr ""
 
-#: src/authorizer/class-options.php:259
+#: src/authorizer/class-options.php:260
 msgid ""
 "You're not currently allowed to log into this site. If you think this is a "
 "mistake, please contact your administrator."
 msgstr ""
 
 #. TRANSLATORS: %s: Shortcode for name of site
-#: src/authorizer/class-options.php:267
+#: src/authorizer/class-options.php:268
 #, php-format
 msgid "Welcome to %s!"
 msgstr ""
 
 #. TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL
-#: src/authorizer/class-options.php:274
+#: src/authorizer/class-options.php:275
 #, php-format
 msgid ""
 "Hello %1$s,\n"
@@ -1050,7 +1142,7 @@ msgid ""
 "%3$s\n"
 msgstr ""
 
-#: src/authorizer/class-options.php:295
+#: src/authorizer/class-options.php:296
 msgid ""
 "Notice: You are browsing this site anonymously, and only have access to a "
 "portion of its content."
@@ -1138,7 +1230,7 @@ msgstr ""
 #: src/authorizer/options/class-access-lists.php:519
 #: src/authorizer/options/class-advanced.php:205
 #: src/authorizer/options/class-external.php:51
-#: src/authorizer/options/external/class-oauth2.php:80
+#: src/authorizer/options/external/class-oauth2.php:82
 msgid "-- None --"
 msgstr ""
 
@@ -1361,12 +1453,12 @@ msgid "Enable CAS Logins"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:70
-#: src/authorizer/options/external/class-oauth2.php:102
+#: src/authorizer/options/external/class-oauth2.php:104
 msgid "The button on the login page will read:"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:72
-#: src/authorizer/options/external/class-oauth2.php:104
+#: src/authorizer/options/external/class-oauth2.php:106
 msgid "Sign in with"
 msgstr ""
 
@@ -1522,7 +1614,7 @@ msgid ""
 msgstr ""
 
 #: src/authorizer/options/external/class-google.php:112
-#: src/authorizer/options/external/class-oauth2.php:180
+#: src/authorizer/options/external/class-oauth2.php:182
 msgid "If restricting to multiple domains, add one domain per line."
 msgstr ""
 
@@ -1607,51 +1699,69 @@ msgstr ""
 msgid "Example:  givenname"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:60
+#: src/authorizer/options/external/class-ldap.php:342
+msgid "username"
+msgstr ""
+
+#: src/authorizer/options/external/class-ldap.php:344
+msgid "password"
+msgstr ""
+
+#: src/authorizer/options/external/class-ldap.php:345
+msgid "Test"
+msgstr ""
+
+#: src/authorizer/options/external/class-ldap.php:348
+msgid ""
+"Note: Make sure to save any changes to LDAP settings before clicking the "
+"Test button."
+msgstr ""
+
+#: src/authorizer/options/external/class-oauth2.php:62
 msgid "Enable OAuth2 Logins"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:126
+#: src/authorizer/options/external/class-oauth2.php:128
 msgid ""
 "Generate your Client ID and Secret for your selected provider by following "
 "their specific instructions."
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:127
+#: src/authorizer/options/external/class-oauth2.php:129
 msgid "If asked for a redirect or callback URL, use:"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:131
+#: src/authorizer/options/external/class-oauth2.php:133
 msgid "If using Microsoft Azure, omit the querystring; use:"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:140
+#: src/authorizer/options/external/class-oauth2.php:142
 msgid "Example:  0123456789abcdef0123"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:160
+#: src/authorizer/options/external/class-oauth2.php:162
 msgid "Example:  0123456789abcdef0123456789abcdef"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:180
+#: src/authorizer/options/external/class-oauth2.php:182
 msgid ""
 "Restrict OAuth2 logins to a specific domain (for example, mycollege.edu). "
 "Leave blank to allow all valid sign-ins."
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:200
+#: src/authorizer/options/external/class-oauth2.php:202
 msgid "Example:  \"common\", or a specific Azure Directory Tenant ID"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:220
+#: src/authorizer/options/external/class-oauth2.php:222
 msgid "Example:  https://example.edu/login/oauth/authorize"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:240
+#: src/authorizer/options/external/class-oauth2.php:242
 msgid "Example:  https://example.edu/login/oauth/access_token"
 msgstr ""
 
-#: src/authorizer/options/external/class-oauth2.php:260
+#: src/authorizer/options/external/class-oauth2.php:262
 msgid "Example:  https://api.example.edu/user"
 msgstr ""
 
