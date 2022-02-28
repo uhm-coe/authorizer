@@ -2081,8 +2081,8 @@ msgid ""
 "Note: Make sure to save any changes to LDAP settings before clicking the "
 "Test button."
 msgstr ""
-"Note : Assurez-vous de sauvegarder les modifications aux réglages LDAP avant "
-"de cliquer sur le bouton Test."
+"Note : Assurez-vous d’enregistrer les modifications effectuées aux réglages "
+"LDAP avant de cliquer sur le bouton Test."
 
 #: src/authorizer/options/external/class-oauth2.php:62
 msgid "Enable OAuth2 Logins"
