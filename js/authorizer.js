@@ -712,17 +712,21 @@
 			selectionHeader: '<div class="custom-header">' + authL10n.public_pages + '</div>',
 		});
 
-		// Switch to the first tab (or the tab indicated in sessionStorage, or the querystring).
-		var tab = '';
-		if ( getQuerystringValuesByKey( 'tab' ).length > 0 ) {
-			tab = getQuerystringValuesByKey( 'tab' )[0];
-		} else if ( sessionStorage.getItem( 'tab' ) ) {
-			tab = sessionStorage.getItem( 'tab' );
+		// Switch to the first tab (or the tab indicated in sessionStorage, or the
+		// querystring). Note: only do this on the settings page, not the dashboard
+		// widget.
+		if ( ! $( '#auth_dashboard_widget' ).length ) {
+			var tab = '';
+			if ( getQuerystringValuesByKey( 'tab' ).length > 0 ) {
+				tab = getQuerystringValuesByKey( 'tab' )[0];
+			} else if ( sessionStorage.getItem( 'tab' ) ) {
+				tab = sessionStorage.getItem( 'tab' );
+			}
+			if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) < 0 ) {
+				tab = 'access_lists';
+			}
+			window.chooseTab( tab, animationSpeed );
 		}
-		if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) < 0 ) {
-			tab = 'access_lists';
-		}
-		window.chooseTab( tab, animationSpeed );
 
 		// Hide/show multisite settings based on override checkbox.
 		$( 'input[name="auth_settings[multisite_override]"]' ).on( 'change', function() {
