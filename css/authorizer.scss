@@ -196,6 +196,16 @@
 
 // Target just the Dashboard widget.
 #auth_dashboard_widget {
+	// Style the settings icon in the meta box header.
+	.js-toggle-auth_settings_dashboard_widget_control {
+		display: inline-block;
+	 .toggle-indicator:before {
+			content: "\f111";
+			display: inline-block;
+			font: normal 20px/1 dashicons;
+		}
+	}
+
 	// Disable fixed height in table nav (widget usually too narrow so search
 	// wraps to second line).
 	.tablenav {

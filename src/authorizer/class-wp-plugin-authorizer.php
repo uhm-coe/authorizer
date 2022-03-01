@@ -88,8 +88,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Enqueue javascript and css on the plugin's options page, the
 		// dashboard (for the widget), and the network admin.
 		add_action( 'load-settings_page_authorizer', array( Admin_Page::get_instance(), 'load_options_page' ) );
-		add_action( 'admin_head-index.php', array( Admin_Page::get_instance(), 'load_options_page' ) );
 		add_action( 'load-toplevel_page_authorizer', array( Admin_Page::get_instance(), 'load_options_page' ) );
+		add_action( 'admin_head-index.php', array( Admin_Page::get_instance(), 'load_options_page' ) );
+		add_action( 'admin_head-index.php', array( Dashboard_Widget::get_instance(), 'widget_scripts' ) );
 
 		// Add custom css and js to wp-login.php.
 		add_action( 'login_enqueue_scripts', array( Login_Form::get_instance(), 'login_enqueue_scripts_and_styles' ) );

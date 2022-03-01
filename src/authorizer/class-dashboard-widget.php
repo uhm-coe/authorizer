@@ -42,6 +42,11 @@ class Dashboard_Widget extends Singleton {
 	public function add_auth_dashboard_widget() {
 		$access_lists = Access_Lists::get_instance();
 		$login_access = Login_Access::get_instance();
+
+		// Get link to Authorizer options (for dashboard widget settings button).
+		$options      = Options::get_instance();
+		$admin_menu   = $options->get( 'advanced_admin_menu' );
+		$settings_url = 'settings' === $admin_menu ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( 'admin.php?page=authorizer' );
 		?>
 		<form method="post" id="auth_settings_access_form" action="">
 			<?php $login_access->print_section_info_access_login(); ?>
@@ -59,6 +64,36 @@ class Dashboard_Widget extends Singleton {
 			</div>
 			<br class="clear" />
 		</form>
+		<button type="button" class="handlediv js-toggle-auth_settings_dashboard_widget_control" aria-expanded="true" data-href="<?php echo esc_attr( $settings_url ); ?>">
+			<span class="screen-reader-text"><?php esc_html_e( 'Settings', 'authorizer' ); ?></span>
+			<span class="toggle-indicator" aria-hidden="true"></span>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Add scripts for dashboard widget.
+	 *
+	 * Action: admin_head-index.php
+	 */
+	public function widget_scripts() {
+		?>
+		<script type="text/javascript">
+		/* <![CDATA[ */
+		jQuery( function( $ ) {
+			if ( $( '#auth_dashboard_widget' ).length ) {
+				// Widget settings toggle.
+				var toggle = $( '.js-toggle-auth_settings_dashboard_widget_control' );
+				toggle.appendTo( '#auth_dashboard_widget .handle-actions' );
+				toggle.click( function( e ) {
+					e.preventDefault();
+					e.stopImmediatePropagation();
+					window.location.href = $( this ).data( 'href' );
+				} );
+			}
+		} );
+		/* ]]> */
+		</script>
 		<?php
 	}
 
