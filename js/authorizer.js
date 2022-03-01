@@ -471,13 +471,6 @@
 		$( 'th, td', auth_settings_external_ldap_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_test_user ).wrapInner( '<div class="animated_wrapper" />' );
 
-		// If we're viewing the dashboard widget, reset a couple of the relevant
-		// option variables (since they aren't nested in table rows).
-		if ( $( '#auth_dashboard_widget' ).length ) {
-			// Remove the helper link, since there are no tabs on the dashboard widget
-			$( '#dashboard_link_approved_users' ).contents().unwrap();
-		}
-
 		// Hide settings unless "Only approved users" is checked
 		if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {
 			animateOption( 'hide_immediately', auth_settings_access_role_receive_pending_emails );
