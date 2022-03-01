@@ -46,7 +46,7 @@ class Dashboard_Widget extends Singleton {
 		// Get link to Authorizer options (for dashboard widget settings button).
 		$options      = Options::get_instance();
 		$admin_menu   = $options->get( 'advanced_admin_menu' );
-		$settings_url = 'settings' === $admin_menu ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( 'admin.php?page=authorizer' );
+		$settings_url = 'settings' === $admin_menu ? admin_url( 'options-general.php?page=authorizer&tab=access_lists' ) : admin_url( 'admin.php?page=authorizer&tab=access_lists' );
 		?>
 		<form method="post" id="auth_settings_access_form" action="">
 			<?php $login_access->print_section_info_access_login(); ?>
