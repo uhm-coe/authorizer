@@ -425,7 +425,7 @@ class Access_Lists extends \Authorizer\Singleton {
 	 */
 	public function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
 		$is_local_user     = array_key_exists( 'local_user', $approved_user ) && 'true' === $approved_user['local_user'];
-		$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && true === $approved_user['multisite_user'];
+		$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && ( true === $approved_user['multisite_user'] || 'true' === $approved_user['multisite_user'] );
 		$option_prefix     = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 		$option_id         = $option_prefix . $option . '_' . $key;
 		$approved_wp_user  = get_user_by( 'email', $approved_user['email'] );
