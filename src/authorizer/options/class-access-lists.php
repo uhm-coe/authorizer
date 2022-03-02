@@ -424,7 +424,6 @@ class Access_Lists extends \Authorizer\Singleton {
 	 * @return void
 	 */
 	public function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
-		$is_local_user     = array_key_exists( 'local_user', $approved_user ) && 'true' === $approved_user['local_user'];
 		$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && ( true === $approved_user['multisite_user'] || 'true' === $approved_user['multisite_user'] );
 		$option_prefix     = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 		$option_id         = $option_prefix . $option . '_' . $key;
@@ -547,7 +546,6 @@ class Access_Lists extends \Authorizer\Singleton {
 				<a class="button button-primary dashicons-before dashicons-remove<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"></a>
 			<?php endif; ?>
 			<a class="button dashicons-before dashicons-no<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
-			&nbsp;<a title="Local WordPress user" class="button disabled auth-local-user dashicons-before dashicons-businessperson<?php echo $is_local_user ? '' : ' invisible'; ?>"></a>
 			&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site<?php echo $is_multisite_user || $is_multisite_admin_page ? '' : ' invisible'; ?>"></a>
 		</li>
 		<?php
