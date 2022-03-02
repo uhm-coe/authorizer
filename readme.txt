@@ -62,7 +62,16 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
-= Version 3.2.2 =
+= 3.3.0 =
+* Add LDAP connection test feature (under LDAP settings).
+* Update translatable strings.
+* Update French translations. Props @julienlusson!
+* Add settings icon to dashboard widget header.
+* Better styling in dashboard widget.
+* Remove "Local WordPress user" icon from Approved User list (uninformative).
+* Small coding standards fixes.
+
+= 3.2.2 =
 * Fix PHP warning when anonymous users browse a restricted site.
 * Only load authorizer-public.js when necessary (when site is configured so only logged in users can view the site, current user does not have access, and anonymous users should be shown a message). Props @flim0 for the catch!
 
