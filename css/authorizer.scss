@@ -233,7 +233,7 @@
 		& > :nth-child(1) { flex-grow: 1; }
 
 		// Shrink role dropdown.
-		.auth-role { max-width: 80px; }
+		.auth-role { max-width: 140px; }
 
 		// Specifically shrink fields when near media breakpoints to prevent
 		// wrapping to a second line when it's "really close."
@@ -258,11 +258,13 @@
 	}
 
 	// Use flexbox to keep everything on one line in approved list.
-	#list_auth_settings_access_users_approved li {
+	#list_auth_settings_access_users_pending li,
+	#list_auth_settings_access_users_approved li,
+	#new_auth_settings_access_users_approved {
 		flex-wrap: nowrap;
 		& > * { flex: 0 0 auto; }
 		& > :nth-child(1) { flex-shrink: 1; }
-		& > :nth-child(2) { flex-shrink: 1; }
+		& > :nth-child(2) { flex-shrink: 2; }
 		& > :nth-child(3) { flex-shrink: 2; }
 		& > :nth-child(4) { flex-shrink: 2; }
 		& > :nth-child(5) { flex-shrink: 1; }
