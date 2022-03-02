@@ -39,15 +39,6 @@
 		margin-bottom: 0;
 	}
 
-	// Fade multisite users (not editable).
-	.auth-multisite-username,
-	.auth-multisite-email,
-	.auth-multisite-role,
-	.auth-multisite-usermeta,
-	.auth-multisite-date-added {
-		opacity: 0.5;
-	}
-
 	// Demo CAS login button sizing.
 	.button.button-external {
 		padding: 3px 16px;
@@ -329,6 +320,15 @@
 			background-color: $color-red-5;
 			border-color: $color-red-20;
 		}
+	}
+
+	// Fade multisite users (not editable).
+	.auth-multisite-username,
+	.auth-multisite-email,
+	.auth-multisite-role,
+	.auth-multisite-usermeta,
+	.auth-multisite-date-added {
+		opacity: 0.5;
 	}
 
 	// Cap max size of date and meta (no need for them to grow large).
