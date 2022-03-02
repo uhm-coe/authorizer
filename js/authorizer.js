@@ -1005,18 +1005,17 @@
 			);
 
 			// Add the new item.
-			var authJsPrefix = isMultisite ? 'authMultisite' : 'auth';
-			var banButton = ! isMultisite ? '<a class="button button-primary dashicons-before dashicons-remove' + ( list === 'approved' ? '' : ' invisible' ) + '" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"></a>' : '';
-			var ignoreButton = '<a class="button dashicons-before dashicons-no" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"></a>';
-			var localIcon = '&nbsp;<a title="' + authL10n.local_wordpress_user + '" class="button disabled auth-local-user dashicons-before dashicons-businessperson' + ( shouldCreateLocalAccount ? '' : ' invisible' ) + '"></a>';
-			var multisiteIcon = '&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site'+ ( isMultisite ? '' : ' invisible' ) + '"></a>';
+			var authJsPrefix  = isMultisite ? 'authMultisite' : 'auth';
+			var multisiteIcon = isMultisite ? '<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site"></a>' : '';
+			var banButton     = isMultisite || 'approved' !== list ? '' : '<a class="button button-primary dashicons-before dashicons-remove" id="block_user_' + nextId + '" onclick="' + authJsPrefix + 'AddUser( this, \'blocked\', false ); ' + authJsPrefix + 'IgnoreUser( this, \'approved\' );" title="' + authL10n.block_ban_user + '"></a>';
+			var ignoreButton  = '<a class="button dashicons-before dashicons-no" id="ignore_user_' + nextId + '" onclick="' + authJsPrefix + 'IgnoreUser( this, \'' + list + '\' );" title="' + authL10n.remove_user + '"></a>';
 			$( ' \
 				<li id="new_user_' + nextId + '" class="new-user" style="display: none;"> \
 					<input type="text" id="auth_settings_access_users_' + list + '_' + nextId + '" name="auth_settings[access_users_' + list + '][' + nextId + '][email]" value="' + user.email + '" readonly="true" class="auth-email" /> \
 					<select name="auth_settings[access_users_' + list + '][' + nextId + '][role]" class="auth-role" onchange="' + authJsPrefix + 'ChangeRole( this );"> \
 					</select> \
 					<input type="text" name="auth_settings[access_users_' + list + '][' + nextId + '][date_added]" value="' + getShortDate() + '" readonly="true" class="auth-date-added" /> \
-					' + banButton + ignoreButton + localIcon + multisiteIcon + ' \
+					' + multisiteIcon + banButton + ignoreButton + ' \
 					<span class="spinner is-active"></span> \
 				</li> \
 			' ).appendTo( '#list_auth_settings_access_users_' + list ).slideDown( 250 );

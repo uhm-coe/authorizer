@@ -84,9 +84,9 @@ class Access_Lists extends \Authorizer\Singleton {
 							<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
 								<?php Helper::wp_dropdown_permitted_roles( $pending_user['role'] ); ?>
 							</select>
-							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-insert" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );"><?php esc_html_e( 'Approve', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-remove" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );"><?php esc_html_e( 'Block', 'authorizer' ); ?></a>
-							<a href="javascript:void(0);" class="button button-secondary dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>"><?php esc_html_e( 'Ignore', 'authorizer' ); ?></a>
+							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-insert" id="approve_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'approved', false ); authIgnoreUser( this, 'pending' );" title="<?php esc_attr_e( 'Approve', 'authorizer' ); ?>"></a>
+							<a href="javascript:void(0);" class="button button-primary dashicons-before dashicons-remove" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="authAddUser( this, 'blocked', false ); authIgnoreUser( this, 'pending' );" title="<?php esc_attr_e( 'Block', 'authorizer' ); ?>"></a>
+							<a href="javascript:void(0);" class="button button-secondary dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'pending' );" title="<?php esc_html_e( 'Remove user', 'authorizer' ); ?>" title="<?php esc_html_e( 'Ignore', 'authorizer' ); ?>"></a>
 						</li>
 					<?php endforeach; ?>
 				<?php else : ?>
@@ -542,11 +542,17 @@ class Access_Lists extends \Authorizer\Singleton {
 					<a class="button button-primary dashicons-before dashicons-edit update-usermeta" id="update_usermeta_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>UpdateUsermeta( this );" title="Update usermeta"></a>
 				<?php endif; ?>
 			<?php endif; ?>
-			<?php if ( ! $is_multisite_admin_page ) : ?>
-				<a class="button button-primary dashicons-before dashicons-remove<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"></a>
+
+			<?php if ( $is_multisite_admin_page ) : // On multisite admin, render buttons: multisite user, ignore. ?>
+				<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site"></a>
+				<a class="button dashicons-before dashicons-no<?php echo $is_current_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
+			<?php elseif ( $is_multisite_user ) : // On single site admin, but showing multisite user, render buttons: multisite user (x2). ?>
+				<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site"></a>
+				<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site"></a>
+			<?php else : // On single site admin showing single site user, render buttons: block, ignore. ?>
+				<a class="button button-primary dashicons-before dashicons-remove<?php echo $is_current_user ? ' invisible' : ''; ?>" id="block_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>AddUser( this, 'blocked', false ); <?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser( this, 'approved' );" title="<?php esc_attr_e( 'Block/Ban user', 'authorizer' ); ?>"></a>
+				<a class="button dashicons-before dashicons-no<?php echo $is_current_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
 			<?php endif; ?>
-			<a class="button dashicons-before dashicons-no<?php echo $is_current_user || $is_multisite_user ? ' invisible' : ''; ?>" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="<?php echo esc_attr( $js_function_prefix ); ?>IgnoreUser(this, 'approved' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
-			&nbsp;<a title="WordPress Multisite user" class="button disabled auth-multisite-user dashicons-before dashicons-admin-site<?php echo $is_multisite_user || $is_multisite_admin_page ? '' : ' invisible'; ?>"></a>
 		</li>
 		<?php
 	}

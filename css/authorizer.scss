@@ -175,6 +175,9 @@
 	#new_auth_settings_access_users_approved,
 	#list_auth_settings_access_users_blocked li,
 	#new_auth_settings_access_users_blocked {
+		display: flex;
+		justify-content: flex-start;
+
 		// Spacing between elements.
 		& > :not(:last-child) { margin-right: 4px; }
 
@@ -218,6 +221,8 @@
 	#new_auth_settings_access_users_approved,
 	#list_auth_settings_access_users_blocked li,
 	#new_auth_settings_access_users_blocked {
+		display: flex;
+		justify-content: flex-start;
 		flex-wrap: wrap;
 		margin-bottom: 12px;
 
@@ -283,17 +288,6 @@
 	// Room at the bottom for logo.
 	#wpbody-content {
 		padding-bottom: 240px;
-	}
-
-	// Flex layout for user lists (pending, approved, blocked).
-	#list_auth_settings_access_users_pending li,
-	#new_auth_settings_access_users_pending,
-	#list_auth_settings_access_users_approved li,
-	#new_auth_settings_access_users_approved,
-	#list_auth_settings_access_users_blocked li,
-	#new_auth_settings_access_users_blocked {
-		display: flex;
-		justify-content: flex-start;
 	}
 
 	// Hide Role dropdown on Blocked user list.
