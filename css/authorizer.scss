@@ -204,12 +204,9 @@
 	.tablenav {
 		height: auto;
 
-		.tablenav-pages {
-			float: none;
-		}
-
-		#user-search-input {
-			max-width: 80px;
+		// Fix offset current page input relative to pager buttons.
+		.current-page {
+			margin-top: -4px;
 		}
 	}
 

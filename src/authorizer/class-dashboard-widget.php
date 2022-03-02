@@ -54,10 +54,12 @@ class Dashboard_Widget extends Singleton {
 				<h2><?php esc_html_e( 'Pending Users', 'authorizer' ); ?></h2>
 				<?php $access_lists->print_combo_auth_access_users_pending(); ?>
 			</div>
+			<br class="clear" />
 			<div>
 				<h2><?php esc_html_e( 'Approved Users', 'authorizer' ); ?></h2>
 				<?php $access_lists->print_combo_auth_access_users_approved(); ?>
 			</div>
+			<br class="clear" />
 			<div>
 				<h2><?php esc_html_e( 'Blocked Users', 'authorizer' ); ?></h2>
 				<?php $access_lists->print_combo_auth_access_users_blocked(); ?>
