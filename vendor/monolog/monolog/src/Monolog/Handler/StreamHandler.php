@@ -26,9 +26,11 @@ use Monolog\Utils;
 class StreamHandler extends AbstractProcessingHandler
 {
     /** @const int */
-    protected const MAX_CHUNK_SIZE = 100 * 1024 * 1024;
+    protected const MAX_CHUNK_SIZE = 2147483647;
+    /** @const int 10MB */
+    protected const DEFAULT_CHUNK_SIZE = 10 * 1024 * 1024;
     /** @var int */
-    protected $streamChunkSize = self::MAX_CHUNK_SIZE;
+    protected $streamChunkSize;
     /** @var resource|null */
     protected $stream;
     /** @var ?string */
@@ -55,13 +57,15 @@ class StreamHandler extends AbstractProcessingHandler
 
         if (($phpMemoryLimit = Utils::expandIniShorthandBytes(ini_get('memory_limit'))) !== false) {
             if ($phpMemoryLimit > 0) {
-                // use max 10% of allowed memory for the chunk size
-                $this->streamChunkSize = max((int) ($phpMemoryLimit / 10), 10*1024);
+                // use max 10% of allowed memory for the chunk size, and at least 100KB
+                $this->streamChunkSize = min(static::MAX_CHUNK_SIZE, max((int) ($phpMemoryLimit / 10), 100 * 1024));
+            } else {
+                // memory is unlimited, set to the default 10MB
+                $this->streamChunkSize = static::DEFAULT_CHUNK_SIZE;
             }
-            // else memory is unlimited, keep the buffer to the default 100MB
         } else {
-            // no memory limit information, use a conservative 10MB
-            $this->streamChunkSize = 10*10*1024;
+            // no memory limit information, set to the default 10MB
+            $this->streamChunkSize = static::DEFAULT_CHUNK_SIZE;
         }
 
         if (is_resource($stream)) {
@@ -126,7 +130,7 @@ class StreamHandler extends AbstractProcessingHandler
         if (!is_resource($this->stream)) {
             $url = $this->url;
             if (null === $url || '' === $url) {
-                throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().');
+                throw new \LogicException('Missing stream url, the stream can not be opened. This may be caused by a premature call to close().' . Utils::getRecordMessageForException($record));
             }
             $this->createDir($url);
             $this->errorMessage = null;
@@ -139,7 +143,7 @@ class StreamHandler extends AbstractProcessingHandler
             if (!is_resource($stream)) {
                 $this->stream = null;
 
-                throw new \UnexpectedValueException(sprintf('The stream or file "%s" could not be opened in append mode: '.$this->errorMessage, $url));
+                throw new \UnexpectedValueException(sprintf('The stream or file "%s" could not be opened in append mode: '.$this->errorMessage, $url) . Utils::getRecordMessageForException($record));
             }
             stream_set_chunk_size($stream, $this->streamChunkSize);
             $this->stream = $stream;
@@ -147,7 +151,7 @@ class StreamHandler extends AbstractProcessingHandler
 
         $stream = $this->stream;
         if (!is_resource($stream)) {
-            throw new \LogicException('No stream was opened yet');
+            throw new \LogicException('No stream was opened yet' . Utils::getRecordMessageForException($record));
         }
 
         if ($this->useLocking) {

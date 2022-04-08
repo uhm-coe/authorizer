@@ -22,12 +22,11 @@
 
 namespace phpseclib3\Crypt\EC\Formats\Keys;
 
+use phpseclib3\Crypt\EC\BaseCurves\Montgomery as MontgomeryCurve;
 use phpseclib3\Crypt\EC\Curves\Curve25519;
 use phpseclib3\Crypt\EC\Curves\Curve448;
-use phpseclib3\Crypt\EC\BaseCurves\Montgomery as MontgomeryCurve;
-use phpseclib3\Math\Common\FiniteField\Integer;
-use phpseclib3\Math\BigInteger;
 use phpseclib3\Exception\UnsupportedFormatException;
+use phpseclib3\Math\BigInteger;
 
 /**
  * Montgomery Curve Private Key Handler
@@ -57,17 +56,18 @@ abstract class MontgomeryPrivate
     {
         switch (strlen($key)) {
             case 32:
-                $curve = new Curve25519;
+                $curve = new Curve25519();
                 break;
             case 56:
-                $curve = new Curve448;
+                $curve = new Curve448();
                 break;
             default:
                 throw new \LengthException('The only supported lengths are 32 and 56');
         }
 
         $components = ['curve' => $curve];
-        $components['dA'] = $components['curve']->convertInteger(new BigInteger($key, 256));
+        $components['dA'] = new BigInteger($key, 256);
+        $curve->rangeCheck($components['dA']);
         // note that EC::getEncodedCoordinates does some additional "magic" (it does strrev on the result)
         $components['QA'] = $components['curve']->multiplyPoint($components['curve']->getBasePoint(), $components['dA']);
 
@@ -91,13 +91,13 @@ abstract class MontgomeryPrivate
      * Convert a private key to the appropriate format.
      *
      * @access public
-     * @param \phpseclib3\Math\Common\FiniteField\Integer $privateKey
+     * @param \phpseclib3\Math\BigInteger $privateKey
      * @param \phpseclib3\Crypt\EC\BaseCurves\Montgomery $curve
      * @param \phpseclib3\Math\Common\FiniteField\Integer[] $publicKey
      * @param string $password optional
      * @return string
      */
-    public static function savePrivateKey(Integer $privateKey, MontgomeryCurve $curve, array $publicKey, $password = '')
+    public static function savePrivateKey(BigInteger $privateKey, MontgomeryCurve $curve, array $publicKey, $password = '')
     {
         if (!empty($password) && is_string($password)) {
             throw new UnsupportedFormatException('MontgomeryPrivate private keys do not support encryption');

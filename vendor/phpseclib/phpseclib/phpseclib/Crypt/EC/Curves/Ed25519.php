@@ -15,9 +15,9 @@
 namespace phpseclib3\Crypt\EC\Curves;
 
 use phpseclib3\Crypt\EC\BaseCurves\TwistedEdwards;
-use phpseclib3\Math\BigInteger;
 use phpseclib3\Crypt\Hash;
 use phpseclib3\Crypt\Random;
+use phpseclib3\Math\BigInteger;
 
 class Ed25519 extends TwistedEdwards
 {
@@ -180,7 +180,6 @@ class Ed25519 extends TwistedEdwards
         // 3.  Interpret the buffer as the little-endian integer, forming a
         //     secret scalar s.
         $dA = new BigInteger($h, 256);
-        $dA = $this->factory->newInteger($dA);
 
         $dA->secret = $str;
         return $dA;

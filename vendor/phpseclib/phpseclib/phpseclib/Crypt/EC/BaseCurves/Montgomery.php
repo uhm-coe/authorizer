@@ -26,11 +26,9 @@
 
 namespace phpseclib3\Crypt\EC\BaseCurves;
 
-use phpseclib3\Math\Common\FiniteField\Integer;
-use phpseclib3\Common\Functions\Strings;
-use phpseclib3\Math\PrimeField;
-use phpseclib3\Math\BigInteger;
 use phpseclib3\Crypt\EC\Curves\Curve25519;
+use phpseclib3\Math\BigInteger;
+use phpseclib3\Math\PrimeField;
 use phpseclib3\Math\PrimeField\Integer as PrimeInteger;
 
 /**
@@ -222,7 +220,7 @@ class Montgomery extends Base
      *
      * @return array
      */
-    public function multiplyPoint(array $p, Integer $d)
+    public function multiplyPoint(array $p, BigInteger $d)
     {
         $p1 = [$this->one, $this->zero];
         $alreadyInternal = isset($x[1]);
