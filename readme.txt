@@ -62,6 +62,10 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.3.1 =
+* Upgrade composer dependencies (firebase/php-jwt v5.4.0 => v5.5.1; google/apiclient v2.11.0 => v2.12.2; google/apiclient-services v0.213.0 => v0.242.0; google/auth v1.18.0 => v1.19.0; guzzlehttp/guzzle 7.3.0 => 7.4.2; guzzlehttp/promises 1.4.1 => 1.5.1; league/oauth2-client 2.6.0 => 2.6.1; monolog/monolog 2.3.4 => 2.4.0; paragonie/constant_time_encoding v2.4.0 => v2.5.0; phpseclib/phpseclib 3.0.10 => 3.0.14).
+* Upgrade guzzlehttp/psr7 2.0.0 => 2.2.1 (security).
+
 = 3.3.0 =
 * Add LDAP connection test feature (under LDAP settings).
 * Update translatable strings.
