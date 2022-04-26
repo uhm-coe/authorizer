@@ -655,7 +655,7 @@
 			$.post( ajaxurl, {
 				action: 'auth_settings_ldap_test_user',
 				username: $( 'input[name="auth_settings[ldap_test_user]"]' ).val(),
-				password: $( 'input[name="auth_settings[ldap_test_pass]"]' ).val(),
+				password: $( 'input#auth_settings_ldap_test_pass' ).val(),
 				nonce: $( '#nonce_save_auth_settings' ).val(),
 			}).done( function ( data ) {
 				$( '#ldap_test_user_result' ).show().val( data.message );
