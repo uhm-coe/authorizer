@@ -1135,13 +1135,13 @@ class Authentication extends Singleton {
 
 		// Multiple search bases can be provided, so iterate through them until a match is found.
 		foreach ( $search_bases as $search_base ) {
-			$ldap_search  = ldap_search(
+			$ldap_search  = @ldap_search( // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 				$ldap,
 				$search_base,
 				$search_filter,
 				$ldap_attributes_to_retrieve
 			);
-			$ldap_entries = ldap_get_entries( $ldap, $ldap_search );
+			$ldap_entries = empty( $ldap_search ) ? array( 'count' => 0 ) : ldap_get_entries( $ldap, $ldap_search );
 			if ( $ldap_entries['count'] > 0 ) {
 				if ( is_array( $debug ) ) {
 					/* TRANSLATORS: 1: LDAP user 2: LDAP search base */
