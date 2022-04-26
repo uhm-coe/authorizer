@@ -1048,13 +1048,39 @@ class Authentication extends Singleton {
 			// Attempt LDAP bind.
 			$result = @ldap_bind( $ldap, $bind_rdn, stripslashes( $bind_password ) ); // phpcs:ignore
 			if ( ! $result ) {
-				// Can't connect to LDAP, so fall back to WordPress authentication.
 				if ( is_array( $debug ) ) {
 					/* TRANSLATORS: LDAP Host */
 					$debug[] = sprintf( __( 'Warning: unable to bind on host %1$s using directory user:', 'authorizer' ), $ldap_host );
 					$debug[] = ldap_error( $ldap );
 				}
-				continue;
+
+				// We failed either an anonymous bind or a bind with a service account,
+				// so try to bind with the logging in user's credentials before failing.
+				// Note: multiple search bases can be provided, so iterate through them
+				// trying to bind as the user logging in.
+				foreach ( $search_bases as $search_base ) {
+					$bind_user_dn = $auth_settings['ldap_uid'] . '=' . $username . ',' . $search_base;
+					$result = @ldap_bind( $ldap, $bind_user_dn, stripslashes( $password ) ); // phpcs:ignore
+					if ( $result ) {
+						if ( is_array( $debug ) ) {
+							/* TRANSLATORS: LDAP User DN */
+							$debug[] = sprintf( __( 'Successful bind using LDAP user DN %s instead of directory user.', 'authorizer' ), $bind_user_dn );
+						}
+
+						break;
+					}
+				}
+
+				if ( ! $result ) {
+					if ( is_array( $debug ) ) {
+						/* TRANSLATORS: LDAP User */
+						$debug[] = sprintf( __( 'Failed: password incorrect for LDAP user %s.', 'authorizer' ), $username );
+						$debug[] = ldap_error( $ldap );
+					}
+
+					// Can't connect to LDAP, so fall back to WordPress authentication.
+					continue;
+				}
 			}
 
 			// If we've reached this, we have a valid ldap connection and bind.
