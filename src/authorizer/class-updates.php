@@ -420,13 +420,39 @@ class Updates extends Singleton {
 			$needs_updating = true;
 		}
 
+		// Update: Remove any cached LDAP test password.
+		$update_if_older_than = 20220426;
+		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
+			if ( is_multisite() ) {
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+				foreach ( $sites as $site ) {
+					$blog_id       = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					$auth_settings = get_blog_option( $blog_id, 'auth_settings', array() );
+					if ( array_key_exists( 'ldap_test_pass', $auth_settings ) && strlen( $auth_settings['ldap_test_pass'] ) > 0 ) {
+						unset( $auth_settings['ldap_test_pass'] );
+						update_blog_option( $blog_id, 'auth_settings', $auth_settings );
+					}
+				}
+			} else {
+				$auth_settings = get_option( 'auth_settings', array() );
+				if ( array_key_exists( 'ldap_test_pass', $auth_settings ) && strlen( $auth_settings['ldap_test_pass'] ) > 0 ) {
+					unset( $auth_settings['ldap_test_pass'] );
+					update_option( 'auth_settings', $auth_settings );
+				}
+			}
+			// Update version to reflect this change has been made.
+			$auth_version   = $update_if_older_than;
+			$needs_updating = true;
+		}
+
 		/* phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		// Update: TEMPLATE
 		$update_if_older_than = YYYYMMDD;
-		if ( $auth_version === false || intval( $auth_version ) < $update_if_older_than ) {
+		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 			////// PLACE UPDATE CODE HERE
 			// Update version to reflect this change has been made.
-			$auth_version = $update_if_older_than;
+			$auth_version   = $update_if_older_than;
 			$needs_updating = true;
 		}
 		*/
