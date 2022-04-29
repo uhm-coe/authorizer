@@ -1215,10 +1215,9 @@ msgstr "Échec : impossible de se connecter aux hôtes LDAP."
 
 #. TRANSLATORS: LDAP search filter
 #: src/authorizer/class-authentication.php:1133
-#, fuzzy, php-format
-#| msgid "LDAP Search Filter"
+#, php-format
 msgid "Using LDAP search filter: %s"
-msgstr "Filtre de recherche LDAP"
+msgstr "Utilisation du filtre de recherche LDAP : %s"
 
 #. TRANSLATORS: 1: LDAP user 2: LDAP search base
 #: src/authorizer/class-authentication.php:1148
@@ -1244,7 +1243,7 @@ msgstr "Échec : aucun utilisateur LDAP %s trouvé."
 #: src/authorizer/class-authentication.php:1198
 #, php-format
 msgid "Failed: password incorrect for LDAP user %s."
-msgstr "Échec : Mot de passe incorrect pour l’utilisateur %s."
+msgstr "Échec : Mot de passe incorrect pour l’utilisateur LDAP %s."
 
 #. TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email
 #: src/authorizer/class-authentication.php:1217
