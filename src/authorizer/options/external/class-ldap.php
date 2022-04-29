@@ -211,7 +211,34 @@ class Ldap extends \Authorizer\Singleton {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
-		<p class="description"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Example:  cn=directory-user,ou=specials,dc=example,dc=edu', 'authorizer' ); ?>
+			<br>
+			<small>
+				<?php
+				echo wp_kses(
+					sprintf(
+						/* TRANSLATORS: %s: Username wildcard */
+						__( 'Note: You can use the %s wildcard to bind as the username of the user logging in instead of a directory user service account.', 'authorizer' ),
+						'<strong>[username]</strong>'
+					), Helper::$allowed_html
+				);
+				?>
+			</small>
+			<br>
+			<small>
+				<?php
+				echo wp_kses(
+					sprintf(
+						/* TRANSLATORS: %s: Username wildcard */
+						__( 'Example: <strong>uid=%s,ou=people,dc=example,dc=edu</strong>.', 'authorizer' ),
+						'[username]'
+					), Helper::$allowed_html
+				);
+				?>
+			</small>
+			<br>
+			<small><?php echo wp_kses( __( 'Leave the LDAP Directory User Password field below blank, and the bind will be attempted with the user-supplied password.', 'authorizer' ), Helper::$allowed_html ); ?></small>
+		</p>
 		<?php
 	}
 

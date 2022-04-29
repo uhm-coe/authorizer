@@ -1043,6 +1043,18 @@ class Authentication extends Singleton {
 			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
 				$bind_rdn      = $auth_settings['ldap_user'];
 				$bind_password = Helper::decrypt( $auth_settings['ldap_password'] );
+
+				// If the bind user contains the [username] wildcard, replace it with
+				// the username and password of the user logging in.
+				if ( false !== strpos( $bind_rdn, '[username]' ) ) {
+					$bind_rdn      = str_replace( '[username]', $username, $bind_rdn );
+					$bind_password = $password;
+
+					if ( is_array( $debug ) ) {
+						/* TRANSLATORS: LDAP User DN */
+						$debug[] = sprintf( __( 'Performing bind as user logging in: %s.', 'authorizer' ), $bind_rdn );
+					}
+				}
 			}
 
 			// Attempt LDAP bind.
