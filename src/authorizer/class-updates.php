@@ -447,7 +447,7 @@ class Updates extends Singleton {
 		}
 
 		// Update: Set default values for newly added prevent_override_multisite option.
-		$update_if_older_than = 20220429;
+		$update_if_older_than = 20220506;
 		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 			// Provide default values for any $auth_settings options that don't exist.
 			if ( is_multisite() ) {
