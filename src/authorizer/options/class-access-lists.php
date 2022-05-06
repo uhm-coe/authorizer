@@ -119,7 +119,7 @@ class Access_Lists extends \Authorizer\Singleton {
 		if (
 			is_multisite() &&
 			! is_network_admin() &&
-			1 !== intval( $auth_override_multisite ) &&
+			( 1 !== intval( $auth_override_multisite ) || ! empty( $auth_multisite_settings['prevent_override_multisite'] ) ) &&
 			array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 			'1' === $auth_multisite_settings['multisite_override']
 		) {
@@ -581,8 +581,9 @@ class Access_Lists extends \Authorizer\Singleton {
 				if ( Helper::SINGLE_CONTEXT !== $admin_mode ) {
 					// Get multisite users only.
 					$auth_settings_access_users = $options->get( 'access_users_approved', Helper::NETWORK_CONTEXT );
-				} elseif ( is_multisite() && 1 === intval( $options->get( 'advanced_override_multisite' ) ) ) {
-					// This site has overridden any multisite settings, so only get its users.
+				} elseif ( is_multisite() && 1 === intval( $options->get( 'advanced_override_multisite' ) ) && empty( $options->get( 'prevent_override_multisite', Helper::NETWORK_CONTEXT ) ) ) {
+					// This site has overridden any multisite settings (and is not
+					// prevented from doing so), so only get its users.
 					$auth_settings_access_users = $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT );
 				} else {
 					// Get all site users and all multisite users.

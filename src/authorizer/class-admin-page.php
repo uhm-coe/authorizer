@@ -818,7 +818,8 @@ class Admin_Page extends Singleton {
 				<h2><?php esc_html_e( 'Authorizer Settings', 'authorizer' ); ?></h2>
 				<p><?php echo wp_kses( __( 'Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the individual sites.', 'authorizer' ), Helper::$allowed_html ); ?></p>
 
-				<input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 === intval( $auth_settings['multisite_override'] ) ); ?> /><label for="auth_settings_multisite_override"><?php esc_html_e( 'Override individual site settings with the settings below', 'authorizer' ); ?></label>
+				<p><input type="checkbox" id="auth_settings_multisite_override" name="auth_settings[multisite_override]" value="1"<?php checked( 1 === intval( $auth_settings['multisite_override'] ) ); ?> /><label for="auth_settings_multisite_override"><?php esc_html_e( 'Override individual site settings with the settings below', 'authorizer' ); ?></label></p>
+				<p><input type="checkbox" id="auth_settings_prevent_override_multisite" name="auth_settings[prevent_override_multisite]" value="1"<?php checked( 1 === intval( $auth_settings['prevent_override_multisite'] ) ); ?> /><label for="auth_settings_prevent_override_multisite"><?php esc_html_e( 'Prevent site administrators from overriding any multisite settings defined here (via Authorizer > Advanced > Override multisite options)', 'authorizer' ); ?></label></p>
 
 				<div id="auth_multisite_settings_disabled_overlay" style="display: none;"></div>
 
@@ -1012,6 +1013,10 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'LDAP attribute update', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_select_ldap_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'LDAP test connection', 'authorizer' ); ?></th>
+							<td><?php $ldap->print_text_button_ldap_test_user( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
 					</tbody></table>
 
 					<?php $advanced->print_section_info_advanced(); ?>
@@ -1116,7 +1121,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.3.0', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.3.3', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',

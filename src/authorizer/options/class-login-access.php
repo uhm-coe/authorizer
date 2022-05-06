@@ -46,8 +46,11 @@ class Login_Access extends \Authorizer\Singleton {
 		$admin_mode           = Helper::get_context( $args );
 		$auth_settings_option = $options->get( $option, $admin_mode, 'allow override', 'print overlay' );
 
-		// If this site is configured independently of any multisite overrides, make sure we are not grabbing the multisite value; otherwise, grab the multisite value to show behind the disabled overlay.
-		if ( is_multisite() && 1 === intval( $options->get( 'advanced_override_multisite' ) ) ) {
+		// If this site is configured independently of any multisite overrides (and
+		// is not prevented from doing so), make sure we are not grabbing the
+		// multisite value; otherwise, grab the multisite value to show behind the
+		// disabled overlay.
+		if ( is_multisite() && 1 === intval( $options->get( 'advanced_override_multisite' ) ) && empty( $options->get( 'prevent_override_multisite', Helper::NETWORK_CONTEXT ) ) ) {
 			$auth_settings_option = $options->get( $option );
 		} elseif ( is_multisite() && Helper::SINGLE_CONTEXT === $admin_mode && $options->get( 'multisite_override', Helper::NETWORK_CONTEXT ) === '1' ) {
 			// Workaround: javascript code hides/shows other settings based

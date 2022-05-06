@@ -38,6 +38,9 @@ class Options extends Singleton {
 		// Get all plugin options.
 		$auth_settings = $this->get_all( $admin_mode, $override_mode );
 
+		// Get multisite options (for checking if multisite override is prevented).
+		$auth_multisite_settings = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() ) : array();
+
 		// Set option to null if it wasn't found.
 		if ( ! array_key_exists( $option, $auth_settings ) ) {
 			return null;
@@ -51,7 +54,11 @@ class Options extends Singleton {
 			'print overlay' === $print_mode &&
 			array_key_exists( 'multisite_override', $auth_settings ) &&
 			'1' === $auth_settings['multisite_override'] &&
-			( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || 1 !== intval( $auth_settings['advanced_override_multisite'] ) )
+			(
+				! array_key_exists( 'advanced_override_multisite', $auth_settings ) ||
+				1 !== intval( $auth_settings['advanced_override_multisite'] ) ||
+				! empty( $auth_multisite_settings['prevent_override_multisite'] )
+			)
 		) {
 			// Get original plugin options (not overridden value). We'll
 			// show this old value behind the disabled overlay.
@@ -79,9 +86,14 @@ class Options extends Singleton {
 			<?php
 		}
 
-		// If we're getting an option in a site that has overridden the multisite override, make
-		// sure we are returning the option value from that site (not the multisite value).
-		if ( array_key_exists( 'advanced_override_multisite', $auth_settings ) && 1 === intval( $auth_settings['advanced_override_multisite'] ) ) {
+		// If we're getting an option in a site that has overridden the multisite
+		// override (and is not prevented from doing so), make sure we are returning
+		// the option value from that site (not the multisite value).
+		if (
+			array_key_exists( 'advanced_override_multisite', $auth_settings ) &&
+			1 === intval( $auth_settings['advanced_override_multisite'] ) &&
+			empty( $auth_multisite_settings['prevent_override_multisite'] )
+		) {
 			$auth_settings = $this->get_all( $admin_mode, 'no override' );
 		}
 
@@ -109,8 +121,8 @@ class Options extends Singleton {
 			$auth_settings = $this->set_default_options();
 		}
 
-		// Merge multisite options if we're in a network and the current site hasn't overridden multisite settings.
-		if ( is_multisite() && ( ! array_key_exists( 'advanced_override_multisite', $auth_settings ) || 1 !== intval( $auth_settings['advanced_override_multisite'] ) ) ) {
+		// Merge multisite options if we're in a network.
+		if ( is_multisite() ) {
 			// Get multisite options.
 			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 
@@ -123,8 +135,19 @@ class Options extends Singleton {
 				array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 				'1' === $auth_multisite_settings['multisite_override']
 			) {
-				// Keep track of the multisite override selection.
-				$auth_settings['multisite_override'] = $auth_multisite_settings['multisite_override'];
+				// Keep track of the multisite override (and prevention) selection.
+				$auth_settings['multisite_override']         = $auth_multisite_settings['multisite_override'];
+				$auth_settings['prevent_override_multisite'] = $auth_multisite_settings['prevent_override_multisite'];
+
+				// Don't merge multisite options if the current site has overridden them
+				// (and isn't prevented from doing so).
+				if (
+					array_key_exists( 'advanced_override_multisite', $auth_settings ) &&
+					1 === intval( $auth_settings['advanced_override_multisite'] ) &&
+					empty( $auth_settings['prevent_override_multisite'] )
+				) {
+					return $auth_settings;
+				}
 
 				/**
 				 * Note: the options below should be the complete list of overridden
@@ -493,6 +516,10 @@ class Options extends Singleton {
 			// Global switch for enabling multisite options.
 			if ( ! array_key_exists( 'multisite_override', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['multisite_override'] = '';
+			}
+			// Global switch for preventing sites from overriding multisite options.
+			if ( ! array_key_exists( 'prevent_override_multisite', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['prevent_override_multisite'] = '';
 			}
 			// Access Lists Defaults.
 			$auth_multisite_settings_access_users_approved = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved' );

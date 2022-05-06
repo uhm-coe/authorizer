@@ -1126,6 +1126,8 @@
 
 		var multisite_override = $( '#auth_settings_multisite_override' ).is( ':checked' ) ? '1' : '';
 
+		var prevent_override_multisite = $( '#auth_settings_prevent_override_multisite' ).is( ':checked' ) ? '1' : '';
+
 		var access_who_can_login = $( 'form input[name="auth_settings[access_who_can_login]"]:checked' ).val();
 
 		var access_who_can_view = $( 'form input[name="auth_settings[access_who_can_view]"]:checked' ).val();
@@ -1205,6 +1207,7 @@
 			action: 'save_auth_multisite_settings',
 			nonce: nonce_save_auth_settings,
 			multisite_override: multisite_override,
+			prevent_override_multisite: prevent_override_multisite,
 			access_who_can_login: access_who_can_login,
 			access_who_can_view: access_who_can_view,
 			access_users_approved: access_users_approved,

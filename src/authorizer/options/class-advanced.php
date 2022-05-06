@@ -374,6 +374,14 @@ class Advanced extends \Authorizer\Singleton {
 		$option               = 'advanced_override_multisite';
 		$auth_settings_option = $options->get( $option );
 
+		// Don't print option if site administrators are prevented from overriding.
+		if ( ! empty( $options->get( 'prevent_override_multisite', Helper::NETWORK_CONTEXT ) ) ) {
+			?>
+			(<?php esc_html_e( 'This setting is overridden by a', 'authorizer' ); ?> <a href="<?php echo esc_attr( network_admin_url( 'admin.php?page=authorizer' ) ); ?>"><?php esc_html_e( 'multisite option', 'authorizer' ); ?></a>.)
+			<?php
+			return;
+		}
+
 		// Print option elements.
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label>

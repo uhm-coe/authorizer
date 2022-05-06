@@ -152,6 +152,7 @@ class Ajax_Endpoints extends Singleton {
 		// Filter options to only the allowed values (multisite options are a subset of all options).
 		$allowed                 = array(
 			'multisite_override',
+			'prevent_override_multisite',
 			'access_who_can_login',
 			'access_who_can_view',
 			'access_default_role',
@@ -260,7 +261,7 @@ class Ajax_Endpoints extends Singleton {
 		if (
 			is_multisite() &&
 			! $is_network_admin &&
-			1 !== intval( $auth_override_multisite ) &&
+			( 1 !== intval( $auth_override_multisite ) || ! empty( $auth_multisite_settings['prevent_override_multisite'] ) ) &&
 			array_key_exists( 'multisite_override', $auth_multisite_settings ) &&
 			'1' === $auth_multisite_settings['multisite_override']
 		) {
