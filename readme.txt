@@ -62,6 +62,14 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.3.3 =
+* Add multisite option to prevent subsites from overriding multisite settings.
+* Allow LDAP bind as user logging in before attempting anonymous bind (by using the [username] wildcard in the LDAP Directory User settings field).
+* Add LDAP test connection to Authorizer multisite settings.
+* Tested up to WordPress 6.0.
+* Update translatable strings.
+* Update French translations. Props @julienlusson!
+
 = 3.3.2 =
 * Attempt LDAP bind as user logging in if directory user credentials not provided or incorrect.
 * Fixed logged errors if LDAP search base couldn't be found (error only shows in LDAP test connection now).
