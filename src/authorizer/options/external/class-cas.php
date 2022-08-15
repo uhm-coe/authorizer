@@ -140,6 +140,30 @@ class Cas extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_select_cas_method( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'cas_method';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$auth_settings_option = $this->sanitize_cas_method( $auth_settings_option );
+
+		// Print option elements.
+		?>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<?php foreach ( array('CLIENT'=>'Client', 'PROXY'=>'Proxy') as $method => $label ) : ?>
+					<option value="<?php echo esc_attr( $method ); ?>" <?php selected( $auth_settings_option, $method ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_select_cas_version( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
@@ -158,6 +182,37 @@ class Cas extends \Authorizer\Singleton {
 	}
 
 
+	/**
+	 * Validate supplied CAS method. Older versions of Authorizer
+	 * stored custom protocol version strings, so we handle converting those here.
+	 *
+	 * @param  string $cas_method CAS protocol string.
+	 *
+	 * @return string CAS method string.
+	 */
+	public function sanitize_cas_method( $cas_method = '' ) {
+		if ( ! class_exists( 'phpCAS' ) ) {
+			return '';
+		}
+
+		$cas_methods = ['PROXY', 'CLIENT'];
+		if ( empty( $cas_method ) ) {
+			$cas_method = array_key_last( $cas_methods ); // Should be 'client'.
+		} elseif ( ! in_array( $cas_method, array_keys( $cas_methods ), true ) ) {
+			// Backwards compatibility with constant strings from Authorizer < 3.0.11.
+			if ( 'CLIENT' === $cas_method ) {
+				$cas_method = 'CLIENT';
+			} elseif ( 'PROXY' === $cas_method ) {
+				$cas_method = 'PROXY';
+			} else {
+				$cas_method = array_key_last( $cas_methods );
+			}
+		}
+
+		return $cas_method;
+	}
+	
+	
 	/**
 	 * Validate supplied CAS version against phpCAS. Older versions of Authorizer
 	 * stored custom protocol version strings, so we handle converting those here.
