@@ -154,6 +154,7 @@ class Cas extends \Authorizer\Singleton {
 					<option value="<?php echo esc_attr( $method ); ?>" <?php selected( $auth_settings_option, $method ); ?>><?php echo esc_html( $label ); ?></option>
 			<?php endforeach; ?>
 		</select>
+		<p class="description"><small><?php esc_html_e( '"Client" is the most common, but use "Proxy" if your CAS server is behind a proxy server.', 'authorizer' ); ?></small></p>
 		<?php
 	}
 
