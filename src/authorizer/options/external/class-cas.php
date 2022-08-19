@@ -192,22 +192,9 @@ class Cas extends \Authorizer\Singleton {
 	 * @return string CAS method string.
 	 */
 	public function sanitize_cas_method( $cas_method = '' ) {
-		if ( ! class_exists( 'phpCAS' ) ) {
-			return '';
-		}
-
-		$cas_methods = ['PROXY', 'CLIENT'];
-		if ( empty( $cas_method ) ) {
-			$cas_method = array_key_last( $cas_methods ); // Should be 'client'.
-		} elseif ( ! in_array( $cas_method, array_keys( $cas_methods ), true ) ) {
-			// Backwards compatibility with constant strings from Authorizer < 3.0.11.
-			if ( 'CLIENT' === $cas_method ) {
-				$cas_method = 'CLIENT';
-			} elseif ( 'PROXY' === $cas_method ) {
-				$cas_method = 'PROXY';
-			} else {
-				$cas_method = array_key_last( $cas_methods );
-			}
+		$cas_methods = array( 'PROXY', 'CLIENT' );
+		if ( empty( $cas_method ) || ! in_array( $cas_method, $cas_methods, true ) ) {
+			$cas_method = array_pop( $cas_methods ); // Default to 'CLIENT'.
 		}
 
 		return $cas_method;
