@@ -399,6 +399,7 @@
 		var auth_settings_external_cas_host = $( '#auth_settings_cas_host' ).closest( 'tr' );
 		var auth_settings_external_cas_port = $( '#auth_settings_cas_port' ).closest( 'tr' );
 		var auth_settings_external_cas_path = $( '#auth_settings_cas_path' ).closest( 'tr' );
+		var auth_settings_external_cas_method = $( '#auth_settings_cas_method' ).closest( 'tr' );
 		var auth_settings_external_cas_version = $( '#auth_settings_cas_version' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_email = $( '#auth_settings_cas_attr_email' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).closest( 'tr' );
@@ -449,6 +450,7 @@
 		$( 'th, td', auth_settings_external_cas_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_port ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_path ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_cas_method ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_version ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_email ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
@@ -527,6 +529,7 @@
 			animateOption( 'hide_immediately', auth_settings_external_cas_host );
 			animateOption( 'hide_immediately', auth_settings_external_cas_port );
 			animateOption( 'hide_immediately', auth_settings_external_cas_path );
+			animateOption( 'hide_immediately', auth_settings_external_cas_method );
 			animateOption( 'hide_immediately', auth_settings_external_cas_version );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_email );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_first_name );
@@ -618,6 +621,7 @@
 			animateOption( action, auth_settings_external_cas_host );
 			animateOption( action, auth_settings_external_cas_port );
 			animateOption( action, auth_settings_external_cas_path );
+			animateOption( action, auth_settings_external_cas_method );
 			animateOption( action, auth_settings_external_cas_version );
 			animateOption( action, auth_settings_external_cas_attr_email );
 			animateOption( action, auth_settings_external_cas_attr_first_name );
@@ -1165,6 +1169,7 @@
 		var cas_host = $( '#auth_settings_cas_host' ).val();
 		var cas_port = $( '#auth_settings_cas_port' ).val();
 		var cas_path = $( '#auth_settings_cas_path' ).val();
+		var cas_method = $( '#auth_settings_cas_method' ).val();
 		var cas_version = $( '#auth_settings_cas_version' ).val();
 		var cas_attr_email = $( '#auth_settings_cas_attr_email' ).val();
 		var cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
@@ -1231,6 +1236,7 @@
 			cas_host: cas_host,
 			cas_port: cas_port,
 			cas_path: cas_path,
+			cas_method: cas_method,
 			cas_version: cas_version,
 			cas_attr_email: cas_attr_email,
 			cas_attr_first_name: cas_attr_first_name,

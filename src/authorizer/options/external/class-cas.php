@@ -140,6 +140,35 @@ class Cas extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_select_cas_method( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'cas_method';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$auth_settings_option = $this->sanitize_cas_method( $auth_settings_option );
+		$select_options       = array(
+			'CLIENT' => 'Client',
+			'PROXY'  => 'Proxy',
+		);
+
+		// Print option elements.
+		?>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<?php foreach ( $select_options as $method => $label ) : ?>
+					<option value="<?php echo esc_attr( $method ); ?>" <?php selected( $auth_settings_option, $method ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<p class="description"><small><?php esc_html_e( '"Client" is the most common, but use "Proxy" if your CAS server is behind a proxy server.', 'authorizer' ); ?></small></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_select_cas_version( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
@@ -155,6 +184,23 @@ class Cas extends \Authorizer\Singleton {
 			<?php endforeach; ?>
 		</select>
 		<?php
+	}
+
+
+	/**
+	 * Validate supplied CAS method.
+	 *
+	 * @param  string $cas_method CAS method string.
+	 *
+	 * @return string             CAS method string 'PROXY' or 'CLIENT' (default).
+	 */
+	public function sanitize_cas_method( $cas_method = '' ) {
+		$cas_methods = array( 'PROXY', 'CLIENT' );
+		if ( empty( $cas_method ) || ! in_array( $cas_method, $cas_methods, true ) ) {
+			$cas_method = array_pop( $cas_methods ); // Default to 'CLIENT'.
+		}
+
+		return $cas_method;
 	}
 
 

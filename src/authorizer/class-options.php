@@ -186,6 +186,7 @@ class Options extends Singleton {
 				$auth_settings['cas_host']                  = $auth_multisite_settings['cas_host'];
 				$auth_settings['cas_port']                  = $auth_multisite_settings['cas_port'];
 				$auth_settings['cas_path']                  = $auth_multisite_settings['cas_path'];
+				$auth_settings['cas_method']                = $auth_multisite_settings['cas_method'];
 				$auth_settings['cas_version']               = $auth_multisite_settings['cas_version'];
 				$auth_settings['cas_attr_email']            = $auth_multisite_settings['cas_attr_email'];
 				$auth_settings['cas_attr_first_name']       = $auth_multisite_settings['cas_attr_first_name'];
@@ -393,6 +394,9 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'cas_path', $auth_settings ) ) {
 			$auth_settings['cas_path'] = '';
+		}
+		if ( ! array_key_exists( 'cas_method', $auth_settings ) ) {
+			$auth_settings['cas_method'] = Options\External\Cas::get_instance()->sanitize_cas_method();
 		}
 		if ( ! array_key_exists( 'cas_version', $auth_settings ) ) {
 			$auth_settings['cas_version'] = Options\External\Cas::get_instance()->sanitize_cas_version();
@@ -604,6 +608,9 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'cas_path', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_path'] = '';
+			}
+			if ( ! array_key_exists( 'cas_method', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['cas_method'] = Options\External\Cas::get_instance()->sanitize_cas_method();
 			}
 			if ( ! array_key_exists( 'cas_version', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_version'] = Options\External\Cas::get_instance()->sanitize_cas_version();

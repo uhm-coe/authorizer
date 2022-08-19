@@ -175,6 +175,7 @@ class Ajax_Endpoints extends Singleton {
 			'cas_host',
 			'cas_port',
 			'cas_path',
+			'cas_method',
 			'cas_version',
 			'cas_attr_email',
 			'cas_attr_first_name',

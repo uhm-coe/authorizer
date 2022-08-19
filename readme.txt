@@ -1,5 +1,5 @@
 === Authorizer ===
-Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba
+Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
 Tested up to: 6.0
 Stable tag: trunk

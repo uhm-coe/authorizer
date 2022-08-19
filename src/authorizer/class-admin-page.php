@@ -111,6 +111,7 @@ class Admin_Page extends Singleton {
 				<li>' . __( '<strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443).', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas).', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>CAS server method</strong>: Select the method to use when setting the CAS config (e.g.,"client" or "proxy")', 'authorizer' ) . '</li>
 				<li>' . __( "<strong>CAS attribute containing first name</strong>: Enter the CAS attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from CAS and added to their WordPress profile.", 'authorizer' ) . '</li>
 				<li>' . __( "<strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added to their WordPress profile.", 'authorizer' ) . '</li>
 				<li>' . __( '<strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.', 'authorizer' ) . '</li>
@@ -529,6 +530,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_external'
 		);
 		add_settings_field(
+			'auth_settings_cas_method',
+			__( 'CAS server method', 'authorizer' ),
+			array( Cas::get_instance(), 'print_select_cas_method' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
 			'auth_settings_cas_version',
 			__( 'CAS server protocol', 'authorizer' ),
 			array( Cas::get_instance(), 'print_select_cas_version' ),
@@ -930,6 +938,10 @@ class Admin_Page extends Singleton {
 							<td><?php $cas->print_text_cas_path( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'CAS server method', 'authorizer' ); ?></th>
+							<td><?php $cas->print_select_cas_method( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS server protocol', 'authorizer' ); ?></th>
 							<td><?php $cas->print_select_cas_version( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -1121,7 +1133,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.3.3', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.4.1', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
