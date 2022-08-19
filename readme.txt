@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.4.1 =
+* Add setting to support CAS servers behind proxies. Props @slyraskal for the [pull request](https://github.com/uhm-coe/authorizer/pull/117)!
+
 = 3.4.0 =
 * Upgrade guzzlehttp from 7.4.2 to 7.4.5.
 * Upgrade composer dependencies (apereo/phpcas 1.4.0 => 1.5.0; google/apiclient v2.12.4 => v2.12.6; google/apiclient-services v0.246.0 => v0.254.0; google/auth v1.21.0 => v1.21.1; monolog/monolog 2.5.0 => 2.7.0; paragonie/constant_time_encoding 2.5.0 => 2.6.3).
