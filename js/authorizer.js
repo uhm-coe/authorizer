@@ -1236,6 +1236,7 @@
 			cas_host: cas_host,
 			cas_port: cas_port,
 			cas_path: cas_path,
+			cas_method: cas_method,
 			cas_version: cas_version,
 			cas_attr_email: cas_attr_email,
 			cas_attr_first_name: cas_attr_first_name,
