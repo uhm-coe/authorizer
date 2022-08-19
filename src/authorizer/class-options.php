@@ -186,7 +186,7 @@ class Options extends Singleton {
 				$auth_settings['cas_host']                  = $auth_multisite_settings['cas_host'];
 				$auth_settings['cas_port']                  = $auth_multisite_settings['cas_port'];
 				$auth_settings['cas_path']                  = $auth_multisite_settings['cas_path'];
-				$auth_settings['cas_method']               = $auth_multisite_settings['cas_method'];
+				$auth_settings['cas_method']                = $auth_multisite_settings['cas_method'];
 				$auth_settings['cas_version']               = $auth_multisite_settings['cas_version'];
 				$auth_settings['cas_attr_email']            = $auth_multisite_settings['cas_attr_email'];
 				$auth_settings['cas_attr_first_name']       = $auth_multisite_settings['cas_attr_first_name'];
