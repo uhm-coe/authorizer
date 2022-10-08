@@ -274,6 +274,20 @@ function signInCallback( authResult ) { // jshint ignore:line
 	 * @return WP_Error|void       WP Error object or void on redirect.
 	 */
 	public function wp_login_errors__maybe_redirect_to_cas( $errors, $redirect_to ) {
+		// If the query string 'checkemail=confirm' is set, we do not want to automatically redirect to
+		// the CAS login screen using 'external=cas', and instead want to directly access the check email
+		// confirmation page.  So we will instead set the URL parameter 'external=wordpress' and redirect.
+		// This is to prevent issues when going through the normal WordPress password reset process.
+		if (
+			isset( $_REQUEST['checkemail'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'confirm' === $_REQUEST['checkemail'] && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			isset( $_SERVER['QUERY_STRING'] ) &&
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		) {
+					wp_redirect( Helper::modify_current_url_for_external_login( 'wordpress' ) );  // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+					exit;
+		}
+
 		// Grab plugin settings.
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
@@ -422,6 +436,56 @@ function signInCallback( authResult ) { // jshint ignore:line
 			$lostpassword_url = $auth_settings['ldap_lostpassword_url'];
 		}
 		return $lostpassword_url;
+	}
+
+
+	/**
+	 * Ensure that whenever we are on a wp-login.php page for WordPress and there is a log in link, it properly
+	 * generates a wp-login.php URL with the additional "wordpress=external" URL parameter.
+	 * Only affects the URL if the Hide WordPress Logins option is enabled.
+	 *
+	 * Filter:  wp_login_url https://developer.wordpress.org/reference/functions/wp_login_url/
+	 *
+	 * @param  string $login_url URL for the log in page.
+	 * @return string            URL for the log in page.
+	 */
+	public function maybe_add_external_wordpress_to_log_in_links( $login_url ) {
+		// Initial check to make sure that we are on a wp-login.php page.
+		if ( isset( $GLOBALS['pagenow'] ) && site_url( $GLOBALS['pagenow'], 'login' ) === $login_url ) {
+			// Do a check in here within the $_REQUEST params to narrow down the scope of where we'll modify the URL
+			// We need to check against the following:  action=lostpassword, checkemail=confirm, action=rp, and action=resetpass.
+			if (
+				(
+					isset( $_REQUEST['action'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					(
+						'lostpassword' === $_REQUEST['action'] || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						'rp' === $_REQUEST['action'] || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+						'resetpass' === $_REQUEST['action'] // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					)
+				) || (
+					isset( $_REQUEST['checkemail'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+					'confirm' === $_REQUEST['checkemail'] // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				)
+			) {
+				// Grab plugins settings.
+				$options       = Options::get_instance();
+				$auth_settings = $options->get_all( HELPER::SINGLE_CONTEXT, 'allow override' );
+
+				// Only change the Log in URL if the Hide WordPress Logins option is enabled in Authorizer.
+				if (
+					array_key_exists( 'advanced_hide_wp_login', $auth_settings ) &&
+					'1' === $auth_settings['advanced_hide_wp_login']
+				) {
+					// Need to determine if existing URL has params already or not, then add the param and value.
+					if ( strpos( $login_url, '?' ) === false ) {
+						$login_url = $login_url . '?external=wordpress';
+					} else {
+						$login_url = $login_url . '&external=wordpress';
+					}
+				}
+			}
+		}
+		return $login_url;
 	}
 
 

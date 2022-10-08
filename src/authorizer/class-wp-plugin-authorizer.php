@@ -51,6 +51,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Modify login page with a custom password url (if option is set).
 		add_filter( 'lostpassword_url', array( Login_Form::get_instance(), 'custom_lostpassword_url' ) );
 
+		// Modify the log in URL (if applicable options are set).
+		add_filter( 'login_url', array( Login_Form::get_instance(), 'maybe_add_external_wordpress_to_log_in_links' ) );
+
 		// If we have a custom login error, add the filter to show it.
 		$error = get_option( 'auth_settings_advanced_login_error' );
 		if ( $error && strlen( $error ) > 0 ) {
