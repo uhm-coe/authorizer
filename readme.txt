@@ -62,6 +62,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.4.2 =
+* Update French translations. Props @julienlusson!
+* Fix password reset for WordPress users when "Immediately redirect to CAS login form." Props @pkarjala for the [fix](https://github.com/uhm-coe/authorizer/issues/121)!
+* Upgrade composer dependencies (firebase/php-jwt 5.5.1 => 6.3.0; google/apiclient-services v0.254.0 => v0.269.0; google/auth v1.21.1 => v1.23.0; guzzlehttp/guzzle 7.4.5 => 7.5.0; guzzlehttp/promises 1.5.1 => 1.5.2; guzzlehttp/psr7 2.4.0 => 2.4.1; monolog/monolog 2.7.0 => 2.8.0; phpseclib/phpseclib 3.0.14 => 3.0.16; symfony/deprecation-contracts 2.5.1 => 2.5.2; thenetworg/oauth2-azure 2.0.1 => v2.1.1).
+
 = 3.4.1 =
 * Add setting to support CAS servers behind proxies. Props @slyraskal for the [pull request](https://github.com/uhm-coe/authorizer/pull/117)!
 
