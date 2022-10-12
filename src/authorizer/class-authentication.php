@@ -659,7 +659,7 @@ class Authentication extends Singleton {
 
 		// Get one time use token.
 		session_start();
-		$token = array_key_exists( 'token', $_SESSION ) ? json_decode( $_SESSION['token'], true ) : null;
+		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
 
 		// No token, so this is not a succesful Google login.
 		if ( empty( $token ) ) {
@@ -688,32 +688,20 @@ class Authentication extends Singleton {
 		}
 
 		// Verify this is a successful Google authentication.
-		// NOTE:  verifyIdToken originally returned an object as per src/OAuth2.php.
-		// However, it looks as though this function is overridden by src/Google/Client.php and returns an array instead
-		// in the v2 library.  Treating as an array for purposes of this functionality.
-		// See https://github.com/googleapis/google-api-php-client/blob/master/src/Google/AccessToken/Verify.php#L77.
 		try {
-			$ticket = $client->verifyIdToken( $token['id_token'], $auth_settings['google_clientid'] );
+			$payload = $client->verifyIdToken( $token );
 		} catch ( Google_Auth_Exception $e ) {
 			// Invalid ticket, so this in not a successful Google login.
 			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 		}
 
 		// Invalid ticket, so this in not a successful Google login.
-		if ( ! $ticket ) {
+		if ( empty( $payload['email'] ) ) {
 			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
 		}
 
 		// Get email address.
-		// Edge case: if another plugin has already defined the Google_Client class,
-		// and it's a version earlier than v2, then we need to handle $token as a
-		// json-encoded string instead of an array.
-		if ( is_object( $ticket ) && method_exists( $ticket, 'getAttributes' ) ) {
-			$attributes = $ticket->getAttributes();
-			$email      = Helper::lowercase( $attributes['payload']['email'] );
-		} else {
-			$email = Helper::lowercase( $ticket['email'] );
-		}
+		$email = Helper::lowercase( $payload['email'] );
 
 		$email_domain = substr( strrchr( $email, '@' ), 1 );
 		$username     = current( explode( '@', $email ) );
@@ -745,7 +733,7 @@ class Authentication extends Singleton {
 			'first_name'        => '',
 			'last_name'         => '',
 			'authenticated_by'  => 'google',
-			'google_attributes' => $ticket,
+			'google_attributes' => $payload,
 		);
 	}
 
@@ -1342,15 +1330,6 @@ class Authentication extends Singleton {
 		if ( 'google' === self::$authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
 
-			// Edge case: if another plugin has already defined the Google_Client class,
-			// and it's a version earlier than v2, then we need to handle $token as a
-			// json-encoded string instead of an array.
-			if ( ! is_array( $token ) ) {
-				$token = json_decode( $token, true );
-			}
-
-			$access_token = isset( $token['access_token'] ) ? $token['access_token'] : null;
-
 			// Build the Google Client.
 			$client = new \Google_Client();
 			$client->setApplicationName( 'WordPress' );
@@ -1359,7 +1338,7 @@ class Authentication extends Singleton {
 			$client->setRedirectUri( 'postmessage' );
 
 			// Revoke the token.
-			$client->revokeToken( $access_token );
+			$client->revokeToken( $token );
 
 			// Remove the credentials from the user's session.
 			unset( $_SESSION['token'] );

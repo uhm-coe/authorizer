@@ -51,7 +51,7 @@ class Ajax_Endpoints extends Singleton {
 
 		// Google authentication token.
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$code = isset( $_POST['code'] ) ? wp_unslash( $_POST['code'] ) : null;
+		$id_token = isset( $_POST['credential'] ) ? wp_unslash( $_POST['credential'] ) : null;
 
 		// Grab plugin settings.
 		$options       = Options::get_instance();
@@ -78,35 +78,14 @@ class Ajax_Endpoints extends Singleton {
 			$client->setHostedDomain( $google_hosteddomain );
 		}
 
-		// Get one time use token (if it doesn't exist, we'll create one below).
+		// Store the token (for verifying later in wp-login).
 		session_start();
 		if ( empty( $_SESSION['token'] ) ) {
-			// Exchange the OAuth 2.0 authorization code for user credentials.
-			$client->authenticate( $code );
-
-			// Edge case: if another plugin has already defined the Google_Client class,
-			// and it's a version earlier than v2, then we need to handle $token as a
-			// json-encoded string instead of an array.
-			if ( $client::LIBVER < '2.0.0' ) {
-				$token = json_decode( $client->getAccessToken(), true );
-			} else {
-				$token = $client->getAccessToken();
-			}
-
 			// Store the token in the session for later use.
-			$_SESSION['token'] = wp_json_encode( $token );
+			$_SESSION['token'] = $id_token;
 
 			$response = 'Successfully authenticated.';
 		} else {
-			// Edge case: if another plugin has already defined the Google_Client class,
-			// and it's a version earlier than v2, then we need to send a json-encoded
-			// string to setAccessToken() instead of an array.
-			if ( $client::LIBVER < '2.0.0' ) {
-				$client->setAccessToken( $_SESSION['token'] );
-			} else {
-				$client->setAccessToken( json_decode( $_SESSION['token'], true ) );
-			}
-
 			$response = 'Already authenticated.';
 		}
 

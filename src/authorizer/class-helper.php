@@ -69,13 +69,6 @@ class Helper {
 	);
 
 	/**
-	 * Generate a unique cookie to add to nonces to prevent CSRF.
-	 *
-	 * @var string
-	 */
-	protected static $cookie_value = null;
-
-	/**
 	 * Encryption key (not secret!).
 	 *
 	 * @var string
@@ -107,23 +100,6 @@ class Helper {
 		} else {
 			return self::SINGLE_CONTEXT;
 		}
-	}
-
-
-	/**
-	 * Retrieve the unique login cookie.
-	 *
-	 * @return string Login cookie value.
-	 */
-	public static function get_cookie_value() {
-		if ( ! self::$cookie_value ) {
-			if ( isset( $_COOKIE['login_unique'] ) ) {
-				self::$cookie_value = sanitize_key( wp_unslash( $_COOKIE['login_unique'] ) );
-			} else {
-				self::$cookie_value = md5( wp_rand() );
-			}
-		}
-		return self::$cookie_value;
 	}
 
 

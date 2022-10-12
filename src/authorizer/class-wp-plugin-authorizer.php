@@ -99,9 +99,6 @@ class WP_Plugin_Authorizer extends Singleton {
 		add_action( 'login_enqueue_scripts', array( Login_Form::get_instance(), 'login_enqueue_scripts_and_styles' ) );
 		add_action( 'login_footer', array( Login_Form::get_instance(), 'load_login_footer_js' ) );
 
-		// Create google nonce cookie when loading wp-login.php if Google is enabled.
-		add_action( 'login_init', array( Login_Form::get_instance(), 'login_init__maybe_set_google_nonce_cookie' ) );
-
 		// Modify login page with external auth links (if enabled; e.g., google or cas).
 		add_action( 'login_form', array( Login_Form::get_instance(), 'login_form_add_external_service_links' ) );
 

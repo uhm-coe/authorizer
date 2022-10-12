@@ -92,15 +92,6 @@ class Login_Form extends Singleton {
 				wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
 			}
 		}
-
-		// If we're using Google logins, load those resources.
-		if ( '1' === $auth_settings['google'] ) {
-			wp_enqueue_script( 'authorizer-login-custom-google', plugins_url( '/js/authorizer-login-custom_google.js', plugin_root() ), array( 'jquery' ), '2.8.0', false ); ?>
-			<meta name="google-signin-clientid" content="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>" />
-			<meta name="google-signin-scope" content="email" />
-			<meta name="google-signin-cookiepolicy" content="single_host_origin" />
-			<?php
-		}
 	}
 
 
@@ -136,22 +127,17 @@ function authUpdateQuerystringParam( uri, key, value ) {
 }
 
 // eslint-disable-next-line
-function signInCallback( authResult ) { // jshint ignore:line
+function signInCallback( credentialResponse ) { // jshint ignore:line
 	var $ = jQuery;
-	if ( authResult.status && authResult.status.signed_in ) {
-		// Hide the sign-in button now that the user is authorized, for example:
-		$( '#googleplus_button' ).attr( 'style', 'display: none' );
 
-		// Send the code to the server
+	if ( credentialResponse.hasOwnProperty( 'credential' ) ) {
+		// Send the JWT to the server
 		var ajaxurl = '<?php echo esc_attr( $ajaxurl ); ?>';
 		$.post(ajaxurl, {
 			action: 'process_google_login',
-			code: authResult.code,
-			nonce: $('#nonce_google_auth-<?php echo esc_attr( Helper::get_cookie_value() ); ?>' ).val(),
+			credential: credentialResponse.credential,
+			nonce: $('#g_id_onload' ).data( 'nonce' ),
 		}, function() {
-			// Handle or verify the server response if necessary.
-			// console.log( response );
-
 			// Reload wp-login.php to continue the authentication process.
 			var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
 
@@ -173,10 +159,10 @@ function signInCallback( authResult ) { // jshint ignore:line
 		//   "user_signed_out" - User is signed-out
 		//   "access_denied" - User denied access to your app
 		//   "immediate_failed" - Could not automatically log in the user
-		// console.log('Sign-in state: ' + authResult['error']);
+		// console.log('Sign-in state: ' + credentialResponse['error']);
 
 		// If user denies access, reload the login page.
-		if ( authResult.error === 'access_denied' || authResult.error === 'user_signed_out' ) {
+		if ( credentialResponse.error === 'access_denied' || credentialResponse.error === 'user_signed_out' ) {
 			window.location.reload();
 		}
 	}
@@ -199,8 +185,24 @@ function signInCallback( authResult ) { // jshint ignore:line
 		?>
 		<div id="auth-external-service-login">
 			<?php if ( '1' === $auth_settings['google'] ) : ?>
-				<p><a id="googleplus_button" class="button button-primary button-external button-google"><span class="dashicons dashicons-googleplus"></span><span class="label"><?php esc_html_e( 'Sign in with Google', 'authorizer' ); ?></span></a></p>
-				<?php wp_nonce_field( 'google_csrf_nonce', 'nonce_google_auth-' . Helper::get_cookie_value() ); ?>
+				<script src="https://accounts.google.com/gsi/client" async defer></script>
+				<div id="g_id_onload"
+					data-client_id="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>"
+					data-context="signin"
+					data-ux_mode="popup"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
+					data-callback="signInCallback">
+				</div>
+				<div class="g_id_signin"
+					data-type="standard"
+					data-shape="pill"
+					data-theme="filled_blue"
+					data-text="signin_with"
+					data-size="large"
+					data-logo_alignment="left"
+					data-width="270">
+				</div>
+				<br>
 			<?php endif; ?>
 
 			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
@@ -308,31 +310,6 @@ function signInCallback( authResult ) { // jshint ignore:line
 		}
 
 		return $errors;
-	}
-
-
-	/**
-	 * Set a unique cookie to add to Google auth nonce to avoid CSRF detection.
-	 * Note: hook into login_init so this fires at the start of the visit to
-	 * wp-login.php, but before any html output is started (so setting the
-	 * cookie header doesn't complain about data already being sent).
-	 *
-	 * Action: login_init
-	 *
-	 * @return void
-	 */
-	public function login_init__maybe_set_google_nonce_cookie() {
-		// Grab plugin settings.
-		$options       = Options::get_instance();
-		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
-
-		// If Google logins are enabled, make sure the cookie is set.
-		if ( array_key_exists( 'google', $auth_settings ) && '1' === $auth_settings['google'] ) {
-			if ( ! isset( $_COOKIE['login_unique'] ) ) {
-				setcookie( 'login_unique', Helper::get_cookie_value(), time() + 1800, '/', defined( 'COOKIE_DOMAIN' ) ? COOKIE_DOMAIN : '' );
-				$_COOKIE['login_unique'] = Helper::get_cookie_value();
-			}
-		}
 	}
 
 
