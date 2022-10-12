@@ -56,8 +56,8 @@ class Google extends \Authorizer\Singleton {
 		esc_html_e( "If you don't have a Google Client ID and Secret, generate them by following these instructions:", 'authorizer' );
 		?>
 		<ol>
-			<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Developers Console</a>. You can name it whatever you want.', 'authorizer' ), Helper::$allowed_html ); ?></li>
-			<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Auth</em> &gt; <em>Credentials</em>, then click <strong>Create New Client ID</strong> under OAuth. Use these settings:', 'authorizer' ), Helper::$allowed_html ); ?>
+			<li><?php echo wp_kses( __( 'Click <strong>Create a Project</strong> on the <a href="https://cloud.google.com/console" target="_blank">Google Cloud Console</a>. You can name it whatever you want.', 'authorizer' ), Helper::$allowed_html ); ?></li>
+			<li><?php echo wp_kses( __( 'Within the project, navigate to <em>APIs and Services</em> &gt; <em>Credentials</em>, then click <strong>+ Create Credentials &gt; OAuth client ID</strong>. Use these settings:', 'authorizer' ), Helper::$allowed_html ); ?>
 				<ul>
 					<li><?php echo wp_kses( __( 'Application Type: <strong>Web application</strong>', 'authorizer' ), Helper::$allowed_html ); ?></li>
 					<li><?php esc_html_e( 'Authorized Javascript Origins:', 'authorizer' ); ?> <strong><?php echo esc_html( rtrim( $site_url_host, '/' ) ); ?></strong></li>
@@ -65,8 +65,8 @@ class Google extends \Authorizer\Singleton {
 				</ul>
 			</li>
 			<li><?php esc_html_e( 'Copy/paste your new Client ID/Secret pair into the fields below.', 'authorizer' ); ?></li>
-			<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Auth</em> &gt; <em>Consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), Helper::$allowed_html ); ?></li>
-			<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/sign-in/web/devconsole-project" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
+			<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Services</em> &gt; <em>OAuth consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), Helper::$allowed_html ); ?></li>
+			<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/gsi/web" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
 		</ol>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></p>
