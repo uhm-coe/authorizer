@@ -424,15 +424,15 @@ class Access_Lists extends \Authorizer\Singleton {
 	 * @return void
 	 */
 	public function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
-		$is_multisite_user = array_key_exists( 'multisite_user', $approved_user ) && ( true === $approved_user['multisite_user'] || 'true' === $approved_user['multisite_user'] );
+		// Adjust javascript function prefixes if multisite.
+		$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
+		$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
+
+		$is_multisite_user = $is_multisite_admin_page || ( array_key_exists( 'multisite_user', $approved_user ) && ( true === $approved_user['multisite_user'] || 'true' === $approved_user['multisite_user'] ) );
 		$option_prefix     = $is_multisite_user ? 'auth_multisite_settings_' : 'auth_settings_';
 		$option_id         = $option_prefix . $option . '_' . $key;
 		$approved_wp_user  = get_user_by( 'email', $approved_user['email'] );
 		$is_current_user   = $approved_wp_user && get_current_user_id() === $approved_wp_user->ID;
-
-		// Adjust javascript function prefixes if multisite.
-		$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
-		$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
 
 		if ( ! $approved_wp_user ) :
 			$approved_user['is_wp_user'] = false;
@@ -488,7 +488,7 @@ class Access_Lists extends \Authorizer\Singleton {
 				id="<?php echo esc_attr( $option_id ); ?>_role"
 				class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'role', $is_multisite_user ) ); ?>"
 				onchange="<?php echo esc_attr( $js_function_prefix ); ?>ChangeRole( this );"
-				<?php if ( $is_multisite_user ) : ?>
+				<?php if ( $is_multisite_user && ! $is_multisite_admin_page ) : ?>
 					disabled="disabled"
 				<?php endif; ?>
 			>
