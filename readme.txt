@@ -62,6 +62,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.5.0 =
+* Migrate Google Sign-In to Google Identity Services library. Details [here](https://developers.google.com/identity/gsi/web/guides/migration).
+* Fix inconsistent labels by network users in the approved list (WordPress multisite).
+* Update composer dependencies (google/apiclient-services v0.269.0 => v0.271.0).
+
 = 3.4.2 =
 * Update French translations. Props @julienlusson!
 * Fix password reset for WordPress users when "Immediately redirect to CAS login form." Props @pkarjala for the [fix](https://github.com/uhm-coe/authorizer/issues/121)!
@@ -648,6 +653,9 @@ add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );
 * Wed Apr 10, 2013
 
 == Upgrade Notice ==
+
+= 3.5.0 =
+Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!
 
 = 3.2.0 =
 Authorizer now requires PHP 7.2.5 or higher (phpCAS 1.4.0 requirement).
