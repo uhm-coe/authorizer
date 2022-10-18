@@ -655,7 +655,7 @@ add_filter( 'authorizer_allow_login', 'check_cas_attributes', 10, 2 );
 == Upgrade Notice ==
 
 = 3.5.0 =
-Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!
+**Upgrade Notice**: Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!
 
 = 3.2.0 =
 Authorizer now requires PHP 7.2.5 or higher (phpCAS 1.4.0 requirement).
