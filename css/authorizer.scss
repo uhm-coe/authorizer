@@ -313,16 +313,18 @@
 		}
 	}
 
-	// Fade multisite users (not editable).
-	.auth-multisite-username,
-	.auth-multisite-email,
-	.auth-multisite-role,
-	.auth-multisite-usermeta,
-	.auth-multisite-date-added {
-		opacity: 0.5;
+	// Fade multisite users (not editable); don't do this on network admin page.
+	&:not(.network-admin) {
+		.auth-multisite-username,
+		.auth-multisite-email,
+		.auth-multisite-role,
+		.auth-multisite-usermeta,
+		.auth-multisite-date-added {
+			opacity: 0.5;
+		}
 	}
 
-	// Cap max size of date and meta (no need for them to grow large).
+// Cap max size of date and meta (no need for them to grow large).
 	.auth-date-added,
 	.auth-usermeta {
 		max-width: 80px;
