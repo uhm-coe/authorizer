@@ -1305,7 +1305,11 @@ class Authentication extends Singleton {
 				$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
 				// Set the CAS client configuration if it hasn't been set already.
-				\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				if ( "PROXY" === strtoupper( $auth_settings['cas_method'] ) ) {
+					\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				} else {
+					\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+				}
 				// Allow redirects at the CAS server endpoint (e.g., allow connections
 				// at an old CAS URL that redirects to a newer CAS URL).
 				\phpCAS::setExtraCurlOption( CURLOPT_FOLLOWLOCATION, true );
