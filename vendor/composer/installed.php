@@ -3,7 +3,7 @@
         'name' => 'uhm-coe/authorizer',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '6e12bb90deafe0a9bbb86f94e10b88c255d3eb28',
+        'reference' => '052cf41754aea4fc2dafa545849503a50e1f0b60',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'apereo/phpcas' => array(
-            'pretty_version' => '1.5.0',
-            'version' => '1.5.0.0',
-            'reference' => 'd6f5797fb568726f34c8e48741776d81e4a2646b',
+            'pretty_version' => '1.6.0',
+            'version' => '1.6.0.0',
+            'reference' => 'f817c72a961484afef95ac64a9257c8e31f063b9',
             'type' => 'library',
             'install_path' => __DIR__ . '/../apereo/phpcas',
             'aliases' => array(),

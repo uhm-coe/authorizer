@@ -760,11 +760,18 @@ class Authentication extends Singleton {
 		 */
 		$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
+		/**
+		 * Get valid service URLs for the CAS client to validate against.
+		 *
+		 * @see: https://github.com/apereo/phpCAS/security/advisories/GHSA-8q72-6qq8-xv64
+		 */
+		$valid_base_urls = Options\External\Cas::get_instance()->get_valid_cas_service_urls();
+
 		// Set the CAS client configuration.
 		if ( "PROXY" === strtoupper( $auth_settings['cas_method'] ) ) {
-			\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+			\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 		} else {
-			\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+			\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 		}
 
 		// Allow redirects at the CAS server endpoint (e.g., allow connections
@@ -1304,11 +1311,18 @@ class Authentication extends Singleton {
 				 */
 				$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
 
+				/**
+				 * Get valid service URLs for the CAS client to validate against.
+				 *
+				 * @see: https://github.com/apereo/phpCAS/security/advisories/GHSA-8q72-6qq8-xv64
+				 */
+				$valid_base_urls = Options\External\Cas::get_instance()->get_valid_cas_service_urls();
+
 				// Set the CAS client configuration if it hasn't been set already.
 				if ( "PROXY" === strtoupper( $auth_settings['cas_method'] ) ) {
-					\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+					\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 				} else {
-					\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'] );
+					\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 				}
 				// Allow redirects at the CAS server endpoint (e.g., allow connections
 				// at an old CAS URL that redirects to a newer CAS URL).

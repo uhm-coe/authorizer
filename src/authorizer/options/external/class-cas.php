@@ -240,6 +240,28 @@ class Cas extends \Authorizer\Singleton {
 
 
 	/**
+	 * phpCAS 1.6.0 asserts that the service URL provided by the user logging in
+	 * matches the URL specified here (to prevent nefarious clients from modifying
+	 * the http headers with their own values). Note: here we handle common
+	 * port/protocol variants in case get_option( 'siteurl' ) doesn't match the
+	 * actual protocol.
+	 *
+	 * @return array protocol://domain:port of current WordPress site (both http and https).
+	 */
+	public function get_valid_cas_service_urls() {
+		$valid_base_url_parts  = parse_url( site_url( '', 'login' ) );
+		$valid_base_url        = ! empty( $valid_base_url_parts['host'] ) ? $valid_base_url_parts['host'] : '';
+		$valid_base_url       .= ! empty( $valid_base_url_parts['port'] ) ? ':' . $valid_base_url_parts['port'] : '';
+		$valid_base_urls       = array(
+			'http://' . $valid_base_url,
+			'https://' . $valid_base_url,
+		);
+
+		return $valid_base_urls;
+	}
+
+
+	/**
 	 * Settings print callback.
 	 *
 	 * @param  string $args Args (e.g., multisite admin mode).
