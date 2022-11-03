@@ -404,6 +404,18 @@ class Authentication extends Singleton {
 			// See: https://github.com/thenetworg/oauth2-azure.
 			session_start();
 			try {
+				// Save the redirect URL for WordPress so we can restore it after a
+				// successful login (note: we can't add the redirect_to querystring
+				// param to the redirectUri param below because it won't match the
+				// approved URI set in the Azure portal).
+				$login_querystring = array();
+				if ( isset( $_SERVER['QUERY_STRING'] ) ) {
+					parse_str( $_SERVER['QUERY_STRING'], $login_querystring ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+				}
+				if ( isset( $login_querystring['redirect_to'] ) ) {
+					$_SESSION['azure_redirect_to'] = $login_querystring['redirect_to'];
+				}
+
 				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
 					'clientId'     => $auth_settings['oauth2_clientid'],
 					'clientSecret' => $auth_settings['oauth2_clientsecret'],

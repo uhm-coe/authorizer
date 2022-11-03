@@ -263,4 +263,21 @@ class OAuth2 extends \Authorizer\Singleton {
 		<?php
 	}
 
+
+	/**
+	 * Restore any redirect_to value saved during an Azure login (in the
+	 * `authenticate` hook). This is needed since the Azure portal needs an
+	 * approved URI to visit after logging in, and cannot have a variable
+	 * redirect_to param in it like the normal WordPress redirect flow.
+	 *
+	 * @hook login_redirect
+	 */
+	public function maybe_redirect_after_azure_login( $redirect_to ) {
+		if ( ! empty( $_SESSION['azure_redirect_to'] ) ) {
+			$redirect_to = $_SESSION['azure_redirect_to'];
+		}
+
+		return $redirect_to;
+	}
+
 }
