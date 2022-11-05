@@ -62,6 +62,13 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.6.0 =
+* Security: update to [phpCAS 1.6.0](https://github.com/apereo/phpCAS/releases/tag/1.6.0) to address CVE-2022-39369.
+* Update composer dependencies (google/apiclient-services 0.271.0 => 0.272.1; google/auth 1.23.0 => 1.23.1; firebase/php-jwt 6.3.0 => 6.3.1; guzzlehttp/psr7 2.4.1 => 2.4.3; phpseclib/phpseclib 3.0.16 => 3.0.17).
+* Fix CAS logouts on proxied CAS servers.
+* Set default values for missed multisite option ldap_test_user.
+* Respect redirect_to param to wp-login.php with Azure logins. Props @manakuke for discovering the [issue](https://github.com/uhm-coe/authorizer/commit/a3d28a91c4ef6bdb32a567f4e5073ed250577ee3)!
+
 = 3.5.0 =
 * Migrate Google Sign-In to Google Identity Services library. Details [here](https://developers.google.com/identity/gsi/web/guides/migration).
 * Fix inconsistent labels by network users in the approved list (WordPress multisite).
