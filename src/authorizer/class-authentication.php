@@ -870,9 +870,25 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Get user first name and last name.
-		$first_name = array_key_exists( 'cas_attr_first_name', $auth_settings ) && strlen( $auth_settings['cas_attr_first_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_first_name'], $cas_attributes ) && strlen( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) > 0 ? $cas_attributes[ $auth_settings['cas_attr_first_name'] ] : '';
-		$last_name  = array_key_exists( 'cas_attr_last_name', $auth_settings ) && strlen( $auth_settings['cas_attr_last_name'] ) > 0 && array_key_exists( $auth_settings['cas_attr_last_name'], $cas_attributes ) && strlen( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) > 0 ? $cas_attributes[ $auth_settings['cas_attr_last_name'] ] : '';
+		// Get user first name (handle string or array results from CAS attribute).
+		$first_name = '';
+		if ( ! empty( $auth_settings['cas_attr_first_name'] ) && ! empty( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
+			if ( is_string( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
+				$first_name = $cas_attributes[ $auth_settings['cas_attr_first_name'] ];
+			} elseif ( is_array( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
+				$first_name = trim( implode( ' ', $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) );
+			}
+		}
+
+		// Get user last name (handle string or array results from CAS attribute).
+		$last_name = '';
+		if ( ! empty( $auth_settings['cas_attr_last_name'] ) && ! empty( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
+			if ( is_string( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
+				$last_name = $cas_attributes[ $auth_settings['cas_attr_last_name'] ];
+			} elseif ( is_array( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
+				$last_name = trim( implode( ' ', $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) );
+			}
+		}
 
 		return array(
 			'email'            => $externally_authenticated_email,
