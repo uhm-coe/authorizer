@@ -51,7 +51,7 @@ class Admin_Page extends Singleton {
 			array(
 				'id'      => 'help_auth_settings_access_lists_content',
 				'title'   => __( 'Access Lists', 'authorizer' ),
-				'content' => $help_auth_settings_access_lists_content,
+				'content' => wp_kses_post( $help_auth_settings_access_lists_content ),
 			)
 		);
 
@@ -65,7 +65,7 @@ class Admin_Page extends Singleton {
 			array(
 				'id'      => 'help_auth_settings_access_login_content',
 				'title'   => __( 'Login Access', 'authorizer' ),
-				'content' => $help_auth_settings_access_login_content,
+				'content' => wp_kses_post( $help_auth_settings_access_login_content ),
 			)
 		);
 
@@ -81,7 +81,7 @@ class Admin_Page extends Singleton {
 			array(
 				'id'      => 'help_auth_settings_access_public_content',
 				'title'   => __( 'Public Access', 'authorizer' ),
-				'content' => $help_auth_settings_access_public_content,
+				'content' => wp_kses_post( $help_auth_settings_access_public_content ),
 			)
 		);
 
@@ -136,7 +136,7 @@ class Admin_Page extends Singleton {
 			array(
 				'id'      => 'help_auth_settings_external_content',
 				'title'   => __( 'External Service', 'authorizer' ),
-				'content' => $help_auth_settings_external_content,
+				'content' => wp_kses_post( $help_auth_settings_external_content ),
 			)
 		);
 
@@ -151,7 +151,7 @@ class Admin_Page extends Singleton {
 			array(
 				'id'      => 'help_auth_settings_advanced_content',
 				'title'   => __( 'Advanced', 'authorizer' ),
-				'content' => $help_auth_settings_advanced_content,
+				'content' => wp_kses_post( $help_auth_settings_advanced_content ),
 			)
 		);
 	}
