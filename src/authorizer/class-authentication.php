@@ -322,6 +322,19 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Fetch the Oauth2 Client Secret (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
+			$auth_settings['oauth2_clientsecret'] = \AUTHORIZER_OAUTH2_CLIENT_SECRET;
+		}
+		/**
+		 * Filters the Oauth2 Client Secret used by Authorizer to authenticate.
+		 *
+		 * @since 3.6.1
+		 *
+		 * @param string $oauth2_client_secret  The stored Oauth2 Client Secret.
+		 */
+		$auth_settings['oauth2_clientsecret'] = apply_filters( 'authorizer_oauth2_client_secret', $auth_settings['oauth2_clientsecret'] );
+
 		// Move on if required params aren't specified in settings.
 		if (
 			empty( $auth_settings['oauth2_clientid'] ) ||
@@ -677,6 +690,19 @@ class Authentication extends Singleton {
 		if ( empty( $token ) ) {
 			return null;
 		}
+
+		// Fetch the Google Client Secret (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
+			$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
+		}
+		/**
+		 * Filters the Google Client Secret used by Authorizer to authenticate.
+		 *
+		 * @since 3.6.1
+		 *
+		 * @param string $google_client_secret  The stored Google Client Secret.
+		 */
+		$auth_settings['google_clientsecret'] = apply_filters( 'authorizer_google_client_secret', $auth_settings['google_clientsecret'] );
 
 		// Build the Google Client.
 		$client = new \Google_Client();
@@ -1375,6 +1401,19 @@ class Authentication extends Singleton {
 		}
 		if ( 'google' === self::$authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
+
+			// Fetch the Google Client Secret (allow overrides from filter or constant).
+			if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
+				$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
+			}
+			/**
+			 * Filters the Google Client Secret used by Authorizer to authenticate.
+			 *
+			 * @since 3.6.1
+			 *
+			 * @param string $google_client_secret  The stored Google Client Secret.
+			 */
+			$auth_settings['google_clientsecret'] = apply_filters( 'authorizer_google_client_secret', $auth_settings['google_clientsecret'] );
 
 			// Build the Google Client.
 			$client = new \Google_Client();

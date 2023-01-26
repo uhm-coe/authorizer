@@ -57,6 +57,19 @@ class Ajax_Endpoints extends Singleton {
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
+		// Fetch the Google Client Secret (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
+			$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
+		}
+		/**
+		 * Filters the Google Client Secret used by Authorizer to authenticate.
+		 *
+		 * @since 3.6.1
+		 *
+		 * @param string $google_client_secret  The stored Google Client Secret.
+		 */
+		$auth_settings['google_clientsecret'] = apply_filters( 'authorizer_google_client_secret', $auth_settings['google_clientsecret'] );
+
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );

@@ -86,6 +86,40 @@ class Google extends \Authorizer\Singleton {
 		$option               = 'google_clientsecret';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
+		// If secret is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_google_client_secret' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_google_client_secret (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_google_client_secret</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_SECRET (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:220px;" />
