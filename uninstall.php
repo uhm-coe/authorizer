@@ -21,12 +21,19 @@ delete_option( 'auth_settings_advanced_admin_notice' );
 delete_option( 'auth_settings_advanced_login_error' );
 delete_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 delete_option( 'auth_settings_advanced_lockouts_failed_attempts' );
+delete_option( 'auth_settings_access_users_approved' );
+delete_option( 'auth_settings_access_users_blocked' );
+delete_option( 'auth_settings_access_users_pending' );
+delete_option( 'auth_settings_advanced_public_notice' );
+delete_option( 'auth_settings_advanced_admin_notice' );
+delete_option( 'auth_version' );
 
 /**
  * Delete multisite options.
  */
 if ( is_multisite() ) {
-	delete_blog_option( BLOG_ID_CURRENT_SITE, 'auth_multisite_settings' );
+	delete_blog_option( get_network()->blog_id, 'auth_multisite_settings' );
+	delete_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved' );
 }
 
 /**
