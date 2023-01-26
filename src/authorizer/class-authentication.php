@@ -1399,7 +1399,7 @@ class Authentication extends Singleton {
 		if ( session_id() === '' ) {
 			session_start();
 		}
-		if ( 'google' === self::$authenticated_by || array_key_exists( 'token', $_SESSION ) ) {
+		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
 
 			// Fetch the Google Client Secret (allow overrides from filter or constant).
