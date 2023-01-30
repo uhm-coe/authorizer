@@ -1,16 +1,16 @@
 === Authorizer ===
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
-Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth
+Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth, oauth2
 Tested up to: 6.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).
+Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS).
 
 == Description ==
 
-*Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, or LDAP. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
+*Authorizer* restricts access to a WordPress site to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, LDAP, or an OAuth2 provider. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
 View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/authorizer](https://github.com/uhm-coe/authorizer)
 
@@ -21,7 +21,7 @@ View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/a
 
 *Authorizer* provides the following options:
 
-* **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts
+* **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts; OAuth2 accounts
 * **Login Access**: All authenticated users (all local and all external can log in); Only specific users (all local and approved external users can log in)
 * **View Access**: Everyone (open access); Only logged in users
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
@@ -35,7 +35,7 @@ View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/a
 
 == Frequently Asked Questions ==
 
-= Help! I've disabled WordPress logins, my external logins (Google/CAS/LDAP) aren't working, and now I can't get back in! =
+= Help! I've disabled WordPress logins, my external logins (Google/CAS/LDAP/OAuth2) aren't working, and now I can't get back in! =
 
 If you add external=wordpress to the wp-login.php URL querystring, you can always get the WordPress login form to reappear. For example, if your site is at [https://www.example.com](https://www.example.com), then the URL would be: [https://www.example.com/wp-login.php?external=wordpress](https://www.example.com/wp-login.php?external=wordpress)
 
