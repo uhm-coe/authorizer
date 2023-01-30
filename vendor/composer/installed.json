@@ -328,17 +328,17 @@
         },
         {
             "name": "google/apiclient-services",
-            "version": "v0.282.0",
-            "version_normalized": "0.282.0.0",
+            "version": "v0.285.0",
+            "version_normalized": "0.285.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-api-php-client-services.git",
-                "reference": "4b31efa27886f5a73527241eaac5491e68b95071"
+                "reference": "d8ffb976f4da1f83326d6d3f471162acd23ec5d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/4b31efa27886f5a73527241eaac5491e68b95071",
-                "reference": "4b31efa27886f5a73527241eaac5491e68b95071",
+                "url": "https://api.github.com/repos/googleapis/google-api-php-client-services/zipball/d8ffb976f4da1f83326d6d3f471162acd23ec5d8",
+                "reference": "d8ffb976f4da1f83326d6d3f471162acd23ec5d8",
                 "shasum": ""
             },
             "require": {
@@ -347,7 +347,7 @@
             "require-dev": {
                 "phpunit/phpunit": "^5.7||^8.5.13"
             },
-            "time": "2023-01-09T01:12:14+00:00",
+            "time": "2023-01-29T01:28:14+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -369,23 +369,23 @@
             ],
             "support": {
                 "issues": "https://github.com/googleapis/google-api-php-client-services/issues",
-                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.282.0"
+                "source": "https://github.com/googleapis/google-api-php-client-services/tree/v0.285.0"
             },
             "install-path": "../google/apiclient-services"
         },
         {
             "name": "google/auth",
-            "version": "v1.24.0",
-            "version_normalized": "1.24.0.0",
+            "version": "v1.25.0",
+            "version_normalized": "1.25.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/googleapis/google-auth-library-php.git",
-                "reference": "1f8cff5aa324700d041efd2df1a0855112a2e7ae"
+                "reference": "0865c44ab50378f7b145827dfcbd1e7a238f7759"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/1f8cff5aa324700d041efd2df1a0855112a2e7ae",
-                "reference": "1f8cff5aa324700d041efd2df1a0855112a2e7ae",
+                "url": "https://api.github.com/repos/googleapis/google-auth-library-php/zipball/0865c44ab50378f7b145827dfcbd1e7a238f7759",
+                "reference": "0865c44ab50378f7b145827dfcbd1e7a238f7759",
                 "shasum": ""
             },
             "require": {
@@ -408,7 +408,7 @@
             "suggest": {
                 "phpseclib/phpseclib": "May be used in place of OpenSSL for signing strings or for token management. Please require version ^2."
             },
-            "time": "2022-11-28T18:29:23+00:00",
+            "time": "2023-01-26T22:04:14+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
@@ -430,7 +430,7 @@
             "support": {
                 "docs": "https://googleapis.github.io/google-auth-library-php/main/",
                 "issues": "https://github.com/googleapis/google-auth-library-php/issues",
-                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.24.0"
+                "source": "https://github.com/googleapis/google-auth-library-php/tree/v1.25.0"
             },
             "install-path": "../google/auth"
         },
