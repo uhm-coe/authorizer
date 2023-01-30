@@ -728,6 +728,9 @@ class Authentication extends Singleton {
 		// Verify this is a successful Google authentication.
 		try {
 			$payload = $client->verifyIdToken( $token );
+		} catch ( \Firebase\JWT\BeforeValidException $e ) {
+			// Server clock out of sync with Google servers.
+			return new \WP_Error( 'invalid_google_login', __( 'The authentication timestamp is too old, please try again.', 'authorizer' ) );
 		} catch ( Google_Auth_Exception $e ) {
 			// Invalid ticket, so this in not a successful Google login.
 			return new \WP_Error( 'invalid_google_login', __( 'Invalid Google credentials provided.', 'authorizer' ) );
