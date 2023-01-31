@@ -1,6 +1,6 @@
 {
     "name": "uhm-coe/authorizer",
-    "description": "Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., Google, LDAP, or CAS).",
+    "description": "Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS).",
     "homepage": "https://github.com/uhm-coe/authorizer",
     "type": "project",
     "require": {
