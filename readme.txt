@@ -62,6 +62,17 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.6.1 =
+* Allow defining Google Client Secret and OAuth2 Client Secret via filters (`authorizer_google_client_secret` and `authorizer_oauth2_client_secret`) or wp-config.php constants (`define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );` and `define( 'AUTHORIZER_OAUTH2_CLIENT_SECRET', '...' );`) to support integrations with third-party secrets managers (or simply to keep the secrets out of the database in plaintext).
+* Handle arrays in CAS attribute for first/last name.
+* Fix: conflict with W3 Total Cache (when using Azure CDN provider that uses an older guzzlehttp library). [Check status](https://github.com/W3EDGE/w3-total-cache/issues/642)
+* Fix: only clean up Google session on logout if it exists.
+* Fix: Remove all plugin options in database upon deletion/uninstall.
+* Fix: Handle Google login error triggered when a stale browser window sends a login request.
+* Upgrade composer dependencies (firebase/php-jwt v6.3.1 => v6.3.2, google/apiclient v2.12.6 => v2.13.0, google/apiclient-services v0.272.1 => v0.285.0, google/auth v1.23.1 => v1.25.0, phpseclib/phpseclib 3.0.17 => 3.0.18).
+* Mention OAuth2 support in readme.txt.
+* Update translatable strings.
+
 = 3.6.0 =
 * Security: update to [phpCAS 1.6.0](https://github.com/apereo/phpCAS/releases/tag/1.6.0) to address CVE-2022-39369.
 * Update composer dependencies (google/apiclient-services 0.271.0 => 0.272.1; google/auth 1.23.0 => 1.23.1; firebase/php-jwt 6.3.0 => 6.3.1; guzzlehttp/psr7 2.4.1 => 2.4.3; phpseclib/phpseclib 3.0.16 => 3.0.17).
