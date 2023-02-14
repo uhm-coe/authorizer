@@ -215,6 +215,10 @@ class WP_Plugin_Authorizer extends Singleton {
 			$should_update_auth_multisite_settings_access_users_approved = false;
 			foreach ( get_super_admins() as $super_admin ) {
 				$user = get_user_by( 'login', $super_admin );
+				// Skip if user wasn't found (edge case).
+				if ( empty( $user ) ) {
+					continue;
+				}
 				// Add to approved list if not there.
 				if ( ! Helper::in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 					$approved_user = array(
