@@ -346,13 +346,13 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		// Make sure $last_attempt (time) and $num_attempts are positive integers.
 		// Note: this addresses resetting them if either is unset from above.
-		$last_attempt = abs( intval( $last_attempt ) );
-		$num_attempts = abs( intval( $num_attempts ) );
+		$last_attempt = absint( $last_attempt );
+		$num_attempts = absint( $num_attempts );
 
 		// Reset the failed attempt count if the time since the last
 		// failed attempt is greater than the reset duration.
 		$time_since_last_fail = time() - $last_attempt;
-		$reset_duration       = $auth_settings['advanced_lockouts']['reset_duration'] * 60; // minutes to seconds.
+		$reset_duration       = absint( $auth_settings['advanced_lockouts']['reset_duration'] ) * 60; // minutes to seconds.
 		if ( $time_since_last_fail > $reset_duration ) {
 			$num_attempts = 0;
 		}
@@ -368,10 +368,10 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		// Log a lockout if we hit the configured limit (via Simple History plugin).
 		$lockouts                   = $auth_settings['advanced_lockouts'];
-		$num_attempts_short_lockout = $lockouts['attempts_1'];
-		$num_attempts_long_lockout  = $lockouts['attempts_1'] + $lockouts['attempts_2'];
+		$num_attempts_short_lockout = absint( $lockouts['attempts_1'] );
+		$num_attempts_long_lockout  = absint( $lockouts['attempts_1'] ) + absint( $lockouts['attempts_2'] );
 		if ( $num_attempts >= $num_attempts_short_lockout ) {
-			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? $lockouts['duration_2'] * 60 : $lockouts['duration_1'] * 60;
+			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? absint( $lockouts['duration_2'] ) * 60 : absint( $lockouts['duration_1'] ) * 60;
 			apply_filters(
 				'simple_history_log_warning',
 				sprintf(

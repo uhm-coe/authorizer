@@ -77,17 +77,17 @@ class Authentication extends Singleton {
 
 		// Make sure $last_attempt (time) and $num_attempts are positive integers.
 		// Note: this addresses resetting them if either is unset from above.
-		$last_attempt = abs( intval( $last_attempt ) );
-		$num_attempts = abs( intval( $num_attempts ) );
+		$last_attempt = absint( $last_attempt );
+		$num_attempts = absint( $num_attempts );
 
 		// Create semantic lockout variables.
 		$lockouts                        = $auth_settings['advanced_lockouts'];
 		$time_since_last_fail            = time() - $last_attempt;
-		$reset_duration                  = $lockouts['reset_duration'] * 60; // minutes to seconds.
-		$num_attempts_long_lockout       = $lockouts['attempts_1'] + $lockouts['attempts_2'];
-		$num_attempts_short_lockout      = $lockouts['attempts_1'];
-		$seconds_remaining_long_lockout  = $lockouts['duration_2'] * 60 - $time_since_last_fail;
-		$seconds_remaining_short_lockout = $lockouts['duration_1'] * 60 - $time_since_last_fail;
+		$reset_duration                  = absint( $lockouts['reset_duration'] ) * 60; // minutes to seconds.
+		$num_attempts_long_lockout       = absint( $lockouts['attempts_1'] ) + absint( $lockouts['attempts_2'] );
+		$num_attempts_short_lockout      = absint( $lockouts['attempts_1'] );
+		$seconds_remaining_long_lockout  = absint( $lockouts['duration_2'] ) * 60 - $time_since_last_fail;
+		$seconds_remaining_short_lockout = absint( $lockouts['duration_1'] ) * 60 - $time_since_last_fail;
 
 		// Check if we need to institute a lockout delay.
 		if ( $is_login_attempt && $time_since_last_fail > $reset_duration ) {
