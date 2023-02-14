@@ -219,7 +219,7 @@ class WP_Plugin_Authorizer extends Singleton {
 				if ( ! Helper::in_multi_array( $user->user_email, $auth_multisite_settings_access_users_approved ) ) {
 					$approved_user = array(
 						'email'      => Helper::lowercase( $user->user_email ),
-						'role'       => count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
+						'role'       => is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : 'administrator',
 						'date_added' => wp_date( 'M Y', strtotime( $user->user_registered ) ),
 						'local_user' => true,
 					);
