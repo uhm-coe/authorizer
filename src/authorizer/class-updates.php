@@ -492,17 +492,16 @@ class Updates extends Singleton {
 		$update_if_older_than = 20221101;
 		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 			// Provide default values for any $auth_settings options that don't exist.
+			$options->set_default_options();
 			if ( is_multisite() ) {
 				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
 					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 					switch_to_blog( $blog_id );
-					$options->set_default_options();
+					$options->set_default_options( array( 'set_multisite_options' => false ) );
 					restore_current_blog();
 				}
-			} else {
-				$options->set_default_options();
 			}
 			// Update version to reflect this change has been made.
 			$auth_version   = $update_if_older_than;

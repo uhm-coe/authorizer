@@ -247,9 +247,23 @@ class Options extends Singleton {
 	 * Set meaningful defaults for the plugin options.
 	 *
 	 * Note: This function is called on plugin activation.
+	 *
+	 * @param array $args {
+	 *     Optional.
+	 *
+	 *     @type bool $set_multisite_options  Whether to also set the default
+	 *                                        multisite options, if in multisite.
+	 *                                        Defaults to true.
+	 * }
 	 */
-	public function set_default_options() {
+	public function set_default_options( $args = array() ) {
 		global $wp_roles;
+
+		// Set default args.
+		$defaults = array(
+			'set_multisite_options' => true,
+		);
+		$args     = wp_parse_args( $args, $defaults );
 
 		$auth_settings = get_option( 'auth_settings' );
 		if ( false === $auth_settings ) {
