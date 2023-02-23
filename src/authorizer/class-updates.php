@@ -508,6 +508,32 @@ class Updates extends Singleton {
 			$needs_updating = true;
 		}
 
+		// Update: Only save one auth_version in the database on multisite (instead
+		// of a version for each subsite, which was unnecessary because the plugin
+		// is updated once at the network level). Remove extra auth_version options.
+		$update_if_older_than = 20230222;
+		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
+			if ( is_multisite() ) {
+				$network_blog_id = get_network()->blog_id;
+				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
+				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
+				foreach ( $sites as $site ) {
+					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
+					// Don't delete auth_version on the main site in the network.
+					if ( $network_blog_id === $blog_id ) {
+						continue;
+					}
+					// Remove auth_version on subsites.
+					switch_to_blog( $blog_id );
+					delete_option( 'auth_version' );
+					restore_current_blog();
+				}
+			}
+			// Update version to reflect this change has been made.
+			$auth_version   = $update_if_older_than;
+			$needs_updating = true;
+		}
+
 		/* phpcs:ignore Squiz.PHP.CommentedOutCode.Found
 		// Update: TEMPLATE
 		$update_if_older_than = YYYYMMDD;
@@ -522,12 +548,7 @@ class Updates extends Singleton {
 		// Save new version number if we performed any updates.
 		if ( $needs_updating ) {
 			if ( is_multisite() ) {
-				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
-				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
-				foreach ( $sites as $site ) {
-					$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
-					update_blog_option( $blog_id, 'auth_version', $auth_version );
-				}
+				update_blog_option( get_network()->blog_id, 'auth_version', $auth_version );
 			} else {
 				update_option( 'auth_version', $auth_version );
 			}
