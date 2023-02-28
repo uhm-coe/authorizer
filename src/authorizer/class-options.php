@@ -525,7 +525,7 @@ class Options extends Singleton {
 		update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
 
 		// Multisite defaults.
-		if ( is_multisite() ) {
+		if ( is_multisite() && $args['set_multisite_options'] ) {
 			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
 
 			if ( false === $auth_multisite_settings ) {
