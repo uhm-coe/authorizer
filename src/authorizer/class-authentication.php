@@ -945,6 +945,27 @@ class Authentication extends Singleton {
 	 *                               falling back to WP auth.
 	 */
 	public function custom_authenticate_ldap( $auth_settings, $username, $password, &$debug = null ) {
+		// Make sure all LDAP settings are defined (user and password can be
+		// overridden by constant or filter and may not exist in auth_settings).
+		$defaults      = array(
+			'ldap'                      => '',
+			'ldap_host'                 => '',
+			'ldap_port'                 => '389',
+			'ldap_tls'                  => '1',
+			'ldap_search_base'          => '',
+			'ldap_search_filter'        => '',
+			'ldap_uid'                  => 'uid',
+			'ldap_attr_email'           => '',
+			'ldap_user'                 => '',
+			'ldap_password'             => '',
+			'ldap_lostpassword_url'     => '',
+			'ldap_attr_first_name'      => '',
+			'ldap_attr_last_name'       => '',
+			'ldap_attr_update_on_login' => '',
+			'ldap_test_user'            => '',
+		);
+		$auth_settings = wp_parse_args( $auth_settings, $defaults );
+
 		// Initialize debug array if a variable was passed in.
 		if ( ! is_null( $debug ) ) {
 			$debug = array(
@@ -1093,12 +1114,44 @@ class Authentication extends Singleton {
 				}
 			}
 
+			// Allow overrides of the LDAP user from filter or constant.
+			if ( defined( 'AUTHORIZER_LDAP_USER' ) ) {
+				$auth_settings['ldap_user'] = \AUTHORIZER_LDAP_USER;
+			}
+			/**
+			 * Filters the LDAP user used by Authorizer to authenticate.
+			 *
+			 * @since 3.6.2
+			 *
+			 * @param string $ldap_user  The stored Oauth2 Client Secret.
+			 */
+			$auth_settings['ldap_user'] = apply_filters( 'authorizer_ldap_user', $auth_settings['ldap_user'] );
+
+			// Allow overrides of the LDAP password from filter or constant.
+			if ( defined( 'AUTHORIZER_LDAP_PASSWORD' ) ) {
+				$auth_settings['ldap_password'] = \AUTHORIZER_LDAP_PASSWORD;
+			}
+			/**
+			 * Filters the LDAP password used by Authorizer to authenticate.
+			 *
+			 * @since 3.6.2
+			 *
+			 * @param string $ldap_password  The stored Oauth2 Client Secret.
+			 */
+			$auth_settings['ldap_password'] = apply_filters( 'authorizer_ldap_password', $auth_settings['ldap_password'] );
+
 			// Set bind credentials; attempt an anonymous bind if not provided.
 			$bind_rdn      = null;
 			$bind_password = null;
 			if ( strlen( $auth_settings['ldap_user'] ) > 0 ) {
 				$bind_rdn      = $auth_settings['ldap_user'];
-				$bind_password = Helper::decrypt( $auth_settings['ldap_password'] );
+				$bind_password = $auth_settings['ldap_password'];
+
+				// Decrypt LDAP password if coming from wp_options database (not needed
+				// if it was provided via constant or filter).
+				if ( ! defined( 'AUTHORIZER_LDAP_PASSWORD' ) && ! has_filter( 'authorizer_ldap_password' ) ) {
+					$bind_password = Helper::decrypt( $bind_password );
+				}
 
 				// If the bind user contains the [username] wildcard, replace it with
 				// the username and password of the user logging in.

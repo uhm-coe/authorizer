@@ -208,6 +208,40 @@ class Ldap extends \Authorizer\Singleton {
 		$option               = 'ldap_user';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
+		// If secret is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_ldap_user' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_ldap_user (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_ldap_user</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_LDAP_USER' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_LDAP_USER (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_LDAP_USER', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" style="width:330px;" />
@@ -254,6 +288,40 @@ class Ldap extends \Authorizer\Singleton {
 		$options              = Options::get_instance();
 		$option               = 'ldap_password';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// If secret is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_ldap_password' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_ldap_password (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_ldap_password</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_LDAP_PASSWORD' ) ) {
+			?>
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_LDAP_PASSWORD (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_LDAP_PASSWORD', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 
 		// Print option elements.
 		?>
