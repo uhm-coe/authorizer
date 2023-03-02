@@ -137,20 +137,6 @@ class Authorization extends Singleton {
 			}
 		}
 
-		// If this externally-authenticated user is an existing administrator (admin
-		// in single site mode, or super admin in network mode), and isn't blocked,
-		// let them in. Update their first/last name if needed (CAS/LDAP).
-		if ( $user && is_super_admin( $user->ID ) ) {
-			if ( $should_update_first_name ) {
-				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
-			}
-			if ( $should_update_last_name ) {
-				update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
-			}
-
-			return $user;
-		}
-
 		// Get the default role for this user (or their current role, if they
 		// already have an account).
 		$default_role = $user && is_array( $user->roles ) && count( $user->roles ) > 0 ? $user->roles[0] : $auth_settings['access_default_role'];
@@ -174,6 +160,20 @@ class Authorization extends Singleton {
 		 * @param array $user_data User data returned from external service.
 		 */
 		$automatically_approve_login = apply_filters( 'authorizer_automatically_approve_login', false, $user_data );
+
+		// If this externally-authenticated user is an existing administrator (admin
+		// in single site mode, or super admin in network mode), and isn't blocked,
+		// let them in. Update their first/last name if needed (CAS/LDAP).
+		if ( $user && is_super_admin( $user->ID ) ) {
+			if ( $should_update_first_name ) {
+				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
+			}
+			if ( $should_update_last_name ) {
+				update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
+			}
+
+			return $user;
+		}
 
 		// Iterate through each of the email addresses provided by the external
 		// service and determine if any of them have access.
