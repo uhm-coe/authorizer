@@ -62,6 +62,14 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.6.2 =
+* Performance tweaks during Authorizer updates on large multisites.
+* Ensure lockout values are integers for invalid login attempts (php8 compatibility).
+* Check for existence of super admin roles before adding super admin to approved list on multisite activation.
+* Update French translations. Props @julienlusson!
+* Allow defining LDAP Directory User and Password via filters (`authorizer_ldap_user` and `authorizer_ldap_password`) or wp-config.php constants (`define( 'AUTHORIZER_LDAP_USER', '...' );` and `define( 'AUTHORIZER_LDAP_PASSWORD', '...' );`) to support integrations with third-party secrets managers (or simply to keep the secrets out of the WordPress database).
+* Allow `authorizer_custom_role` filter on admin logins.
+
 = 3.6.1 =
 * Allow defining Google Client Secret and OAuth2 Client Secret via filters (`authorizer_google_client_secret` and `authorizer_oauth2_client_secret`) or wp-config.php constants (`define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );` and `define( 'AUTHORIZER_OAUTH2_CLIENT_SECRET', '...' );`) to support integrations with third-party secrets managers (or simply to keep the secrets out of the database in plaintext).
 * Handle arrays in CAS attribute for first/last name.
