@@ -359,8 +359,8 @@ msgstr ""
 
 #: src/authorizer/class-admin-page.php:128
 msgid ""
-"<strong>Use TLS</strong>: Select whether all communication with the LDAP "
-"server should be performed over a TLS-secured connection."
+"<strong>Use STARTTLS</strong>: Select whether unencrypted communication with "
+"the LDAP server should be upgraded to a TLS-secured connection using STARTTLS."
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:129
