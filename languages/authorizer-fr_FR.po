@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Authorizer en français\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authorizer\n"
-"POT-Creation-Date: 2023-02-14 15:44+0100\n"
+"POT-Creation-Date: 2023-04-22 19:42+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: Paul Ryan <paul.ryan@hawaii.edu>\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.0.1\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-KeywordsList: __;_e;__ngettext:1,2;_n:1,2;__ngettext_noop:1,2;"
 "_n_noop:1,2;_c,_nc:4c,1,2;_x:1,2c;_nx:4c,1,2;_nx_noop:4c,1,2;_ex:1,2c;"
@@ -231,12 +231,19 @@ msgstr ""
 "et chemin)."
 
 #: src/authorizer/class-admin-page.php:94
+#, fuzzy
+#| msgid ""
+#| "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
+#| "log in with their LDAP (Lightweight Directory Access Protocol) "
+#| "credentials. You will need to enter details about your LDAP server (host, "
+#| "port, search base, uid attribute, directory user, directory user "
+#| "password, and whether to use TLS) to enable Google Logins."
 msgid ""
 "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
 "log in with their LDAP (Lightweight Directory Access Protocol) credentials. "
 "You will need to enter details about your LDAP server (host, port, search "
 "base, uid attribute, directory user, directory user password, and whether to "
-"use TLS) to enable Google Logins."
+"use STARTTLS) to enable Google Logins."
 msgstr ""
 "<strong>Activer la connexion LDAP</strong> : indiquez si vous souhaitez "
 "autoriser les utilisateurs à se connecter avec leurs identifiants LDAP "
@@ -515,9 +522,14 @@ msgstr ""
 "l’annuaire."
 
 #: src/authorizer/class-admin-page.php:128
+#, fuzzy
+#| msgid ""
+#| "<strong>Use TLS</strong>: Select whether all communication with the LDAP "
+#| "server should be performed over a TLS-secured connection."
 msgid ""
-"<strong>Use TLS</strong>: Select whether all communication with the LDAP "
-"server should be performed over a TLS-secured connection."
+"<strong>Use STARTTLS</strong>: Select whether unencrypted communication with "
+"the LDAP server should be upgraded to a TLS-secured connection using "
+"STARTTLS."
 msgstr ""
 "<strong>Utiliser TLS</strong> : Indiquez si toute communication avec le "
 "serveur LDAP devra passer par une connexion TLS sécurisée."
@@ -873,7 +885,9 @@ msgstr "Port LDAP"
 #: src/authorizer/class-admin-page.php:611
 #: src/authorizer/class-admin-page.php:985
 #: src/authorizer/options/external/class-ldap.php:104
-msgid "Use TLS"
+#, fuzzy
+#| msgid "Use TLS"
+msgid "Use STARTTLS"
 msgstr "Utiliser TLS"
 
 #: src/authorizer/class-admin-page.php:618
@@ -2112,8 +2126,10 @@ msgstr ""
 "champ est ignoré."
 
 #: src/authorizer/options/external/class-ldap.php:105
-msgid "If ldaps is used, this should be unchecked"
-msgstr "Si ldaps est utilisé, cela devrait être décoché"
+msgid ""
+"If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is "
+"ignored."
+msgstr ""
 
 #: src/authorizer/options/external/class-ldap.php:125
 msgid "Example:  ou=people,dc=example,dc=edu"
@@ -2268,22 +2284,33 @@ msgstr "Exemple : https://espace.site.test/login/oauth/access_token"
 msgid "Example:  https://api.example.edu/user"
 msgstr "Exemple : https://api.site.test/user"
 
+#. Plugin Name of the plugin/theme
+msgid "Authorizer"
+msgstr "Authorizer"
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/uhm-coe/authorizer"
+msgstr "https://github.com/uhm-coe/authorizer"
+
+#. Description of the plugin/theme
+#, fuzzy
+#| msgid ""
+#| "Authorizer limits login attempts, restricts access to specified users, "
+#| "and authenticates against external sources (e.g., Google, LDAP, or CAS)."
+msgid ""
+"Authorizer limits login attempts, restricts access to specified users, and "
+"authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS)."
+msgstr ""
+"Authorizer limite les tentatives d’authentification, restreint les accès à "
+"des utilisateurs spécifiques, et permet l’authentification via des sources "
+"externes (ex : OAuth2, Google, LDAP, ou CAS)."
+
+#. Author of the plugin/theme
+msgid "Paul Ryan <prar@hawaii.edu>"
+msgstr "Paul Ryan <prar@hawaii.edu>"
+
+#~ msgid "If ldaps is used, this should be unchecked"
+#~ msgstr "Si ldaps est utilisé, cela devrait être décoché"
+
 #~ msgid "Sign in with Google"
 #~ msgstr "S’authentifier avec Google"
-
-#~ msgid "Authorizer"
-#~ msgstr "Authorizer"
-
-#~ msgid "https://github.com/uhm-coe/authorizer"
-#~ msgstr "https://github.com/uhm-coe/authorizer"
-
-#~ msgid ""
-#~ "Authorizer limits login attempts, restricts access to specified users, "
-#~ "and authenticates against external sources (e.g., Google, LDAP, or CAS)."
-#~ msgstr ""
-#~ "Authorizer limite les tentatives d’authentification, restreint les accès "
-#~ "à des utilisateurs spécifiques, et permet l’authentification via des "
-#~ "sources externes (ex : OAuth2, Google, LDAP, ou CAS)."
-
-#~ msgid "Paul Ryan <prar@hawaii.edu>"
-#~ msgstr "Paul Ryan <prar@hawaii.edu>"
