@@ -237,13 +237,6 @@ msgstr ""
 "CAS."
 
 #: src/authorizer/class-admin-page.php:94
-#, fuzzy
-#| msgid ""
-#| "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
-#| "log in with their LDAP (Lightweight Directory Access Protocol) "
-#| "credentials. You will need to enter details about your LDAP server (host, "
-#| "port, search base, uid attribute, directory user, directory user "
-#| "password, and whether to use TLS) to enable Google Logins."
 msgid ""
 "<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
 "log in with their LDAP (Lightweight Directory Access Protocol) credentials. "
@@ -256,8 +249,8 @@ msgstr ""
 "(Lightweight Directory Access Protocol) . Tendrás que introducir los "
 "detalles sobre tu servidor CAS (servidor, puerto, base de búsqueda, atributo "
 "UID, usuario del directorio, contraseña del usuario del directorio, y si "
-"quieres utilizar TLS), para poder activar los inicios de sesión mediante "
-"LDAP."
+"quieres utilizar STARTTLS), para poder activar los inicios de sesión "
+"mediante LDAP."
 
 #: src/authorizer/class-admin-page.php:95
 msgid ""
@@ -510,17 +503,14 @@ msgstr ""
 "directorio."
 
 #: src/authorizer/class-admin-page.php:128
-#, fuzzy
-#| msgid ""
-#| "<strong>Use TLS</strong>: Select whether all communication with the LDAP "
-#| "server should be performed over a TLS-secured connection."
 msgid ""
 "<strong>Use STARTTLS</strong>: Select whether unencrypted communication with "
 "the LDAP server should be upgraded to a TLS-secured connection using "
 "STARTTLS."
 msgstr ""
-"<strong>Utilizar TLS.</strong> Selecciona si todas las comunicaciones con el "
-"servidor LDAP deben llevarse a cabo sobre una conexión TLS segura."
+"<strong>Utilizar STARTTLS.</strong> Selecciona si las comunicaciones sin "
+"cifrar con el servidor LDAP deben ser mejoradas con cifrado TLS usando "
+"STARTTLS."
 
 #: src/authorizer/class-admin-page.php:129
 msgid ""
@@ -889,10 +879,8 @@ msgstr "Puerto de LDAP"
 #: src/authorizer/class-admin-page.php:611
 #: src/authorizer/class-admin-page.php:985
 #: src/authorizer/options/external/class-ldap.php:104
-#, fuzzy
-#| msgid "Use TLS"
 msgid "Use STARTTLS"
-msgstr "Utilizar TLS"
+msgstr "Utilizar STARTTLS"
 
 #: src/authorizer/class-admin-page.php:618
 #: src/authorizer/class-admin-page.php:989
