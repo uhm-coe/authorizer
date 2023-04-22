@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Authorizer\n"
-"POT-Creation-Date: 2023-04-22 19:01+0200\n"
+"POT-Creation-Date: 2023-04-22 19:08+0200\n"
 "PO-Revision-Date: 2023-01-30 14:42-1000\n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: University of Hawaii <dcdc@hawaii.edu>\n"
@@ -663,7 +663,7 @@ msgstr ""
 #: src/authorizer/class-admin-page.php:611
 #: src/authorizer/class-admin-page.php:985
 #: src/authorizer/options/external/class-ldap.php:104
-msgid "Use TLS"
+msgid "Use STARTTLS"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:618
@@ -1744,7 +1744,9 @@ msgid ""
 msgstr ""
 
 #: src/authorizer/options/external/class-ldap.php:105
-msgid "If ldaps is used, this should be unchecked"
+msgid ""
+"If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is "
+"ignored."
 msgstr ""
 
 #: src/authorizer/options/external/class-ldap.php:125
