@@ -1,7 +1,7 @@
 === Authorizer ===
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: cas, ldap, google, google plus, login, authentication, authorization, access, education, limit login attempts, oauth, oauth2
-Tested up to: 6.1
+Tested up to: 6.2
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
