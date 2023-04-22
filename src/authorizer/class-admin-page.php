@@ -91,7 +91,7 @@ class Admin_Page extends Singleton {
 			<p>' . __( '<strong>Enable OAuth2 Logins</strong>: Choose if you want to allow users to log in with one of the supported OAuth2 providers. You will need to enter your API Client ID and Secret to enable these logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.', 'authorizer' ) . '</p>
-			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.', 'authorizer' ) . '</p>
+			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use STARTTLS) to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p><strong><em>' . __( 'If you enable OAuth2 logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
@@ -608,7 +608,7 @@ class Admin_Page extends Singleton {
 		);
 		add_settings_field(
 			'auth_settings_ldap_tls',
-			__( 'Use TLS', 'authorizer' ),
+			__( 'Use STARTTLS', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_ldap_tls' ),
 			'authorizer',
 			'auth_settings_external'
@@ -982,7 +982,7 @@ class Admin_Page extends Singleton {
 							<td><?php $ldap->print_text_ldap_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Use STARTTLS', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_checkbox_ldap_tls( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
