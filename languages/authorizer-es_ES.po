@@ -508,9 +508,8 @@ msgid ""
 "the LDAP server should be upgraded to a TLS-secured connection using "
 "STARTTLS."
 msgstr ""
-"<strong>Utilizar STARTTLS.</strong> Selecciona si las comunicaciones sin "
-"cifrar con el servidor LDAP deben ser mejoradas con cifrado TLS usando "
-"STARTTLS."
+"<strong>Utilizar STARTTLS.</strong> Selecciona si la comunicación insegura "
+"con el servidor LDAP debe ser asegurada con cifrado TLS usando STARTTLS."
 
 #: src/authorizer/class-admin-page.php:129
 msgid ""
@@ -2135,6 +2134,8 @@ msgid ""
 "If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is "
 "ignored."
 msgstr ""
+"Si usas un URL ldaps:// (y, con ello, TLS Implícito), esta casilla es "
+"ignorada."
 
 #: src/authorizer/options/external/class-ldap.php:125
 msgid "Example:  ou=people,dc=example,dc=edu"
