@@ -49,8 +49,8 @@ msgid ""
 "list."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:53 src/authorizer/class-options.php:944
-#: src/authorizer/class-options.php:950
+#: src/authorizer/class-admin-page.php:53 src/authorizer/class-options.php:958
+#: src/authorizer/class-options.php:964
 msgid "Access Lists"
 msgstr ""
 
@@ -81,7 +81,7 @@ msgid ""
 "once they try to log in to the site for the first time."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:67 src/authorizer/class-options.php:951
+#: src/authorizer/class-admin-page.php:67 src/authorizer/class-options.php:965
 msgid "Login Access"
 msgstr ""
 
@@ -127,7 +127,7 @@ msgid ""
 "here."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:83 src/authorizer/class-options.php:952
+#: src/authorizer/class-admin-page.php:83 src/authorizer/class-options.php:966
 msgid "Public Access"
 msgstr ""
 
@@ -396,8 +396,8 @@ msgid ""
 "set, this only happens the first time they log in."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:138 src/authorizer/class-options.php:945
-#: src/authorizer/class-options.php:953
+#: src/authorizer/class-admin-page.php:138 src/authorizer/class-options.php:959
+#: src/authorizer/class-options.php:967
 msgid "External Service"
 msgstr ""
 
@@ -435,8 +435,8 @@ msgid ""
 "directory under sample-theme-add-branding."
 msgstr ""
 
-#: src/authorizer/class-admin-page.php:153 src/authorizer/class-options.php:946
-#: src/authorizer/class-options.php:954
+#: src/authorizer/class-admin-page.php:153 src/authorizer/class-options.php:960
+#: src/authorizer/class-options.php:968
 msgid "Advanced"
 msgstr ""
 
@@ -972,122 +972,122 @@ msgid "CAS server returned an Authentication Exception. Details:"
 msgstr ""
 
 #. TRANSLATORS: Current time
-#: src/authorizer/class-authentication.php:952
+#: src/authorizer/class-authentication.php:973
 #, php-format
 msgid "[%s] Attempting to authenticate via LDAP."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:962
+#: src/authorizer/class-authentication.php:983
 msgid "Failed: no LDAP Host(s) specified."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:973
+#: src/authorizer/class-authentication.php:994
 msgid "Failed: no LDAP Search Base(s) specified."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1006
+#: src/authorizer/class-authentication.php:1027
 msgid "Failed: empty username and password."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1014
+#: src/authorizer/class-authentication.php:1035
 msgid "Failed: empty username."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1016
+#: src/authorizer/class-authentication.php:1037
 msgid "You must provide a username or email."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1020
+#: src/authorizer/class-authentication.php:1041
 msgid "Failed: empty password."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1022
+#: src/authorizer/class-authentication.php:1043
 msgid "You must provide a password."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1028
+#: src/authorizer/class-authentication.php:1049
 msgid "Failed: php-ldap extension not installed."
 msgstr ""
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1055
+#: src/authorizer/class-authentication.php:1076
 #, php-format
 msgid "Warning: could not parse host %s with wp_parse_url()."
 msgstr ""
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1078
+#: src/authorizer/class-authentication.php:1099
 #, php-format
 msgid "Warning: syntax check failed on host %s in ldap_connect()."
 msgstr ""
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1089
+#: src/authorizer/class-authentication.php:1110
 #, php-format
 msgid "Warning: unable to start TLS on host %s:"
 msgstr ""
 
 #. TRANSLATORS: LDAP User DN
-#: src/authorizer/class-authentication.php:1111
+#: src/authorizer/class-authentication.php:1164
 #, php-format
 msgid "Performing bind as user logging in: %s."
 msgstr ""
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1121
+#: src/authorizer/class-authentication.php:1174
 #, php-format
 msgid "Warning: unable to bind on host %1$s using directory user:"
 msgstr ""
 
 #. TRANSLATORS: LDAP User DN
-#: src/authorizer/class-authentication.php:1135
+#: src/authorizer/class-authentication.php:1188
 #, php-format
 msgid "Successful bind using LDAP user DN %s instead of directory user."
 msgstr ""
 
 #. TRANSLATORS: LDAP User
-#: src/authorizer/class-authentication.php:1145
-#: src/authorizer/class-authentication.php:1292
+#: src/authorizer/class-authentication.php:1198
+#: src/authorizer/class-authentication.php:1345
 #, php-format
 msgid "Failed: password incorrect for LDAP user %s."
 msgstr ""
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1158
+#: src/authorizer/class-authentication.php:1211
 #, php-format
 msgid "Connected to LDAP host %s."
 msgstr ""
 
-#: src/authorizer/class-authentication.php:1166
+#: src/authorizer/class-authentication.php:1219
 msgid "Failed: unable to connect to any LDAP host."
 msgstr ""
 
 #. TRANSLATORS: LDAP search filter
-#: src/authorizer/class-authentication.php:1227
+#: src/authorizer/class-authentication.php:1280
 #, php-format
 msgid "Using LDAP search filter: %s"
 msgstr ""
 
 #. TRANSLATORS: 1: LDAP user 2: LDAP search base
-#: src/authorizer/class-authentication.php:1242
+#: src/authorizer/class-authentication.php:1295
 #, php-format
 msgid "Found user %1$s in search base: %2$s"
 msgstr ""
 
 #. TRANSLATORS: 1: LDAP user 2: LDAP search base
-#: src/authorizer/class-authentication.php:1247
+#: src/authorizer/class-authentication.php:1300
 #, php-format
 msgid "Failed to find user %1$s in %2$s. Trying next search base."
 msgstr ""
 
 #. TRANSLATORS: LDAP User
-#: src/authorizer/class-authentication.php:1255
+#: src/authorizer/class-authentication.php:1308
 #, php-format
 msgid "Failed: no LDAP user %s found."
 msgstr ""
 
 #. TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email
-#: src/authorizer/class-authentication.php:1311
+#: src/authorizer/class-authentication.php:1364
 #, php-format
 msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
 msgstr ""
@@ -1180,27 +1180,27 @@ msgstr ""
 msgid "multisite option"
 msgstr ""
 
-#: src/authorizer/class-options.php:281
+#: src/authorizer/class-options.php:295
 msgid ""
 "You're not currently allowed to view this site. Your administrator has been "
 "notified, and once he/she has approved your request, you will be able to log "
 "in. If you need any other help, please contact your administrator."
 msgstr ""
 
-#: src/authorizer/class-options.php:284
+#: src/authorizer/class-options.php:298
 msgid ""
 "You're not currently allowed to log into this site. If you think this is a "
 "mistake, please contact your administrator."
 msgstr ""
 
 #. TRANSLATORS: %s: Shortcode for name of site
-#: src/authorizer/class-options.php:292
+#: src/authorizer/class-options.php:306
 #, php-format
 msgid "Welcome to %s!"
 msgstr ""
 
 #. TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL
-#: src/authorizer/class-options.php:299
+#: src/authorizer/class-options.php:313
 #, php-format
 msgid ""
 "Hello %1$s,\n"
@@ -1209,7 +1209,7 @@ msgid ""
 "%3$s\n"
 msgstr ""
 
-#: src/authorizer/class-options.php:320
+#: src/authorizer/class-options.php:334
 msgid ""
 "Notice: You are browsing this site anonymously, and only have access to a "
 "portion of its content."
@@ -1566,22 +1566,22 @@ msgid "Example:  givenName"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:323
-#: src/authorizer/options/external/class-ldap.php:322
+#: src/authorizer/options/external/class-ldap.php:390
 msgid "Example:  sn"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:340
-#: src/authorizer/options/external/class-ldap.php:339
+#: src/authorizer/options/external/class-ldap.php:407
 msgid "Do not update first and last name fields on login"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:341
-#: src/authorizer/options/external/class-ldap.php:340
+#: src/authorizer/options/external/class-ldap.php:408
 msgid "Update first and last name fields on login"
 msgstr ""
 
 #: src/authorizer/options/external/class-cas.php:342
-#: src/authorizer/options/external/class-ldap.php:341
+#: src/authorizer/options/external/class-ldap.php:409
 msgid "Update first and last name fields on login only if they are empty"
 msgstr ""
 
@@ -1781,12 +1781,12 @@ msgid ""
 "<strong>@example.edu</strong> in this field."
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:214
+#: src/authorizer/options/external/class-ldap.php:248
 msgid "Example:  cn=directory-user,ou=specials,dc=example,dc=edu"
 msgstr ""
 
 #. TRANSLATORS: %s: Username wildcard
-#: src/authorizer/options/external/class-ldap.php:221
+#: src/authorizer/options/external/class-ldap.php:255
 #, php-format
 msgid ""
 "Note: You can use the %s wildcard to bind as the username of the user "
@@ -1794,38 +1794,38 @@ msgid ""
 msgstr ""
 
 #. TRANSLATORS: %s: Username wildcard
-#: src/authorizer/options/external/class-ldap.php:233
+#: src/authorizer/options/external/class-ldap.php:267
 #, php-format
 msgid "Example: <strong>uid=%s,ou=people,dc=example,dc=edu</strong>."
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:240
+#: src/authorizer/options/external/class-ldap.php:274
 msgid ""
 "Leave the LDAP Directory User Password field below blank, and the bind will "
 "be attempted with the user-supplied password."
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:282
+#: src/authorizer/options/external/class-ldap.php:350
 msgid "Example:  https://myschool.example.edu:8888/am-forgot-password"
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:302
+#: src/authorizer/options/external/class-ldap.php:370
 msgid "Example:  givenname"
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:369
+#: src/authorizer/options/external/class-ldap.php:437
 msgid "username"
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:371
+#: src/authorizer/options/external/class-ldap.php:439
 msgid "password"
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:372
+#: src/authorizer/options/external/class-ldap.php:440
 msgid "Test"
 msgstr ""
 
-#: src/authorizer/options/external/class-ldap.php:375
+#: src/authorizer/options/external/class-ldap.php:443
 msgid ""
 "Note: Make sure to save any changes to LDAP settings before clicking the "
 "Test button."
