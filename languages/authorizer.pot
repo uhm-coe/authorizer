@@ -351,10 +351,30 @@ msgid ""
 "has permissions to browse the directory."
 msgstr ""
 
+#: src/authorizer/class-admin-page.php:126
+msgid ""
+"Note: for increased security, you can leave this field blank and instead "
+"define this value either in wp-config.php via "
+"<code>define( 'AUTHORIZER_LDAP_USER', '...' );</code>, or you may fetch it "
+"from an external service like AWS Secrets Manager by hooking into the "
+"<code>authorizer_ldap_user</code> filter. This will prevent it from being "
+"stored in plaintext in the WordPress database."
+msgstr ""
+
 #: src/authorizer/class-admin-page.php:127
 msgid ""
 "<strong>LDAP Directory User Password</strong>: Enter the password for the "
 "LDAP user that has permission to browse the directory."
+msgstr ""
+
+#: src/authorizer/class-admin-page.php:127
+msgid ""
+"Note: for increased security, you can leave this field blank and instead "
+"define this value either in wp-config.php via "
+"<code>define( 'AUTHORIZER_LDAP_PASSWORD', '...' );</code>, or you may fetch "
+"it from an external service like AWS Secrets Manager by hooking into the "
+"<code>authorizer_ldap_password</code> filter. This will prevent it from "
+"being stored in the WordPress database."
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:128
@@ -1677,8 +1697,12 @@ msgid ""
 msgstr ""
 
 #. TRANSLATORS: %s: authorizer_google_client_secret (filter name)
+#. TRANSLATORS: %s: authorizer_ldap_user (filter name)
+#. TRANSLATORS: %s: authorizer_ldap_password (filter name)
 #. TRANSLATORS: %s: authorizer_oauth2_client_secret (filter name)
 #: src/authorizer/options/external/class-google.php:98
+#: src/authorizer/options/external/class-ldap.php:220
+#: src/authorizer/options/external/class-ldap.php:301
 #: src/authorizer/options/external/class-oauth2.php:168
 #, php-format
 msgid ""
@@ -1686,8 +1710,12 @@ msgid ""
 msgstr ""
 
 #. TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_SECRET (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_LDAP_USER (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_LDAP_PASSWORD (defined constant name)
 #. TRANSLATORS: %s: AUTHORIZER_OAUTH2_CLIENT_SECRET (defined constant name)
 #: src/authorizer/options/external/class-google.php:113
+#: src/authorizer/options/external/class-ldap.php:235
+#: src/authorizer/options/external/class-ldap.php:316
 #: src/authorizer/options/external/class-oauth2.php:183
 #, php-format
 msgid ""
