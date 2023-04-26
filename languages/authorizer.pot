@@ -161,11 +161,11 @@ msgstr ""
 
 #: src/authorizer/class-admin-page.php:94
 msgid ""
-"<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log "
-"in with their LDAP (Lightweight Directory Access Protocol) credentials. You "
-"will need to enter details about your LDAP server (host, port, search base, "
-"uid attribute, directory user, directory user password, and whether to use "
-"STARTTLS) to enable Google Logins."
+"<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
+"log in with their LDAP (Lightweight Directory Access Protocol) credentials. "
+"You will need to enter details about your LDAP server (host, port, search "
+"base, uid attribute, directory user, directory user password, and whether to "
+"use STARTTLS) to enable LDAP Logins."
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:95
