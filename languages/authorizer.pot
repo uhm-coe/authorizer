@@ -3,14 +3,14 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Authorizer\n"
-"POT-Creation-Date: 2023-01-30 14:47-1000\n"
+"POT-Creation-Date: 2023-04-22 19:42+0200\n"
 "PO-Revision-Date: 2023-01-30 14:42-1000\n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: University of Hawaii <dcdc@hawaii.edu>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.12\n"
+"X-Generator: Poedit 3.2.2\n"
 "X-Poedit-Basepath: ..\n"
 "X-Poedit-WPHeader: authorizer.php\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -161,11 +161,11 @@ msgstr ""
 
 #: src/authorizer/class-admin-page.php:94
 msgid ""
-"<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to "
-"log in with their LDAP (Lightweight Directory Access Protocol) credentials. "
-"You will need to enter details about your LDAP server (host, port, search "
-"base, uid attribute, directory user, directory user password, and whether to "
-"use TLS) to enable Google Logins."
+"<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log "
+"in with their LDAP (Lightweight Directory Access Protocol) credentials. You "
+"will need to enter details about your LDAP server (host, port, search base, "
+"uid attribute, directory user, directory user password, and whether to use "
+"STARTTLS) to enable Google Logins."
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:95
@@ -359,8 +359,8 @@ msgstr ""
 
 #: src/authorizer/class-admin-page.php:128
 msgid ""
-"<strong>Use TLS</strong>: Select whether all communication with the LDAP "
-"server should be performed over a TLS-secured connection."
+"<strong>Use STARTTLS</strong>: Select whether unencrypted communication with "
+"the LDAP server should be upgraded to a TLS-secured connection using STARTTLS."
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:129
@@ -663,7 +663,7 @@ msgstr ""
 #: src/authorizer/class-admin-page.php:611
 #: src/authorizer/class-admin-page.php:985
 #: src/authorizer/options/external/class-ldap.php:104
-msgid "Use TLS"
+msgid "Use STARTTLS"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:618
@@ -1744,7 +1744,9 @@ msgid ""
 msgstr ""
 
 #: src/authorizer/options/external/class-ldap.php:105
-msgid "If ldaps is used, this should be unchecked"
+msgid ""
+"If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is "
+"ignored."
 msgstr ""
 
 #: src/authorizer/options/external/class-ldap.php:125

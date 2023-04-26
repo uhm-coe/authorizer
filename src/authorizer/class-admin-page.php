@@ -91,7 +91,7 @@ class Admin_Page extends Singleton {
 			<p>' . __( '<strong>Enable OAuth2 Logins</strong>: Choose if you want to allow users to log in with one of the supported OAuth2 providers. You will need to enter your API Client ID and Secret to enable these logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.', 'authorizer' ) . '</p>
-			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use TLS) to enable Google Logins.', 'authorizer' ) . '</p>
+			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use STARTTLS) to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p><strong><em>' . __( 'If you enable OAuth2 logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
@@ -125,7 +125,7 @@ class Admin_Page extends Singleton {
 				<li>' . __( '<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind against for login attempts.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_LDAP_USER', '...' );</code>, or you may fetch it from an external service like AWS Secrets Manager by hooking into the <code>authorizer_ldap_user</code> filter. This will prevent it from being stored in plaintext in the WordPress database.", 'authorizer' ) . '</li>
 				<li>' . __( '<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_LDAP_PASSWORD', '...' );</code>, or you may fetch it from an external service like AWS Secrets Manager by hooking into the <code>authorizer_ldap_password</code> filter. This will prevent it from being stored in the WordPress database.", 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Use TLS</strong>: Select whether all communication with the LDAP server should be performed over a TLS-secured connection.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Use STARTTLS</strong>: Select whether unencrypted communication with the LDAP server should be upgraded to a TLS-secured connection using STARTTLS.', 'authorizer' ) . '</li>
 				<li>' . __( "<strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to the appropriate location to change the password on their external authentication service here.", 'authorizer' ) . '</li>
 				<li>' . __( "<strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
 				<li>' . __( "<strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and added to their WordPress profile.", 'authorizer' ) . '</li>
@@ -608,7 +608,7 @@ class Admin_Page extends Singleton {
 		);
 		add_settings_field(
 			'auth_settings_ldap_tls',
-			__( 'Use TLS', 'authorizer' ),
+			__( 'Use STARTTLS', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_ldap_tls' ),
 			'authorizer',
 			'auth_settings_external'
@@ -982,7 +982,7 @@ class Admin_Page extends Singleton {
 							<td><?php $ldap->print_text_ldap_port( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></th>
+							<th scope="row"><?php esc_html_e( 'Use STARTTLS', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_checkbox_ldap_tls( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>

@@ -101,8 +101,8 @@ class Ldap extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use TLS', 'authorizer' ); ?></label>
-		<p class="description"><small><?php esc_html_e( 'If ldaps is used, this should be unchecked', 'authorizer' ); ?></small></p>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Use STARTTLS', 'authorizer' ); ?></label>
+		<p class="description"><small><?php esc_html_e( 'If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is ignored.', 'authorizer' ); ?></small></p>
 		<?php
 	}
 
