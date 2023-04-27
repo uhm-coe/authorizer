@@ -62,6 +62,14 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.6.3 =
+* Update helper text for the LDAP STARTTLS option. Props @TuringTux for the [pull request](https://github.com/uhm-coe/authorizer/pull/132)!
+* Update French translations. Props @julienlusson!
+* Update composer dependencies (phpseclib/phpseclib 3.0.18 => 3.0.19; psr/http-message 1.0.1 => 1.1; psr/http-factory 1.0.1 => 1.0.2; guzzlehttp/psr7 2.4.3 => 2.5.0; apereo/phpcas 1.6.0 => 1.6.1; firebase/php-jwt v6.3.2 => v6.4.0; google/apiclient v2.13.0 => v2.13.2; google/apiclient-services v0.285.0 => v0.297.0; google/auth v1.25.0 => v1.26.0; guzzlehttp/guzzle 7.5.0 => 7.5.1; league/oauth2-client 2.6.1 => 2.7.0; monolog/monolog 2.8.0 => 2.9.1; psr/http-client 1.0.1 => 1.0.2).
+* Fix: Remove private pages from search results and archives if visitor is an anonymous user and site is configured to only allow logged in users to see the site. Props @ramrajone for the bug report!
+* Fix: Allow minor clock drift (30s) between the WordPress server and Google's server when processing Google logins.
+* Tested up to WordPress 6.2.
+
 = 3.6.2 =
 * Performance tweaks during Authorizer updates on large multisites.
 * Ensure lockout values are integers for invalid login attempts (php8 compatibility).
