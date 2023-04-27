@@ -640,6 +640,30 @@ class Authorization extends Singleton {
 		wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
 	}
 
+	/**
+	 * If we're showing search results or a post listing (home or archive page) to
+	 * an anonymous user, and Authorizer is configured to only allow logged in
+	 * users to see the site, filter the query to only posts marked public.
+	 *
+	 * Action: pre_get_posts
+	 *
+	 * @param WP_Query $query The WP_Query instance (passed by reference).
+	 * @return void
+	 */
+	public function remove_private_pages_from_search_and_archives( $query ) {
+		if (
+			! is_user_logged_in() && $query->is_main_query() &&
+			( is_search() || is_home() || is_archive() )
+		) {
+			$options      = Options::get_instance();
+			$who_can_view = $options->get( 'access_who_can_view' );
+			$public_pages = $options->get( 'access_public_pages' );
+			$public_pages = is_array( $public_pages ) ? $public_pages : array();
+			if ( 'logged_in_users' === $who_can_view ) {
+				$query->set( 'post__in', $public_pages );
+			}
+		}
+	}
 
 	/**
 	 * Prevent REST API access if user isn't authenticated and "only logged in
