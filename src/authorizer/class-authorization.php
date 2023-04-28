@@ -651,11 +651,17 @@ class Authorization extends Singleton {
 	 * @return void
 	 */
 	public function remove_private_pages_from_search_and_archives( $query ) {
+		// It's possible for pre_get_posts to fire before wp-includes/pluggable.php
+		// is loaded, so verify before using the is_user_logged_in() function.
+		if ( ! function_exists( 'is_user_logged_in' ) ) {
+			require ABSPATH . WPINC . '/pluggable.php';
+		}
+
 		// Do nothing if user is logged in, this isn't the main query, or we're not
 		// showing search results, home page, or an archive page.
 		if (
 			is_user_logged_in() || ! $query->is_main_query() ||
-			! ( is_search() || is_home() || is_archive() )
+			! ( $query->is_search() || $query->is_home() || $query->is_archive() )
 		) {
 			return;
 		}
