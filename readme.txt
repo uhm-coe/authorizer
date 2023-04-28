@@ -62,6 +62,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.6.3.1 =
+* Compatibility fix for Oxygen Builder.
+
 = 3.6.3 =
 * Update helper text for the LDAP STARTTLS option. Props @TuringTux for the [pull request](https://github.com/uhm-coe/authorizer/pull/132)!
 * Update French translations. Props @julienlusson!
