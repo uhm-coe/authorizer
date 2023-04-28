@@ -725,6 +725,10 @@ class Authentication extends Singleton {
 			$client->setHostedDomain( $google_hosteddomain );
 		}
 
+		// Allow minor clock drift between this server's clock and Google's.
+		// See: https://github.com/googleapis/google-api-php-client/issues/1630
+		\Firebase\JWT\JWT::$leeway = 30;
+
 		// Verify this is a successful Google authentication.
 		try {
 			$payload = $client->verifyIdToken( $token );

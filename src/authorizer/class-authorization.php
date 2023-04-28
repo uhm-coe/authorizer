@@ -640,6 +640,58 @@ class Authorization extends Singleton {
 		wp_die( '<p>Access denied.</p>', 'Site Access Restricted' );
 	}
 
+	/**
+	 * If we're showing search results or a post listing (home or archive page) to
+	 * an anonymous user, and Authorizer is configured to only allow logged in
+	 * users to see the site, filter the query to only posts marked public.
+	 *
+	 * Action: pre_get_posts
+	 *
+	 * @param WP_Query $query The WP_Query instance (passed by reference).
+	 * @return void
+	 */
+	public function remove_private_pages_from_search_and_archives( $query ) {
+		// Do nothing if user is logged in, this isn't the main query, or we're not
+		// showing search results, home page, or an archive page.
+		if (
+			is_user_logged_in() || ! $query->is_main_query() ||
+			! ( is_search() || is_home() || is_archive() )
+		) {
+			return;
+		}
+
+		$options      = Options::get_instance();
+		$who_can_view = $options->get( 'access_who_can_view' );
+		$public_pages = $options->get( 'access_public_pages' );
+		$public_pages = is_array( $public_pages ) ? $public_pages : array();
+
+		// Do nothing if this site isn't restricted to logged in users only.
+		if ( 'logged_in_users' !== $who_can_view ) {
+			return;
+		}
+
+		// Check for special public types (home, 404, categories).
+		$public_category_ids = array();
+		foreach ( $public_pages as $index => $public_page ) {
+			if ( 'home' === $public_page || 'auth_public_404' === $public_page ) {
+				unset( $public_pages[ $index ] );
+			} elseif ( 'cat_' === substr( $public_page, 0, 4 ) ) {
+				$public_category_name = substr( $public_page, 4 );
+				unset( $public_pages[ $index ] );
+				$public_category_ids[] = get_cat_ID( $public_category_name );
+			}
+		}
+		if ( ! empty( $public_category_ids ) ) {
+			$pages_in_public_categories = get_posts( array(
+				'posts_per_page' => -1,
+				'fields'         => 'ids',
+				'category__in'   => $public_category_ids,
+			) );
+			$public_pages = array_merge( $public_pages, $pages_in_public_categories );
+		}
+
+		$query->set( 'post__in', $public_pages );
+	}
 
 	/**
 	 * Prevent REST API access if user isn't authenticated and "only logged in

@@ -823,7 +823,7 @@ class Options extends Singleton {
 		$auth_settings['ldap_lostpassword_url'] = filter_var( $auth_settings['ldap_lostpassword_url'], FILTER_SANITIZE_URL );
 
 		// Obfuscate LDAP directory user password.
-		if ( strlen( $auth_settings['ldap_password'] ) > 0 ) {
+		if ( isset( $auth_settings['ldap_password'] ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
 			// encrypt the directory user password for some minor obfuscation in the database.
 			$auth_settings['ldap_password'] = Helper::encrypt( $auth_settings['ldap_password'] );
 		}
