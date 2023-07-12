@@ -657,6 +657,12 @@ class Authorization extends Singleton {
 			require ABSPATH . WPINC . '/pluggable.php';
 		}
 
+		// Fix for edge case when viewing admin pages in Pressbooks (Undefined
+		// constant "SECURE_AUTH_COOKIE").
+		if ( ! defined( 'SECURE_AUTH_COOKIE' ) ) {
+			wp_cookie_constants();
+		}
+
 		// Do nothing if user is logged in, this isn't the main query, or we're not
 		// showing search results, home page, or an archive page.
 		if (
