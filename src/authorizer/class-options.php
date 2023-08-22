@@ -208,7 +208,7 @@ class Options extends Singleton {
 				$auth_settings['ldap_attr_first_name']      = $auth_multisite_settings['ldap_attr_first_name'];
 				$auth_settings['ldap_attr_last_name']       = $auth_multisite_settings['ldap_attr_last_name'];
 				$auth_settings['ldap_attr_update_on_login'] = $auth_multisite_settings['ldap_attr_update_on_login'];
-				$auth_settings['ldap_test_user']            = $auth_multisite_settings['ldap_test_user'];
+				$auth_settings['ldap_test_user']            = $auth_multisite_settings['ldap_test_user'] ?? '';
 
 				// Override access_who_can_login and access_who_can_view.
 				$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
