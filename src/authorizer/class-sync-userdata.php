@@ -360,22 +360,20 @@ class Sync_Userdata extends Singleton {
 					update_blog_option( $blog_id, 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 				}
 			}
-		} else {
+		} elseif ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved' ) ) {
 			// In a single site environment, just find the old user in the approved list and update the email.
-			if ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved' ) ) {
-				$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
-				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
-					// Update old user email in approved list to the new email.
-					if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-						$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
-					}
-					// If new user email is already in approved list, remove that entry.
-					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-						unset( $auth_settings_access_users_approved[ $key ] );
-					}
+			$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
+			foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
+				// Update old user email in approved list to the new email.
+				if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+					$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
 				}
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				// If new user email is already in approved list, remove that entry.
+				if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+					unset( $auth_settings_access_users_approved[ $key ] );
+				}
 			}
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 		}
 
 		// We're hooking into this filter merely for its location in the codebase,
@@ -450,7 +448,6 @@ class Sync_Userdata extends Singleton {
 			$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 			$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
 		}
-
 	}
 
 
@@ -699,7 +696,6 @@ class Sync_Userdata extends Singleton {
 			$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 			$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
 		}
-
 	}
 
 
@@ -741,5 +737,4 @@ class Sync_Userdata extends Singleton {
 			$this->add_network_user_to_site( $user_id, $blog_id );
 		}
 	}
-
 }

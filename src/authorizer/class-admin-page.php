@@ -1170,5 +1170,4 @@ class Admin_Page extends Singleton {
 		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
 		add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
 	}
-
 }

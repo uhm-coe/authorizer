@@ -498,5 +498,4 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		return ob_get_clean();
 	}
-
 }

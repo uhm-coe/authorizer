@@ -49,5 +49,4 @@ abstract class Singleton {
 	 */
 	private function __clone() {
 	}
-
 }

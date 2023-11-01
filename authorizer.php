@@ -23,42 +23,42 @@
 
 namespace Authorizer;
 
-require_once dirname( __FILE__ ) . '/polyfills.php';
+require_once __DIR__ . '/polyfills.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/abstract-class-singleton.php';
+require_once __DIR__ . '/src/authorizer/abstract-class-singleton.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/class-wp-plugin-authorizer.php';
+require_once __DIR__ . '/src/authorizer/class-wp-plugin-authorizer.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/class-helper.php';
+require_once __DIR__ . '/src/authorizer/class-helper.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/class-updates.php';
+require_once __DIR__ . '/src/authorizer/class-updates.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/class-authentication.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-authorization.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-login-form.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-dashboard-widget.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-ajax-endpoints.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-sync-userdata.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/class-admin-page.php';
+require_once __DIR__ . '/src/authorizer/class-authentication.php';
+require_once __DIR__ . '/src/authorizer/class-authorization.php';
+require_once __DIR__ . '/src/authorizer/class-login-form.php';
+require_once __DIR__ . '/src/authorizer/class-dashboard-widget.php';
+require_once __DIR__ . '/src/authorizer/class-ajax-endpoints.php';
+require_once __DIR__ . '/src/authorizer/class-sync-userdata.php';
+require_once __DIR__ . '/src/authorizer/class-admin-page.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/class-options.php';
+require_once __DIR__ . '/src/authorizer/class-options.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/options/class-access-lists.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/class-login-access.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/class-public-access.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/class-external.php';
+require_once __DIR__ . '/src/authorizer/options/class-access-lists.php';
+require_once __DIR__ . '/src/authorizer/options/class-login-access.php';
+require_once __DIR__ . '/src/authorizer/options/class-public-access.php';
+require_once __DIR__ . '/src/authorizer/options/class-external.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-oauth2.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-google.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-cas.php';
-require_once dirname( __FILE__ ) . '/src/authorizer/options/external/class-ldap.php';
+require_once __DIR__ . '/src/authorizer/options/external/class-oauth2.php';
+require_once __DIR__ . '/src/authorizer/options/external/class-google.php';
+require_once __DIR__ . '/src/authorizer/options/external/class-cas.php';
+require_once __DIR__ . '/src/authorizer/options/external/class-ldap.php';
 
-require_once dirname( __FILE__ ) . '/src/authorizer/options/class-advanced.php';
+require_once __DIR__ . '/src/authorizer/options/class-advanced.php';
 
 /**
  * Add composer libraries.
  */
-require_once dirname( __FILE__ ) . '/vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 /**
  * Helper function to always return the path to the plugin's entry point. Used

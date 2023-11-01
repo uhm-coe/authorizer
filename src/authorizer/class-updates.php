@@ -554,5 +554,4 @@ class Updates extends Singleton {
 			}
 		}
 	}
-
 }

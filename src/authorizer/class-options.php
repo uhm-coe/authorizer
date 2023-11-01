@@ -729,21 +729,21 @@ class Options extends Singleton {
 	/**
 	 * List sanitizer.
 	 *
-	 * @param  array $list Array of users to sanitize.
-	 * @return array       Array of sanitized users.
+	 * @param  array $user_list Array of users to sanitize.
+	 * @return array            Array of sanitized users.
 	 */
-	public function sanitize_user_list( $list ) {
+	public function sanitize_user_list( $user_list ) {
 		// If it's not a list, make it so.
-		if ( ! is_array( $list ) ) {
-			$list = array();
+		if ( ! is_array( $user_list ) ) {
+			$user_list = array();
 		}
-		foreach ( $list as $key => $user_info ) {
+		foreach ( $user_list as $key => $user_info ) {
 			if ( strlen( $user_info['email'] ) < 1 ) {
 				// Make sure there are no empty entries in the list.
-				unset( $list[ $key ] );
+				unset( $user_list[ $key ] );
 			}
 		}
-		return $list;
+		return $user_list;
 	}
 
 
@@ -1016,5 +1016,4 @@ class Options extends Singleton {
 
 		return $user;
 	}
-
 }

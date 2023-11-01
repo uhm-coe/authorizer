@@ -562,15 +562,15 @@ class Access_Lists extends \Authorizer\Singleton {
 	 * Helper function to get number of users (including multisite users)
 	 * in a given list (pending, approved, or blocked).
 	 *
-	 * @param  string $list       List to get count of.
+	 * @param  string $user_list  List to get count of.
 	 * @param  string $admin_mode Helper::SINGLE_CONTEXT or Helper::NETWORK_CONTEXT determines whether to include multisite users.
 	 * @return int                Number of users in list.
 	 */
-	protected function get_user_count_from_list( $list, $admin_mode = Helper::SINGLE_CONTEXT ) {
+	protected function get_user_count_from_list( $user_list, $admin_mode = Helper::SINGLE_CONTEXT ) {
 		$options                    = Options::get_instance();
 		$auth_settings_access_users = array();
 
-		switch ( $list ) {
+		switch ( $user_list ) {
 			case 'pending':
 				$auth_settings_access_users = $options->get( 'access_users_pending', Helper::SINGLE_CONTEXT );
 				break;
@@ -596,5 +596,4 @@ class Access_Lists extends \Authorizer\Singleton {
 
 		return count( $auth_settings_access_users );
 	}
-
 }

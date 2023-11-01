@@ -52,5 +52,4 @@ class External extends \Authorizer\Singleton {
 		</select>
 		<?php
 	}
-
 }

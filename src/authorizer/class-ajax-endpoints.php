@@ -439,15 +439,14 @@ class Ajax_Endpoints extends Singleton {
 			if ( $should_update_auth_settings_access_users_approved ) {
 				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 			}
+		} elseif ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
+			// Update user's usermeta value for usermeta key stored in authorizer options.
+			// We have an ACF field value, so use the ACF function to update it.
+			update_field( str_replace( 'acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
 		} else {
 			// Update user's usermeta value for usermeta key stored in authorizer options.
-			if ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
-				// We have an ACF field value, so use the ACF function to update it.
-				update_field( str_replace( 'acf___', '', $meta_key ), $meta_value, 'user_' . $wp_user->ID );
-			} else {
-				// We have a normal usermeta value, so just update it via the WordPress function.
-				update_user_meta( $wp_user->ID, $meta_key, $meta_value );
-			}
+			// We have a normal usermeta value, so just update it via the WordPress function.
+			update_user_meta( $wp_user->ID, $meta_key, $meta_value );
 		}
 
 		// Return 'success' value to AJAX call.
@@ -605,25 +604,23 @@ class Ajax_Endpoints extends Singleton {
 						} else {
 							$invalid_emails[] = $approved_user['email'];
 						}
-					} else {
-						if ( ! Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved' ) ) {
-							$auth_settings_access_users_approved = $options->sanitize_user_list(
-								$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )
-							);
-							$approved_user['date_added']         = wp_date( 'M Y' );
-							array_push( $auth_settings_access_users_approved, $approved_user );
-							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-							// Edge case: if added user already exists in WordPress, make sure
-							// their role matches the one just set here when adding to the
-							// approved list. Note: this will also trigger a redundant role
-							// sync in action set_user_role, but it shouldn't do anything
-							// since we just updated the role in the approved list above.
-							if ( false !== $new_user && ! in_array( $approved_user['role'], $new_user->roles, true ) ) {
-								$new_user->set_role( $approved_user['role'] );
-							}
-						} else {
-							$invalid_emails[] = $approved_user['email'];
+					} elseif ( ! Authorization::get_instance()->is_email_in_list( $approved_user['email'], 'approved' ) ) {
+						$auth_settings_access_users_approved = $options->sanitize_user_list(
+							$options->get( 'access_users_approved', Helper::SINGLE_CONTEXT )
+						);
+						$approved_user['date_added']         = wp_date( 'M Y' );
+						array_push( $auth_settings_access_users_approved, $approved_user );
+						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+						// Edge case: if added user already exists in WordPress, make sure
+						// their role matches the one just set here when adding to the
+						// approved list. Note: this will also trigger a redundant role
+						// sync in action set_user_role, but it shouldn't do anything
+						// since we just updated the role in the approved list above.
+						if ( false !== $new_user && ! in_array( $approved_user['role'], $new_user->roles, true ) ) {
+							$new_user->set_role( $approved_user['role'] );
 						}
+					} else {
+						$invalid_emails[] = $approved_user['email'];
 					}
 
 					// If we've added a new multisite user, go through all pending/approved/blocked lists
@@ -857,5 +854,4 @@ class Ajax_Endpoints extends Singleton {
 		wp_send_json( $response );
 		exit;
 	}
-
 }

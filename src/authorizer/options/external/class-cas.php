@@ -240,19 +240,19 @@ class Cas extends \Authorizer\Singleton {
 
 
 	/**
-	 * phpCAS 1.6.0 asserts that the service URL provided by the user logging in
-	 * matches the URL specified here (to prevent nefarious clients from modifying
-	 * the http headers with their own values). Note: here we handle common
-	 * port/protocol variants in case get_option( 'siteurl' ) doesn't match the
-	 * actual protocol.
+	 * Package phpCAS 1.6.0 asserts that the service URL provided by the user
+	 * logging in matches the URL specified here (to prevent nefarious clients
+	 * from modifying the http headers with their own values). Note: here we
+	 * handle common port/protocol variants in case get_option( 'siteurl' )
+	 * doesn't match the actual protocol.
 	 *
 	 * @return array protocol://domain:port of current WordPress site (both http and https).
 	 */
 	public function get_valid_cas_service_urls() {
-		$valid_base_url_parts  = parse_url( site_url( '', 'login' ) );
-		$valid_base_url        = ! empty( $valid_base_url_parts['host'] ) ? $valid_base_url_parts['host'] : '';
-		$valid_base_url       .= ! empty( $valid_base_url_parts['port'] ) ? ':' . $valid_base_url_parts['port'] : '';
-		$valid_base_urls       = array(
+		$valid_base_url_parts = wp_parse_url( site_url( '', 'login' ) );
+		$valid_base_url       = ! empty( $valid_base_url_parts['host'] ) ? $valid_base_url_parts['host'] : '';
+		$valid_base_url      .= ! empty( $valid_base_url_parts['port'] ) ? ':' . $valid_base_url_parts['port'] : '';
+		$valid_base_urls      = array(
 			'http://' . $valid_base_url,
 			'https://' . $valid_base_url,
 		);
@@ -391,5 +391,4 @@ class Cas extends \Authorizer\Singleton {
 		<p class="description"><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></p>
 		<?php
 	}
-
 }

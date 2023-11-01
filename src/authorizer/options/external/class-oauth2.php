@@ -305,13 +305,14 @@ class OAuth2 extends \Authorizer\Singleton {
 	 * redirect_to param in it like the normal WordPress redirect flow.
 	 *
 	 * @hook login_redirect
+	 *
+	 * @param string $redirect_to Destination URL.
 	 */
 	public function maybe_redirect_after_azure_login( $redirect_to ) {
 		if ( ! empty( $_SESSION['azure_redirect_to'] ) ) {
-			$redirect_to = $_SESSION['azure_redirect_to'];
+			$redirect_to = sanitize_url( $_SESSION['azure_redirect_to'] );
 		}
 
 		return $redirect_to;
 	}
-
 }

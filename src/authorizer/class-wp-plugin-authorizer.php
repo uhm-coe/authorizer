@@ -191,7 +191,6 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Remove user from network approved users (and add them to the approved
 		// list on sites they are already on) when super admin status is removed.
 		add_action( 'revoke_super_admin', array( Sync_Userdata::get_instance(), 'revoke_super_admin__remove_from_network_approved' ) );
-
 	}
 
 
@@ -257,7 +256,6 @@ class WP_Plugin_Authorizer extends Singleton {
 			$options->set_default_options();
 			$sync_userdata->add_wp_users_to_approved_list();
 		}
-
 	}
 
 
@@ -283,5 +281,4 @@ class WP_Plugin_Authorizer extends Singleton {
 			basename( dirname( plugin_root() ) ) . '/languages'
 		);
 	}
-
 }

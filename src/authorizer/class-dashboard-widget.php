@@ -98,5 +98,4 @@ class Dashboard_Widget extends Singleton {
 		</script>
 		<?php
 	}
-
 }

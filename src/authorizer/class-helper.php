@@ -287,7 +287,6 @@ class Helper {
 		?>
 		<option value=""<?php selected( $is_selected ); ?><?php disabled( $is_disabled ); ?>><?php esc_html_e( '&mdash; No role for this site &mdash;', 'authorizer' ); ?></option>
 		<?php
-
 	}
 
 
@@ -311,7 +310,7 @@ class Helper {
 			if ( 'case insensitive' === $case_sensitivity && ! is_array( $item ) ) {
 				$item = strtolower( $item );
 			}
-			if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && self::in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+			if ( ( 'strict' === $strict_mode ? $item === $needle : $item == $needle ) || ( is_array( $item ) && self::in_multi_array( $needle, $item, $strict_mode, $case_sensitivity ) ) ) { // phpcs:ignore Universal.Operators.StrictComparisons.LooseEqual
 				return true;
 			}
 		}
@@ -382,17 +381,17 @@ class Helper {
 	 * Helper function to get a single user info array from one of the access
 	 * control lists (pending, approved, or blocked).
 	 *
-	 * @param  string $email Email address to retrieve info for.
-	 * @param  array  $list  List to get info from.
-	 * @return mixed         false if not found, otherwise: array(
-	 *                         'email' => '',
-	 *                         'role' => '',
-	 *                         'date_added' => '',
-	 *                         ['usermeta' => [''|array()]]
-	 *                       );
+	 * @param  string $email           Email address to retrieve info for.
+	 * @param  array  $user_info_list  List to get info from.
+	 * @return mixed                   false if not found, otherwise: array(
+	 *                                   'email' => '',
+	 *                                   'role' => '',
+	 *                                   'date_added' => '',
+	 *                                   ['usermeta' => [''|array()]]
+	 *                                 );
 	 */
-	public static function get_user_info_from_list( $email, $list ) {
-		foreach ( $list as $user_info ) {
+	public static function get_user_info_from_list( $email, $user_info_list ) {
+		foreach ( $user_info_list as $user_info ) {
 			if ( 0 === strcasecmp( $user_info['email'], $email ) ) {
 				return $user_info;
 			}
@@ -404,11 +403,11 @@ class Helper {
 	 * Helper function to convert a string to lowercase.  Prefers to use mb_strtolower,
 	 * but will fall back to strtolower if the former is not available.
 	 *
-	 * @param  string $string String to convert to lowercase.
-	 * @return string         Input in lowercase.
+	 * @param  string $str String to convert to lowercase.
+	 * @return string      Input in lowercase.
 	 */
-	public static function lowercase( $string ) {
-		return function_exists( 'mb_strtolower' ) ? mb_strtolower( $string ) : strtolower( $string );
+	public static function lowercase( $str ) {
+		return function_exists( 'mb_strtolower' ) ? mb_strtolower( $str ) : strtolower( $str );
 	}
 
 
@@ -530,5 +529,4 @@ class Helper {
 
 		return "$scheme$user$pass$host$port$path$query$fragment";
 	}
-
 }
