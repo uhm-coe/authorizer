@@ -199,53 +199,6 @@ class Sync_Userdata extends Singleton {
 
 
 	/**
-	 * Keep authorizer approved users' roles in sync with WordPress roles
-	 * if someone changes the role via the WordPress Edit User page
-	 * (wp-admin/user-edit.php or wp-admin/profile.php).
-	 *
-	 * Action: user_profile_update_errors
-	 *
-	 * @param WP_Error $errors Errors object to add any custom errors to (passed by reference).
-	 * @param bool     $update True if updating existing user, false if saving a new one.
-	 * @param stdClass $user   Updated WP_User object for user being edited (passed by reference).
-	 */
-	public function edit_user_profile_update_role( &$errors, $update, &$user ) {
-		// Do nothing if we're not updating role.
-		if ( ! property_exists( $user, 'role' ) || ! property_exists( $user, 'ID' ) ) {
-			return;
-		}
-
-		// Safety check; will likely not fire if we reach this function.
-		if ( ! current_user_can( 'edit_user', $user->ID ) ) {
-			return;
-		}
-
-		// Don't perform Authorizer updates if we have a WordPress error.
-		$errors_on_user_update = $errors->get_error_codes();
-		if ( ! empty( $errors_on_user_update ) ) {
-			return;
-		}
-
-		// Get original user object (fail if not a real WordPress user).
-		$userdata = get_userdata( $user->ID );
-		if ( ! $userdata ) {
-			return;
-		}
-
-		// If user is in approved list, update his/her associated role.
-		if ( Authorization::get_instance()->is_email_in_list( $userdata->user_email, 'approved' ) ) {
-			$options                             = Options::get_instance();
-			$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
-			foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
-				if ( 0 === strcasecmp( $check_user['email'], $userdata->user_email ) ) {
-					$auth_settings_access_users_approved[ $key ]['role'] = $user->role;
-				}
-			}
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-		}
-	}
-
-	/**
 	 * Update user role in approved list if it's changed via bulk action on the
 	 * WordPress list users page.
 	 *

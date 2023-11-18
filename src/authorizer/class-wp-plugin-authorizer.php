@@ -85,9 +85,6 @@ class WP_Plugin_Authorizer extends Singleton {
 		// WordPress list users page (and anywhere else WP_User::set_role() is called).
 		add_action( 'set_user_role', array( Sync_Userdata::get_instance(), 'set_user_role_sync_role' ), 10, 3 );
 
-		// Update user role in approved list if it's changed in the WordPress edit user page.
-		add_action( 'user_profile_update_errors', array( Sync_Userdata::get_instance(), 'edit_user_profile_update_role' ), 10, 3 );
-
 		// Update user email in approved list if it's changed in the WordPress edit user page.
 		add_filter( 'send_email_change_email', array( Sync_Userdata::get_instance(), 'edit_user_profile_update_email' ), 10, 3 );
 
