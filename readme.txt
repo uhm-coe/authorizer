@@ -16,7 +16,7 @@ View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/a
 
 *Authorizer* requires the following:
 
-* **CAS server** (2.x, 3.x, 4.x, or 5.x) or **LDAP server** (plugin needs the URL)
+* **CAS server** (2.x, 3.x, 4.x, 5.x, 6.x, or 7.x) or **LDAP server** (plugin needs the URL)
 * PHP extensions: php-ldap, php-curl, php-dom
 
 *Authorizer* provides the following options:
