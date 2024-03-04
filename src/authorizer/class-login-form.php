@@ -372,11 +372,19 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$num_attempts_long_lockout  = absint( $lockouts['attempts_1'] ) + absint( $lockouts['attempts_2'] );
 		if ( $num_attempts >= $num_attempts_short_lockout ) {
 			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? absint( $lockouts['duration_2'] ) * 60 : absint( $lockouts['duration_1'] ) * 60;
+			
+			if ( false !== $user ) {
+				/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+				$lockout_log_message = __( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' );
+			} else {
+				/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+				$lockout_log_message = __( 'Authorizer lockout triggered for %1$s on all non-existent user names after the %3$s invalid attempt (triggered by non-existent user name: %2$s).', 'authorizer' );
+			}
+
 			apply_filters(
 				'simple_history_log_warning',
 				sprintf(
-					/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
-					__( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' ),
+					$lockout_log_message,
 					Helper::seconds_as_sentence( $lockout_length_in_seconds ),
 					$username,
 					Helper::ordinal( $num_attempts )
