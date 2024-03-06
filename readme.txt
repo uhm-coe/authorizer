@@ -242,7 +242,8 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * Update phpCAS from 1.3.6 to 1.3.8.
 * Update Google API PHP Client from 2.7.1 to 2.8.1.
 
-[Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
+= < 3.0.0 =
+* [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
 
 == Upgrade Notice ==
 
