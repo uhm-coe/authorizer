@@ -5,7 +5,7 @@
  * Description:       Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS).
  * Version:           3.6.3.1
  * Requires at least: 4.4
- * Requires PHP:      7.2.5
+ * Requires PHP:      7.4
  * Author:            Paul Ryan <prar@hawaii.edu>
  * License:           GPL v2 or later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
