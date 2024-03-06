@@ -1164,6 +1164,13 @@ msgid ""
 "attempt."
 msgstr ""
 
+#: src/authorizer/class-login-form.php:381
+#, php-format
+msgid ""
+"Authorizer lockout triggered for %1$s on all non-existent user names after "
+"the %3$s invalid attempt (triggered by non-existent user name: %2$s)."
+msgstr ""
+
 #: src/authorizer/class-options.php:83
 #: src/authorizer/options/class-advanced.php:379
 msgid "This setting is overridden by a"
