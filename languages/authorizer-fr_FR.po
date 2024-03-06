@@ -1426,6 +1426,18 @@ msgstr ""
 "Authorizer a déclenché un verrouillage de %1$s pour l’utilisateur %2$s après "
 "%3$s essais invalides."
 
+#: src/authorizer/class-login-form.php:381
+#, fuzzy, php-format
+#| msgid ""
+#| "Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid "
+#| "attempt."
+msgid ""
+"Authorizer lockout triggered for %1$s on all non-existent user names after "
+"the %3$s invalid attempt (triggered by non-existent user name: %2$s)."
+msgstr ""
+"Authorizer a déclenché un verrouillage de %1$s pour l’utilisateur %2$s après "
+"%3$s essais invalides."
+
 #: src/authorizer/class-options.php:83
 #: src/authorizer/options/class-advanced.php:379
 msgid "This setting is overridden by a"
