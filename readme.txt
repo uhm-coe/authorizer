@@ -243,3 +243,14 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * Update Google API PHP Client from 2.7.1 to 2.8.1.
 
 [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
+
+== Upgrade Notice ==
+
+= 3.5.0 =
+**Upgrade Notice**: Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!
+
+= 3.2.0 =
+Authorizer now requires PHP 7.2.5 or higher (phpCAS 1.4.0 requirement).
+
+= 1.0 =
+Upgrade now to get the latest features.
