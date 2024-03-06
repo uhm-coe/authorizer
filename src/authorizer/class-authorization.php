@@ -465,7 +465,6 @@ class Authorization extends Singleton {
 
 		// Sanity check: if we made it here without returning, something has gone wrong.
 		return new \WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
-
 	}
 
 
@@ -651,11 +650,23 @@ class Authorization extends Singleton {
 	 * @return void
 	 */
 	public function remove_private_pages_from_search_and_archives( $query ) {
+		// It's possible for pre_get_posts to fire before wp-includes/pluggable.php
+		// is loaded, so verify before using the is_user_logged_in() function.
+		if ( ! function_exists( 'is_user_logged_in' ) ) {
+			require ABSPATH . WPINC . '/pluggable.php';
+		}
+
+		// Fix for edge case when viewing admin pages in Pressbooks (Undefined
+		// constant "SECURE_AUTH_COOKIE").
+		if ( ! defined( 'SECURE_AUTH_COOKIE' ) ) {
+			wp_cookie_constants();
+		}
+
 		// Do nothing if user is logged in, this isn't the main query, or we're not
 		// showing search results, home page, or an archive page.
 		if (
 			is_user_logged_in() || ! $query->is_main_query() ||
-			! ( is_search() || is_home() || is_archive() )
+			! ( $query->is_search() || $query->is_home() || $query->is_archive() )
 		) {
 			return;
 		}
@@ -687,7 +698,7 @@ class Authorization extends Singleton {
 				'fields'         => 'ids',
 				'category__in'   => $public_category_ids,
 			) );
-			$public_pages = array_merge( $public_pages, $pages_in_public_categories );
+			$public_pages               = array_merge( $public_pages, $pages_in_public_categories );
 		}
 
 		$query->set( 'post__in', $public_pages );
@@ -738,18 +749,18 @@ class Authorization extends Singleton {
 	 * approved users.
 	 *
 	 * @param  string $email          Email to check existent of.
-	 * @param  string $list           List to look for email in.
+	 * @param  string $user_list      List to look for email in.
 	 * @param  string $multisite_mode Admin context.
 	 * @return boolean                Whether email was found.
 	 */
-	public function is_email_in_list( $email = '', $list = 'approved', $multisite_mode = 'single' ) {
+	public function is_email_in_list( $email = '', $user_list = 'approved', $multisite_mode = 'single' ) {
 		if ( empty( $email ) ) {
 			return false;
 		}
 
 		$options = Options::get_instance();
 
-		switch ( $list ) {
+		switch ( $user_list ) {
 			case 'pending':
 				$auth_settings_access_users_pending = $options->get( 'access_users_pending', Helper::SINGLE_CONTEXT );
 				return Helper::in_multi_array( $email, $auth_settings_access_users_pending );
@@ -793,5 +804,4 @@ class Authorization extends Singleton {
 				return Helper::in_multi_array( $email, $auth_settings_access_users_approved );
 		}
 	}
-
 }

@@ -205,5 +205,4 @@ class Public_Access extends \Authorizer\Singleton {
 		</select>
 		<?php
 	}
-
 }

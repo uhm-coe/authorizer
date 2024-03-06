@@ -229,5 +229,4 @@ class Login_Access extends \Authorizer\Singleton {
 		</small>
 		<?php
 	}
-
 }

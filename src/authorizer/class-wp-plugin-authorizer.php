@@ -85,9 +85,6 @@ class WP_Plugin_Authorizer extends Singleton {
 		// WordPress list users page (and anywhere else WP_User::set_role() is called).
 		add_action( 'set_user_role', array( Sync_Userdata::get_instance(), 'set_user_role_sync_role' ), 10, 3 );
 
-		// Update user role in approved list if it's changed in the WordPress edit user page.
-		add_action( 'user_profile_update_errors', array( Sync_Userdata::get_instance(), 'edit_user_profile_update_role' ), 10, 3 );
-
 		// Update user email in approved list if it's changed in the WordPress edit user page.
 		add_filter( 'send_email_change_email', array( Sync_Userdata::get_instance(), 'edit_user_profile_update_email' ), 10, 3 );
 
@@ -191,7 +188,6 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Remove user from network approved users (and add them to the approved
 		// list on sites they are already on) when super admin status is removed.
 		add_action( 'revoke_super_admin', array( Sync_Userdata::get_instance(), 'revoke_super_admin__remove_from_network_approved' ) );
-
 	}
 
 
@@ -257,7 +253,6 @@ class WP_Plugin_Authorizer extends Singleton {
 			$options->set_default_options();
 			$sync_userdata->add_wp_users_to_approved_list();
 		}
-
 	}
 
 
@@ -283,5 +278,4 @@ class WP_Plugin_Authorizer extends Singleton {
 			basename( dirname( plugin_root() ) ) . '/languages'
 		);
 	}
-
 }

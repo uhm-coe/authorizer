@@ -813,7 +813,7 @@ class Authentication extends Singleton {
 		$valid_base_urls = Options\External\Cas::get_instance()->get_valid_cas_service_urls();
 
 		// Set the CAS client configuration.
-		if ( "PROXY" === strtoupper( $auth_settings['cas_method'] ) ) {
+		if ( 'PROXY' === strtoupper( $auth_settings['cas_method'] ) ) {
 			\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 		} else {
 			\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
@@ -1433,7 +1433,7 @@ class Authentication extends Singleton {
 				$valid_base_urls = Options\External\Cas::get_instance()->get_valid_cas_service_urls();
 
 				// Set the CAS client configuration if it hasn't been set already.
-				if ( "PROXY" === strtoupper( $auth_settings['cas_method'] ) ) {
+				if ( 'PROXY' === strtoupper( $auth_settings['cas_method'] ) ) {
 					\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
 				} else {
 					\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
@@ -1489,5 +1489,4 @@ class Authentication extends Singleton {
 			unset( $_SESSION['token'] );
 		}
 	}
-
 }

@@ -199,53 +199,6 @@ class Sync_Userdata extends Singleton {
 
 
 	/**
-	 * Keep authorizer approved users' roles in sync with WordPress roles
-	 * if someone changes the role via the WordPress Edit User page
-	 * (wp-admin/user-edit.php or wp-admin/profile.php).
-	 *
-	 * Action: user_profile_update_errors
-	 *
-	 * @param WP_Error $errors Errors object to add any custom errors to (passed by reference).
-	 * @param bool     $update True if updating existing user, false if saving a new one.
-	 * @param stdClass $user   Updated WP_User object for user being edited (passed by reference).
-	 */
-	public function edit_user_profile_update_role( &$errors, $update, &$user ) {
-		// Do nothing if we're not updating role.
-		if ( ! property_exists( $user, 'role' ) || ! property_exists( $user, 'ID' ) ) {
-			return;
-		}
-
-		// Safety check; will likely not fire if we reach this function.
-		if ( ! current_user_can( 'edit_user', $user->ID ) ) {
-			return;
-		}
-
-		// Don't perform Authorizer updates if we have a WordPress error.
-		$errors_on_user_update = $errors->get_error_codes();
-		if ( ! empty( $errors_on_user_update ) ) {
-			return;
-		}
-
-		// Get original user object (fail if not a real WordPress user).
-		$userdata = get_userdata( $user->ID );
-		if ( ! $userdata ) {
-			return;
-		}
-
-		// If user is in approved list, update his/her associated role.
-		if ( Authorization::get_instance()->is_email_in_list( $userdata->user_email, 'approved' ) ) {
-			$options                             = Options::get_instance();
-			$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
-			foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
-				if ( 0 === strcasecmp( $check_user['email'], $userdata->user_email ) ) {
-					$auth_settings_access_users_approved[ $key ]['role'] = $user->role;
-				}
-			}
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-		}
-	}
-
-	/**
 	 * Update user role in approved list if it's changed via bulk action on the
 	 * WordPress list users page.
 	 *
@@ -360,22 +313,20 @@ class Sync_Userdata extends Singleton {
 					update_blog_option( $blog_id, 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 				}
 			}
-		} else {
+		} elseif ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved' ) ) {
 			// In a single site environment, just find the old user in the approved list and update the email.
-			if ( Authorization::get_instance()->is_email_in_list( $user['user_email'], 'approved' ) ) {
-				$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
-				foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
-					// Update old user email in approved list to the new email.
-					if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
-						$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
-					}
-					// If new user email is already in approved list, remove that entry.
-					if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
-						unset( $auth_settings_access_users_approved[ $key ] );
-					}
+			$auth_settings_access_users_approved = $options->sanitize_user_list( $options->get( 'access_users_approved', Helper::SINGLE_CONTEXT ) );
+			foreach ( $auth_settings_access_users_approved as $key => $check_user ) {
+				// Update old user email in approved list to the new email.
+				if ( 0 === strcasecmp( $check_user['email'], $user['user_email'] ) ) {
+					$auth_settings_access_users_approved[ $key ]['email'] = Helper::lowercase( $userdata['user_email'] );
 				}
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				// If new user email is already in approved list, remove that entry.
+				if ( 0 === strcasecmp( $check_user['email'], $userdata['user_email'] ) ) {
+					unset( $auth_settings_access_users_approved[ $key ] );
+				}
 			}
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
 		}
 
 		// We're hooking into this filter merely for its location in the codebase,
@@ -450,7 +401,6 @@ class Sync_Userdata extends Singleton {
 			$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 			$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
 		}
-
 	}
 
 
@@ -699,7 +649,6 @@ class Sync_Userdata extends Singleton {
 			$blog_id = function_exists( 'get_sites' ) ? $site->blog_id : $site['blog_id'];
 			$this->remove_network_user_from_site_when_removed( $user_id, $blog_id );
 		}
-
 	}
 
 
@@ -741,5 +690,4 @@ class Sync_Userdata extends Singleton {
 			$this->add_network_user_to_site( $user_id, $blog_id );
 		}
 	}
-
 }

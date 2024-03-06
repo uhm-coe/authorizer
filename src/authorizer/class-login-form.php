@@ -320,7 +320,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	 *
 	 * Action: wp_login_failed
 	 *
-	 * @param  string $username Username to update login count for.
+	 * @param  string $username Username or email address.
 	 * @return void
 	 */
 	public function update_login_failed_count( $username ) {
@@ -329,17 +329,22 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Get user trying to log in.
-		// If this isn't a real user, update the global failed attempt
-		// variables. We'll use these global variables to institute the
-		// lockouts on nonexistent accounts. We do this so an attacker
-		// won't be able to determine which accounts are real by which
-		// accounts get locked out on multiple invalid attempts.
 		$user = get_user_by( 'login', $username );
+
+		// If user not found, check if logging in with an email address.
+		if ( false === $user ) {
+			$user = get_user_by( 'email', $username );
+		}
 
 		if ( false !== $user ) {
 			$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
 			$num_attempts = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', true );
 		} else {
+			// If this isn't a real user, update the global failed attempt
+			// variables. We'll use these global variables to institute the
+			// lockouts on nonexistent accounts. We do this so an attacker
+			// won't be able to determine which accounts are real by which
+			// accounts get locked out on multiple invalid attempts.
 			$last_attempt = get_option( 'auth_settings_advanced_lockouts_time_last_failed' );
 			$num_attempts = get_option( 'auth_settings_advanced_lockouts_failed_attempts' );
 		}
@@ -372,11 +377,19 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$num_attempts_long_lockout  = absint( $lockouts['attempts_1'] ) + absint( $lockouts['attempts_2'] );
 		if ( $num_attempts >= $num_attempts_short_lockout ) {
 			$lockout_length_in_seconds = $num_attempts >= $num_attempts_long_lockout ? absint( $lockouts['duration_2'] ) * 60 : absint( $lockouts['duration_1'] ) * 60;
+
+			if ( false !== $user ) {
+				/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+				$lockout_log_message = __( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' );
+			} else {
+				/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
+				$lockout_log_message = __( 'Authorizer lockout triggered for %1$s on all non-existent user names after the %3$s invalid attempt (triggered by non-existent user name: %2$s).', 'authorizer' );
+			}
+
 			apply_filters(
 				'simple_history_log_warning',
 				sprintf(
-					/* TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts */
-					__( 'Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt.', 'authorizer' ),
+					$lockout_log_message,
 					Helper::seconds_as_sentence( $lockout_length_in_seconds ),
 					$username,
 					Helper::ordinal( $num_attempts )
@@ -498,5 +511,4 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		return ob_get_clean();
 	}
-
 }

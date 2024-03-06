@@ -183,7 +183,6 @@ class Advanced extends \Authorizer\Singleton {
 			<label><input type="radio" id="radio_auth_settings_<?php echo esc_attr( $option ); ?>_top" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="top"<?php checked( 'top' === $auth_settings_option ); ?> /> <?php esc_html_e( 'Show in sidebar (top level)', 'authorizer' ); ?></label>
 		</fieldset>
 		<?php
-
 	}
 
 
@@ -387,5 +386,4 @@ class Advanced extends \Authorizer\Singleton {
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Configure this site independently (don't inherit any multisite settings)", 'authorizer' ); ?></label>
 		<?php
 	}
-
 }

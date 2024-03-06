@@ -16,7 +16,7 @@ View or contribute to the plugin source on GitHub: [https://github.com/uhm-coe/a
 
 *Authorizer* requires the following:
 
-* **CAS server** (2.x, 3.x, 4.x, or 5.x) or **LDAP server** (plugin needs the URL)
+* **CAS server** (2.x, 3.x, 4.x, 5.x, 6.x, or 7.x) or **LDAP server** (plugin needs the URL)
 * PHP extensions: php-ldap, php-curl, php-dom
 
 *Authorizer* provides the following options:
@@ -61,6 +61,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.6.3.1 =
+* Compatibility fix for Oxygen Builder.
 
 = 3.6.3 =
 * Update helper text for the LDAP STARTTLS option. Props @TuringTux for the [pull request](https://github.com/uhm-coe/authorizer/pull/132)!

@@ -146,5 +146,4 @@ class Google extends \Authorizer\Singleton {
 		<p class="description"><?php esc_html_e( 'Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins.', 'authorizer' ); ?> <?php esc_html_e( 'If restricting to multiple domains, add one domain per line.', 'authorizer' ); ?></p>
 		<?php
 	}
-
 }
