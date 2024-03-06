@@ -62,6 +62,16 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.7.0 =
+* Drop support for PHP 7.2 and 7.3. Minimum PHP version is now 7.4 (due to google-api-php-client requirements).
+* Simple History now logs a different message if the global lockout is triggered on a nonexistent user. Props @TuringTux for the [pull request](https://github.com/uhm-coe/authorizer/pull/143)!
+* Update French translations. Props @julienlusson!
+* Fix incrementing the wrong failed login counter if failed login used an email address instead of a username. Now the specific user counter is incremented instead of the global/nonexistent user counter. Props @TuringTux for the [report and investigation](https://github.com/uhm-coe/authorizer/issues/138)!
+* Fix for PHP warning when viewing admin pages in Pressbooks.
+* Fix for PHP warning about missing `ldap_test_user` setting on some multisite installs.
+* Remove old jQuery library from multi-select package (has XSS vulnerabilities).
+* Update composer dependencies: google/apiclient (v2.13.2 => v2.14.0); thenetworg/oauth2-azure (v2.1.1 => v2.2.2); components/jquery (3.6.0 => v3.7.1); google/apiclient-services (v0.297.0 => v0.302.0); guzzlehttp/guzzle (7.5.1 => 7.8.1); guzzlehttp/promises (1.5.2 => 2.0.2); guzzlehttp/psr7 (2.5.0 => 2.6.2); monolog/monolog (2.9.1 => 2.9.2); phpseclib/phpseclib (3.0.19 => 3.0.37); psr/http-client (1.0.2 => 1.0.3).
+
 = 3.6.3.1 =
 * Compatibility fix for Oxygen Builder.
 
