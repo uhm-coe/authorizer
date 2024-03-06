@@ -320,7 +320,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	 *
 	 * Action: wp_login_failed
 	 *
-	 * @param  string $username Username to update login count for.
+	 * @param  string $username Username or email address.
 	 * @return void
 	 */
 	public function update_login_failed_count( $username ) {
@@ -330,6 +330,11 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		// Get user trying to log in.
 		$user = get_user_by( 'login', $username );
+
+		// If user not found, check if logging in with an email address.
+		if ( false === $user ) {
+			$user = get_user_by( 'email', $username );
+		}
 
 		if ( false !== $user ) {
 			$last_attempt = get_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', true );
