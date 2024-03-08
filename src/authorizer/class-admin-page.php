@@ -1159,12 +1159,12 @@ class Admin_Page extends Singleton {
 
 		wp_enqueue_script( 'jquery-autogrow-textarea', plugins_url( 'vendor-custom/jquery.autogrow-textarea/jquery.autogrow-textarea.js', plugin_root() ), array( 'jquery' ), '3.0.7', true );
 
-		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor/components/multi-select/js/jquery.multi-select.min.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
+		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/js/jquery.multi-select.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
 
 		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '3.5.0' );
 		wp_enqueue_style( 'authorizer-css' );
 
-		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor/components/multi-select/css/multi-select.min.css', plugin_root() ), array(), '0.9.12' );
+		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/css/multi-select.css', plugin_root() ), array(), '0.9.12' );
 		wp_enqueue_style( 'jquery-multi-select-css' );
 
 		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
