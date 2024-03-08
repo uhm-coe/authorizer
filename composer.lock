@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "74fbe1a8fedd503dfbc69245fb7a01be",
+    "content-hash": "b84c16c6ff6e12376c07520b3d6f099a",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -76,117 +76,6 @@
                 "source": "https://github.com/apereo/phpCAS/tree/1.6.1"
             },
             "time": "2023-02-19T19:52:35+00:00"
-        },
-        {
-            "name": "components/jquery",
-            "version": "v3.7.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/components/jquery.git",
-                "reference": "8edc7785239bb8c2ad2b83302b856a1d61de60e7"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/components/jquery/zipball/8edc7785239bb8c2ad2b83302b856a1d61de60e7",
-                "reference": "8edc7785239bb8c2ad2b83302b856a1d61de60e7",
-                "shasum": ""
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "jquery.js"
-                    ],
-                    "files": [
-                        "jquery.min.js",
-                        "jquery.min.map",
-                        "jquery.slim.js",
-                        "jquery.slim.min.js",
-                        "jquery.slim.min.map"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "JS Foundation and other contributors"
-                }
-            ],
-            "description": "jQuery JavaScript Library",
-            "homepage": "http://jquery.com",
-            "support": {
-                "forum": "http://forum.jquery.com",
-                "irc": "irc://irc.freenode.org/jquery",
-                "issues": "https://github.com/jquery/jquery/issues",
-                "source": "https://github.com/jquery/jquery",
-                "wiki": "http://docs.jquery.com/"
-            },
-            "time": "2023-09-22T01:43:46+00:00"
-        },
-        {
-            "name": "components/multi-select",
-            "version": "0.9.12",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/sabinus52/multi-select.git",
-                "reference": "8b345485001df29ea48ac3134199df0ce8b6e48d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/sabinus52/multi-select/zipball/8b345485001df29ea48ac3134199df0ce8b6e48d",
-                "reference": "8b345485001df29ea48ac3134199df0ce8b6e48d",
-                "shasum": ""
-            },
-            "require": {
-                "components/jquery": ">= 1.8"
-            },
-            "suggest": {
-                "robloach/component-installer": "Allows installation of Components via Composer"
-            },
-            "type": "component",
-            "extra": {
-                "component": {
-                    "scripts": [
-                        "js/jquery.multi-select.js"
-                    ],
-                    "styles": [
-                        "css/multi-select.css"
-                    ],
-                    "files": [
-                        "css/multi-select*.css",
-                        "js/jquery.multi-select*.js",
-                        "img/switch.png"
-                    ]
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "wtfpl"
-            ],
-            "authors": [
-                {
-                    "name": "lou",
-                    "email": "louiscuny@gmail.com"
-                }
-            ],
-            "description": "This is a user-friendlier drop-in replacement for the standard <select> with multiple attribute activated.",
-            "homepage": "http://loudev.com/",
-            "keywords": [
-                "double list",
-                "form",
-                "jquery",
-                "multiple",
-                "multiselect",
-                "select"
-            ],
-            "support": {
-                "issues": "https://github.com/sabinus52/multi-select/issues",
-                "source": "https://github.com/lou/multi-select"
-            },
-            "time": "2015-04-05T17:34:00+00:00"
         },
         {
             "name": "firebase/php-jwt",
