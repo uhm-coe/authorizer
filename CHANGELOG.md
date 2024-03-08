@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.7.1 =
+* Replace jquery.multi-select composer dependency with local copy (since the composer package was removed). Props @julienlusson the catch!
+
 = 3.7.0 =
 * Drop support for PHP 7.2 and 7.3. Minimum PHP version is now 7.4 (due to google-api-php-client requirements).
 * Simple History now logs a different message if the global lockout is triggered on a nonexistent user. Props @TuringTux for the [pull request](https://github.com/uhm-coe/authorizer/pull/143)!
