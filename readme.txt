@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.4
-Stable tag: 3.7.0
+Stable tag: 3.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.7.1 =
+* Replace jquery.multi-select composer dependency with local copy (since the composer package was removed). Props @julienlusson the catch!
 
 = 3.7.0 =
 * Drop support for PHP 7.2 and 7.3. Minimum PHP version is now 7.4 (due to google-api-php-client requirements).
