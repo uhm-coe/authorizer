@@ -274,9 +274,6 @@ class Access_Lists extends \Authorizer\Singleton {
 					?>
 					<li>
 						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>" value="<?php echo esc_attr( $blocked_user['email'] ); ?>" readonly="true" class="auth-email" />
-						<select id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_role" class="auth-role">
-							<?php Helper::wp_dropdown_permitted_roles( $blocked_user['role'] ); ?>
-						</select>
 						<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>_<?php echo esc_attr( $key ); ?>_date_added" value="<?php echo esc_attr( wp_date( 'M Y', strtotime( $blocked_user['date_added'] ) ) ); ?>" readonly="true" class="auth-date-added" />
 						<a class="button dashicons-before dashicons-no" id="ignore_user_<?php echo esc_attr( $key ); ?>" onclick="authIgnoreUser( this, 'blocked' );" title="<?php esc_attr_e( 'Remove user', 'authorizer' ); ?>"></a>
 					</li>
