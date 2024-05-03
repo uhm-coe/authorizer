@@ -396,12 +396,16 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
+
 		add_settings_field(
 			'auth_settings_external_oauth2',
 			__( 'OAuth2 Logins', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_checkbox_auth_external_oauth2' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'class' => 'border-top',
+			)
 		);
 		add_settings_field(
 			'auth_settings_oauth2_provider',
@@ -466,12 +470,16 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
+
 		add_settings_field(
 			'auth_settings_external_google',
 			__( 'Google Logins', 'authorizer' ),
 			array( Google::get_instance(), 'print_checkbox_auth_external_google' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'class' => 'border-top',
+			)
 		);
 		add_settings_field(
 			'auth_settings_google_clientid',
@@ -494,6 +502,7 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
+
 		add_settings_field(
 			'auth_settings_external_cas',
 			__( 'CAS Logins', 'authorizer' ),
@@ -569,7 +578,10 @@ class Admin_Page extends Singleton {
 			__( 'CAS attribute update', 'authorizer' ),
 			array( Cas::get_instance(), 'print_select_cas_attr_update_on_login' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'class' => 'border-top',
+			)
 		);
 		add_settings_field(
 			'auth_settings_cas_auto_login',
@@ -590,7 +602,10 @@ class Admin_Page extends Singleton {
 			__( 'LDAP Logins', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'class' => 'border-top',
+			)
 		);
 		add_settings_field(
 			'auth_settings_ldap_host',
@@ -1161,7 +1176,7 @@ class Admin_Page extends Singleton {
 
 		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/js/jquery.multi-select.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
 
-		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '3.5.0' );
+		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '3.7.1' );
 		wp_enqueue_style( 'authorizer-css' );
 
 		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/css/multi-select.css', plugin_root() ), array(), '0.9.12' );

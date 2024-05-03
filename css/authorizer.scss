@@ -184,6 +184,19 @@
 		& > :nth-child(1) { flex-grow: 4; }
 		& > :nth-child(2) { flex-grow: 2; }
 	}
+
+	// Section breaks for pages with many options.
+	table.form-table {
+		tr {
+			&.border-top {
+				border-top: 3px solid $color-gray-5;
+			}
+
+			&.border-top-small {
+				border-top: 1px solid $color-gray-5;
+			}
+		}
+	}
 }
 
 
