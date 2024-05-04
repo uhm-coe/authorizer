@@ -110,6 +110,11 @@ class WP_Plugin_Authorizer extends Singleton {
 		// already being sent).
 		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_cas' ), 10, 2 );
 
+		// Prevent access to password reset if WordPress logins are disabled.
+		add_filter( 'lost_password_html_link', array( Login_Form::get_instance(), 'maybe_hide_lost_password_link' ), PHP_INT_MAX, 1 );
+		add_action( 'lost_password', array( Login_Form::get_instance(), 'maybe_hide_lost_password_form' ), PHP_INT_MAX, 1 );
+		add_filter( 'lostpassword_errors', array( Login_Form::get_instance(), 'maybe_prevent_password_reset' ), PHP_INT_MAX, 1 );
+
 		// Verify current user has access to page they are visiting.
 		add_action( 'parse_request', array( Authorization::get_instance(), 'restrict_access' ), 9 );
 		add_action( 'init', array( Sync_Userdata::get_instance(), 'init__maybe_add_network_approved_user' ) );

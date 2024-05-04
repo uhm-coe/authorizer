@@ -511,4 +511,91 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 		return ob_get_clean();
 	}
+
+	/**
+	 * Hide "Lost your password?" link if WordPress logins are disabled and at
+	 * least one external service is enabled. Note: don't hide the link if LDAP
+	 * logins are enabled and a custom lost password URL is provided.
+	 *
+	 * Filter: lost_password_html_link
+	 */
+	public function maybe_hide_lost_password_link( $html_link ) {
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		if (
+			array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
+			'1' === $auth_settings['advanced_disable_wp_login'] &&
+			(
+				'1' === $auth_settings['cas'] ||
+				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['google'] ||
+				'1' === $auth_settings['ldap']
+			) && ! (
+				'1' === $auth_settings['ldap'] &&
+				array_key_exists( 'ldap_lostpassword_url', $auth_settings ) &&
+				strlen( $auth_settings['ldap_lostpassword_url'] ) > 0
+			)
+		) {
+			$html_link = '';
+		}
+
+		return $html_link;
+	}
+
+
+	/**
+	 * Disable password reset form if WordPress logins are disabled and at least
+	 * one external service is enabled.
+	 *
+	 * Action: lost_password
+	 */
+	public function maybe_hide_lost_password_form( $errors ) {
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		if (
+			array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
+			'1' === $auth_settings['advanced_disable_wp_login'] &&
+			(
+				'1' === $auth_settings['cas'] ||
+				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['google'] ||
+				'1' === $auth_settings['ldap']
+			)
+		) {
+			wp_safe_redirect( wp_login_url() );
+			exit;
+		}
+	}
+
+	/**
+	 * Ensure password retrieval emails are prevented from being sent if WordPress
+	 * logins are disabled and at least one external service is enabled.
+	 *
+	 * Filter: lostpassword_errors
+	 */
+	public function maybe_prevent_password_reset( $errors ) {
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		if (
+			is_wp_error( $errors ) && ! $errors->has_errors() &&
+			array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
+			'1' === $auth_settings['advanced_disable_wp_login'] &&
+			(
+				'1' === $auth_settings['cas'] ||
+				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['google'] ||
+				'1' === $auth_settings['ldap']
+			)
+		) {
+			$errors->add( 'logins_disabled', __( '<strong>ERROR</strong>: The username field is empty.' ) );
+		}
+
+		return $errors;
+	}
 }
