@@ -923,6 +923,10 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Resource Owner URL', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_text_oauth2_url_resource( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 automatic login', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_checkbox_oauth2_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
 						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
 							<td><?php $google->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
