@@ -158,6 +158,7 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_url_authorize',
 			'oauth2_url_token',
 			'oauth2_url_resource',
+			'oauth2_auto_login',
 			'google',
 			'google_clientid',
 			'google_clientsecret',

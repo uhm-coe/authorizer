@@ -177,6 +177,7 @@ class Options extends Singleton {
 				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
 				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
 				$auth_settings['oauth2_url_resource']       = $auth_multisite_settings['oauth2_url_resource'];
+				$auth_settings['oauth2_auto_login']         = $auth_multisite_settings['oauth2_auto_login'];
 				$auth_settings['google']                    = $auth_multisite_settings['google'];
 				$auth_settings['google_clientid']           = $auth_multisite_settings['google_clientid'];
 				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
@@ -396,6 +397,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'oauth2_url_resource', $auth_settings ) ) {
 			$auth_settings['oauth2_url_resource'] = '';
 		}
+		if ( ! array_key_exists( 'oauth2_auto_login', $auth_settings ) ) {
+			$auth_settings['oauth2_auto_login'] = '';
+		}
 
 		if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
 			$auth_settings['cas_custom_label'] = 'CAS';
@@ -602,6 +606,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'oauth2_url_resource', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_url_resource'] = '';
 			}
+			if ( ! array_key_exists( 'oauth2_auto_login', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_auto_login'] = '';
+			}
 			if ( ! array_key_exists( 'google_clientid', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google_clientid'] = '';
 			}
@@ -783,6 +790,9 @@ class Options extends Singleton {
 
 		// Sanitize Enable OAuth2 Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['oauth2'] = array_key_exists( 'oauth2', $auth_settings ) && strlen( $auth_settings['oauth2'] ) > 0 ? '1' : '';
+
+		// Sanitize OAuth2 auto-login (checkbox: value can only be '1' or empty string).
+		$auth_settings['oauth2_auto_login'] = array_key_exists( 'oauth2_auto_login', $auth_settings ) && strlen( $auth_settings['oauth2_auto_login'] ) > 0 ? '1' : '';
 
 		// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['google'] = array_key_exists( 'google', $auth_settings ) && strlen( $auth_settings['google'] ) > 0 ? '1' : '';

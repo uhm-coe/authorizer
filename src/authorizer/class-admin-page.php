@@ -470,6 +470,13 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
+		add_settings_field(
+			'auth_settings_oauth2_auto_login',
+			__( 'OAuth2 automatic login', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_checkbox_oauth2_auto_login' ),
+			'authorizer',
+			'auth_settings_external'
+		);
 
 		add_settings_field(
 			'auth_settings_external_google',

@@ -314,6 +314,58 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 
 
 	/**
+	 * Redirect to OAuth2 login when visiting login page (only if option is
+	 * enabled, OAuth2 is the only service, and WordPress logins are hidden).
+	 * Note: hook into wp_login_errors filter so this fires after the
+	 * authenticate hook (where the redirect to OAuth2 happens), but before html
+	 * output is started (so the redirect header doesn't complain about data
+	 * already being sent).
+	 *
+	 * Filter: wp_login_errors
+	 *
+	 * @param  object $errors      WP Error object.
+	 * @param  string $redirect_to Where to redirect on error.
+	 * @return WP_Error|void       WP Error object or void on redirect.
+	 */
+	public function wp_login_errors__maybe_redirect_to_oauth2( $errors, $redirect_to ) {
+		// If the query string 'checkemail=confirm' is set, we do not want to automatically redirect to
+		// the OAuth2 login screen using 'external=oauth2', and instead want to directly access the check email
+		// confirmation page.  So we will instead set the URL parameter 'external=wordpress' and redirect.
+		// This is to prevent issues when going through the normal WordPress password reset process.
+		if (
+			isset( $_REQUEST['checkemail'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'confirm' === $_REQUEST['checkemail'] && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			isset( $_SERVER['QUERY_STRING'] ) &&
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		) {
+					wp_redirect( Helper::modify_current_url_for_external_login( 'wordpress' ) );  // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+					exit;
+		}
+
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		// Check whether we should redirect to OAuth2.
+		if (
+			isset( $_SERVER['QUERY_STRING'] ) &&
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			array_key_exists( 'oauth2_auto_login', $auth_settings ) && '1' === $auth_settings['oauth2_auto_login'] &&
+			array_key_exists( 'oauth2', $auth_settings ) && '1' === $auth_settings['oauth2'] &&
+			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
+			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
+			( ! array_key_exists( 'cas', $auth_settings ) || '1' !== $auth_settings['cas'] ) &&
+			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
+		) {
+			wp_redirect( Helper::modify_current_url_for_external_login( 'oauth2' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			exit;
+		}
+
+		return $errors;
+	}
+
+
+	/**
 	 * Implements hook: do_action( 'wp_login_failed', $username );
 	 * Update the user meta for the user that just failed logging in.
 	 * Keep track of time of last failed attempt and number of failed attempts.

@@ -467,10 +467,10 @@ class Helper {
 
 
 	/**
-	 * Generate CAS authentication URL (wp-login.php URL with reauth=1 removed
-	 * and external=cas added).
+	 * Generate CAS or OAuth2 authentication URL (wp-login.php URL with reauth=1 removed
+	 * and external=cas or external=oauth2 added).
 	 *
-	 * @param string $provider External service provider type.
+	 * @param string $provider External service provider type (e.g., 'cas', or 'oauth2').
 	 */
 	public static function modify_current_url_for_external_login( $provider = 'cas' ) {
 		// Construct the URL of the current page (wp-login.php).

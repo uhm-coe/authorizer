@@ -110,6 +110,14 @@ class WP_Plugin_Authorizer extends Singleton {
 		// already being sent).
 		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_cas' ), 10, 2 );
 
+		// Redirect to OAuth2 login when visiting login page (only if option is
+		// enabled, OAuth2 is the only service, and WordPress logins are hidden).
+		// Note: hook into wp_login_errors filter so this fires after the
+		// authenticate hook (where the redirect to OAuth2 happens), but before html
+		// output is started (so the redirect header doesn't complain about data
+		// already being sent).
+		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_oauth2' ), 10, 2 );
+
 		// Prevent access to password reset if WordPress logins are disabled.
 		add_filter( 'lost_password_html_link', array( Login_Form::get_instance(), 'maybe_hide_lost_password_link' ), PHP_INT_MAX, 1 );
 		add_action( 'lost_password', array( Login_Form::get_instance(), 'maybe_hide_lost_password_form' ), PHP_INT_MAX, 1 );
