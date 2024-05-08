@@ -876,7 +876,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Default role for new users', 'authorizer' ); ?></th>
 							<td><?php $external->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-						<tr>
+						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'OAuth2 Logins', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_checkbox_auth_external_oauth2( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -916,7 +916,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Resource Owner URL', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_text_oauth2_url_resource( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-						<tr>
+						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
 							<td><?php $google->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -932,7 +932,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Google Hosted Domain', 'authorizer' ); ?></th>
 							<td><?php $google->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-						<tr>
+						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
 							<td><?php $cas->print_checkbox_auth_external_cas( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -984,7 +984,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'CAS users linked by username', 'authorizer' ); ?></th>
 							<td><?php $cas->print_checkbox_cas_link_on_username( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-						<tr>
+						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
