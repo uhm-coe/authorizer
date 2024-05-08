@@ -62,6 +62,15 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 == Changelog ==
 
+= 3.8.0 =
+* Block the WordPress lost password endpoint if Authorizer is configured to disable WordPress logins. Props @manakuke for the [discovery](https://wordpress.org/support/topic/remove-block-forgot-password-page/)!
+* Allow immediately showing OAuth2 login form if it’s the only external service enabled and WordPress logins are hidden (e.g., skip showing the “Log In with OAuth2” button on wp-login.php). Props @dblas for the [suggestion](https://wordpress.org/support/topic/bypassing-the-wp-log-on-screen/)!
+* Generate performant translations from .mo files. See: https://make.wordpress.org/core/2024/02/27/i18n-improvements-6-5-performant-translations/
+* Fix role change in authorizer_custom_role filter not synced to approved list. Props mdebski for the [issue and research](https://github.com/uhm-coe/authorizer/issues/149)!
+* Fix duplicate delete option during uninstall routine.
+* Fix unneeded role dropdown for blocked users (since blocked users get their roles removed, this was causing php warnings on checking strlen() on the null role value).
+* Tested up to WordPress 6.5.3.
+
 = 3.7.1 =
 * Replace jquery.multi-select composer dependency with local copy (since the composer package was removed). Props @julienlusson the catch!
 
