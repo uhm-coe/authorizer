@@ -142,7 +142,7 @@ class Ajax_Endpoints extends Singleton {
 		$auth_multisite_settings = $options->sanitize_options( $_POST );
 
 		// Filter options to only the allowed values (multisite options are a subset of all options).
-		$allowed                 = array(
+		$allowed = array(
 			'multisite_override',
 			'prevent_override_multisite',
 			'access_who_can_login',
@@ -164,6 +164,7 @@ class Ajax_Endpoints extends Singleton {
 			'google_clientsecret',
 			'google_hosteddomain',
 			'cas',
+			'cas_auto_login',
 			'cas_custom_label',
 			'cas_host',
 			'cas_port',
@@ -174,7 +175,6 @@ class Ajax_Endpoints extends Singleton {
 			'cas_attr_first_name',
 			'cas_attr_last_name',
 			'cas_attr_update_on_login',
-			'cas_auto_login',
 			'cas_link_on_username',
 			'ldap',
 			'ldap_host',

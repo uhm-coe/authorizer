@@ -396,6 +396,7 @@
 		var auth_settings_external_google_clientid = $( '#auth_settings_google_clientid' ).closest( 'tr' );
 		var auth_settings_external_google_clientsecret = $( '#auth_settings_google_clientsecret' ).closest( 'tr' );
 		var auth_settings_external_google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).closest( 'tr' );
+		var auth_settings_external_cas_auto_login = $( '#auth_settings_cas_auto_login' ).closest( 'tr' );
 		var auth_settings_external_cas_custom_label = $( '#auth_settings_cas_custom_label' ).closest( 'tr' );
 		var auth_settings_external_cas_host = $( '#auth_settings_cas_host' ).closest( 'tr' );
 		var auth_settings_external_cas_port = $( '#auth_settings_cas_port' ).closest( 'tr' );
@@ -406,7 +407,6 @@
 		var auth_settings_external_cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).closest( 'tr' );
-		var auth_settings_external_cas_auto_login = $( '#auth_settings_cas_auto_login' ).closest( 'tr' );
 		var auth_settings_external_cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).closest( 'tr' );
 		var auth_settings_external_ldap_host = $( '#auth_settings_ldap_host' ).closest( 'tr' );
 		var auth_settings_external_ldap_port = $( '#auth_settings_ldap_port' ).closest( 'tr' );
@@ -448,6 +448,7 @@
 		$( 'th, td', auth_settings_external_google_clientid ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_google_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_google_hosteddomain ).wrapInner( '<div class="animated_wrapper" />' );
+		$( 'th, td', auth_settings_external_cas_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_custom_label ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_port ).wrapInner( '<div class="animated_wrapper" />' );
@@ -458,7 +459,6 @@
 		$( 'th, td', auth_settings_external_cas_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_cas_link_on_username ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
 		$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
@@ -528,6 +528,7 @@
 
 		// Hide CAS options if unchecked
 		if ( ! $( '#auth_settings_cas' ).is( ':checked' ) ) {
+			animateOption( 'hide_immediately', auth_settings_external_cas_auto_login );
 			animateOption( 'hide_immediately', auth_settings_external_cas_custom_label );
 			animateOption( 'hide_immediately', auth_settings_external_cas_host );
 			animateOption( 'hide_immediately', auth_settings_external_cas_port );
@@ -538,7 +539,6 @@
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_first_name );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_last_name );
 			animateOption( 'hide_immediately', auth_settings_external_cas_attr_update_on_login );
-			animateOption( 'hide_immediately', auth_settings_external_cas_auto_login );
 			animateOption( 'hide_immediately', auth_settings_external_cas_link_on_username );
 		}
 
@@ -621,6 +621,7 @@
 		// Event handler: Show/hide CAS options based on checkbox
 		$( 'input[name="auth_settings[cas]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+			animateOption( action, auth_settings_external_cas_auto_login );
 			animateOption( action, auth_settings_external_cas_custom_label );
 			animateOption( action, auth_settings_external_cas_host );
 			animateOption( action, auth_settings_external_cas_port );
@@ -631,7 +632,6 @@
 			animateOption( action, auth_settings_external_cas_attr_first_name );
 			animateOption( action, auth_settings_external_cas_attr_last_name );
 			animateOption( action, auth_settings_external_cas_attr_update_on_login );
-			animateOption( action, auth_settings_external_cas_auto_login );
 			animateOption( action, auth_settings_external_cas_link_on_username );
 		});
 
@@ -1173,6 +1173,7 @@
 		params.google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).val();
 
 		params.cas = $( '#auth_settings_cas' ).is( ':checked' ) ? '1' : '';
+		params.cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
 		params.cas_custom_label = $( '#auth_settings_cas_custom_label' ).val();
 		params.cas_host = $( '#auth_settings_cas_host' ).val();
 		params.cas_port = $( '#auth_settings_cas_port' ).val();
@@ -1183,7 +1184,6 @@
 		params.cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
 		params.cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
 		params.cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
-		params.cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
 		params.cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
 		params.ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';

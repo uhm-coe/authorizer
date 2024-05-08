@@ -183,6 +183,7 @@ class Options extends Singleton {
 				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
 				$auth_settings['google_hosteddomain']       = $auth_multisite_settings['google_hosteddomain'];
 				$auth_settings['cas']                       = $auth_multisite_settings['cas'];
+				$auth_settings['cas_auto_login']            = $auth_multisite_settings['cas_auto_login'];
 				$auth_settings['cas_custom_label']          = $auth_multisite_settings['cas_custom_label'];
 				$auth_settings['cas_host']                  = $auth_multisite_settings['cas_host'];
 				$auth_settings['cas_port']                  = $auth_multisite_settings['cas_port'];
@@ -193,7 +194,6 @@ class Options extends Singleton {
 				$auth_settings['cas_attr_first_name']       = $auth_multisite_settings['cas_attr_first_name'];
 				$auth_settings['cas_attr_last_name']        = $auth_multisite_settings['cas_attr_last_name'];
 				$auth_settings['cas_attr_update_on_login']  = $auth_multisite_settings['cas_attr_update_on_login'];
-				$auth_settings['cas_auto_login']            = $auth_multisite_settings['cas_auto_login'];
 				$auth_settings['cas_link_on_username']      = $auth_multisite_settings['cas_link_on_username'];
 				$auth_settings['ldap']                      = $auth_multisite_settings['ldap'];
 				$auth_settings['ldap_host']                 = $auth_multisite_settings['ldap_host'];
@@ -401,6 +401,9 @@ class Options extends Singleton {
 			$auth_settings['oauth2_auto_login'] = '';
 		}
 
+		if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
+			$auth_settings['cas_auto_login'] = '';
+		}
 		if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
 			$auth_settings['cas_custom_label'] = 'CAS';
 		}
@@ -430,9 +433,6 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_settings ) ) {
 			$auth_settings['cas_attr_update_on_login'] = '';
-		}
-		if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
-			$auth_settings['cas_auto_login'] = '';
 		}
 		if ( ! array_key_exists( 'cas_link_on_username', $auth_settings ) ) {
 			$auth_settings['cas_link_on_username'] = '';
@@ -618,6 +618,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'google_hosteddomain', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google_hosteddomain'] = '';
 			}
+			if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['cas_auto_login'] = '';
+			}
 			if ( ! array_key_exists( 'cas_custom_label', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_custom_label'] = 'CAS';
 			}
@@ -647,9 +650,6 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'cas_attr_update_on_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_attr_update_on_login'] = '';
-			}
-			if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
-				$auth_multisite_settings['cas_auto_login'] = '';
 			}
 			if ( ! array_key_exists( 'cas_link_on_username', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_link_on_username'] = '';
@@ -800,6 +800,9 @@ class Options extends Singleton {
 		// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas'] = array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ? '1' : '';
 
+		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
+		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
+
 		// Sanitize CAS Host setting.
 		$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
 
@@ -810,9 +813,6 @@ class Options extends Singleton {
 		if ( ! isset( $auth_settings['cas_attr_update_on_login'] ) || ! in_array( $auth_settings['cas_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
 			$auth_settings['cas_attr_update_on_login'] = '';
 		}
-
-		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
-		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
 
 		// Sanitize CAS link on username (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas_link_on_username'] = array_key_exists( 'cas_link_on_username', $auth_settings ) && strlen( $auth_settings['cas_link_on_username'] ) > 0 ? '1' : '';
