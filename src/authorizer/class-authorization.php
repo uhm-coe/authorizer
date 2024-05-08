@@ -222,11 +222,30 @@ class Authorization extends Singleton {
 			if ( $is_newly_approved_user || $this->is_email_in_list( $user_email, 'approved' ) ) {
 				$user_info = $is_newly_approved_user ? $approved_user : Helper::get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
-				// If this user's role was modified above (in the
-				// authorizer_custom_role filter), use that value instead of
-				// whatever is specified in the approved list.
+				// If this user's role was modified above (in the authorizer_custom_role
+				// filter), use that value instead of whatever is specified in the
+				// approved list. Also update the role in the approved list.
 				if ( $default_role !== $approved_role ) {
 					$user_info['role'] = $approved_role;
+
+					// Find the user in either the single site or multisite approved list
+					// and update their role there also.
+					foreach ( $auth_settings_access_users_approved_single as $index => $auth_settings_access_user_approved_single ) {
+						if ( $user_info['email'] === $auth_settings_access_user_approved_single['email'] ) {
+							$auth_settings_access_users_approved_single[$index]['role'] = $approved_role;
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+							break;
+						}
+					}
+					if ( is_multisite() ) {
+						foreach ( $auth_settings_access_users_approved_multi as $index => $auth_settings_access_user_approved_multi ) {
+							if ( $user_info['email'] === $auth_settings_access_user_approved_multi['email'] ) {
+								$auth_settings_access_users_approved_multi[$index]['role'] = $approved_role;
+								update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_settings_access_users_approved_multi );
+								break;
+							}
+						}
+					}
 				}
 
 				// If the approved external user does not have a WordPress account, create it.
