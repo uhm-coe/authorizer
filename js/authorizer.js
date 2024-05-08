@@ -1125,148 +1125,93 @@
 		});
 		$( caller ).after( $spinner );
 
-		// Get form elements to save
-		var nonce_save_auth_settings = $( '#nonce_save_auth_settings' ).val();
+		// Get form elements to save.
+		var params = {
+			action: 'save_auth_multisite_settings',
+			nonce: $( '#nonce_save_auth_settings' ).val(),
+		};
 
-		var multisite_override = $( '#auth_settings_multisite_override' ).is( ':checked' ) ? '1' : '';
+		params.multisite_override = $( '#auth_settings_multisite_override' ).is( ':checked' ) ? '1' : '';
 
-		var prevent_override_multisite = $( '#auth_settings_prevent_override_multisite' ).is( ':checked' ) ? '1' : '';
+		params.prevent_override_multisite = $( '#auth_settings_prevent_override_multisite' ).is( ':checked' ) ? '1' : '';
 
-		var access_who_can_login = $( 'form input[name="auth_settings[access_who_can_login]"]:checked' ).val();
+		params.access_who_can_login = $( 'form input[name="auth_settings[access_who_can_login]"]:checked' ).val();
 
-		var access_who_can_view = $( 'form input[name="auth_settings[access_who_can_view]"]:checked' ).val();
+		params.access_who_can_view = $( 'form input[name="auth_settings[access_who_can_view]"]:checked' ).val();
 
-		var access_users_approved = {};
+		params.access_users_approved = {};
 		$( '#list_auth_settings_access_users_approved li' ).each( function( index ) {
 			var user = {};
 			user.email = $( '.auth-email', this ).val();
 			user.role = $( '.auth-role', this ).val();
 			user.date_added = $( '.auth-date-added', this ).val();
 			user.local_user = $( '.auth-local-user', this ).length !== 0;
-			access_users_approved[index] = user;
+			params.access_users_approved[index] = user;
 		});
 
-		var access_default_role = $( '#auth_settings_access_default_role' ).val();
+		params.access_default_role = $( '#auth_settings_access_default_role' ).val();
 
-		var oauth2 = $( '#auth_settings_oauth2' ).is( ':checked' ) ? '1' : '';
-		var oauth2_provider = $( '#auth_settings_oauth2_provider' ).val();
-		var oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).val();
-		var oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).val();
-		var oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).val();
-		var oauth2_hosteddomain = $( '#auth_settings_oauth2_hosteddomain' ).val();
-		var oauth2_tenant_id = $( '#auth_settings_oauth2_tenant_id' ).val();
-		var oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).val();
-		var oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).val();
-		var oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).val();
+		params.oauth2 = $( '#auth_settings_oauth2' ).is( ':checked' ) ? '1' : '';
+		params.oauth2_provider = $( '#auth_settings_oauth2_provider' ).val();
+		params.oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).val();
+		params.oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).val();
+		params.oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).val();
+		params.oauth2_hosteddomain = $( '#auth_settings_oauth2_hosteddomain' ).val();
+		params.oauth2_tenant_id = $( '#auth_settings_oauth2_tenant_id' ).val();
+		params.oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).val();
+		params.oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).val();
+		params.oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).val();
 
-		var google = $( '#auth_settings_google' ).is( ':checked' ) ? '1' : '';
-		var google_clientid = $( '#auth_settings_google_clientid' ).val();
-		var google_clientsecret = $( '#auth_settings_google_clientsecret' ).val();
-		var google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).val();
+		params.google = $( '#auth_settings_google' ).is( ':checked' ) ? '1' : '';
+		params.google_clientid = $( '#auth_settings_google_clientid' ).val();
+		params.google_clientsecret = $( '#auth_settings_google_clientsecret' ).val();
+		params.google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).val();
 
-		var cas = $( '#auth_settings_cas' ).is( ':checked' ) ? '1' : '';
-		var cas_custom_label = $( '#auth_settings_cas_custom_label' ).val();
-		var cas_host = $( '#auth_settings_cas_host' ).val();
-		var cas_port = $( '#auth_settings_cas_port' ).val();
-		var cas_path = $( '#auth_settings_cas_path' ).val();
-		var cas_method = $( '#auth_settings_cas_method' ).val();
-		var cas_version = $( '#auth_settings_cas_version' ).val();
-		var cas_attr_email = $( '#auth_settings_cas_attr_email' ).val();
-		var cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
-		var cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
-		var cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
-		var cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
-		var cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
+		params.cas = $( '#auth_settings_cas' ).is( ':checked' ) ? '1' : '';
+		params.cas_custom_label = $( '#auth_settings_cas_custom_label' ).val();
+		params.cas_host = $( '#auth_settings_cas_host' ).val();
+		params.cas_port = $( '#auth_settings_cas_port' ).val();
+		params.cas_path = $( '#auth_settings_cas_path' ).val();
+		params.cas_method = $( '#auth_settings_cas_method' ).val();
+		params.cas_version = $( '#auth_settings_cas_version' ).val();
+		params.cas_attr_email = $( '#auth_settings_cas_attr_email' ).val();
+		params.cas_attr_first_name = $( '#auth_settings_cas_attr_first_name' ).val();
+		params.cas_attr_last_name = $( '#auth_settings_cas_attr_last_name' ).val();
+		params.cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
+		params.cas_auto_login = $( '#auth_settings_cas_auto_login' ).is( ':checked' ) ? '1' : '';
+		params.cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 
-		var ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';
-		var ldap_host = $( '#auth_settings_ldap_host' ).val();
-		var ldap_port = $( '#auth_settings_ldap_port' ).val();
-		var ldap_search_base = $( '#auth_settings_ldap_search_base' ).val();
-		var ldap_search_filter = $( '#auth_settings_ldap_search_filter' ).val();
-		var ldap_uid = $( '#auth_settings_ldap_uid' ).val();
-		var ldap_attr_email = $( '#auth_settings_ldap_attr_email' ).val();
-		var ldap_user = $( '#auth_settings_ldap_user' ).val();
-		var ldap_password = $( '#auth_settings_ldap_password' ).val();
-		var ldap_tls = $( '#auth_settings_ldap_tls' ).is( ':checked' ) ? '1' : '';
-		var ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).val();
-		var ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
-		var ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
-		var ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).val();
-		var ldap_test_user = $( '#auth_settings_ldap_test_user' ).val();
+		params.ldap = $( '#auth_settings_ldap' ).is( ':checked' ) ? '1' : '';
+		params.ldap_host = $( '#auth_settings_ldap_host' ).val();
+		params.ldap_port = $( '#auth_settings_ldap_port' ).val();
+		params.ldap_search_base = $( '#auth_settings_ldap_search_base' ).val();
+		params.ldap_search_filter = $( '#auth_settings_ldap_search_filter' ).val();
+		params.ldap_uid = $( '#auth_settings_ldap_uid' ).val();
+		params.ldap_attr_email = $( '#auth_settings_ldap_attr_email' ).val();
+		params.ldap_user = $( '#auth_settings_ldap_user' ).val();
+		params.ldap_password = $( '#auth_settings_ldap_password' ).val();
+		params.ldap_tls = $( '#auth_settings_ldap_tls' ).is( ':checked' ) ? '1' : '';
+		params.ldap_lostpassword_url = $( '#auth_settings_ldap_lostpassword_url' ).val();
+		params.ldap_attr_first_name = $( '#auth_settings_ldap_attr_first_name' ).val();
+		params.ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).val();
+		params.ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).val();
+		params.ldap_test_user = $( '#auth_settings_ldap_test_user' ).val();
 
-		var advanced_lockouts = {
+		params.advanced_lockouts = {
 			attempts_1: $( '#auth_settings_advanced_lockouts_attempts_1' ).val(),
 			duration_1: $( '#auth_settings_advanced_lockouts_duration_1' ).val(),
 			attempts_2: $( '#auth_settings_advanced_lockouts_attempts_2' ).val(),
 			duration_2: $( '#auth_settings_advanced_lockouts_duration_2' ).val(),
 			reset_duration: $( '#auth_settings_advanced_lockouts_reset_duration' ).val(),
 		};
-		var advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
-		var advanced_disable_wp_login = $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ? '1' : '';
-		var advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
-		var advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
-		var advanced_users_sort_by = $( '#auth_settings_advanced_users_sort_by' ).val();
-		var advanced_users_sort_order = $( '#auth_settings_advanced_users_sort_order' ).val();
+		params.advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
+		params.advanced_disable_wp_login = $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ? '1' : '';
+		params.advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
+		params.advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
+		params.advanced_users_sort_by = $( '#auth_settings_advanced_users_sort_by' ).val();
+		params.advanced_users_sort_order = $( '#auth_settings_advanced_users_sort_order' ).val();
 
-		$.post( ajaxurl, {
-			action: 'save_auth_multisite_settings',
-			nonce: nonce_save_auth_settings,
-			multisite_override: multisite_override,
-			prevent_override_multisite: prevent_override_multisite,
-			access_who_can_login: access_who_can_login,
-			access_who_can_view: access_who_can_view,
-			access_users_approved: access_users_approved,
-			access_default_role: access_default_role,
-			oauth2: oauth2,
-			oauth2_provider: oauth2_provider,
-			oauth2_custom_label: oauth2_custom_label,
-			oauth2_clientid: oauth2_clientid,
-			oauth2_clientsecret: oauth2_clientsecret,
-			oauth2_hosteddomain: oauth2_hosteddomain,
-			oauth2_tenant_id: oauth2_tenant_id,
-			oauth2_url_authorize: oauth2_url_authorize,
-			oauth2_url_token: oauth2_url_token,
-			oauth2_url_resource: oauth2_url_resource,
-			google: google,
-			google_clientid: google_clientid,
-			google_clientsecret: google_clientsecret,
-			google_hosteddomain: google_hosteddomain,
-			cas: cas,
-			cas_custom_label: cas_custom_label,
-			cas_host: cas_host,
-			cas_port: cas_port,
-			cas_path: cas_path,
-			cas_method: cas_method,
-			cas_version: cas_version,
-			cas_attr_email: cas_attr_email,
-			cas_attr_first_name: cas_attr_first_name,
-			cas_attr_last_name: cas_attr_last_name,
-			cas_attr_update_on_login: cas_attr_update_on_login,
-			cas_auto_login: cas_auto_login,
-			cas_link_on_username: cas_link_on_username,
-			ldap: ldap,
-			ldap_host: ldap_host,
-			ldap_port: ldap_port,
-			ldap_search_base: ldap_search_base,
-			ldap_search_filter: ldap_search_filter,
-			ldap_uid: ldap_uid,
-			ldap_attr_email: ldap_attr_email,
-			ldap_user: ldap_user,
-			ldap_password: ldap_password,
-			ldap_tls: ldap_tls,
-			ldap_lostpassword_url: ldap_lostpassword_url,
-			ldap_attr_first_name: ldap_attr_first_name,
-			ldap_attr_last_name: ldap_attr_last_name,
-			ldap_attr_update_on_login: ldap_attr_update_on_login,
-			ldap_test_user: ldap_test_user,
-			advanced_lockouts: advanced_lockouts,
-			advanced_hide_wp_login: advanced_hide_wp_login,
-			advanced_disable_wp_login: advanced_disable_wp_login,
-			advanced_users_per_page: advanced_users_per_page,
-			advanced_users_sort_by: advanced_users_sort_by,
-			advanced_users_sort_order: advanced_users_sort_order,
-			advanced_widget_enabled: advanced_widget_enabled,
-		}, function( response ) {
+		$.post( ajaxurl, params, function( response ) {
 			var succeeded = response === 'success';
 			var spinnerText = succeeded ? authL10n.saved + '.' : '<span class="attention">' + authL10n.failed + '.</span>';
 			var spinnerWait = succeeded ? 500 : 2000;
