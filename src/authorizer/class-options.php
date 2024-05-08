@@ -177,7 +177,7 @@ class Options extends Singleton {
 				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
 				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
 				$auth_settings['oauth2_url_resource']       = $auth_multisite_settings['oauth2_url_resource'];
-				$auth_settings['oauth2_auto_login']         = $auth_multisite_settings['oauth2_auto_login'];
+				$auth_settings['oauth2_auto_login']         = $auth_multisite_settings['oauth2_auto_login'] ?? '';
 				$auth_settings['google']                    = $auth_multisite_settings['google'];
 				$auth_settings['google_clientid']           = $auth_multisite_settings['google_clientid'];
 				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
