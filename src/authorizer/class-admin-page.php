@@ -508,7 +508,10 @@ class Admin_Page extends Singleton {
 			__( 'CAS Logins', 'authorizer' ),
 			array( Cas::get_instance(), 'print_checkbox_auth_external_cas' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'class' => 'border-top',
+			)
 		);
 		add_settings_field(
 			'auth_settings_cas_custom_label',
@@ -578,10 +581,7 @@ class Admin_Page extends Singleton {
 			__( 'CAS attribute update', 'authorizer' ),
 			array( Cas::get_instance(), 'print_select_cas_attr_update_on_login' ),
 			'authorizer',
-			'auth_settings_external',
-			array(
-				'class' => 'border-top',
-			)
+			'auth_settings_external'
 		);
 		add_settings_field(
 			'auth_settings_cas_auto_login',
