@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.5
-Stable tag: 3.7.1
+Stable tag: 3.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.8.1 =
+* Add missing OAuth2 automatic login multisite option.
 
 = 3.8.0 =
 * Block the WordPress lost password endpoint if Authorizer is configured to disable WordPress logins. Props @manakuke for the [discovery](https://wordpress.org/support/topic/remove-block-forgot-password-page/)!
