@@ -231,19 +231,23 @@ class Authorization extends Singleton {
 					$user_info['role'] = $approved_role;
 
 					// Find the user in either the single site or multisite approved list
-					// and update their role there also.
+					// and update their role there if different.
 					foreach ( $auth_settings_access_users_approved_single as $index => $auth_settings_access_user_approved_single ) {
 						if ( $user_info['email'] === $auth_settings_access_user_approved_single['email'] ) {
-							$auth_settings_access_users_approved_single[$index]['role'] = $approved_role;
-							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+							if ( $auth_settings_access_users_approved_single[ $index ]['role'] !== $approved_role ) {
+								$auth_settings_access_users_approved_single[ $index ]['role'] = $approved_role;
+								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+							}
 							break;
 						}
 					}
 					if ( is_multisite() ) {
 						foreach ( $auth_settings_access_users_approved_multi as $index => $auth_settings_access_user_approved_multi ) {
 							if ( $user_info['email'] === $auth_settings_access_user_approved_multi['email'] ) {
-								$auth_settings_access_users_approved_multi[$index]['role'] = $approved_role;
-								update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_settings_access_users_approved_multi );
+								if ( $auth_settings_access_users_approved_multi[ $index ]['role'] !== $approved_role ) {
+									$auth_settings_access_users_approved_multi[ $index ]['role'] = $approved_role;
+									update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_settings_access_users_approved_multi );
+								}
 								break;
 							}
 						}
