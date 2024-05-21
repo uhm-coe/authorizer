@@ -223,11 +223,10 @@ class Authorization extends Singleton {
 				$user_info = $is_newly_approved_user ? $approved_user : Helper::get_user_info_from_list( $user_email, $auth_settings_access_users_approved );
 
 				// If this user's role was modified above (in the authorizer_custom_role
-				// filter), or if the entry in the approved list doesn't match this
-				// role, update the role in the approved list and use that role (i.e.,
-				// if the roles are out of sync, use the WordPress role /
-				// authorizer_custom_role value instead of the role in the approved list).
-				if ( $default_role !== $approved_role || $user_info['role'] !== $approved_role ) {
+				// filter), update the role in the approved list and use that role
+				// (i.e., if the roles are out of sync, use the authorizer_custom_role
+				// value instead of the role in the approved list).
+				if ( has_filter( 'authorizer_custom_role' ) ) {
 					$user_info['role'] = $approved_role;
 
 					// Find the user in either the single site or multisite approved list
@@ -392,14 +391,6 @@ class Authorization extends Singleton {
 					}
 					if ( $should_update_last_name ) {
 						update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
-					}
-
-					// Update this user's role if it was modified in the
-					// authorizer_custom_role filter.
-					if ( $default_role !== $approved_role ) {
-						// Update user's role in WordPress. Note: User's role will be changed
-						// in the approved list via hook `set_user_role` in WP_User::set_role().
-						$user->set_role( $approved_role );
 					}
 				}
 
