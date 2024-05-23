@@ -177,6 +177,11 @@ class Public_Access extends \Authorizer\Singleton {
 					array(
 						'post_type'      => $post_type,
 						'posts_per_page' => 1000, // phpcs:ignore WordPress.WP.PostsPerPage.posts_per_page_posts_per_page
+						// Disable caches to minimize memory footprint.
+						'cache_results'          => false,
+						'update_post_meta_cache' => false,
+						'update_post_term_cache' => false,
+						'update_menu_item_cache' => false,
 					)
 				);
 				$pages = is_array( $pages ) ? $pages : array();
