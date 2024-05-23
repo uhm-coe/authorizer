@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.5
-Stable tag: 3.8.2
+Stable tag: 3.8.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,11 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.8.3 =
+* Disable caching on the Authorizer Settings page to reduce memory footprint. Props @timkite for the [report](https://wordpress.org/support/topic/authorizer-admin-page-using-too-much-memory/)!
+* Add zh_CN translation. Props pinke for the [pull request](https://github.com/uhm-coe/authorizer/pull/150)!
+* Update translatable strings.
 
 = 3.8.2 =
 * Fix new user always assigned default role on first login instead of role in approved list. Bug introduced in 3.8.1. Props @melidonis for the [report](https://wordpress.org/support/topic/new-users-role-reverted-to-subscriber/)!
