@@ -579,6 +579,11 @@ msgid "Resource Owner URL"
 msgstr ""
 
 #: src/authorizer/class-admin-page.php:475
+#: src/authorizer/class-admin-page.php:927
+msgid "OAuth2 automatic login"
+msgstr ""
+
+#: src/authorizer/class-admin-page.php:483
 #: src/authorizer/class-admin-page.php:931
 msgid "Google Logins"
 msgstr ""
@@ -1870,6 +1875,19 @@ msgstr ""
 
 #: src/authorizer/options/external/class-oauth2.php:296
 msgid "Example:  https://api.example.edu/user"
+msgstr ""
+
+#: src/authorizer/options/external/class-oauth2.php:315
+msgid ""
+"Immediately redirect to OAuth2 login form if it's the only enabled external "
+"service and WordPress logins are hidden"
+msgstr ""
+
+#: src/authorizer/options/external/class-oauth2.php:316
+msgid ""
+"Note: This feature will only work if you have checked \"Hide WordPress "
+"Logins\" in Advanced settings, and if OAuth2 is the only enabled service (i."
+"e., no Google, LDAP, or CAS)."
 msgstr ""
 
 #. Plugin Name of the plugin/theme
