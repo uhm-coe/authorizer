@@ -1,0 +1,1598 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Authorizer\n"
+"POT-Creation-Date: 2024-03-06 08:11-1000\n"
+"PO-Revision-Date: 2024-05-23 12:54+0800\n"
+"Last-Translator: pinke <xpinke@gmail.com>\n"
+"Language-Team: pinke <xpinke@gmail.com>\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+"X-Generator: Poedit 3.4.4\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: authorizer.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.min.js\n"
+"X-Poedit-SearchPathExcluded-1: node_modules\n"
+"X-Poedit-SearchPathExcluded-2: vendor\n"
+
+#: src/authorizer/class-admin-page.php:45
+msgid "<strong>Pending Users</strong>: Pending users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you."
+msgstr "<strong>待定用户</strong>: 待定用户是指已成功 登录站点，但尚未获得您的批准(或阻止)的用户。"
+
+#: src/authorizer/class-admin-page.php:46
+msgid "<strong>Approved Users</strong>: Approved users have access to the site once they successfully log in."
+msgstr "<strong>审核用户</strong>: 获得批准的用户在成功登录后即可访问该站点。"
+
+#: src/authorizer/class-admin-page.php:47
+msgid "<strong>Blocked Users</strong>: Blocked users will receive an error message when they try to visit the site after authenticating."
+msgstr "<strong>禁止用户</strong>: 被禁止的用户在通过身份验证后尝试访问站点时将收到一条错误消息。"
+
+#: src/authorizer/class-admin-page.php:48
+msgid ""
+"Users in the <strong>Pending</strong> list appear automatically after a new user tries to log in from the configured external authentication service. You can add users to the <strong>Approved</strong> or "
+"<strong>Blocked</strong> lists by typing them in manually, or by clicking the <em>Approve</em> or <em>Block</em> buttons next to a user in the <strong>Pending</strong> list."
+msgstr ""
+"新用户尝试从配置的外部身份验证服务登录后，\"<strong>待定</strong>\"列表中的用户会自动出现。您可以手动输入用户，或单击 \"<strong>待定</strong>\"列表中用户旁边的 \"<strong>批准</strong>\"或 \"<strong>阻止</strong>\"按"
+"钮，将其添加到 \"已<em>批准</em>\"或 \"已<em>阻止</em>\"列表中。"
+
+#: src/authorizer/class-admin-page.php:53 src/authorizer/class-options.php:958 src/authorizer/class-options.php:964
+msgid "Access Lists"
+msgstr "访问列表"
+
+#: src/authorizer/class-admin-page.php:60
+msgid ""
+"<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external "
+"service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>."
+msgstr ""
+"<strong>谁可以登录网站？</strong>在这里选择您想在网站上使用的访问限制级别。您可以让拥有 WordPress 账户或 Google、CAS 或 LDAP 等外部服务账户的任何人都可以登录网站，也可以限制只有 WordPress 用户和您通过<em>访问列表</em>"
+"指定的外部用户可以登录网站。"
+
+#: src/authorizer/class-admin-page.php:61
+msgid ""
+"<strong>Which role should receive email notifications about pending users?</strong>: If you've restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification "
+"email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them "
+"their access is pending approval."
+msgstr ""
+"<strong>哪个角色应收到有关待处理用户的电子邮件通知？</strong>如果您限制了<strong>已批准用户</strong>的访问权限，您可以确定每次有新的外部用户成功登录并被添加到待定列表时，哪些 WordPress 用户会收到通知邮件。指定角色的所"
+"有用户都会收到一封电子邮件，而外部用户则会收到一条信息（如下所示），告诉他们他们的访问正在等待批准。"
+
+#: src/authorizer/class-admin-page.php:62
+msgid "<strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time."
+msgstr "<strong>待处理用户在尝试登录后会看到什么信息？</strong> 在这里，您可以指定新的外部用户在首次尝试登录网站时会看到的确切信息。"
+
+#: src/authorizer/class-admin-page.php:67 src/authorizer/class-options.php:965
+msgid "Login Access"
+msgstr "登录访问"
+
+#: src/authorizer/class-admin-page.php:74
+msgid ""
+"<strong>Who can view the site?</strong>: You can restrict the site's visibility by only allowing logged in users to see pages. If you do so, you can customize the specifics about the site's privacy using the settings "
+"below."
+msgstr "<strong>谁可以查看网站？</strong>您可以限制网站的可见性，只允许登录用户查看页面。如果这样做，您可以使用下面的设置自定义网站隐私的具体内容。"
+
+#: src/authorizer/class-admin-page.php:75
+msgid ""
+"<strong>What pages (if any) should be available to everyone?</strong>: If you'd like to declare certain pages on your site as always public (such as the course syllabus, introduction, or calendar), specify those pages "
+"here. These pages will always be available no matter what access restrictions exist."
+msgstr "<strong>哪些页面（如果有的话）应该对所有人开放？</strong> 如果您想将网站上的某些页面（如课程大纲、简介或日历）永久公开，请在此处指定这些页面。无论存在何种访问限制，这些页面都将始终可用。"
+
+#: src/authorizer/class-admin-page.php:76
+msgid ""
+"<strong>What happens to people without access when they visit a <em>private</em> page?</strong>: Choose the response anonymous users receive when visiting the site. You can choose between immediately taking them to "
+"the <strong>login screen</strong>, or simply showing them a <strong>message</strong>."
+msgstr ""
+"<strong>访问私人页面时，没有访问权限<em>的人会发生什么情况</em>页面？</strong>：选择匿名用户在访问时收到的响应网站。您可以选择立即将他们带到<strong>登录屏幕</strong>，或者只是向他们显示<strong>一条消息</strong>。"
+
+#: src/authorizer/class-admin-page.php:77
+msgid ""
+"<strong>What happens to people without access when they visit a <em>public</em> page?</strong>: Choose the response anonymous users receive when visiting a page on the site marked as public. You can choose between "
+"showing them the page without any message, or showing them a the page with a message above the content."
+msgstr "<strong>访问公共场所时，没有访问权限<em>的人会发生什么情况</em>页面？</strong>：选择匿名用户在访问时收到的响应网站上标记为公共的页面。您可以选择向他们展示没有任何消息的页面，或向他们显示带有消息的页面内容。"
+
+#: src/authorizer/class-admin-page.php:78
+msgid "<strong>What message should people without access see?</strong>: If you chose to show new users a <strong>message</strong> above, type that message here."
+msgstr "<strong>没有访问权限的人应该看到什么消息？</strong>：如果你选择要向新用户显示上面<strong>的消息</strong>，请在此处键入该消息。"
+
+#: src/authorizer/class-admin-page.php:83 src/authorizer/class-options.php:966
+msgid "Public Access"
+msgstr "公共访问"
+
+#: src/authorizer/class-admin-page.php:90
+msgid "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose."
+msgstr "<strong>要进行身份验证的外部服务类型</strong>：选择您将使用的身份验证服务类型。你必须填写下面的不同字段取决于您选择的服务。"
+
+#: src/authorizer/class-admin-page.php:91
+msgid "<strong>Enable OAuth2 Logins</strong>: Choose if you want to allow users to log in with one of the supported OAuth2 providers. You will need to enter your API Client ID and Secret to enable these logins."
+msgstr "<strong>启用 OAuth2 登录</strong>：选择是否允许用户使用受支持的 OAuth2 提供程序之一登录。您需要输入用于启用这些登录的 API 客户端 ID 和密钥。"
+
+#: src/authorizer/class-admin-page.php:92
+msgid "<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins."
+msgstr "<strong>启用 Google 登录</strong>：选择是否允许用户使用他们的 Google 帐户凭据登录。您将需要输入您的 API 用于启用 Google 登录的客户端 ID 和密码。"
+
+#: src/authorizer/class-admin-page.php:93
+msgid ""
+"<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS "
+"Logins."
+msgstr "<strong>启用 CAS 登录</strong>：选择是否允许用户登录通过CAS（中央身份验证服务）。您需要输入有关您的 CAS 服务器（主机、端口和路径）的详细信息，以启用 CAS 登录。"
+
+#: src/authorizer/class-admin-page.php:94
+msgid ""
+"<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, "
+"search base, uid attribute, directory user, directory user password, and whether to use STARTTLS) to enable LDAP Logins."
+msgstr ""
+"<strong>启用 LDAP 登录</strong>：选择是否允许用户登录使用他们的 LDAP（轻量级目录访问协议）凭据。你将需要输入有关您的 LDAP 服务器的详细信息（主机、端口、搜索库、uid 属性、目录用户、目录用户密码、是否使用STARTTLS） 启用 "
+"LDAP 登录。"
+
+#: src/authorizer/class-admin-page.php:95
+msgid "<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!"
+msgstr "<strong>新 CAS 用户的默认角色</strong>：指定新角色默认情况下，外部用户将获得。一定要选择一个角色，有限的权限！"
+
+#: src/authorizer/class-admin-page.php:96
+msgid "If you enable OAuth2 logins:"
+msgstr "如果启用 OAuth2 登录："
+
+#: src/authorizer/class-admin-page.php:98
+msgid "<strong>Client ID</strong>: You can generate this ID following the instructions for your specific provider."
+msgstr "<strong>客户端 ID：</strong>您可以按照针对特定提供商的说明。"
+
+#: src/authorizer/class-admin-page.php:99
+msgid "<strong>Client Secret</strong>: You can generate this secret by following the instructions for your specific provider."
+msgstr "\"\"<strong>客户端密码</strong>：您可以通过遵循针对特定提供商的说明。"
+
+#: src/authorizer/class-admin-page.php:99
+msgid ""
+"Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OAUTH2_CLIENT_SECRET', '...' );</code>, or you may fetch it from an "
+"external service like AWS Secrets Manager by hooking into the <code>authorizer_oauth2_client_secret</code> filter. This will prevent it from being stored in plaintext in the WordPress database."
+msgstr ""
+"注意：为了提高安全性，您可以将此字段留空，而是在wp-config.php中定义此值 <code>define（ 'AUTHORIZER_OAUTH2_CLIENT_SECRET'， '...' ）;</code>，或者你可以通过挂接到<code>authorizer_oauth2_client_secret</code>过滤器。这将"
+"防止它从以明文形式存储在 WordPress 数据库中。"
+
+#: src/authorizer/class-admin-page.php:100
+msgid ""
+"<strong>Authorization URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the first: the endpoint first contacted to initiate "
+"the authentication."
+msgstr "\"\"<strong>授权 URL：</strong>对于通用 OAuth2 提供程序，您将需要指定 OAuth2 身份验证流所需的 3 个端点。这是第一个：首先联系的端点以启动身份验证。"
+
+#: src/authorizer/class-admin-page.php:101
+msgid ""
+"<strong>Access Token URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the second: the endpoint that is contacted after "
+"initiation to retrieve an access token for the user that just authenticated."
+msgstr "\"\"<strong>访问令牌 URL：</strong>对于通用 OAuth2 提供程序，您将需要指定 OAuth2 身份验证流所需的 3 个端点。这是第二个：启动后联系的端点检索刚刚通过身份验证的用户的访问令牌。"
+
+#: src/authorizer/class-admin-page.php:102
+msgid ""
+"<strong>Resource Owner URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the third: the endpoint that is contacted after "
+"successfully receiving an authentication token to retrieve details on the user that just authenticated."
+msgstr "<strong>资源所有者 URL：</strong>对于通用 OAuth2 提供程序，您将需要指定 OAuth2 身份验证所需的 3 个端点流动。这是第三个：成功后联系的端点接收身份验证令牌以检索有关用户的详细信息，只是已认证。"
+
+#: src/authorizer/class-admin-page.php:104
+msgid "If you enable Google logins:"
+msgstr "如果您启用 Google 登录："
+
+#: src/authorizer/class-admin-page.php:106
+msgid ""
+"<strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client ID typically looks something like this: "
+"1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com"
+msgstr ""
+"<strong>Google 客户端 ID：</strong>您可以通过创建一个新的项目在<a href='https：//cloud.google.com/console'>Google Developers 控制台</a>。客户端 ID 通常如下所示：1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
+"googleusercontent.com"
+
+#: src/authorizer/class-admin-page.php:107
+msgid ""
+"<strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client Secret typically looks something "
+"like this: sDNgX5_pr_5bly-frKmvp8jT"
+msgstr "<strong>Google 客户端密码</strong>：您可以通过以下方式生成此密码在<a href='https：//cloud.google.com/console'>Google Developers Console</a>.客户端密钥通常显示为像这样的东西：sDNgX5_pr_5bly-frKmvp8jT"
+
+#: src/authorizer/class-admin-page.php:107
+msgid ""
+"Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );</code>, or you may fetch it from an "
+"external service like AWS Secrets Manager by hooking into the <code>authorizer_google_client_secret</code> filter. This will prevent it from being stored in plaintext in the WordPress database."
+msgstr ""
+"注意：为了提高安全性，您可以将此字段留空，而是在wp-config.php中定义此值 <code>define（ 'AUTHORIZER_GOOGLE_CLIENT_SECRET'， '...' ）;</code>，或者你可以通过挂接到<code>authorizer_google_client_secret</code>过滤器。这将"
+"防止它从以明文形式存储在 WordPress 数据库中。"
+
+#: src/authorizer/class-admin-page.php:109
+msgid "If you enable CAS logins:"
+msgstr "如果启用 CAS 登录："
+
+#: src/authorizer/class-admin-page.php:111
+msgid "<strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu)."
+msgstr "<strong>CAS 服务器主机名</strong>：输入 CAS 服务器的主机名您针对（例如，authn.example.edu）进行身份验证。"
+
+#: src/authorizer/class-admin-page.php:112
+msgid "<strong>CAS server port</strong>: Enter the port on the CAS server to connect to (e.g., 443)."
+msgstr "<strong>CAS 服务器端口</strong>：输入 CAS 服务器上的端口进行连接到（例如，443）。"
+
+#: src/authorizer/class-admin-page.php:113
+msgid "<strong>CAS server path/context</strong>: Enter the path to the login endpoint on the CAS server (e.g., /cas)."
+msgstr "<strong>CAS 服务器路径/上下文</strong>：输入登录路径CAS 服务器上的端点（例如 /cas）。"
+
+#: src/authorizer/class-admin-page.php:114
+msgid "<strong>CAS server method</strong>: Select the method to use when setting the CAS config (e.g.,\"client\" or \"proxy\")"
+msgstr "<strong>CAS 服务器方法</strong>：选择设置CAS 配置（例如，客户端或代理）"
+
+#: src/authorizer/class-admin-page.php:115
+msgid ""
+"<strong>CAS attribute containing first name</strong>: Enter the CAS attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from CAS and "
+"added to their WordPress profile."
+msgstr "<strong>包含名字的 CAS 属性</strong>：输入 CAS 属性这有用户的名字。当这个用户第一次登录时，他们的WordPress帐户将从 CAS 检索他们的名字并添加到他们的WordPress个人资料。"
+
+#: src/authorizer/class-admin-page.php:116
+msgid ""
+"<strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added "
+"to their WordPress profile."
+msgstr "<strong>包含姓氏的 CAS 属性</strong>：输入 CAS 属性那有用户的姓氏。当这个用户第一次登录时，他们的WordPress帐户将从 CAS 检索他们的姓氏并添加到他们的WordPress个人资料。"
+
+#: src/authorizer/class-admin-page.php:117
+msgid ""
+"<strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this "
+"is not set, this only happens the first time they log in."
+msgstr "<strong>CAS 属性更新</strong>：选择第一个和最后一个 从 CAS 检索到的名称应覆盖用户在他们的 WordPress 个人资料中的名字和姓氏字段。如果这不是设置，这只发生在他们第一次登录时。"
+
+#: src/authorizer/class-admin-page.php:119
+msgid "If you enable LDAP logins:"
+msgstr "如果启用 LDAP 登录："
+
+#: src/authorizer/class-admin-page.php:121
+msgid "<strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against."
+msgstr "<strong>LDAP 主机</strong>：输入您验证的 LDAP 服务器的 URL反对。"
+
+#: src/authorizer/class-admin-page.php:122
+msgid "<strong>LDAP Port</strong>: Enter the port number that the LDAP server listens on."
+msgstr "<strong>LDAP端口</strong>：输入LDAP服务器的端口号听着。"
+
+#: src/authorizer/class-admin-page.php:123
+msgid "<strong>LDAP Search Base</strong>: Enter the LDAP string that represents the search base, e.g., ou=people,dc=example,dc=edu"
+msgstr "<strong>LDAP 搜索库</strong>：输入表示搜索库的 LDAP 字符串，例如 ou=people，dc=example，dc=edu"
+
+#: src/authorizer/class-admin-page.php:124
+msgid "<strong>LDAP Search Filter</strong>: Enter the optional LDAP string that represents the search filter, e.g., (memberOf=cn=wp_users,ou=people,dc=example,dc=edu)"
+msgstr "<strong>LDAP 搜索过滤器</strong>：输入表示搜索过滤器的可选 LDAP 字符串，例如 （memberOf=cn=wp_users，ou=people，dc=example，dc=edu）"
+
+#: src/authorizer/class-admin-page.php:125
+msgid ""
+"<strong>LDAP attribute containing username</strong>: Enter the name of the LDAP attribute that contains the usernames used by those attempting to log in. The plugin will search on this attribute to find the cn to bind "
+"against for login attempts."
+msgstr "<strong>包含用户名的 LDAP 属性</strong>：输入包含尝试登录的用户使用的用户名的 LDAP 属性的名称。插件将搜索此属性以查找要绑定登录尝试的 cn。"
+
+#: src/authorizer/class-admin-page.php:126
+msgid "<strong>LDAP Directory User</strong>: Enter the name of the LDAP user that has permissions to browse the directory."
+msgstr "<strong>LDAP 目录用户</strong>：输入有权浏览目录的 LDAP 用户的名称。"
+
+#: src/authorizer/class-admin-page.php:126
+msgid ""
+"Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_LDAP_USER', '...' );</code>, or you may fetch it from an external "
+"service like AWS Secrets Manager by hooking into the <code>authorizer_ldap_user</code> filter. This will prevent it from being stored in plaintext in the WordPress database."
+msgstr ""
+"注意：为了提高安全性，您可以将此字段留空，而是通过 <code>define（ 'AUTHORIZER_LDAP_USER'， '...' ）;</code> 在wp-config.php中定义此值，也可以通过挂接到 <code>authorizer_ldap_user</code> 筛选条件从 AWS Secrets Manager "
+"等外部服务获取此值。这将防止它以明文形式存储在 WordPress 数据库中。"
+
+#: src/authorizer/class-admin-page.php:127
+msgid "<strong>LDAP Directory User Password</strong>: Enter the password for the LDAP user that has permission to browse the directory."
+msgstr "<strong>LDAP 目录用户密码</strong>：输入有权浏览目录的 LDAP 用户的密码。"
+
+#: src/authorizer/class-admin-page.php:127
+msgid ""
+"Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_LDAP_PASSWORD', '...' );</code>, or you may fetch it from an external "
+"service like AWS Secrets Manager by hooking into the <code>authorizer_ldap_password</code> filter. This will prevent it from being stored in the WordPress database."
+msgstr ""
+"注意：为了提高安全性，您可以将此字段留空，而是通过 <code>define（ 'AUTHORIZER_LDAP_PASSWORD'， '...' ）;</code> 在wp-config.php中定义此值，也可以通过挂接到 <code>authorizer_ldap_password</code> 筛选条件从 AWS Secrets "
+"Manager 等外部服务获取该值。这将防止它存储在 WordPress 数据库中。"
+
+#: src/authorizer/class-admin-page.php:128
+msgid "<strong>Use STARTTLS</strong>: Select whether unencrypted communication with the LDAP server should be upgraded to a TLS-secured connection using STARTTLS."
+msgstr "<strong>使用 STARTTLS</strong>：选择是否应使用 STARTTLS 将与 LDAP 服务器的未加密通信升级为受 TLS 保护的连接。"
+
+#: src/authorizer/class-admin-page.php:129
+msgid ""
+"<strong>Custom lost password URL</strong>: The WordPress login page contains a link to recover a lost password. If you have external users who shouldn't change the password on their WordPress account, point them to "
+"the appropriate location to change the password on their external authentication service here."
+msgstr "<strong>自定义丢失密码 URL：</strong>WordPress 登录页面包含用于恢复丢失密码的链接。如果您有外部用户不应更改其 WordPress 帐户上的密码，请在此处将他们指向适当的位置以更改其外部身份验证服务的密码。"
+
+#: src/authorizer/class-admin-page.php:130
+msgid ""
+"<strong>LDAP attribute containing first name</strong>: Enter the LDAP attribute that has the user's first name. When this user first logs in, their WordPress account will have their first name retrieved from LDAP and "
+"added to their WordPress profile."
+msgstr "<strong>包含名字的 LDAP 属性</strong>：输入具有用户名字的 LDAP 属性。当此用户首次登录时，他们的 WordPress 帐户将从 LDAP 检索他们的名字并添加到他们的 WordPress 个人资料中。"
+
+#: src/authorizer/class-admin-page.php:131
+msgid ""
+"<strong>LDAP attribute containing last name</strong>: Enter the LDAP attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from LDAP and "
+"added to their WordPress profile."
+msgstr "<strong>包含姓氏的 LDAP 属性</strong>：输入包含用户姓氏的 LDAP 属性。当该用户首次登录时，他们的 WordPress 帐户将从 LDAP 检索他们的姓氏并添加到他们的 WordPress 个人资料中。"
+
+#: src/authorizer/class-admin-page.php:132
+msgid ""
+"<strong>LDAP attribute update</strong>: Select whether the first and last names retrieved from LDAP should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this "
+"is not set, this only happens the first time they log in."
+msgstr "<strong>LDAP 属性更新</strong>：选择从 LDAP 检索到的名字和姓氏是否应覆盖用户在其 WordPress 配置文件中的名字和姓氏字段中输入的任何值。如果未设置此设置，则仅在他们第一次登录时发生。"
+
+#: src/authorizer/class-admin-page.php:138 src/authorizer/class-options.php:959 src/authorizer/class-options.php:967
+msgid "External Service"
+msgstr "外部服务"
+
+#: src/authorizer/class-admin-page.php:145
+msgid ""
+"<strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a "
+"longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal."
+msgstr ""
+"<strong>限制无效登录尝试</strong>：选择限制重复无效登录尝试的个人（或机器人）访问的时间（以及持续时间）。您可以先设置较短的延迟，然后在重复无效尝试后设置较长的延迟;您还可以设置延迟重置为正常之前必须经过多少时间。"
+
+#: src/authorizer/class-admin-page.php:146
+msgid ""
+"<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins "
+"by adding external=wordpress to the wp-login URL, like so:"
+msgstr ""
+"<strong>隐藏 WordPress 登录</strong>：如果要隐藏 WordPress 用户名和密码字段以及 wp-login 屏幕上的“登录”按钮，请启用此选项。注意：您始终可以通过将 external=wordpress 添加到 wp-login URL 来访问 WordPress 登录名，如下所"
+"示："
+
+#: src/authorizer/class-admin-page.php:147
+msgid ""
+"<strong>Disable WordPress Logins</strong>: If you want to prevent users from logging in with their WordPress passwords and instead only allow logins from external services, enable this option. Note: enabling this will "
+"also hide WordPress logins unless the LDAP external service is enabled."
+msgstr "<strong>禁用 WordPress 登录</strong>：如果要阻止用户使用其 WordPress 密码登录，而只允许从外部服务登录，请启用此选项。注意：启用此功能也会隐藏 WordPress 登录，除非启用了 LDAP 外部服务。"
+
+#: src/authorizer/class-admin-page.php:148
+msgid ""
+"<strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the `authorizer_add_branding_option` filter in your theme to "
+"add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding."
+msgstr ""
+"<strong>自定义 WordPress 登录品牌</strong>：如果您想在 WordPress 登录页面上使用自定义品牌，请在此处选择。您需要使用主题中的“authorizer_add_branding_option”过滤器来添加它。您可以在 sample-theme-add-branding 下的插件目录"
+"中看到实现此过滤器的示例主题。"
+
+#: src/authorizer/class-admin-page.php:153 src/authorizer/class-options.php:960 src/authorizer/class-options.php:968
+msgid "Advanced"
+msgstr "高级"
+
+#: src/authorizer/class-admin-page.php:185
+msgid "Can't reach CAS server. Please provide"
+msgstr "无法访问 CAS 服务器。请提供"
+
+#: src/authorizer/class-admin-page.php:185
+msgid "accurate CAS settings"
+msgstr "准确的 CAS 设置"
+
+#: src/authorizer/class-admin-page.php:185
+msgid "if you intend to use it."
+msgstr "如果您打算使用它。"
+
+#: src/authorizer/class-admin-page.php:230 src/authorizer/class-dashboard-widget.php:70
+msgid "Settings"
+msgstr "设置"
+
+#: src/authorizer/class-admin-page.php:245
+msgid "Network Settings"
+msgstr "网络设置"
+
+#: src/authorizer/class-admin-page.php:294
+msgid "Who can log into the site?"
+msgstr "谁可以登录网站？"
+
+#: src/authorizer/class-admin-page.php:301
+msgid "Which role should receive email notifications about pending users?"
+msgstr "哪个角色应接收有关待处理用户的电子邮件通知？"
+
+#: src/authorizer/class-admin-page.php:308
+msgid "What message should pending users see after attempting to log in?"
+msgstr "待处理用户在尝试登录后应看到什么消息？"
+
+#: src/authorizer/class-admin-page.php:315
+msgid "What message should blocked users see after attempting to log in?"
+msgstr "被阻止的用户在尝试登录后应该看到什么消息？"
+
+#: src/authorizer/class-admin-page.php:322
+msgid "Send welcome email to new approved users?"
+msgstr "是否发送新的邮件给新申请的用户?"
+
+#: src/authorizer/class-admin-page.php:329
+msgid "Welcome email subject"
+msgstr "欢迎邮件主题"
+
+#: src/authorizer/class-admin-page.php:336
+msgid "Welcome email body"
+msgstr "欢迎邮件内容"
+
+#: src/authorizer/class-admin-page.php:351
+msgid "Who can view the site?"
+msgstr "谁可以查看这个网站?"
+
+#: src/authorizer/class-admin-page.php:358
+msgid "What pages (if any) should be available to everyone?"
+msgstr "哪些页面（如果有）应该可供所有人使用？"
+
+#: src/authorizer/class-admin-page.php:365
+msgid "What happens to people without access when they visit a private page?"
+msgstr "没有访问权限的用户在访问私人页面时会发生什么情况？"
+
+#: src/authorizer/class-admin-page.php:372
+msgid "What happens to people without access when they visit a public page?"
+msgstr "没有访问权限的用户在访问公共页面时会发生什么情况？"
+
+#: src/authorizer/class-admin-page.php:379
+msgid "What message should people without access see?"
+msgstr "没有访问权限的人应该看到什么消息？"
+
+#: src/authorizer/class-admin-page.php:394 src/authorizer/class-admin-page.php:861
+msgid "Default role for new users"
+msgstr "新用户的默认角色"
+
+#: src/authorizer/class-admin-page.php:401 src/authorizer/class-admin-page.php:865
+msgid "OAuth2 Logins"
+msgstr "OAuth2登录"
+
+#: src/authorizer/class-admin-page.php:408
+msgid "Provider"
+msgstr "提供商"
+
+#: src/authorizer/class-admin-page.php:415
+msgid "Custom label"
+msgstr "定制标签"
+
+#: src/authorizer/class-admin-page.php:422 src/authorizer/class-admin-page.php:877
+msgid "Client ID"
+msgstr "Client ID"
+
+#: src/authorizer/class-admin-page.php:429 src/authorizer/class-admin-page.php:881
+msgid "Client Secret"
+msgstr "Client Secret"
+
+#: src/authorizer/class-admin-page.php:436 src/authorizer/class-admin-page.php:885
+msgid "OAuth2 Hosted Domain"
+msgstr "OAuth2 安全域名"
+
+#: src/authorizer/class-admin-page.php:443 src/authorizer/class-admin-page.php:889
+msgid "Tenant ID"
+msgstr "Tenant ID"
+
+#: src/authorizer/class-admin-page.php:450 src/authorizer/class-admin-page.php:893
+msgid "Authorization URL"
+msgstr "授权的URL地址"
+
+#: src/authorizer/class-admin-page.php:457 src/authorizer/class-admin-page.php:897
+msgid "Access Token URL"
+msgstr "获取AccessToken的URL地址"
+
+#: src/authorizer/class-admin-page.php:464 src/authorizer/class-admin-page.php:901
+msgid "Resource Owner URL"
+msgstr "获取用户信息的URL地址"
+
+#: src/authorizer/class-admin-page.php:471 src/authorizer/class-admin-page.php:905
+msgid "Google Logins"
+msgstr "Google登录"
+
+#: src/authorizer/class-admin-page.php:478 src/authorizer/class-admin-page.php:909
+msgid "Google Client ID"
+msgstr "Google 客户端 ID"
+
+#: src/authorizer/class-admin-page.php:485 src/authorizer/class-admin-page.php:913
+msgid "Google Client Secret"
+msgstr "Google 客户端密码"
+
+#: src/authorizer/class-admin-page.php:492 src/authorizer/class-admin-page.php:917
+msgid "Google Hosted Domain"
+msgstr "Google 托管域名"
+
+#: src/authorizer/class-admin-page.php:499 src/authorizer/class-admin-page.php:921
+msgid "CAS Logins"
+msgstr "CAS 登录"
+
+#: src/authorizer/class-admin-page.php:506
+msgid "CAS custom label"
+msgstr "CAS 自定义标签"
+
+#: src/authorizer/class-admin-page.php:513 src/authorizer/class-admin-page.php:929
+msgid "CAS server hostname"
+msgstr "CAS 服务器主机名"
+
+#: src/authorizer/class-admin-page.php:520 src/authorizer/class-admin-page.php:933
+msgid "CAS server port"
+msgstr "CAS 服务器端口"
+
+#: src/authorizer/class-admin-page.php:527 src/authorizer/class-admin-page.php:937
+msgid "CAS server path/context"
+msgstr "CAS 服务器路径/上下文"
+
+#: src/authorizer/class-admin-page.php:534 src/authorizer/class-admin-page.php:941
+msgid "CAS server method"
+msgstr "CAS 服务器方法"
+
+#: src/authorizer/class-admin-page.php:541 src/authorizer/class-admin-page.php:945
+msgid "CAS server protocol"
+msgstr "CAS 服务器协议"
+
+#: src/authorizer/class-admin-page.php:548
+msgid "CAS attribute containing email address"
+msgstr "包含电子邮件地址的 CAS 属性"
+
+#: src/authorizer/class-admin-page.php:555 src/authorizer/class-admin-page.php:953
+msgid "CAS attribute containing first name"
+msgstr "包含名字的 CAS 属性"
+
+#: src/authorizer/class-admin-page.php:562 src/authorizer/class-admin-page.php:957
+msgid "CAS attribute containing last name"
+msgstr "包含姓氏的 CAS 属性"
+
+#: src/authorizer/class-admin-page.php:569 src/authorizer/class-admin-page.php:961
+msgid "CAS attribute update"
+msgstr "CAS 属性更新"
+
+#: src/authorizer/class-admin-page.php:576 src/authorizer/class-admin-page.php:965
+msgid "CAS automatic login"
+msgstr "CAS 自动登录"
+
+#: src/authorizer/class-admin-page.php:583 src/authorizer/class-admin-page.php:969
+msgid "CAS users linked by username"
+msgstr "按用户名链接的 CAS 用户"
+
+#: src/authorizer/class-admin-page.php:590 src/authorizer/class-admin-page.php:973
+msgid "LDAP Logins"
+msgstr "LDAP 登录"
+
+#: src/authorizer/class-admin-page.php:597 src/authorizer/class-admin-page.php:977
+msgid "LDAP Host"
+msgstr "LDAP 主机"
+
+#: src/authorizer/class-admin-page.php:604 src/authorizer/class-admin-page.php:981
+msgid "LDAP Port"
+msgstr "LDAP 端口"
+
+#: src/authorizer/class-admin-page.php:611 src/authorizer/class-admin-page.php:985 src/authorizer/options/external/class-ldap.php:104
+msgid "Use STARTTLS"
+msgstr "使用 STARTTLS"
+
+#: src/authorizer/class-admin-page.php:618 src/authorizer/class-admin-page.php:989
+msgid "LDAP Search Base"
+msgstr "LDAP 搜索库"
+
+#: src/authorizer/class-admin-page.php:625 src/authorizer/class-admin-page.php:993
+msgid "LDAP Search Filter"
+msgstr "LDAP 搜索过滤器"
+
+#: src/authorizer/class-admin-page.php:632 src/authorizer/class-admin-page.php:997
+msgid "LDAP attribute containing username"
+msgstr "包含用户名的 LDAP 属性"
+
+#: src/authorizer/class-admin-page.php:639
+msgid "LDAP attribute containing email address"
+msgstr "包含电子邮件地址的 LDAP 属性"
+
+#: src/authorizer/class-admin-page.php:646 src/authorizer/class-admin-page.php:1005
+msgid "LDAP Directory User"
+msgstr "LDAP 目录用户"
+
+#: src/authorizer/class-admin-page.php:653 src/authorizer/class-admin-page.php:1009
+msgid "LDAP Directory User Password"
+msgstr "LDAP 目录用户密码"
+
+#: src/authorizer/class-admin-page.php:660 src/authorizer/class-admin-page.php:1013
+msgid "Custom lost password URL"
+msgstr "自定义丢失密码 URL"
+
+#: src/authorizer/class-admin-page.php:667 src/authorizer/class-admin-page.php:1017
+msgid "LDAP attribute containing first name"
+msgstr "包含名字的 LDAP 属性"
+
+#: src/authorizer/class-admin-page.php:674 src/authorizer/class-admin-page.php:1021
+msgid "LDAP attribute containing last name"
+msgstr "包含姓氏的 LDAP 属性"
+
+#: src/authorizer/class-admin-page.php:681 src/authorizer/class-admin-page.php:1025
+msgid "LDAP attribute update"
+msgstr "LDAP 属性更新"
+
+#: src/authorizer/class-admin-page.php:688 src/authorizer/class-admin-page.php:1029
+msgid "LDAP test connection"
+msgstr "LDAP 测试连接"
+
+#: src/authorizer/class-admin-page.php:703 src/authorizer/class-admin-page.php:1037
+msgid "Limit invalid login attempts"
+msgstr "限制无效登录尝试"
+
+#: src/authorizer/class-admin-page.php:710
+msgid "Hide WordPress Login"
+msgstr "隐藏 WordPress 登录"
+
+#: src/authorizer/class-admin-page.php:717 src/authorizer/class-admin-page.php:1045 src/authorizer/options/class-advanced.php:102
+msgid "Disable WordPress Logins"
+msgstr "禁用 WordPress 登录"
+
+#: src/authorizer/class-admin-page.php:724
+msgid "Custom WordPress login branding"
+msgstr "自定义 WordPress 登录品牌"
+
+#: src/authorizer/class-admin-page.php:731
+msgid "Authorizer admin menu item location"
+msgstr "授权方管理菜单项位置"
+
+#: src/authorizer/class-admin-page.php:738
+msgid "Show custom usermeta in user list"
+msgstr "在用户列表中显示自定义 usermeta"
+
+#: src/authorizer/class-admin-page.php:745 src/authorizer/class-admin-page.php:1049
+msgid "Number of users per page"
+msgstr "每页用户数"
+
+#: src/authorizer/class-admin-page.php:752 src/authorizer/class-admin-page.php:1053
+msgid "Approved users sort method"
+msgstr "已批准的用户排序方法"
+
+#: src/authorizer/class-admin-page.php:759 src/authorizer/class-admin-page.php:1057
+msgid "Approved users sort order"
+msgstr "已批准的用户排序顺序"
+
+#: src/authorizer/class-admin-page.php:766
+msgid "Show dashboard widget to admin users"
+msgstr "向管理员用户显示仪表板小组件"
+
+#: src/authorizer/class-admin-page.php:775
+msgid "Override multisite options"
+msgstr "覆盖多站点选项"
+
+#: src/authorizer/class-admin-page.php:790 src/authorizer/class-admin-page.php:826 src/authorizer/class-dashboard-widget.php:34
+msgid "Authorizer Settings"
+msgstr "授权方设置"
+
+#: src/authorizer/class-admin-page.php:810
+msgid "You do not have sufficient permissions to access this page."
+msgstr "您没有足够的权限来访问此页面。"
+
+#: src/authorizer/class-admin-page.php:827
+msgid ""
+"Most <strong>Authorizer</strong> settings are set in the individual sites, but you can specify a few options here that apply to <strong>all sites in the network</strong>. These settings will override settings in the "
+"individual sites."
+msgstr "大多数<strong>授权方</strong>设置都是在各个站点中设置的，但您可以在此处指定一些适用于<strong>网络中所有站点</strong>的选项。这些设置将覆盖各个站点中的设置。"
+
+#: src/authorizer/class-admin-page.php:829
+msgid "Override individual site settings with the settings below"
+msgstr "使用以下设置覆盖单个站点设置"
+
+#: src/authorizer/class-admin-page.php:830
+msgid "Prevent site administrators from overriding any multisite settings defined here (via Authorizer > Advanced > Override multisite options)"
+msgstr "阻止站点管理员覆盖此处定义的任何多站点设置（通过授权方>高级>覆盖多站点选项）"
+
+#: src/authorizer/class-admin-page.php:841
+msgid "Manage who has access to all sites in the network."
+msgstr "管理谁有权访问网络中的所有站点。"
+
+#: src/authorizer/class-admin-page.php:845
+msgid "Who can log in to sites in this network?"
+msgstr "谁可以登录此网络中的站点？"
+
+#: src/authorizer/class-admin-page.php:849
+msgid "Who can view sites in this network?"
+msgstr "谁可以查看此网络中的站点？"
+
+#: src/authorizer/class-admin-page.php:853
+msgid "Approved Users (All Sites)"
+msgstr "批准的用户（所有站点）"
+
+#: src/authorizer/class-admin-page.php:853
+msgid "Note: these users will <strong>not</strong> receive welcome emails when approved. Only users approved from individual sites can receive these messages."
+msgstr "注意：这些用户在获得批准后<strong>不会</strong>收到欢迎电子邮件。只有从各个站点获得批准的用户才能接收这些消息。"
+
+#: src/authorizer/class-admin-page.php:869
+msgid "OAuth2 Provider"
+msgstr "OAuth2 提供程序"
+
+#: src/authorizer/class-admin-page.php:873
+msgid "Custom Label"
+msgstr "自定义标签"
+
+#: src/authorizer/class-admin-page.php:925
+msgid "CAS Custom Label"
+msgstr "CAS 自定义标签"
+
+#: src/authorizer/class-admin-page.php:949
+msgid "CAS attribute containing email"
+msgstr "包含电子邮件的 CAS 属性"
+
+#: src/authorizer/class-admin-page.php:1001
+msgid "LDAP attribute containing email"
+msgstr "包含电子邮件的 LDAP 属性"
+
+#: src/authorizer/class-admin-page.php:1041 src/authorizer/options/class-advanced.php:82
+msgid "Hide WordPress Logins"
+msgstr "隐藏 WordPress 登录"
+
+#: src/authorizer/class-admin-page.php:1061 src/authorizer/options/class-advanced.php:358
+msgid "Show Dashboard Widget"
+msgstr "显示仪表板小组件"
+
+#: src/authorizer/class-admin-page.php:1068 src/authorizer/class-admin-page.php:1149
+msgid "Save Changes"
+msgstr "保存更改"
+
+#: src/authorizer/class-admin-page.php:1142
+msgid "Saved"
+msgstr "保存"
+
+#: src/authorizer/class-admin-page.php:1143
+msgid "Duplicate"
+msgstr "重复"
+
+#: src/authorizer/class-admin-page.php:1144
+msgid "Failed"
+msgstr "失败"
+
+#: src/authorizer/class-admin-page.php:1145
+msgid "Local WordPress user"
+msgstr "本地 WordPress 用户"
+
+#: src/authorizer/class-admin-page.php:1146 src/authorizer/options/class-access-lists.php:553
+msgid "Block/Ban user"
+msgstr "阻止/禁止用户"
+
+#: src/authorizer/class-admin-page.php:1147 src/authorizer/options/class-access-lists.php:89 src/authorizer/options/class-access-lists.php:281 src/authorizer/options/class-access-lists.php:548
+#: src/authorizer/options/class-access-lists.php:554
+msgid "Remove user"
+msgstr "删除用户"
+
+#: src/authorizer/class-admin-page.php:1148
+msgid "No users in"
+msgstr "中没有用户"
+
+#: src/authorizer/class-admin-page.php:1150
+msgid "Private Pages"
+msgstr "私人页面"
+
+#: src/authorizer/class-admin-page.php:1151
+msgid "Public Pages"
+msgstr "公共页面"
+
+#: src/authorizer/class-admin-page.php:1152 src/authorizer/options/class-access-lists.php:337
+msgid "First page"
+msgstr "首页"
+
+#: src/authorizer/class-admin-page.php:1153 src/authorizer/options/class-access-lists.php:348
+msgid "Previous page"
+msgstr "上一页"
+
+#: src/authorizer/class-admin-page.php:1154 src/authorizer/options/class-access-lists.php:375
+msgid "Next page"
+msgstr "下一页"
+
+#: src/authorizer/class-admin-page.php:1155 src/authorizer/options/class-access-lists.php:386
+msgid "Last page"
+msgstr "最后一页"
+
+#: src/authorizer/class-ajax-endpoints.php:343 src/authorizer/options/class-access-lists.php:313
+#, php-format
+msgid "%s user"
+msgid_plural "%s users"
+msgstr[0] "%s 用户"
+
+#: src/authorizer/class-authentication.php:71
+msgid "<strong>ERROR</strong>: Incorrect username or password."
+msgstr "<strong>错误</strong>： 用户名或密码不正确。"
+
+#: src/authorizer/class-authentication.php:109 src/authorizer/class-authentication.php:127
+#, php-format
+msgid ""
+"<strong>ERROR</strong>: There have been too many invalid login attempts for the username <strong>%1$s</strong>. Please wait <strong id=\"seconds_remaining\" data-seconds=\"%2$s\">%3$s</strong> before trying again. <a "
+"href=\"%4$s\" title=\"Password Lost and Found\">Lost your password</a>?"
+msgstr ""
+"<strong>错误</strong>：用户名 <strong>%1$s</strong> 的无效登录尝试次数过多。请稍候 <strong id=“seconds_remaining” data-seconds=“%2$s”>%3$s</strong>，然后再试一次。<a href=“%4$s” title=“密码失物招领”>丢失密码</a>？"
+
+#: src/authorizer/class-authentication.php:234
+msgid "<strong>ERROR</strong>: The username field is empty."
+msgstr "<strong>错误</strong>：用户名字段为空。"
+
+#: src/authorizer/class-authentication.php:238
+msgid "<strong>ERROR</strong>: The password field is empty."
+msgstr "<strong>错误</strong>：密码字段为空。"
+
+#: src/authorizer/class-authentication.php:654
+msgid "Email address does not match the allowed hosted domain"
+msgstr "电子邮件地址与允许的托管域不匹配"
+
+#: src/authorizer/class-authentication.php:737
+msgid "The authentication timestamp is too old, please try again."
+msgstr "身份验证时间戳太旧，请重试。"
+
+#: src/authorizer/class-authentication.php:740 src/authorizer/class-authentication.php:745
+msgid "Invalid Google credentials provided."
+msgstr "提供的 Google 凭据无效。"
+
+#: src/authorizer/class-authentication.php:771
+msgid "Google credentials do not match the allowed hosted domain"
+msgstr "Google 凭据与允许的托管域不匹配"
+
+#: src/authorizer/class-authentication.php:848
+msgid "CAS server returned an Authentication Exception. Details:"
+msgstr "CAS 服务器返回身份验证异常。详："
+
+#: src/authorizer/class-authentication.php:977
+#, php-format
+msgid "[%s] Attempting to authenticate via LDAP."
+msgstr "[%s]尝试通过 LDAP 进行身份验证。"
+
+#: src/authorizer/class-authentication.php:987
+msgid "Failed: no LDAP Host(s) specified."
+msgstr "失败：未指定 LDAP 主机。"
+
+#: src/authorizer/class-authentication.php:998
+msgid "Failed: no LDAP Search Base(s) specified."
+msgstr "失败：未指定LDAP搜索库。"
+
+#: src/authorizer/class-authentication.php:1031
+msgid "Failed: empty username and password."
+msgstr "失败：用户名和密码为空。"
+
+#: src/authorizer/class-authentication.php:1039
+msgid "Failed: empty username."
+msgstr "失败：用户名为空。"
+
+#: src/authorizer/class-authentication.php:1041
+msgid "You must provide a username or email."
+msgstr "您必须提供用户名或电子邮件。"
+
+#: src/authorizer/class-authentication.php:1045
+msgid "Failed: empty password."
+msgstr "失败：密码为空。"
+
+#: src/authorizer/class-authentication.php:1047
+msgid "You must provide a password."
+msgstr "您必须提供密码。"
+
+#: src/authorizer/class-authentication.php:1053
+msgid "Failed: php-ldap extension not installed."
+msgstr "失败：未安装 php-ldap 扩展。"
+
+#: src/authorizer/class-authentication.php:1080
+#, php-format
+msgid "Warning: could not parse host %s with wp_parse_url()."
+msgstr "警告：无法使用 wp_parse_url（） 解析主机 %s。"
+
+#: src/authorizer/class-authentication.php:1103
+#, php-format
+msgid "Warning: syntax check failed on host %s in ldap_connect()."
+msgstr "警告：在 ldap_connect（） 中对主机 %s 进行语法检查失败。"
+
+#: src/authorizer/class-authentication.php:1114
+#, php-format
+msgid "Warning: unable to start TLS on host %s:"
+msgstr "警告：无法在主机 %s 上启动 TLS："
+
+#: src/authorizer/class-authentication.php:1168
+#, php-format
+msgid "Performing bind as user logging in: %s."
+msgstr "以用户身份登录时执行绑定：%s。"
+
+#: src/authorizer/class-authentication.php:1178
+#, php-format
+msgid "Warning: unable to bind on host %1$s using directory user:"
+msgstr "警告：无法使用目录用户绑定主机 %1$s："
+
+#: src/authorizer/class-authentication.php:1192
+#, php-format
+msgid "Successful bind using LDAP user DN %s instead of directory user."
+msgstr "使用 LDAP 用户 DN %s 而不是目录用户成功绑定。"
+
+#: src/authorizer/class-authentication.php:1202 src/authorizer/class-authentication.php:1349
+#, php-format
+msgid "Failed: password incorrect for LDAP user %s."
+msgstr "失败：LDAP 用户 %s 的密码不正确。"
+
+#: src/authorizer/class-authentication.php:1215
+#, php-format
+msgid "Connected to LDAP host %s."
+msgstr "已连接到 LDAP 主机 %s。"
+
+#: src/authorizer/class-authentication.php:1223
+msgid "Failed: unable to connect to any LDAP host."
+msgstr "失败：无法连接到任何 LDAP 主机。"
+
+#: src/authorizer/class-authentication.php:1284
+#, php-format
+msgid "Using LDAP search filter: %s"
+msgstr "使用 LDAP 搜索过滤器： %s"
+
+#: src/authorizer/class-authentication.php:1299
+#, php-format
+msgid "Found user %1$s in search base: %2$s"
+msgstr "在搜索库中找到用户 %1$s： %2$s"
+
+#: src/authorizer/class-authentication.php:1304
+#, php-format
+msgid "Failed to find user %1$s in %2$s. Trying next search base."
+msgstr "未能在 %2$s 中找到用户 %1$s。尝试下一个搜索库。"
+
+#: src/authorizer/class-authentication.php:1312
+#, php-format
+msgid "Failed: no LDAP user %s found."
+msgstr "失败：未找到 LDAP 用户 %s。"
+
+#: src/authorizer/class-authentication.php:1368
+#, php-format
+msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
+msgstr "[%1$s]已通过 LDAP 成功对用户 %2$s （%3$s） 进行身份验证。"
+
+#: src/authorizer/class-authorization.php:124 src/authorizer/class-authorization.php:622
+#, php-format
+msgid "%s - Access Restricted"
+msgstr "%s - 访问受限"
+
+#: src/authorizer/class-authorization.php:132 src/authorizer/class-authorization.php:459
+msgid "Back"
+msgstr "返回"
+
+#: src/authorizer/class-authorization.php:136 src/authorizer/class-authorization.php:467
+msgid "Invalid login attempted."
+msgstr "尝试的登录无效。"
+
+#: src/authorizer/class-authorization.php:427
+#, php-format
+msgid "Action required: Pending user %1$s at %2$s"
+msgstr "所需操作：待处理用户 %1$s at %2$s"
+
+#: src/authorizer/class-authorization.php:433
+#, php-format
+msgid ""
+"A new user has tried to access the %1$s site you manage at:\n"
+"%2$s\n"
+"\n"
+"Please log in to approve or deny their request:\n"
+"%3$s\n"
+msgstr ""
+"新用户尝试访问您管理的 %1$s 站点：\n"
+"%2$s\n"
+"\n"
+"请登录以批准或拒绝其请求：\n"
+"%3$s\n"
+
+#: src/authorizer/class-authorization.php:630 src/authorizer/class-login-form.php:40
+msgid "Log In"
+msgstr "登录"
+
+#: src/authorizer/class-dashboard-widget.php:54 src/authorizer/options/class-access-lists.php:40
+msgid "Pending Users"
+msgstr "待定用户"
+
+#: src/authorizer/class-dashboard-widget.php:59 src/authorizer/options/class-access-lists.php:44
+msgid "Approved Users"
+msgstr "批准的用户"
+
+#: src/authorizer/class-dashboard-widget.php:64 src/authorizer/options/class-access-lists.php:48
+msgid "Blocked Users"
+msgstr "阻止的用户"
+
+#: src/authorizer/class-helper.php:288
+msgid "&mdash; No role for this site &mdash;"
+msgstr "&mdash; 本网站没有角色 &mdash;"
+
+#: src/authorizer/class-login-form.php:216 src/authorizer/class-login-form.php:233
+#, php-format
+msgid "Sign in with %s"
+msgstr "用%s登录"
+
+#: src/authorizer/class-login-form.php:257
+msgid "or"
+msgstr "或"
+
+#: src/authorizer/class-login-form.php:378
+#, php-format
+msgid "Authorizer lockout triggered for %1$s on user %2$s after the %3$s invalid attempt."
+msgstr "在 %3$s 无效尝试后，对用户 %2$s 的 %1$s 触发了授权方锁定。"
+
+#: src/authorizer/class-login-form.php:381
+#, php-format
+msgid "Authorizer lockout triggered for %1$s on all non-existent user names after the %3$s invalid attempt (triggered by non-existent user name: %2$s)."
+msgstr "在 %3$s 无效尝试后，对所有不存在的用户名触发了 %1$s 的授权方锁定（由不存在的用户名触发：%2$s）。"
+
+#: src/authorizer/class-options.php:83 src/authorizer/options/class-advanced.php:379
+msgid "This setting is overridden by a"
+msgstr "此设置被"
+
+#: src/authorizer/class-options.php:83 src/authorizer/options/class-advanced.php:379
+msgid "multisite option"
+msgstr "多站点选项"
+
+#: src/authorizer/class-options.php:295
+msgid ""
+"You're not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your "
+"administrator."
+msgstr "您目前无法查看此网站。您的管理员已收到通知，一旦他/她批准了您的请求，您就可以登录了。如果您需要任何其他帮助，请联系您的管理员。"
+
+#: src/authorizer/class-options.php:298
+msgid "You're not currently allowed to log into this site. If you think this is a mistake, please contact your administrator."
+msgstr "您目前无法登录此站点。如果您认为这是错误，请与您的管理员联系。"
+
+#: src/authorizer/class-options.php:306
+#, php-format
+msgid "Welcome to %s!"
+msgstr "欢迎来到 %s！"
+
+#: src/authorizer/class-options.php:313
+#, php-format
+msgid ""
+"Hello %1$s,\n"
+"Welcome to %2$s! You now have access to all content on the site. Please visit us here:\n"
+"%3$s\n"
+msgstr ""
+"您好 %1$s，\n"
+"欢迎来到 %2$s！您现在可以访问网站上的所有内容。请访问我们：\n"
+"%3$s\n"
+
+#: src/authorizer/class-options.php:334
+msgid "Notice: You are browsing this site anonymously, and only have access to a portion of its content."
+msgstr "注意：您是匿名浏览本网站，只能访问其部分内容。"
+
+#: src/authorizer/options/class-access-lists.php:30
+msgid "Manage who has access to this site using these lists."
+msgstr "使用这些列表管理谁有权访问此站点。"
+
+#: src/authorizer/options/class-access-lists.php:32
+msgid "<strong>Pending</strong> users are users who have successfully logged in to the site, but who haven't yet been approved (or blocked) by you."
+msgstr "<strong>待处理</strong>用户是指已成功登录网站但尚未获得您的批准（或阻止）的用户。"
+
+#: src/authorizer/options/class-access-lists.php:33
+msgid "<strong>Approved</strong> users have access to the site once they successfully log in."
+msgstr "<strong>获得批准</strong>的用户在成功登录后即可访问该站点。"
+
+#: src/authorizer/options/class-access-lists.php:34
+msgid "<strong>Blocked</strong> users will receive an error message when they try to visit the site after authenticating."
+msgstr "<strong>被阻止</strong>的用户在身份验证后尝试访问该站点时将收到错误消息。"
+
+#: src/authorizer/options/class-access-lists.php:34
+msgid "Note: if you want to block all email addresses from a domain, say anyone@example.com, simply add \"@example.com\" to the blocked list."
+msgstr "注意：如果您想阻止域中的所有电子邮件地址，例如 anyone@example.com，只需将“@example.com”添加到阻止列表中即可。"
+
+#: src/authorizer/options/class-access-lists.php:87 src/authorizer/options/class-access-lists.php:224
+msgid "Approve"
+msgstr "批准"
+
+#: src/authorizer/options/class-access-lists.php:88 src/authorizer/options/class-access-lists.php:290
+msgid "Block"
+msgstr "禁用"
+
+#: src/authorizer/options/class-access-lists.php:89
+msgid "Ignore"
+msgstr "忽视"
+
+#: src/authorizer/options/class-access-lists.php:93
+msgid "No pending users"
+msgstr "没有待处理的用户"
+
+#: src/authorizer/options/class-access-lists.php:219 src/authorizer/options/class-access-lists.php:286
+msgid "email address"
+msgstr "电子邮件地址"
+
+#: src/authorizer/options/class-access-lists.php:227
+msgid "Toggle Dropdown"
+msgstr "切换下拉列表"
+
+#: src/authorizer/options/class-access-lists.php:230
+msgid "Create a new WordPress account, and email the user an activation link."
+msgstr "创建一个新的 WordPress 帐户，并通过电子邮件向用户发送激活链接。"
+
+#: src/authorizer/options/class-access-lists.php:355 src/authorizer/options/class-access-lists.php:359
+msgid "Current Page"
+msgstr "当前页面"
+
+#: src/authorizer/options/class-access-lists.php:367
+#, php-format
+msgctxt "paging"
+msgid "%1$s of %2$s"
+msgstr "%1$s 的 %2$s"
+
+#: src/authorizer/options/class-access-lists.php:399
+msgid "Search Users"
+msgstr "搜索用户"
+
+#: src/authorizer/options/class-access-lists.php:401
+msgid "Search"
+msgstr "搜索"
+
+#: src/authorizer/options/class-access-lists.php:518 src/authorizer/options/class-advanced.php:204 src/authorizer/options/class-external.php:51 src/authorizer/options/external/class-oauth2.php:82
+msgid "-- None --"
+msgstr "--没有--"
+
+#: src/authorizer/options/class-advanced.php:29
+msgid "You may optionally specify some advanced settings below."
+msgstr "您可以选择在下面指定一些高级设置。"
+
+#: src/authorizer/options/class-advanced.php:48 src/authorizer/options/class-advanced.php:55
+msgid "After"
+msgstr "之后"
+
+#: src/authorizer/options/class-advanced.php:51
+msgid "invalid password attempts, delay further attempts on that user for"
+msgstr "无效的密码尝试，延迟对该用户的进一步尝试"
+
+#: src/authorizer/options/class-advanced.php:53
+msgid "minute(s)."
+msgstr "分钟(s)。"
+
+#: src/authorizer/options/class-advanced.php:57
+msgid "more invalid attempts, increase the delay to"
+msgstr "无效尝试越多，延迟增加到"
+
+#: src/authorizer/options/class-advanced.php:59
+msgid "minutes."
+msgstr "分钟。"
+
+#: src/authorizer/options/class-advanced.php:61
+msgid "Reset the delays after"
+msgstr "重置延迟后"
+
+#: src/authorizer/options/class-advanced.php:63
+msgid "minutes with no invalid attempts."
+msgstr "没有无效尝试的分钟数。"
+
+#: src/authorizer/options/class-advanced.php:83
+msgid "Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:"
+msgstr "注意：您始终可以通过将 external=wordpress 添加到 wp-login URL 来访问 WordPress 登录名，如下所示："
+
+#: src/authorizer/options/class-advanced.php:103
+msgid ""
+"Warning: Disabling WordPress logins means you will not be able to access WordPress administration if your external service(s) are not working. Use with caution. Note: If no external services are enabled, WordPress "
+"logins will not be disabled."
+msgstr "警告：禁用 WordPress 登录意味着如果您的外部服务无法正常工作，您将无法访问 WordPress 管理。请谨慎使用。注意：如果未启用外部服务，则不会禁用WordPress登录。"
+
+#: src/authorizer/options/class-advanced.php:123
+msgid "Default WordPress login screen"
+msgstr "默认 WordPress 登录屏幕"
+
+#: src/authorizer/options/class-advanced.php:157
+msgid ""
+"<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory "
+"under sample-theme-add-branding."
+msgstr "<strong>模版开发者注意事项</strong>：在此处使用模版中的“authorizer_add_branding_option”过滤器添加更多选项。您可以在 sample-theme-add-branding 下的插件目录中看到实现此过滤器的示例主题。"
+
+#: src/authorizer/options/class-advanced.php:181
+msgid "Show in Settings menu"
+msgstr "在“设置”菜单中显示"
+
+#: src/authorizer/options/class-advanced.php:183
+msgid "Show in sidebar (top level)"
+msgstr "在侧边栏中显示（顶层）"
+
+#: src/authorizer/options/class-advanced.php:264
+msgid "All Usermeta:"
+msgstr "所有用户meta："
+
+#: src/authorizer/options/class-advanced.php:313
+msgid "Date approved"
+msgstr "批准日期"
+
+#: src/authorizer/options/class-advanced.php:314
+msgid "Email"
+msgstr "电子邮件"
+
+#: src/authorizer/options/class-advanced.php:315
+msgid "Role"
+msgstr "角色"
+
+#: src/authorizer/options/class-advanced.php:316
+msgid "Date registered"
+msgstr "注册日期"
+
+#: src/authorizer/options/class-advanced.php:337
+msgid "Ascending"
+msgstr "顺序"
+
+#: src/authorizer/options/class-advanced.php:338
+msgid "Descending"
+msgstr "倒序"
+
+#: src/authorizer/options/class-advanced.php:359
+msgid "Note: Only users with the create_users capability will be able to see the dashboard widget."
+msgstr "注意：只有具有create_users功能的用户才能看到仪表板小组件。"
+
+#: src/authorizer/options/class-advanced.php:386
+msgid "Configure this site independently (don't inherit any multisite settings)"
+msgstr "独立配置此站点（不继承任何多站点设置）"
+
+#: src/authorizer/options/class-external.php:29
+msgid "Enter your external server settings below."
+msgstr "在下面输入您的外部服务器设置。"
+
+#: src/authorizer/options/class-login-access.php:30
+msgid "Choose who is able to log into this site below."
+msgstr "在下面选择谁可以登录此站点。"
+
+#: src/authorizer/options/class-login-access.php:69
+msgid "All authenticated users (All external service users and all WordPress users)"
+msgstr "所有经过身份验证的用户（所有外部服务用户和所有 WordPress 用户）"
+
+#: src/authorizer/options/class-login-access.php:71
+msgid "Only"
+msgstr "只有"
+
+#: src/authorizer/options/class-login-access.php:71
+msgid "approved users"
+msgstr "审核的用户"
+
+#: src/authorizer/options/class-login-access.php:71
+msgid "(Approved external users and all WordPress users)"
+msgstr "（经批准的外部用户和所有 WordPress 用户）"
+
+#: src/authorizer/options/class-login-access.php:92
+msgid "None (Don't send notification emails)"
+msgstr "无（不发送通知电子邮件）"
+
+#: src/authorizer/options/class-login-access.php:169
+msgid "Send a welcome email when approving a new user"
+msgstr "批准新用户时发送欢迎电子邮件"
+
+#: src/authorizer/options/class-login-access.php:188
+msgid "You can use the <b>[site_name]</b> shortcode."
+msgstr "您可以使用 <b>[site_name]</b> 短代码。"
+
+#: src/authorizer/options/class-login-access.php:223
+#, php-format
+msgid "You can use %1$s, %2$s, and %3$s shortcodes."
+msgstr "可以使用 %1$s、%2$s 和 %3$s 短代码。"
+
+#: src/authorizer/options/class-public-access.php:29
+msgid "Choose your public access options here."
+msgstr "在此处选择您的公共访问选项。"
+
+#: src/authorizer/options/class-public-access.php:68
+msgid "Everyone can see the site"
+msgstr "每个人都可以看到该网站"
+
+#: src/authorizer/options/class-public-access.php:70
+msgid "Only logged in users can see the site"
+msgstr "只有登录用户才能看到该站点"
+
+#: src/authorizer/options/class-public-access.php:91
+msgid "Send them to the login screen"
+msgstr "将它们发送到登录屏幕"
+
+#: src/authorizer/options/class-public-access.php:93
+msgid "Show them the anonymous access message (below)"
+msgstr "向他们展示匿名访问消息（如下）"
+
+#: src/authorizer/options/class-public-access.php:114
+msgid "Show them the page <strong>without</strong> the anonymous access message"
+msgstr "向他们显示<strong>没有</strong>匿名访问消息的页面"
+
+#: src/authorizer/options/class-public-access.php:116
+msgid "Show them the page <strong>with</strong> the anonymous access message (marked up as a <a href=\"http://getbootstrap.com/components/#alerts-dismissible\" target=\"_blank\">Bootstrap Dismissible Alert</a>)"
+msgstr "向他们展示<strong>带有</strong>匿名访问消息的页面（标记为<a href=“http://getbootstrap.com/components/#alerts-dismissible” target=“_blank”>Bootstrap Dismissible Alert</a>）"
+
+#: src/authorizer/options/class-public-access.php:169
+msgid "Home"
+msgstr "主页"
+
+#: src/authorizer/options/class-public-access.php:170
+msgid "Home Page"
+msgstr "主页"
+
+#: src/authorizer/options/class-public-access.php:171
+msgid "Nonexistent (404) Pages"
+msgstr "不存在 （404） 页"
+
+#: src/authorizer/options/class-public-access.php:189
+msgid "Categories"
+msgstr "类别"
+
+#: src/authorizer/options/external/class-cas.php:34
+msgid "<a href=\"http://www.php.net//manual/en/curl.installation.php\" target=\"_blank\" style=\"color: #dc3232;\">PHP CURL extension</a> is not installed"
+msgstr "<a href=“http://www.php.net//manual/en/curl.installation.php” target=“_blank” style=“color： #dc3232;”>PHP CURL 扩展</a>未安装"
+
+#: src/authorizer/options/external/class-cas.php:37
+msgid "<a href=\"http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working\" target=\"_blank\" style=\"color: #dc3232;\">PHP openssl extension</a> is not installed"
+msgstr "<a href=“http://stackoverflow.com/questions/23424459/enable-php-openssl-not-working” target=“_blank” style=“color： #dc3232;”>PHP openssl extension</a> 未安装"
+
+#: src/authorizer/options/external/class-cas.php:43
+msgid "Warning"
+msgstr "警告"
+
+#: src/authorizer/options/external/class-cas.php:52
+msgid "Enable CAS Logins"
+msgstr "启用 CAS 登录"
+
+#: src/authorizer/options/external/class-cas.php:70 src/authorizer/options/external/class-oauth2.php:104
+msgid "The button on the login page will read:"
+msgstr "登录页面上的按钮将显示："
+
+#: src/authorizer/options/external/class-cas.php:72 src/authorizer/options/external/class-oauth2.php:106
+msgid "Sign in with"
+msgstr "登录方式"
+
+#: src/authorizer/options/external/class-cas.php:92
+msgid "Example:  authn.example.edu"
+msgstr "示例：authn.example.edu"
+
+#: src/authorizer/options/external/class-cas.php:112
+msgid "Example:  443"
+msgstr "示例：443"
+
+#: src/authorizer/options/external/class-cas.php:132
+msgid "Example:  /cas"
+msgstr "示例：/cas"
+
+#: src/authorizer/options/external/class-cas.php:161
+msgid "\"Client\" is the most common, but use \"Proxy\" if your CAS server is behind a proxy server."
+msgstr "“客户端”是最常见的，但如果 CAS 服务器位于代理服务器后面，请使用“代理”。"
+
+#: src/authorizer/options/external/class-cas.php:280 src/authorizer/options/external/class-ldap.php:191
+msgid "Example:  mail"
+msgstr "示例：邮件"
+
+#: src/authorizer/options/external/class-cas.php:282
+msgid ""
+"Note: If your CAS server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For example, "
+"if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field."
+msgstr ""
+"注意：如果您的 CAS 服务器未返回包含电子邮件的属性，您可以在此处指定电子邮件地址的@domain部分，电子邮件地址将根据该部分和用户名构建。例如，如果用户“bob”登录并且他的电子邮件地址应 bob@example.edu，则在此字段中输入 "
+"<strong>@example.edu</strong>。"
+
+#: src/authorizer/options/external/class-cas.php:303
+msgid "Example:  givenName"
+msgstr "示例：givenName"
+
+#: src/authorizer/options/external/class-cas.php:323 src/authorizer/options/external/class-ldap.php:390
+msgid "Example:  sn"
+msgstr "示例：sn"
+
+#: src/authorizer/options/external/class-cas.php:340 src/authorizer/options/external/class-ldap.php:407
+msgid "Do not update first and last name fields on login"
+msgstr "登录时不更新名字和姓氏字段"
+
+#: src/authorizer/options/external/class-cas.php:341 src/authorizer/options/external/class-ldap.php:408
+msgid "Update first and last name fields on login"
+msgstr "更新登录时的名字和姓氏字段"
+
+#: src/authorizer/options/external/class-cas.php:342 src/authorizer/options/external/class-ldap.php:409
+msgid "Update first and last name fields on login only if they are empty"
+msgstr "仅当名字和姓氏字段为空时，才更新登录时的名字和姓氏字段"
+
+#: src/authorizer/options/external/class-cas.php:370
+msgid "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden"
+msgstr "如果它是唯一启用的外部服务，并且 WordPress 登录名被隐藏，请立即重定向到 CAS 登录表单"
+
+#: src/authorizer/options/external/class-cas.php:371
+msgid ""
+"Note: This feature will only work if you have checked \"Hide WordPress Logins\" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and "
+"a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction."
+msgstr ""
+"注意：仅当您在高级设置中选中了“隐藏 WordPress 登录”，并且 CAS 是唯一启用的服务（即没有 Google 或 LDAP）时，此功能才有效。如果已启用 CAS 单点登录 （SSO），并且用户已在其他位置登录 CAS，则启用此功能将允许自动登录，而无需"
+"任何用户交互。"
+
+#: src/authorizer/options/external/class-cas.php:390
+msgid "Link CAS accounts to WordPress accounts by their username (leave this off to link by email address)"
+msgstr "通过用户名将 CAS 帐户链接到 WordPress 帐户（将其保留为按电子邮件地址链接）"
+
+#: src/authorizer/options/external/class-cas.php:391
+msgid ""
+"Note: The default (and most secure) behavior is to associate WordPress accounts with CAS accounts by the email they have in common. However, some uncommon CAS server configurations don't contain email addresses for "
+"users. Enable this option if your CAS server doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails."
+msgstr ""
+"注意：默认（也是最安全的）行为是通过 WordPress 帐户与 CAS 帐户的共同电子邮件相关联。但是，某些不常见的 CAS 服务器配置不包含用户的电子邮件地址。如果您的 CAS 服务器没有包含电子邮件的属性，或者您的 WordPress 帐户没有电子"
+"邮件，请启用此选项。"
+
+#: src/authorizer/options/external/class-google.php:35
+msgid "Enable Google Logins"
+msgstr "启用 Google 登录"
+
+#: src/authorizer/options/external/class-google.php:56
+msgid "If you don't have a Google Client ID and Secret, generate them by following these instructions:"
+msgstr "如果您没有 Google 客户端 ID 和密钥，请按照以下说明生成它们："
+
+#: src/authorizer/options/external/class-google.php:59
+msgid "Click <strong>Create a Project</strong> on the <a href=\"https://cloud.google.com/console\" target=\"_blank\">Google Cloud Console</a>. You can name it whatever you want."
+msgstr "点击 <a href=“https://cloud.google.com/console” target=“_blank”>Google Cloud Console 上的<strong>创建项目</strong></a>。您可以随心所欲地命名它。"
+
+#: src/authorizer/options/external/class-google.php:60
+msgid "Within the project, navigate to <em>APIs and Services</em> &gt; <em>Credentials</em>, then click <strong>+ Create Credentials &gt; OAuth client ID</strong>. Use these settings:"
+msgstr "在项目中，导航到“<em>API 和服务</em>”&gt;<em>“凭据</em>”，然后单击“<strong>+ 创建凭据”&gt; OAuth 客户端 ID“</strong>。使用以下设置："
+
+#: src/authorizer/options/external/class-google.php:62
+msgid "Application Type: <strong>Web application</strong>"
+msgstr "应用程序类型：<strong>Web 应用程序</strong>"
+
+#: src/authorizer/options/external/class-google.php:63
+msgid "Authorized Javascript Origins:"
+msgstr "授权的 Javascript 来源："
+
+#: src/authorizer/options/external/class-google.php:64
+msgid "Authorized Redirect URI: <em>none</em>"
+msgstr "授权重定向 URI：<em>无</em>"
+
+#: src/authorizer/options/external/class-google.php:67
+msgid "Copy/paste your new Client ID/Secret pair into the fields below."
+msgstr "将新的客户端 ID/密钥对复制/粘贴到以下字段中。"
+
+#: src/authorizer/options/external/class-google.php:68
+msgid ""
+"<strong>Note</strong>: Navigate to <em>APIs and Services</em> &gt; <em>OAuth consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before "
+"they are redirected back to WordPress."
+msgstr "<strong>注意</strong>：在用户成功输入密码后，但在用户<em></em>被重定向回 WordPress 之前，导航&gt; <em>API 和服务</em>，以更改 Google 同意屏幕的显示方式。"
+
+#: src/authorizer/options/external/class-google.php:69
+msgid "Note: Google may have a more recent version of these instructions in their <a href=\"https://developers.google.com/identity/gsi/web\" target=\"_blank\">developer documentation</a>."
+msgstr "注意：Google 的 <a href=“https://developers.google.com/identity/gsi/web” target=“_blank”>开发者文档中可能提供了这些说明的最新版本</a>。"
+
+#: src/authorizer/options/external/class-google.php:72
+msgid "Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com"
+msgstr "示例：1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com"
+
+#: src/authorizer/options/external/class-google.php:98 src/authorizer/options/external/class-ldap.php:220 src/authorizer/options/external/class-ldap.php:301 src/authorizer/options/external/class-oauth2.php:168
+#, php-format
+msgid "This setting is not editable since it has been defined in the %s filter."
+msgstr "此设置不可编辑，因为它已在 %s 筛选器中定义。"
+
+#: src/authorizer/options/external/class-google.php:113 src/authorizer/options/external/class-ldap.php:235 src/authorizer/options/external/class-ldap.php:316 src/authorizer/options/external/class-oauth2.php:183
+#, php-format
+msgid "This setting is not editable since it has been defined in wp-config.php via %s"
+msgstr "此设置不可编辑，因为它已通过 %s 在 wp-config.php 中定义"
+
+#: src/authorizer/options/external/class-google.php:126
+msgid "Example:  sDNgX5_pr_5bly-frKmvp8jT"
+msgstr "示例：sDNgX5_pr_5bly-frKmvp8jT"
+
+#: src/authorizer/options/external/class-google.php:146
+msgid "Restrict Google logins to a specific Google Apps hosted domain (for example, mycollege.edu). Leave blank to allow all Google sign-ins."
+msgstr "将 Google 登录限制为特定的 Google Apps 托管域（例如 mycollege.edu）。留空以允许所有 Google 登录。"
+
+#: src/authorizer/options/external/class-google.php:146 src/authorizer/options/external/class-oauth2.php:216
+msgid "If restricting to multiple domains, add one domain per line."
+msgstr "如果限制为多个域，则每行添加一个域。"
+
+#: src/authorizer/options/external/class-ldap.php:34
+msgid "Warning: <a href=\"http://www.php.net/manual/en/ldap.installation.php\" target=\"_blank\" style=\"color: #dc3232;\">PHP LDAP extension</a> is <strong>not</strong> installed"
+msgstr "警告：<a href=“http://www.php.net/manual/en/ldap.installation.php” target=“_blank” style=“color： #dc3232;”>PHP LDAP 扩展</a><strong>未</strong>安装"
+
+#: src/authorizer/options/external/class-ldap.php:38
+msgid "Enable LDAP Logins"
+msgstr "启用 LDAP 登录"
+
+#: src/authorizer/options/external/class-ldap.php:58
+msgid "Specify either a hostname (for example, ldap.example.edu) or a full LDAP URI (for example, ldaps://ldap.example.edu:636)."
+msgstr "指定主机名（例如，ldap.example.edu）或完整的 LDAP URI（例如，ldaps://ldap.example.edu:636）。"
+
+#: src/authorizer/options/external/class-ldap.php:60
+msgid "If you have multiple LDAP servers (failover or high-availability configuration), separate them by newlines (one per line)."
+msgstr "如果您有多个 LDAP 服务器（故障转移或高可用性配置），请用换行符（每行一个）分隔它们。"
+
+#: src/authorizer/options/external/class-ldap.php:82
+msgid "Example:  389"
+msgstr "示例：389"
+
+#: src/authorizer/options/external/class-ldap.php:84
+msgid "If a full LDAP URI (ldaps://hostname:port) is specified above, this field is ignored."
+msgstr "如果上面指定了完整的 LDAP URI （ldaps：//hostname：port），则忽略此字段。"
+
+#: src/authorizer/options/external/class-ldap.php:105
+msgid "If an ldaps:// URL (and therefore Implicit TLS) is used, this checkbox is ignored."
+msgstr "如果使用 ldaps:// URL（因此使用隐式 TLS），则忽略此复选框。"
+
+#: src/authorizer/options/external/class-ldap.php:125
+msgid "Example:  ou=people,dc=example,dc=edu"
+msgstr "示例：ou=people，dc=example，dc=edu"
+
+#: src/authorizer/options/external/class-ldap.php:127
+msgid "If you have multiple search bases, separate them by newlines (one per line)."
+msgstr "如果您有多个搜索库，请用换行符分隔它们（每行一个）。"
+
+#: src/authorizer/options/external/class-ldap.php:148
+msgid "Example:  (memberOf=cn=wp_users,ou=people,dc=example,dc=edu)"
+msgstr "示例：（memberOf=cn=wp_users，ou=people，dc=example，dc=edu）"
+
+#: src/authorizer/options/external/class-ldap.php:150
+msgid "If you wish to use an LDAP search filter, enter it here. Otherwise leave this field blank."
+msgstr "如果您希望使用 LDAP 搜索过滤器，请在此处输入。否则，请将此字段留空。"
+
+#: src/authorizer/options/external/class-ldap.php:171
+msgid "Example:  uid"
+msgstr "示例：uid"
+
+#: src/authorizer/options/external/class-ldap.php:193
+msgid ""
+"Note: If your LDAP server doesn't return an attribute containing an email, you can specify the @domain portion of the email address here, and the email address will be constructed from it and the username. For "
+"example, if user 'bob' logs in and his email address should be bob@example.edu, then enter <strong>@example.edu</strong> in this field."
+msgstr ""
+"注意：如果您的 LDAP 服务器未返回包含电子邮件的属性，您可以在此处指定电子邮件地址的@domain部分，电子邮件地址将根据它和用户名构建。例如，如果用户“bob”登录并且他的电子邮件地址应 bob@example.edu，则在此字段中输入 "
+"<strong>@example.edu</strong>。"
+
+#: src/authorizer/options/external/class-ldap.php:248
+msgid "Example:  cn=directory-user,ou=specials,dc=example,dc=edu"
+msgstr "示例：cn=directory-user，ou=specials，dc=example，dc=edu"
+
+#: src/authorizer/options/external/class-ldap.php:255
+#, php-format
+msgid "Note: You can use the %s wildcard to bind as the username of the user logging in instead of a directory user service account."
+msgstr "注意：您可以使用 %s 通配符绑定为登录用户的用户名，而不是目录用户服务帐户。"
+
+#: src/authorizer/options/external/class-ldap.php:267
+#, php-format
+msgid "Example: <strong>uid=%s,ou=people,dc=example,dc=edu</strong>."
+msgstr "示例：<strong>uid=%s，ou=people，dc=example，dc=edu</strong>。"
+
+#: src/authorizer/options/external/class-ldap.php:274
+msgid "Leave the LDAP Directory User Password field below blank, and the bind will be attempted with the user-supplied password."
+msgstr "将“LDAP 目录用户密码”字段留空，将尝试使用用户提供的密码进行绑定。"
+
+#: src/authorizer/options/external/class-ldap.php:350
+msgid "Example:  https://myschool.example.edu:8888/am-forgot-password"
+msgstr "示例：https://myschool.example.edu:8888/am-forgot-password"
+
+#: src/authorizer/options/external/class-ldap.php:370
+msgid "Example:  givenname"
+msgstr "示例：givenname"
+
+#: src/authorizer/options/external/class-ldap.php:437
+msgid "username"
+msgstr "用户名"
+
+#: src/authorizer/options/external/class-ldap.php:439
+msgid "password"
+msgstr "密码"
+
+#: src/authorizer/options/external/class-ldap.php:440
+msgid "Test"
+msgstr "测试"
+
+#: src/authorizer/options/external/class-ldap.php:443
+msgid "Note: Make sure to save any changes to LDAP settings before clicking the Test button."
+msgstr "注意：在单击“测试”按钮之前，请确保保存对 LDAP 设置所做的任何更改。"
+
+#: src/authorizer/options/external/class-oauth2.php:62
+msgid "Enable OAuth2 Logins"
+msgstr "启用 OAuth2 登录"
+
+#: src/authorizer/options/external/class-oauth2.php:128
+msgid "Generate your Client ID and Secret for your selected provider by following their specific instructions."
+msgstr "按照其特定说明为所选提供商生成客户端 ID 和密钥。"
+
+#: src/authorizer/options/external/class-oauth2.php:129
+msgid "If asked for a redirect or callback URL, use:"
+msgstr "如果要求提供重定向或回调 URL，请使用："
+
+#: src/authorizer/options/external/class-oauth2.php:133
+msgid "If using Microsoft Azure, omit the querystring; use:"
+msgstr "如果使用 Microsoft Azure，请省略查询字符串;用："
+
+#: src/authorizer/options/external/class-oauth2.php:142
+msgid "Example:  0123456789abcdef0123"
+msgstr "示例：0123456789abcdef0123"
+
+#: src/authorizer/options/external/class-oauth2.php:196
+msgid "Example:  0123456789abcdef0123456789abcdef"
+msgstr "示例：0123456789abcdef0123456789abcdef"
+
+#: src/authorizer/options/external/class-oauth2.php:216
+msgid "Restrict OAuth2 logins to a specific domain (for example, mycollege.edu). Leave blank to allow all valid sign-ins."
+msgstr "将 OAuth2 登录限制为特定域（例如，mycollege.edu）。留空以允许所有有效登录。"
+
+#: src/authorizer/options/external/class-oauth2.php:236
+msgid "Example:  \"common\", or a specific Azure Directory Tenant ID"
+msgstr "示例：“common”，或特定的 Azure 目录租户 ID"
+
+#: src/authorizer/options/external/class-oauth2.php:256
+msgid "Example:  https://example.edu/login/oauth/authorize"
+msgstr "如: https://example.edu/login/oauth/authorize"
+
+#: src/authorizer/options/external/class-oauth2.php:276
+msgid "Example:  https://example.edu/login/oauth/access_token"
+msgstr "如: https://example.edu/login/oauth/access_token"
+
+#: src/authorizer/options/external/class-oauth2.php:296
+msgid "Example:  https://api.example.edu/user"
+msgstr "如: https://api.example.edu/user"
+
+#. Plugin Name of the plugin/theme
+msgid "Authorizer"
+msgstr "授权管理"
+
+#. Plugin URI of the plugin/theme
+msgid "https://github.com/uhm-coe/authorizer"
+msgstr "https://github.com/uhm-coe/authorizer"
+
+#. Description of the plugin/theme
+msgid "Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS)."
+msgstr "授权方限制登录尝试，限制对指定用户的访问，并针对外部源（例如 OAuth2、Google、LDAP 或 CAS）进行身份验证。"
+
+#. Author of the plugin/theme
+msgid "Paul Ryan <prar@hawaii.edu>"
+msgstr "保罗·瑞安（Paul Ryan）<prar@hawaii.edu>"
