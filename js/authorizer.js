@@ -273,13 +273,13 @@
 	// Helper function to hide/show wordpress option
 	function animateOption( action, option ) {
 		if ( action === 'show' ) {
-			$( 'div.animated_wrapper', option ).slideDown( animationSpeed );
+			option.fadeIn( animationSpeed );
 			$( 'th, td', option ).removeClass( 'hide-animate hide-no-animate' );
 		} else if ( action === 'hide' ) {
-			$( 'div.animated_wrapper', option ).slideUp( animationSpeed );
+			option.fadeOut( animationSpeed );
 			$( 'td, th', option ).addClass( 'hide-animate' );
 		} else if ( action === 'hide_immediately' ) {
-			$( 'div.animated_wrapper', option ).hide();
+			option.hide();
 			$( 'td, th', option ).addClass( 'hide-no-animate' );
 		}
 	}
@@ -423,57 +423,6 @@
 		var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_ldap_test_user = $( '#auth_settings_ldap_test_user' ).closest( 'tr' );
 		/* eslint-enable */
-
-		// Wrap the th and td in the rows above so we can animate their heights (can't animate tr heights with jquery)
-		$( 'th, td', auth_settings_access_role_receive_pending_emails ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_pending_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_blocked_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_should_email_approved_users ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_email_approved_users_subject ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_email_approved_users_body ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_public_pages ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_redirect_to_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_public_warning ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_access_redirect_to_message ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_provider ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_custom_label ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_clientid ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_hosteddomain ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_tenant_id ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_url_authorize ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_url_token ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_url_resource ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_oauth2_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_google_clientid ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_google_clientsecret ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_google_hosteddomain ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_auto_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_custom_label ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_host ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_port ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_path ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_method ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_version ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_attr_email ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_cas_link_on_username ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_host ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_port ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_search_base ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_search_filter ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_uid ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_attr_email ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_user ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_password ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_tls ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_lostpassword_url ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_attr_first_name ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_attr_last_name ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_attr_update_on_login ).wrapInner( '<div class="animated_wrapper" />' );
-		$( 'th, td', auth_settings_external_ldap_test_user ).wrapInner( '<div class="animated_wrapper" />' );
 
 		// Hide settings unless "Only approved users" is checked
 		if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {

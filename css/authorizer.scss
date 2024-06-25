@@ -80,9 +80,6 @@
 
 	// Mobile screen sizing.
 	@media screen and (max-width: 782px) {
-		.animated_wrapper {
-			width: 100% !important;
-		}
 		th {
 			padding: 8px 0 0;
 		}
@@ -134,9 +131,10 @@
 	.form-table {
 		th,
 		td {
+			transition: padding 0.25s ease;
+
 			&.hide-animate {
 				padding: 0;
-				transition: padding 0.25s ease;
 			}
 
 			&.hide-no-animate {
