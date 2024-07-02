@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.5
-Stable tag: 3.8.4
+Stable tag: 3.8.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.8.5 =
+* Fix database migrations re-running in complex multisite multi-network setups. Props @mpemburn for the research (and endurance) to discover the [root cause](https://wordpress.org/support/topic/numerous-set_default_options-calls-cause-site-to-crash/)!
 
 = 3.8.4 =
 * Update French translations. Props @julienlusson!
