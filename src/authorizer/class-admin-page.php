@@ -841,7 +841,7 @@ class Admin_Page extends Singleton {
 		$ldap          = Ldap::get_instance();
 		$oauth2        = OAuth2::get_instance();
 		$advanced      = Advanced::get_instance();
-		$auth_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
+		$auth_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 		?>
 		<div class="wrap">
 			<form method="post" action="" autocomplete="off">

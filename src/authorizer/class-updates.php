@@ -28,7 +28,7 @@ class Updates extends Singleton {
 		// Get current version.
 		$needs_updating = false;
 		if ( is_multisite() ) {
-			$auth_version = get_blog_option( get_network()->blog_id, 'auth_version' );
+			$auth_version = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version' );
 		} else {
 			$auth_version = get_option( 'auth_version' );
 		}
@@ -62,21 +62,21 @@ class Updates extends Singleton {
 			}
 			// Copy multisite user lists to new options (if they exist).
 			if ( is_multisite() ) {
-				$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
+				$auth_multisite_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 				if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_pending', $auth_multisite_settings ) ) {
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_pending', $auth_multisite_settings['access_users_pending'] );
 					unset( $auth_multisite_settings['access_users_pending'] );
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', $auth_multisite_settings );
 				}
 				if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_approved', $auth_multisite_settings ) ) {
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', $auth_multisite_settings['access_users_approved'] );
 					unset( $auth_multisite_settings['access_users_approved'] );
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', $auth_multisite_settings );
 				}
 				if ( is_array( $auth_multisite_settings ) && array_key_exists( 'access_users_blocked', $auth_multisite_settings ) ) {
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_blocked', $auth_multisite_settings['access_users_blocked'] );
 					unset( $auth_multisite_settings['access_users_blocked'] );
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', $auth_multisite_settings );
 				}
 			}
 			// Update version to reflect this change has been made.
@@ -149,11 +149,11 @@ class Updates extends Singleton {
 		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 			if ( is_multisite() ) {
 				// Reencrypt LDAP password in network (multisite) options.
-				$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
+				$auth_multisite_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 				if ( array_key_exists( 'ldap_password', $auth_multisite_settings ) && strlen( $auth_multisite_settings['ldap_password'] ) > 0 ) {
 					$plaintext_ldap_password                  = Helper::decrypt( $auth_multisite_settings['ldap_password'], 'mcrypt' );
 					$auth_multisite_settings['ldap_password'] = Helper::encrypt( $plaintext_ldap_password );
-					update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
+					update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', $auth_multisite_settings );
 				}
 			}
 			// Update version to reflect this change has been made.
@@ -191,7 +191,7 @@ class Updates extends Singleton {
 					}
 				}
 				// Remove duplicates from multisite approved user list.
-				$auth_multisite_settings_access_users_approved = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() );
+				$auth_multisite_settings_access_users_approved = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', array() );
 				if ( is_array( $auth_multisite_settings_access_users_approved ) ) {
 					$should_update   = false;
 					$distinct_emails = array();
@@ -204,7 +204,7 @@ class Updates extends Singleton {
 						}
 					}
 					if ( $should_update ) {
-						update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+						update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 					}
 				}
 			} else {
@@ -514,7 +514,7 @@ class Updates extends Singleton {
 		$update_if_older_than = 20230222;
 		if ( false === $auth_version || intval( $auth_version ) < $update_if_older_than ) {
 			if ( is_multisite() ) {
-				$network_blog_id = get_network()->blog_id;
+				$network_blog_id = get_main_site_id( get_main_network_id() );
 				// phpcs:ignore WordPress.WP.DeprecatedFunctions.wp_get_sitesFound
 				$sites = function_exists( 'get_sites' ) ? get_sites() : wp_get_sites( array( 'limit' => PHP_INT_MAX ) );
 				foreach ( $sites as $site ) {
@@ -548,7 +548,7 @@ class Updates extends Singleton {
 		// Save new version number if we performed any updates.
 		if ( $needs_updating ) {
 			if ( is_multisite() ) {
-				update_blog_option( get_network()->blog_id, 'auth_version', $auth_version );
+				update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version', $auth_version );
 			} else {
 				update_option( 'auth_version', $auth_version );
 			}

@@ -28,9 +28,9 @@ class Options extends Singleton {
 	public function get( $option, $admin_mode = Helper::SINGLE_CONTEXT, $override_mode = 'no override', $print_mode = 'no overlay' ) {
 		// Special case for user lists (they are saved seperately to prevent concurrency issues).
 		if ( in_array( $option, array( 'access_users_pending', 'access_users_approved', 'access_users_blocked' ), true ) ) {
-			$list = Helper::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings_' . $option );
+			$list = Helper::NETWORK_CONTEXT === $admin_mode ? array() : get_option( 'auth_settings_' . $option, array() );
 			if ( is_multisite() && Helper::NETWORK_CONTEXT === $admin_mode ) {
-				$list = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_' . $option, array() );
+				$list = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_' . $option, array() );
 			}
 			return $list;
 		}
@@ -39,7 +39,7 @@ class Options extends Singleton {
 		$auth_settings = $this->get_all( $admin_mode, $override_mode );
 
 		// Get multisite options (for checking if multisite override is prevented).
-		$auth_multisite_settings = is_multisite() ? get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() ) : array();
+		$auth_multisite_settings = is_multisite() ? get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() ) : array();
 
 		// Set option to null if it wasn't found.
 		if ( ! array_key_exists( $option, $auth_settings ) ) {
@@ -124,7 +124,7 @@ class Options extends Singleton {
 		// Merge multisite options if we're in a network.
 		if ( is_multisite() ) {
 			// Get multisite options.
-			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 
 			// Return the multisite options if we're viewing the network admin options page.
 			// Otherwise override options with their multisite equivalents.
@@ -530,7 +530,7 @@ class Options extends Singleton {
 
 		// Multisite defaults.
 		if ( is_multisite() && $args['set_multisite_options'] ) {
-			$auth_multisite_settings = get_blog_option( get_network()->blog_id, 'auth_multisite_settings', array() );
+			$auth_multisite_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 
 			if ( false === $auth_multisite_settings ) {
 				$auth_multisite_settings = array();
@@ -544,7 +544,7 @@ class Options extends Singleton {
 				$auth_multisite_settings['prevent_override_multisite'] = '';
 			}
 			// Access Lists Defaults.
-			$auth_multisite_settings_access_users_approved = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved' );
+			$auth_multisite_settings_access_users_approved = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved' );
 			if ( false === $auth_multisite_settings_access_users_approved ) {
 				$auth_multisite_settings_access_users_approved = array();
 			}
@@ -725,8 +725,8 @@ class Options extends Singleton {
 				$auth_multisite_settings['advanced_widget_enabled'] = '1';
 			}
 			// Save default network options to database.
-			update_blog_option( get_network()->blog_id, 'auth_multisite_settings', $auth_multisite_settings );
-			update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+			update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', $auth_multisite_settings );
+			update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 		}
 
 		return $auth_settings;

@@ -31,9 +31,9 @@ delete_option( 'auth_version' );
  * Delete multisite options.
  */
 if ( is_multisite() ) {
-	delete_blog_option( get_network()->blog_id, 'auth_multisite_settings' );
-	delete_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved' );
-	delete_blog_option( get_network()->blog_id, 'auth_version' );
+	delete_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings' );
+	delete_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved' );
+	delete_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version' );
 }
 
 /**

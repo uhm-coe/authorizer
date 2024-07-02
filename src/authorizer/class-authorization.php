@@ -245,7 +245,7 @@ class Authorization extends Singleton {
 							if ( $user_info['email'] === $auth_settings_access_user_approved_multi['email'] ) {
 								if ( $auth_settings_access_users_approved_multi[ $index ]['role'] !== $approved_role ) {
 									$auth_settings_access_users_approved_multi[ $index ]['role'] = $approved_role;
-									update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_settings_access_users_approved_multi );
+									update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', $auth_settings_access_users_approved_multi );
 								}
 								break;
 							}

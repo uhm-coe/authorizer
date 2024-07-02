@@ -224,7 +224,7 @@ class WP_Plugin_Authorizer extends Singleton {
 		if ( is_multisite() && $network_wide ) {
 
 			// Add super admins to the multisite approved list.
-			$auth_multisite_settings_access_users_approved               = get_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', array() );
+			$auth_multisite_settings_access_users_approved               = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', array() );
 			$should_update_auth_multisite_settings_access_users_approved = false;
 			foreach ( get_super_admins() as $super_admin ) {
 				$user = get_user_by( 'login', $super_admin );
@@ -245,7 +245,7 @@ class WP_Plugin_Authorizer extends Singleton {
 				}
 			}
 			if ( $should_update_auth_multisite_settings_access_users_approved ) {
-				update_blog_option( get_network()->blog_id, 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
+				update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings_access_users_approved', $auth_multisite_settings_access_users_approved );
 			}
 
 			// Run plugin activation on each site in the network.
