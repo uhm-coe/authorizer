@@ -301,6 +301,7 @@ class Authentication extends Singleton {
 		}
 
 		if ($encrypted_token != ''){
+			//Save the Access Token in user_meta for later use, f.e in other Plugins
 			update_user_meta( $user->ID, 'encrypted_token', $encrypted_token );
 		}
 
