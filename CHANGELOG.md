@@ -1,5 +1,14 @@
 # Changelog
 
+= 3.9.0 =
+* Tested up to WordPress 6.6.
+* Fix ldap_connect() deprecation notice in PHP 8.3. Props @svyatoslavnetrunner for the [code](https://wordpress.org/support/topic/php8-ldap_connect-deprecation/)!
+* Trim whitespace from Google Client ID and Secret. Props @JSLittlefield for the [suggestion](https://wordpress.org/support/topic/solved-white-screen-using-google-authentication/)!
+* Allow defining Google Client ID and OAuth2 Client ID via filters (`authorizer_google_client_id` and `authorizer_oauth2_client_id`) or wp-config.php constants (`define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );` and `define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );`) to support integrations with third-party secrets managers (or simply to keep the secrets out of the database in plaintext). Client Secrets were already added in version 3.6.1, this update adds filters and constants for the Client IDs. Props @nks04747 for the [suggestion](https://wordpress.org/support/topic/storing-oauth2-client-id-in-wp-config/)!
+* Fix Google/LDAP/Oauth2 secrets fields not hiding in Authorizer Settings if overridden by a filter or constant, and the external service is disabled.
+* Fix warning about duplicate DOM IDs in Authorizer Settings.
+* Update composer dependencies: guzzlehttp/guzzle (7.8.1 => 7.9.1); guzzlehttp/promises (2.0.2 => 2.0.3); guzzlehttp/psr7 (2.6.2 => 2.7.0); monolog/monolog (2.9.2 => 2.9.3); paragonie/constant_time_encoding (v2.6.3 => v2.7.0); phpseclib/phpseclib (3.0.37 => 3.0.39); psr/http-factory (1.0.2 => 1.1.0); symfony/deprecation-contracts (v2.5.2 => v2.5.3).
+
 = 3.8.5 =
 * Fix database migrations re-running in complex multisite multi-network setups. Props @mpemburn for the research (and endurance) to discover the [root cause](https://wordpress.org/support/topic/numerous-set_default_options-calls-cause-site-to-crash/)!
 
