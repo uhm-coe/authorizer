@@ -68,6 +68,44 @@ class Google extends \Authorizer\Singleton {
 			<li><?php echo wp_kses( __( '<strong>Note</strong>: Navigate to <em>APIs and Services</em> &gt; <em>OAuth consent screen</em> to change the way the Google consent screen appears after a user has successfully entered their password, but before they are redirected back to WordPress.', 'authorizer' ), Helper::$allowed_html ); ?></li>
 			<li><?php echo wp_kses( __( 'Note: Google may have a more recent version of these instructions in their <a href="https://developers.google.com/identity/gsi/web" target="_blank">developer documentation</a>.', 'authorizer' ), Helper::$allowed_html ); ?></li>
 		</ol>
+		<?php
+		// If ID is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_google_client_id' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_google_client_id (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_google_client_id</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_ID (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
+		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com', 'authorizer' ); ?></p>
 		<?php

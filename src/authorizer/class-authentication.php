@@ -322,6 +322,19 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_ID' ) ) {
+			$auth_settings['oauth2_clientid'] = \AUTHORIZER_OAUTH2_CLIENT_ID;
+		}
+		/**
+		 * Filters the Oauth2 Client ID used by Authorizer to authenticate.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @param string $oauth2_client_id  The stored Oauth2 Client ID.
+		 */
+		$auth_settings['oauth2_clientid'] = apply_filters( 'authorizer_oauth2_client_id', $auth_settings['oauth2_clientid'] );
+
 		// Fetch the Oauth2 Client Secret (allow overrides from filter or constant).
 		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
 			$auth_settings['oauth2_clientsecret'] = \AUTHORIZER_OAUTH2_CLIENT_SECRET;
@@ -690,6 +703,19 @@ class Authentication extends Singleton {
 		if ( empty( $token ) ) {
 			return null;
 		}
+
+		// Fetch the Google Client ID (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
+			$auth_settings['google_clientid'] = \AUTHORIZER_GOOGLE_CLIENT_ID;
+		}
+		/**
+		 * Filters the Google Client ID used by Authorizer to authenticate.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @param string $google_client_id  The stored Google Client ID.
+		 */
+		$auth_settings['google_clientid'] = apply_filters( 'authorizer_google_client_id', $auth_settings['google_clientid'] );
 
 		// Fetch the Google Client Secret (allow overrides from filter or constant).
 		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
@@ -1468,6 +1494,19 @@ class Authentication extends Singleton {
 		}
 		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
+
+			// Fetch the Google Client ID (allow overrides from filter or constant).
+			if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
+				$auth_settings['google_clientid'] = \AUTHORIZER_GOOGLE_CLIENT_ID;
+			}
+			/**
+			 * Filters the Google Client ID used by Authorizer to authenticate.
+			 *
+			 * @since 3.9.0
+			 *
+			 * @param string $google_client_id  The stored Google Client ID.
+			 */
+			$auth_settings['google_clientid'] = apply_filters( 'authorizer_google_client_id', $auth_settings['google_clientid'] );
 
 			// Fetch the Google Client Secret (allow overrides from filter or constant).
 			if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
