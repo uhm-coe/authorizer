@@ -1065,11 +1065,15 @@ class Authentication extends Singleton {
 		// Attempt each LDAP host until we have a valid connection.
 		$ldap_valid = false;
 		foreach ( $ldap_hosts as $ldap_host ) {
-			// Construct LDAP connection parameters. ldap_connect() takes either a
-			// hostname or a full LDAP URI as its first parameter (works with OpenLDAP
-			// 2.x.x or later). If it's an LDAP URI, the second parameter, $port, is
-			// ignored, and port must be specified in the full URI. An LDAP URI is of
-			// the form ldap://hostname:port or ldaps://hostname:port.
+			// Construct LDAP connection parameters. In PHP < 8.3, ldap_connect()
+			// takes either a hostname or a full LDAP URI as its first parameter
+			// (works with OpenLDAP 2.x.x or later). If it's an LDAP URI, the second
+			// parameter, $port, is ignored, and port must be specified in the full
+			// URI. An LDAP URI is of the form ldap://hostname:port or
+			// ldaps://hostname:port.
+			// In PHP 8.3, ldap_connect() only takes a single param (the signature
+			// with 2 params is deprecated). We thus convert all LDAP hosts to a full
+			// LDAP URI, defaulting to ldap:// if the full URI isn't provided.
 			$ldap_port   = intval( $auth_settings['ldap_port'] );
 			$parsed_host = wp_parse_url( $ldap_host );
 
@@ -1089,10 +1093,13 @@ class Authentication extends Singleton {
 					$parsed_host['port'] = $ldap_port;
 				}
 				$ldap_host = Helper::build_url( $parsed_host );
+			} else {
+				// Construct the LDAP URI from the provided host and port.
+				$ldap_host = 'ldap://' . $ldap_host . ':' . $ldap_port;
 			}
 
 			// Create LDAP connection.
-			$ldap = ldap_connect( $ldap_host, $ldap_port );
+			$ldap = ldap_connect( $ldap_host );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			ldap_set_option( $ldap, LDAP_OPT_REFERRALS, 0 );
 
