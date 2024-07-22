@@ -160,6 +160,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		// just print an informational message.
 		if ( has_filter( 'authorizer_oauth2_client_secret' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -175,6 +176,7 @@ class OAuth2 extends \Authorizer\Singleton {
 			return;
 		} elseif ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(

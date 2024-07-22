@@ -101,6 +101,7 @@ class Google extends \Authorizer\Singleton {
 				);
 				?>
 			</p>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<?php
 			return;
 		} elseif ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
@@ -116,6 +117,7 @@ class Google extends \Authorizer\Singleton {
 				);
 				?>
 			</p>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<?php
 			return;
 		}
