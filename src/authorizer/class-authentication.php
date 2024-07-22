@@ -707,8 +707,8 @@ class Authentication extends Singleton {
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
-		$client->setClientId( $auth_settings['google_clientid'] );
-		$client->setClientSecret( $auth_settings['google_clientsecret'] );
+		$client->setClientId( trim( $auth_settings['google_clientid'] ) );
+		$client->setClientSecret( trim( $auth_settings['google_clientsecret'] ) );
 		$client->setRedirectUri( 'postmessage' );
 
 		/**
@@ -1485,8 +1485,8 @@ class Authentication extends Singleton {
 			// Build the Google Client.
 			$client = new \Google_Client();
 			$client->setApplicationName( 'WordPress' );
-			$client->setClientId( $auth_settings['google_clientid'] );
-			$client->setClientSecret( $auth_settings['google_clientsecret'] );
+			$client->setClientId( trim( $auth_settings['google_clientid'] ) );
+			$client->setClientSecret( trim( $auth_settings['google_clientsecret'] ) );
 			$client->setRedirectUri( 'postmessage' );
 
 			// Revoke the token.
