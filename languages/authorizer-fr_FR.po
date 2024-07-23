@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Authorizer en français\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authorizer\n"
-"POT-Creation-Date: 2024-05-23 09:17-1000\n"
+"POT-Creation-Date: 2024-07-23 08:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: Paul Ryan <paul.ryan@hawaii.edu>\n"
@@ -267,6 +267,22 @@ msgstr ""
 "<strong>ID client :</strong> Vous pouvez générer cet ID en suivant les "
 "instructions du fournisseur spécifique choisi."
 
+#: src/authorizer/class-admin-page.php:98
+msgid ""
+"Note: for increased security, you can leave this field blank and instead "
+"define this value either in wp-config.php via "
+"<code>define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );</code>, or you may "
+"fetch it from an external service like AWS Secrets Manager by hooking into "
+"the <code>authorizer_oauth2_client_id</code> filter. This will prevent it "
+"from being stored in plaintext in the WordPress database."
+msgstr ""
+"Remarque : pour une sécurité accrue, vous pouvez laisser ce champ vide et "
+"définir cette valeur soit dans le fichier wp-config.php via "
+"<code>define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );</code>, ou vous pouvez "
+"la récupérer à partir d’un service externe comme AWS Secrets Manager via un "
+"hook dans le filtre <code>authorizer_oauth2_client_id</code>. Cela empêchera "
+"qu’il soit stocké en clair dans la base de données WordPress."
+
 #: src/authorizer/class-admin-page.php:99
 msgid ""
 "<strong>Client Secret</strong>: You can generate this secret by following "
@@ -346,6 +362,22 @@ msgstr ""
 "un nouveau projet dans <a href='https://cloud.google.com/console'>Google "
 "Developers Console</a>. Une ID client ressemble typiquement à cela : "
 "1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com"
+
+#: src/authorizer/class-admin-page.php:106
+msgid ""
+"Note: for increased security, you can leave this field blank and instead "
+"define this value either in wp-config.php via "
+"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );</code>, or you may "
+"fetch it from an external service like AWS Secrets Manager by hooking into "
+"the <code>authorizer_google_client_id</code> filter. This will prevent it "
+"from being stored in plaintext in the WordPress database."
+msgstr ""
+"Remarque : pour une sécurité accrue, vous pouvez laisser ce champ vide et "
+"définir cette valeur soit dans le fichier wp-config.php via "
+"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_ID'', '...' );</code>, ou vous "
+"pouvez la récupérer à partir d’un service externe comme AWS Secrets Manager "
+"via un hook dans le filtre <code>authorizer_google_client_id</code>. Cela "
+"empêchera qu’il soit stocké en clair dans la base de données WordPress."
 
 #: src/authorizer/class-admin-page.php:107
 msgid ""
@@ -1177,7 +1209,8 @@ msgstr "Page suivante"
 msgid "Last page"
 msgstr "Dernière page"
 
-#: src/authorizer/class-ajax-endpoints.php:344
+#. TRANSLATORS: %s: number of users
+#: src/authorizer/class-ajax-endpoints.php:357
 #: src/authorizer/options/class-access-lists.php:310
 #, php-format
 msgid "%s user"
@@ -1189,6 +1222,7 @@ msgstr[1] "%s utilisateurs"
 msgid "<strong>ERROR</strong>: Incorrect username or password."
 msgstr "<strong>Erreur</strong> : Identifiant ou mot de passe incorrect."
 
+#. TRANSLATORS: 1: username 2: duration of lockout in seconds 3: duration of lockout as a phrase 4: lost password URL
 #: src/authorizer/class-authentication.php:109
 #: src/authorizer/class-authentication.php:127
 #, php-format
@@ -1214,145 +1248,160 @@ msgstr "<strong>Erreur</strong> : L’identifiant est vide."
 msgid "<strong>ERROR</strong>: The password field is empty."
 msgstr "<strong>Erreur</strong>: Le mot de passe est vide."
 
-#: src/authorizer/class-authentication.php:654
+#: src/authorizer/class-authentication.php:667
 msgid "Email address does not match the allowed hosted domain"
 msgstr "L'adresse électronique ne correspond pas au domaine hébergé autorisé"
 
-#: src/authorizer/class-authentication.php:737
+#: src/authorizer/class-authentication.php:763
 msgid "The authentication timestamp is too old, please try again."
 msgstr ""
 "L’horodatage de l’authentification est trop ancien, veuillez réessayer."
 
-#: src/authorizer/class-authentication.php:740
-#: src/authorizer/class-authentication.php:745
+#: src/authorizer/class-authentication.php:766
+#: src/authorizer/class-authentication.php:771
 msgid "Invalid Google credentials provided."
 msgstr "Identifiants Google fournis invalides."
 
-#: src/authorizer/class-authentication.php:771
+#: src/authorizer/class-authentication.php:797
 msgid "Google credentials do not match the allowed hosted domain"
 msgstr ""
 "Les informations d’authentification Google ne correspondent pas au domaine "
 "hébergé autorisé"
 
-#: src/authorizer/class-authentication.php:848
+#: src/authorizer/class-authentication.php:874
 msgid "CAS server returned an Authentication Exception. Details:"
 msgstr "Le serveur CAS a indiqué une erreur d’authentification. Détails :"
 
-#: src/authorizer/class-authentication.php:977
+#. TRANSLATORS: Current time
+#: src/authorizer/class-authentication.php:1003
 #, php-format
 msgid "[%s] Attempting to authenticate via LDAP."
 msgstr "[%s] Tentative de connexion via LDAP."
 
-#: src/authorizer/class-authentication.php:987
+#: src/authorizer/class-authentication.php:1013
 msgid "Failed: no LDAP Host(s) specified."
 msgstr "Échec : aucun hôte LDAP renseigné."
 
-#: src/authorizer/class-authentication.php:998
+#: src/authorizer/class-authentication.php:1024
 msgid "Failed: no LDAP Search Base(s) specified."
 msgstr "Échec : aucune Base de recherche LDAP renseignée."
 
-#: src/authorizer/class-authentication.php:1031
+#: src/authorizer/class-authentication.php:1057
 msgid "Failed: empty username and password."
 msgstr "Échec : identifiant et mot de passe vides."
 
-#: src/authorizer/class-authentication.php:1039
+#: src/authorizer/class-authentication.php:1065
 msgid "Failed: empty username."
 msgstr "Échec : mot de passe vide."
 
-#: src/authorizer/class-authentication.php:1041
+#: src/authorizer/class-authentication.php:1067
 msgid "You must provide a username or email."
 msgstr "Vous devez fournir un identifiant ou e-mail."
 
-#: src/authorizer/class-authentication.php:1045
+#: src/authorizer/class-authentication.php:1071
 msgid "Failed: empty password."
 msgstr "Échec : mot de passe vide."
 
-#: src/authorizer/class-authentication.php:1047
+#: src/authorizer/class-authentication.php:1073
 msgid "You must provide a password."
 msgstr "Vous devez fournir un mot de passe."
 
-#: src/authorizer/class-authentication.php:1053
+#: src/authorizer/class-authentication.php:1079
 msgid "Failed: php-ldap extension not installed."
 msgstr "Échec : l’extension php-ldap n’est pas installée."
 
-#: src/authorizer/class-authentication.php:1080
+#. TRANSLATORS: LDAP Host
+#: src/authorizer/class-authentication.php:1110
 #, php-format
 msgid "Warning: could not parse host %s with wp_parse_url()."
 msgstr "Attention : impossible d’analyser l’hôte %s avec wp_parse_url()."
 
-#: src/authorizer/class-authentication.php:1103
+#. TRANSLATORS: LDAP Host
+#: src/authorizer/class-authentication.php:1136
 #, php-format
 msgid "Warning: syntax check failed on host %s in ldap_connect()."
 msgstr ""
 "Attention : vérification échouée de la syntaxe de l’hôte %s dans "
 "ldap_connect()."
 
-#: src/authorizer/class-authentication.php:1114
+#. TRANSLATORS: LDAP Host
+#: src/authorizer/class-authentication.php:1147
 #, php-format
 msgid "Warning: unable to start TLS on host %s:"
 msgstr "Attention : impossible de démarrer TLS sur l’hôte %s :"
 
-#: src/authorizer/class-authentication.php:1168
+#. TRANSLATORS: LDAP User DN
+#: src/authorizer/class-authentication.php:1201
 #, php-format
 msgid "Performing bind as user logging in: %s."
 msgstr "Liaison avec l’utilisateur se connectant : %s."
 
-#: src/authorizer/class-authentication.php:1178
+#. TRANSLATORS: LDAP Host
+#: src/authorizer/class-authentication.php:1211
 #, php-format
 msgid "Warning: unable to bind on host %1$s using directory user:"
 msgstr ""
 "Attention : Impossible de se lier à l’hôte %1$s avec l’utilisateur de "
 "l’annuaire :"
 
-#: src/authorizer/class-authentication.php:1192
+#. TRANSLATORS: LDAP User DN
+#: src/authorizer/class-authentication.php:1225
 #, php-format
 msgid "Successful bind using LDAP user DN %s instead of directory user."
 msgstr ""
 "Lien effectué avec succès avec le DN de l’utilisateur LDAP %s au lieu d'un "
 "utilisateur de service de l'annuaire."
 
-#: src/authorizer/class-authentication.php:1202
-#: src/authorizer/class-authentication.php:1349
+#. TRANSLATORS: LDAP User
+#: src/authorizer/class-authentication.php:1235
+#: src/authorizer/class-authentication.php:1382
 #, php-format
 msgid "Failed: password incorrect for LDAP user %s."
 msgstr "Échec : Mot de passe incorrect pour l’utilisateur LDAP %s."
 
-#: src/authorizer/class-authentication.php:1215
+#. TRANSLATORS: LDAP Host
+#: src/authorizer/class-authentication.php:1248
 #, php-format
 msgid "Connected to LDAP host %s."
 msgstr "Connecté à l’hôte LDAP %s."
 
-#: src/authorizer/class-authentication.php:1223
+#: src/authorizer/class-authentication.php:1256
 msgid "Failed: unable to connect to any LDAP host."
 msgstr "Échec : impossible de se connecter aux hôtes LDAP."
 
-#: src/authorizer/class-authentication.php:1284
+#. TRANSLATORS: LDAP search filter
+#: src/authorizer/class-authentication.php:1317
 #, php-format
 msgid "Using LDAP search filter: %s"
 msgstr "Utilisation du filtre de recherche LDAP : %s"
 
-#: src/authorizer/class-authentication.php:1299
+#. TRANSLATORS: 1: LDAP user 2: LDAP search base
+#: src/authorizer/class-authentication.php:1332
 #, php-format
 msgid "Found user %1$s in search base: %2$s"
 msgstr "Utilisateur %1$s trouvé dans la base de recherche : %2$s"
 
-#: src/authorizer/class-authentication.php:1304
+#. TRANSLATORS: 1: LDAP user 2: LDAP search base
+#: src/authorizer/class-authentication.php:1337
 #, php-format
 msgid "Failed to find user %1$s in %2$s. Trying next search base."
 msgstr ""
 "Impossible de trouver l’utilisateur %1$s dans %2$s. Essai avec la base de "
 "recherche suivante."
 
-#: src/authorizer/class-authentication.php:1312
+#. TRANSLATORS: LDAP User
+#: src/authorizer/class-authentication.php:1345
 #, php-format
 msgid "Failed: no LDAP user %s found."
 msgstr "Échec : aucun utilisateur LDAP %s trouvé."
 
-#: src/authorizer/class-authentication.php:1368
+#. TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email
+#: src/authorizer/class-authentication.php:1401
 #, php-format
 msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
 msgstr "[%1$s] Authentification LDAP réussie de l’utilisateur %2$s (%3$s)."
 
+#. TRANSLATORS: %s: Name of blog
 #: src/authorizer/class-authorization.php:124
 #: src/authorizer/class-authorization.php:638
 #, php-format
@@ -1369,11 +1418,13 @@ msgstr "Retour"
 msgid "Invalid login attempted."
 msgstr "Tentative d’authentification invalide."
 
+#. TRANSLATORS: 1: User email 2: Name of site
 #: src/authorizer/class-authorization.php:443
 #, php-format
 msgid "Action required: Pending user %1$s at %2$s"
 msgstr "Action requise : Utilisateur %1$s en attente sur %2$s"
 
+#. TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer
 #: src/authorizer/class-authorization.php:449
 #, php-format
 msgid ""
@@ -1413,6 +1464,8 @@ msgstr "Utilisateurs bloqués"
 msgid "&mdash; No role for this site &mdash;"
 msgstr "&mdash; Aucun rôle pour ce site &mdash;"
 
+#. TRANSLATORS: %s: Custom OAuth2 label from authorizer options
+#. TRANSLATORS: %s: Custom CAS label from authorizer options
 #: src/authorizer/class-login-form.php:216
 #: src/authorizer/class-login-form.php:233
 #, php-format
@@ -1423,6 +1476,7 @@ msgstr "S’authentifier avec %s"
 msgid "or"
 msgstr "ou"
 
+#. TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts
 #: src/authorizer/class-login-form.php:435
 #, php-format
 msgid ""
@@ -1431,6 +1485,7 @@ msgid ""
 msgstr ""
 "Authorizer a bloqué l’utilisateur %2$s pour %1$s après %3$s essais invalides."
 
+#. TRANSLATORS: 1: duration of lockout 2: username 3: ordinal number of invalid attempts
 #: src/authorizer/class-login-form.php:438
 #, php-format
 msgid ""
@@ -1470,11 +1525,13 @@ msgstr ""
 "Vous n’êtes actuellement pas autorisé à vous connecter à ce site. Si vous "
 "pensez que cela est une erreur, veuillez contacter votre administrateur⋅ice."
 
+#. TRANSLATORS: %s: Shortcode for name of site
 #: src/authorizer/class-options.php:307
 #, php-format
 msgid "Welcome to %s!"
 msgstr "Bienvenue sur %s !"
 
+#. TRANSLATORS: 1: Shortcode for user email 2: Shortcode for site name 3: Shortcode for site URL
 #: src/authorizer/class-options.php:314
 #, php-format
 msgid ""
@@ -1573,6 +1630,7 @@ msgstr ""
 msgid "Current Page"
 msgstr "Page courante"
 
+#. TRANSLATORS: 1: number of current page 2: number of total pages
 #: src/authorizer/options/class-access-lists.php:364
 #, php-format
 msgctxt "paging"
@@ -1763,6 +1821,7 @@ msgstr ""
 msgid "You can use the <b>[site_name]</b> shortcode."
 msgstr "Vous pouvez utiliser le shortcode <b>[site_name]</b>."
 
+#. TRANSLATORS: 1: Shortcode for site name 2: Shortcode for site URL 3: Shortcode for user email
 #: src/authorizer/options/class-login-access.php:223
 #, php-format
 msgid "You can use %1$s, %2$s, and %3$s shortcodes."
@@ -1816,7 +1875,7 @@ msgstr "Page d’accueil"
 msgid "Nonexistent (404) Pages"
 msgstr "Pages inexistantes (404)"
 
-#: src/authorizer/options/class-public-access.php:189
+#: src/authorizer/options/class-public-access.php:194
 msgid "Categories"
 msgstr "Catégories"
 
@@ -1927,22 +1986,22 @@ msgid "Example:  givenName"
 msgstr "Exemple : givenName"
 
 #: src/authorizer/options/external/class-cas.php:343
-#: src/authorizer/options/external/class-ldap.php:390
+#: src/authorizer/options/external/class-ldap.php:394
 msgid "Example:  sn"
 msgstr "Exemple : sn"
 
 #: src/authorizer/options/external/class-cas.php:360
-#: src/authorizer/options/external/class-ldap.php:407
+#: src/authorizer/options/external/class-ldap.php:411
 msgid "Do not update first and last name fields on login"
 msgstr "Ne pas mettre à jour les champs nom et prénom lors de la connexion"
 
 #: src/authorizer/options/external/class-cas.php:361
-#: src/authorizer/options/external/class-ldap.php:408
+#: src/authorizer/options/external/class-ldap.php:412
 msgid "Update first and last name fields on login"
 msgstr "Uniquement mettre à jour les champs nom et prénom lors de la connexion"
 
 #: src/authorizer/options/external/class-cas.php:362
-#: src/authorizer/options/external/class-ldap.php:409
+#: src/authorizer/options/external/class-ldap.php:413
 msgid "Update first and last name fields on login only if they are empty"
 msgstr ""
 "Mettre à jour les champs prénom et nom lors de l’authentification uniquement "
@@ -2044,28 +2103,36 @@ msgstr ""
 "instructions dans leur <a href=\"https://developers.google.com/identity/gsi/"
 "web\" target=\"_blank\">documentation développeur</a>."
 
-#: src/authorizer/options/external/class-google.php:72
-msgid ""
-"Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
-"googleusercontent.com"
-msgstr ""
-"Exemple : 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
-"googleusercontent.com"
-
-#: src/authorizer/options/external/class-google.php:98
-#: src/authorizer/options/external/class-ldap.php:220
-#: src/authorizer/options/external/class-ldap.php:301
-#: src/authorizer/options/external/class-oauth2.php:168
+#. TRANSLATORS: %s: authorizer_google_client_id (filter name)
+#. TRANSLATORS: %s: authorizer_google_client_secret (filter name)
+#. TRANSLATORS: %s: authorizer_ldap_user (filter name)
+#. TRANSLATORS: %s: authorizer_ldap_password (filter name)
+#. TRANSLATORS: %s: authorizer_oauth2_client_id (filter name)
+#. TRANSLATORS: %s: authorizer_oauth2_client_secret (filter name)
+#: src/authorizer/options/external/class-google.php:82
+#: src/authorizer/options/external/class-google.php:136
+#: src/authorizer/options/external/class-ldap.php:221
+#: src/authorizer/options/external/class-ldap.php:304
+#: src/authorizer/options/external/class-oauth2.php:152
+#: src/authorizer/options/external/class-oauth2.php:207
 #, php-format
 msgid ""
 "This setting is not editable since it has been defined in the %s filter."
 msgstr ""
 "Ce paramètre n’est pas modifiable car il a été configuré dans le filtre %s."
 
-#: src/authorizer/options/external/class-google.php:113
-#: src/authorizer/options/external/class-ldap.php:235
-#: src/authorizer/options/external/class-ldap.php:316
-#: src/authorizer/options/external/class-oauth2.php:183
+#. TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_ID (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_SECRET (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_LDAP_USER (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_LDAP_PASSWORD (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_OAUTH2_CLIENT_ID (defined constant name)
+#. TRANSLATORS: %s: AUTHORIZER_OAUTH2_CLIENT_SECRET (defined constant name)
+#: src/authorizer/options/external/class-google.php:98
+#: src/authorizer/options/external/class-google.php:152
+#: src/authorizer/options/external/class-ldap.php:237
+#: src/authorizer/options/external/class-ldap.php:320
+#: src/authorizer/options/external/class-oauth2.php:168
+#: src/authorizer/options/external/class-oauth2.php:223
 #, php-format
 msgid ""
 "This setting is not editable since it has been defined in wp-config.php via "
@@ -2074,11 +2141,19 @@ msgstr ""
 "Ce paramètre n’est pas modifiable car il a été configuré dans wp-config.php "
 "via %s"
 
-#: src/authorizer/options/external/class-google.php:126
+#: src/authorizer/options/external/class-google.php:110
+msgid ""
+"Example:  1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
+"googleusercontent.com"
+msgstr ""
+"Exemple : 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps."
+"googleusercontent.com"
+
+#: src/authorizer/options/external/class-google.php:166
 msgid "Example:  sDNgX5_pr_5bly-frKmvp8jT"
 msgstr "Exemple : sDNgX5_pr_5bly-frKmvp8jT"
 
-#: src/authorizer/options/external/class-google.php:146
+#: src/authorizer/options/external/class-google.php:186
 msgid ""
 "Restrict Google logins to a specific Google Apps hosted domain (for example, "
 "mycollege.edu). Leave blank to allow all Google sign-ins."
@@ -2087,8 +2162,8 @@ msgstr ""
 "mycollege.edu). Laissez vide pour autoriser toutes les authentifications "
 "Google."
 
-#: src/authorizer/options/external/class-google.php:146
-#: src/authorizer/options/external/class-oauth2.php:216
+#: src/authorizer/options/external/class-google.php:186
+#: src/authorizer/options/external/class-oauth2.php:256
 msgid "If restricting to multiple domains, add one domain per line."
 msgstr ""
 "En cas de limitation à plusieurs domaines, ajoutez un domaine par ligne."
@@ -2185,11 +2260,12 @@ msgstr ""
 "connecte et son adresse électronique doit être bob@example.edu, alors entrez "
 "<strong>@example.edu</strong> dans ce champ."
 
-#: src/authorizer/options/external/class-ldap.php:248
+#: src/authorizer/options/external/class-ldap.php:250
 msgid "Example:  cn=directory-user,ou=specials,dc=example,dc=edu"
 msgstr "Exemple : cn=directory-user,ou=specials,dc=example,dc=edu"
 
-#: src/authorizer/options/external/class-ldap.php:255
+#. TRANSLATORS: %s: Username wildcard
+#: src/authorizer/options/external/class-ldap.php:257
 #, php-format
 msgid ""
 "Note: You can use the %s wildcard to bind as the username of the user "
@@ -2199,12 +2275,13 @@ msgstr ""
 "liaison avec le nom d'utilisateur se connectant au lieu d’un compte de "
 "service de l'annuaire."
 
-#: src/authorizer/options/external/class-ldap.php:267
+#. TRANSLATORS: %s: Username wildcard
+#: src/authorizer/options/external/class-ldap.php:269
 #, php-format
 msgid "Example: <strong>uid=%s,ou=people,dc=example,dc=edu</strong>."
 msgstr "Exemple :  <strong>uid=%s,ou=people,dc=example,dc=edu</strong>."
 
-#: src/authorizer/options/external/class-ldap.php:274
+#: src/authorizer/options/external/class-ldap.php:276
 msgid ""
 "Leave the LDAP Directory User Password field below blank, and the bind will "
 "be attempted with the user-supplied password."
@@ -2212,27 +2289,27 @@ msgstr ""
 "Laisser vide le champ Mot de passe de l’utilisateur de l’annuaire LDAP, et "
 "la liaison sera effectuée avec le mot de passe fourni par l’utilisateur."
 
-#: src/authorizer/options/external/class-ldap.php:350
+#: src/authorizer/options/external/class-ldap.php:354
 msgid "Example:  https://myschool.example.edu:8888/am-forgot-password"
 msgstr "Exemple : https://espace.site.test:8888/mot-de-passe-perdu"
 
-#: src/authorizer/options/external/class-ldap.php:370
+#: src/authorizer/options/external/class-ldap.php:374
 msgid "Example:  givenname"
 msgstr "Exemple : givenName"
 
-#: src/authorizer/options/external/class-ldap.php:437
+#: src/authorizer/options/external/class-ldap.php:441
 msgid "username"
 msgstr "identifiant"
 
-#: src/authorizer/options/external/class-ldap.php:439
+#: src/authorizer/options/external/class-ldap.php:443
 msgid "password"
 msgstr "mot de passe"
 
-#: src/authorizer/options/external/class-ldap.php:440
+#: src/authorizer/options/external/class-ldap.php:444
 msgid "Test"
 msgstr "Test"
 
-#: src/authorizer/options/external/class-ldap.php:443
+#: src/authorizer/options/external/class-ldap.php:447
 msgid ""
 "Note: Make sure to save any changes to LDAP settings before clicking the "
 "Test button."
@@ -2260,15 +2337,15 @@ msgstr "Si une adresse de redirection ou de rappel est demandée, utilisez :"
 msgid "If using Microsoft Azure, omit the querystring; use:"
 msgstr "Pour Microsoft Azure, omettez la chaîne de requête, utilisez :"
 
-#: src/authorizer/options/external/class-oauth2.php:142
+#: src/authorizer/options/external/class-oauth2.php:180
 msgid "Example:  0123456789abcdef0123"
 msgstr "Exemple : 0123456789abcdef0123"
 
-#: src/authorizer/options/external/class-oauth2.php:196
+#: src/authorizer/options/external/class-oauth2.php:236
 msgid "Example:  0123456789abcdef0123456789abcdef"
 msgstr "Exemple : 0123456789abcdef0123456789abcdef"
 
-#: src/authorizer/options/external/class-oauth2.php:216
+#: src/authorizer/options/external/class-oauth2.php:256
 msgid ""
 "Restrict OAuth2 logins to a specific domain (for example, mycollege.edu). "
 "Leave blank to allow all valid sign-ins."
@@ -2277,24 +2354,24 @@ msgstr ""
 "mycollege.edu). Laissez vide pour autoriser toutes les authentifications "
 "valides."
 
-#: src/authorizer/options/external/class-oauth2.php:236
+#: src/authorizer/options/external/class-oauth2.php:276
 msgid "Example:  \"common\", or a specific Azure Directory Tenant ID"
 msgstr ""
 "Exemple: \"common\", ou un ID de locataire Azure Active Directory spécifique"
 
-#: src/authorizer/options/external/class-oauth2.php:256
+#: src/authorizer/options/external/class-oauth2.php:296
 msgid "Example:  https://example.edu/login/oauth/authorize"
 msgstr "Exemple : https://espace.site.test/login/oauth/authorize"
 
-#: src/authorizer/options/external/class-oauth2.php:276
+#: src/authorizer/options/external/class-oauth2.php:316
 msgid "Example:  https://example.edu/login/oauth/access_token"
 msgstr "Exemple : https://espace.site.test/login/oauth/access_token"
 
-#: src/authorizer/options/external/class-oauth2.php:296
+#: src/authorizer/options/external/class-oauth2.php:336
 msgid "Example:  https://api.example.edu/user"
 msgstr "Exemple : https://api.site.test/user"
 
-#: src/authorizer/options/external/class-oauth2.php:315
+#: src/authorizer/options/external/class-oauth2.php:355
 msgid ""
 "Immediately redirect to OAuth2 login form if it's the only enabled external "
 "service and WordPress logins are hidden"
@@ -2303,7 +2380,7 @@ msgstr ""
 "est le seul service externe activé et que le formulaire de connexion "
 "WordPress est masqué"
 
-#: src/authorizer/options/external/class-oauth2.php:316
+#: src/authorizer/options/external/class-oauth2.php:356
 msgid ""
 "Note: This feature will only work if you have checked \"Hide WordPress "
 "Logins\" in Advanced settings, and if OAuth2 is the only enabled service (i."
@@ -2314,26 +2391,23 @@ msgstr ""
 "avancés et si OAuth2 est le seul service activé (ex. : pas de Google, ni de "
 "LDAP ou CAS)."
 
-#. Plugin Name of the plugin/theme
-msgid "Authorizer"
-msgstr "Authorizer"
+#~ msgid "Authorizer"
+#~ msgstr "Authorizer"
 
-#. Plugin URI of the plugin/theme
-msgid "https://github.com/uhm-coe/authorizer"
-msgstr "https://github.com/uhm-coe/authorizer"
+#~ msgid "https://github.com/uhm-coe/authorizer"
+#~ msgstr "https://github.com/uhm-coe/authorizer"
 
-#. Description of the plugin/theme
-msgid ""
-"Authorizer limits login attempts, restricts access to specified users, and "
-"authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS)."
-msgstr ""
-"Authorizer limite les tentatives d’authentification, restreint les accès à "
-"des utilisateurs spécifiques, et permet l’authentification via des sources "
-"externes (ex : OAuth2, Google, LDAP, ou CAS)."
+#~ msgid ""
+#~ "Authorizer limits login attempts, restricts access to specified users, "
+#~ "and authenticates against external sources (e.g., OAuth2, Google, LDAP, "
+#~ "or CAS)."
+#~ msgstr ""
+#~ "Authorizer limite les tentatives d’authentification, restreint les accès "
+#~ "à des utilisateurs spécifiques, et permet l’authentification via des "
+#~ "sources externes (ex : OAuth2, Google, LDAP, ou CAS)."
 
-#. Author of the plugin/theme
-msgid "Paul Ryan <prar@hawaii.edu>"
-msgstr "Paul Ryan <prar@hawaii.edu>"
+#~ msgid "Paul Ryan <prar@hawaii.edu>"
+#~ msgstr "Paul Ryan <prar@hawaii.edu>"
 
 #~ msgid "If ldaps is used, this should be unchecked"
 #~ msgstr "Si ldaps est utilisé, cela devrait être décoché"
