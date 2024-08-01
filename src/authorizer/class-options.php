@@ -337,13 +337,14 @@ class Options extends Singleton {
 
 		// External Service Defaults.
 		if ( ! array_key_exists( 'access_default_role', $auth_settings ) ) {
-			// Set default role to 'student' if that role exists, 'subscriber' otherwise.
-			$all_roles      = $wp_roles->roles;
-			$editable_roles = apply_filters( 'editable_roles', $all_roles );
-			if ( array_key_exists( 'student', $editable_roles ) ) {
-				$auth_settings['access_default_role'] = 'student';
-			} else {
-				$auth_settings['access_default_role'] = 'subscriber';
+			// Set default role to 'subscriber', or 'student' if that role exists.
+			$auth_settings['access_default_role'] = 'subscriber';
+			if ( ! empty( $wp_roles ) ) {
+				$all_roles      = $wp_roles->roles;
+				$editable_roles = apply_filters( 'editable_roles', $all_roles );
+				if ( is_array( $editable_roles ) && array_key_exists( 'student', $editable_roles ) ) {
+					$auth_settings['access_default_role'] = 'student';
+				}
 			}
 		}
 
@@ -558,13 +559,14 @@ class Options extends Singleton {
 			}
 			// External Service Defaults.
 			if ( ! array_key_exists( 'access_default_role', $auth_multisite_settings ) ) {
-				// Set default role to 'student' if that role exists, 'subscriber' otherwise.
-				$all_roles      = $wp_roles->roles;
-				$editable_roles = apply_filters( 'editable_roles', $all_roles );
-				if ( array_key_exists( 'student', $editable_roles ) ) {
-					$auth_multisite_settings['access_default_role'] = 'student';
-				} else {
-					$auth_multisite_settings['access_default_role'] = 'subscriber';
+				// Set default role to 'subscriber', or 'student' if that role exists.
+				$auth_multisite_settings['access_default_role'] = 'subscriber';
+				if ( ! empty( $wp_roles ) ) {
+					$all_roles      = $wp_roles->roles;
+					$editable_roles = apply_filters( 'editable_roles', $all_roles );
+					if ( is_array( $editable_roles ) && array_key_exists( 'student', $editable_roles ) ) {
+						$auth_multisite_settings['access_default_role'] = 'student';
+					}
 				}
 			}
 			if ( ! array_key_exists( 'oauth2', $auth_multisite_settings ) ) {

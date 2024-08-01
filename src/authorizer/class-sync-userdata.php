@@ -568,10 +568,12 @@ class Sync_Userdata extends Singleton {
 			global $wp_roles;
 			$default_role_display_name = $default_role['name'];
 			$default_role              = '';
-			foreach ( $wp_roles->role_names as $role_name => $display_name ) {
-				if ( $default_role_display_name === $display_name ) {
-					$default_role = $role_name;
-					break;
+			if ( ! empty( $wp_roles ) && is_array( $wp_roles->role_names ) ) {
+				foreach ( $wp_roles->role_names as $role_name => $display_name ) {
+					if ( $default_role_display_name === $display_name ) {
+						$default_role = $role_name;
+						break;
+					}
 				}
 			}
 		}
