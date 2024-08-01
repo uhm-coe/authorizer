@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.9.1 =
+* Fix for global $wp_roles unavailable in some multisite contexts leading to a fatal error.
+
 = 3.9.0 =
 * Tested up to WordPress 6.6.
 * Fix ldap_connect() deprecation notice in PHP 8.3. Props @svyatoslavnetrunner for the [code](https://wordpress.org/support/topic/php8-ldap_connect-deprecation/)!
