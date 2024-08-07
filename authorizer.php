@@ -36,6 +36,8 @@ require_once __DIR__ . '/src/authorizer/class-updates.php';
 require_once __DIR__ . '/src/authorizer/class-authentication.php';
 require_once __DIR__ . '/src/authorizer/class-authorization.php';
 require_once __DIR__ . '/src/authorizer/class-login-form.php';
+require_once __DIR__ . '/src/authorizer/class-save-secure.php';
+
 require_once __DIR__ . '/src/authorizer/class-dashboard-widget.php';
 require_once __DIR__ . '/src/authorizer/class-ajax-endpoints.php';
 require_once __DIR__ . '/src/authorizer/class-sync-userdata.php';
