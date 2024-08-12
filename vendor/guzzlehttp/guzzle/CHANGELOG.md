@@ -3,6 +3,13 @@
 Please refer to [UPGRADING](UPGRADING.md) guide for upgrading to a major version.
 
 
+## 7.9.2 - 2024-07-24
+
+### Fixed
+
+- Adjusted handler selection to use cURL if its version is 7.21.2 or higher, rather than 7.34.0
+
+
 ## 7.9.1 - 2024-07-19
 
 ### Fixed
