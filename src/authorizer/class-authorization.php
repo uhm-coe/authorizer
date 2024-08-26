@@ -150,15 +150,14 @@ class Authorization extends Singleton {
 		 * @param array $user_data User data returned from external service.
 		 */
 
+		$add_roles = [];
+		$remove_roles = [];
 		$custom_role_return = apply_filters( 'authorizer_custom_role', $default_role, $user_data );
 		if (is_array($custom_role_return) && count($custom_role_return, 0) == 3)
 			[$approved_role, $add_roles, $remove_roles] = $custom_role_return;
-		else {
+		else 
 			$approved_role = $custom_role_return;
-			$add_roles = [];
-			$remove_roles = [];
-		}
-
+		
 		/**
 		 * Filter whether to automatically approve the currently logging in user
 		 * based on any of their user attributes.
@@ -316,10 +315,9 @@ class Authorization extends Singleton {
 					 * );
 					 */
 					do_action( 'authorizer_user_register', $user, $user_data );
+					// Add Secondary roles to user
 					foreach($add_roles as $role)
 						$user->add_role($role);
-					foreach($remove_roles as $role)
-						$user->remove_role($role);
 					// If multisite, iterate through all sites in the network and add the user
 					// currently logging in to any of them that have the user on the approved list.
 					// Note: this is useful for first-time logins--some users will have access
@@ -403,6 +401,13 @@ class Authorization extends Singleton {
 					if ( $should_update_last_name ) {
 						update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
 					}
+					// Update User Roles
+					foreach($add_roles as $role)
+						if(!in_array($role, $user->roles))
+							$user->add_role($role);
+					foreach($remove_roles as $role)
+						if(in_array($role, $user->roles))
+							$user->remove_role($role);
 				}
 
 				// If this is multisite, add new user to current blog.
