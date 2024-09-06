@@ -192,18 +192,7 @@ class Public_Access extends \Authorizer\Singleton {
 				</optgroup>
 			<?php endforeach; ?>
 			<optgroup label="<?php esc_attr_e( 'Categories', 'authorizer' ); ?>">
-				<?php
-				// If sitepress-multilingual-cms plugin is enabled, temporarily disable
-				// its terms_clauses filter since it conflicts with the category handling.
-				if ( array_key_exists( 'sitepress', $GLOBALS ) && is_object( $GLOBALS['sitepress'] ) ) {
-					remove_filter( 'terms_clauses', array( $GLOBALS['sitepress'], 'terms_clauses' ) );
-					$categories = get_categories( array( 'hide_empty' => false ) );
-					add_filter( 'terms_clauses', array( $GLOBALS['sitepress'], 'terms_clauses' ) );
-				} else {
-					$categories = get_categories( array( 'hide_empty' => false ) );
-				}
-				foreach ( $categories as $category ) :
-					?>
+				<?php foreach ( get_categories( array( 'hide_empty' => false ) ) as $category ) : ?>
 					<option value="<?php echo esc_attr( 'cat_' . $category->slug ); ?>" <?php selected( in_array( 'cat_' . $category->slug, $auth_settings_option, true ) ); ?>><?php echo esc_html( $category->name ); ?></option>
 				<?php endforeach; ?>
 			</optgroup>
