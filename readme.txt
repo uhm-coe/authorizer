@@ -64,6 +64,7 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 
 = 3.9.1 =
 * Fix for global $wp_roles unavailable in some multisite contexts leading to a fatal error.
+* Update French translations. Props @julienlusson!
 
 = 3.9.0 =
 * Tested up to WordPress 6.6.
