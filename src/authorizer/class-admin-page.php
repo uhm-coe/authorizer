@@ -1013,13 +1013,12 @@ class Admin_Page extends Singleton {
 						foreach ( range( 1, $cas_num_servers ) as $cas_num_server ) :
 							$prefix = $cas_num_server . '. ';
 							?>
-							<tr>
+							<tr class="border-top-small">
 								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'CAS Custom Label', 'authorizer' ); ?></th>
 								<td>
 									<?php
 									$cas->print_text_cas_custom_label( array(
 										'context'        => Helper::NETWORK_CONTEXT,
-										'class'          => 'border-top-small',
 										'cas_num_server' => $cas_num_server,
 									) );
 									?>
