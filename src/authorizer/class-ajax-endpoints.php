@@ -178,6 +178,7 @@ class Ajax_Endpoints extends Singleton {
 			'google_hosteddomain',
 			'cas',
 			'cas_auto_login',
+			'cas_num_servers',
 			'cas_custom_label',
 			'cas_host',
 			'cas_port',
@@ -211,6 +212,24 @@ class Ajax_Endpoints extends Singleton {
 			'advanced_users_sort_order',
 			'advanced_widget_enabled',
 		);
+		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
+			// Add options if more than one CAS server.
+			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+				array_push( $allowed, array(
+					'cas_custom_label_' . $cas_num_server,
+					'cas_host_' . $cas_num_server,
+					'cas_port_' . $cas_num_server,
+					'cas_path_' . $cas_num_server,
+					'cas_method_' . $cas_num_server,
+					'cas_version_' . $cas_num_server,
+					'cas_attr_email_' . $cas_num_server,
+					'cas_attr_first_name_' . $cas_num_server,
+					'cas_attr_last_name_' . $cas_num_server,
+					'cas_attr_update_on_login_' . $cas_num_server,
+					'cas_link_on_username_' . $cas_num_server,
+				) );
+			}
+		}
 		$auth_multisite_settings = array_intersect_key( $auth_multisite_settings, array_flip( $allowed ) );
 
 		// Update multisite settings in database.

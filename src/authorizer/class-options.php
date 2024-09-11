@@ -166,35 +166,58 @@ class Options extends Singleton {
 				 * $ms_approved_users = $options->get( 'access_users_approved', Helper::NETWORK_CONTEXT );
 				 */
 
-				// Override external services (google, cas, or ldap) and associated options.
-				$auth_settings['oauth2']                    = $auth_multisite_settings['oauth2'];
-				$auth_settings['oauth2_provider']           = $auth_multisite_settings['oauth2_provider'];
-				$auth_settings['oauth2_custom_label']       = $auth_multisite_settings['oauth2_custom_label'];
-				$auth_settings['oauth2_clientid']           = $auth_multisite_settings['oauth2_clientid'];
-				$auth_settings['oauth2_clientsecret']       = $auth_multisite_settings['oauth2_clientsecret'];
-				$auth_settings['oauth2_hosteddomain']       = $auth_multisite_settings['oauth2_hosteddomain'];
-				$auth_settings['oauth2_tenant_id']          = $auth_multisite_settings['oauth2_tenant_id'];
-				$auth_settings['oauth2_url_authorize']      = $auth_multisite_settings['oauth2_url_authorize'];
-				$auth_settings['oauth2_url_token']          = $auth_multisite_settings['oauth2_url_token'];
-				$auth_settings['oauth2_url_resource']       = $auth_multisite_settings['oauth2_url_resource'];
-				$auth_settings['oauth2_auto_login']         = $auth_multisite_settings['oauth2_auto_login'] ?? '';
-				$auth_settings['google']                    = $auth_multisite_settings['google'];
-				$auth_settings['google_clientid']           = $auth_multisite_settings['google_clientid'];
-				$auth_settings['google_clientsecret']       = $auth_multisite_settings['google_clientsecret'];
-				$auth_settings['google_hosteddomain']       = $auth_multisite_settings['google_hosteddomain'];
-				$auth_settings['cas']                       = $auth_multisite_settings['cas'];
-				$auth_settings['cas_auto_login']            = $auth_multisite_settings['cas_auto_login'];
-				$auth_settings['cas_custom_label']          = $auth_multisite_settings['cas_custom_label'];
-				$auth_settings['cas_host']                  = $auth_multisite_settings['cas_host'];
-				$auth_settings['cas_port']                  = $auth_multisite_settings['cas_port'];
-				$auth_settings['cas_path']                  = $auth_multisite_settings['cas_path'];
-				$auth_settings['cas_method']                = $auth_multisite_settings['cas_method'];
-				$auth_settings['cas_version']               = $auth_multisite_settings['cas_version'];
-				$auth_settings['cas_attr_email']            = $auth_multisite_settings['cas_attr_email'];
-				$auth_settings['cas_attr_first_name']       = $auth_multisite_settings['cas_attr_first_name'];
-				$auth_settings['cas_attr_last_name']        = $auth_multisite_settings['cas_attr_last_name'];
-				$auth_settings['cas_attr_update_on_login']  = $auth_multisite_settings['cas_attr_update_on_login'];
-				$auth_settings['cas_link_on_username']      = $auth_multisite_settings['cas_link_on_username'];
+				// Override external service (Oauth2) and associated options.
+				$auth_settings['oauth2']               = $auth_multisite_settings['oauth2'];
+				$auth_settings['oauth2_provider']      = $auth_multisite_settings['oauth2_provider'];
+				$auth_settings['oauth2_custom_label']  = $auth_multisite_settings['oauth2_custom_label'];
+				$auth_settings['oauth2_clientid']      = $auth_multisite_settings['oauth2_clientid'];
+				$auth_settings['oauth2_clientsecret']  = $auth_multisite_settings['oauth2_clientsecret'];
+				$auth_settings['oauth2_hosteddomain']  = $auth_multisite_settings['oauth2_hosteddomain'];
+				$auth_settings['oauth2_tenant_id']     = $auth_multisite_settings['oauth2_tenant_id'];
+				$auth_settings['oauth2_url_authorize'] = $auth_multisite_settings['oauth2_url_authorize'];
+				$auth_settings['oauth2_url_token']     = $auth_multisite_settings['oauth2_url_token'];
+				$auth_settings['oauth2_url_resource']  = $auth_multisite_settings['oauth2_url_resource'];
+				$auth_settings['oauth2_auto_login']    = $auth_multisite_settings['oauth2_auto_login'] ?? '';
+
+				// Override external service (Google) and associated options.
+				$auth_settings['google']              = $auth_multisite_settings['google'];
+				$auth_settings['google_clientid']     = $auth_multisite_settings['google_clientid'];
+				$auth_settings['google_clientsecret'] = $auth_multisite_settings['google_clientsecret'];
+				$auth_settings['google_hosteddomain'] = $auth_multisite_settings['google_hosteddomain'];
+
+				// Override external service (CAS) and associated options.
+				$auth_settings['cas']                      = $auth_multisite_settings['cas'];
+				$auth_settings['cas_auto_login']           = $auth_multisite_settings['cas_auto_login'];
+				$auth_settings['cas_num_servers']          = $auth_multisite_settings['cas_num_servers'];
+				$auth_settings['cas_custom_label']         = $auth_multisite_settings['cas_custom_label'];
+				$auth_settings['cas_host']                 = $auth_multisite_settings['cas_host'];
+				$auth_settings['cas_port']                 = $auth_multisite_settings['cas_port'];
+				$auth_settings['cas_path']                 = $auth_multisite_settings['cas_path'];
+				$auth_settings['cas_method']               = $auth_multisite_settings['cas_method'];
+				$auth_settings['cas_version']              = $auth_multisite_settings['cas_version'];
+				$auth_settings['cas_attr_email']           = $auth_multisite_settings['cas_attr_email'];
+				$auth_settings['cas_attr_first_name']      = $auth_multisite_settings['cas_attr_first_name'];
+				$auth_settings['cas_attr_last_name']       = $auth_multisite_settings['cas_attr_last_name'];
+				$auth_settings['cas_attr_update_on_login'] = $auth_multisite_settings['cas_attr_update_on_login'];
+				$auth_settings['cas_link_on_username']     = $auth_multisite_settings['cas_link_on_username'];
+				// Add any options for extra CAS servers.
+				if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
+					foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+						$auth_settings[ 'cas_custom_label_' . $cas_num_server ]         = $auth_multisite_settings[ 'cas_custom_label_' . $cas_num_server ] ?? 'CAS';
+						$auth_settings[ 'cas_host_' . $cas_num_server ]                 = $auth_multisite_settings[ 'cas_host_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_port_' . $cas_num_server ]                 = $auth_multisite_settings[ 'cas_port_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_path_' . $cas_num_server ]                 = $auth_multisite_settings[ 'cas_path_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_method_' . $cas_num_server ]               = $auth_multisite_settings[ 'cas_method_' . $cas_num_server ] ?? Options\External\Cas::get_instance()->sanitize_cas_method();
+						$auth_settings[ 'cas_version_' . $cas_num_server ]              = $auth_multisite_settings[ 'cas_version_' . $cas_num_server ] ?? Options\External\Cas::get_instance()->sanitize_cas_version();
+						$auth_settings[ 'cas_attr_email_' . $cas_num_server ]           = $auth_multisite_settings[ 'cas_attr_email_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_attr_first_name_' . $cas_num_server ]      = $auth_multisite_settings[ 'cas_attr_first_name_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_attr_last_name_' . $cas_num_server ]       = $auth_multisite_settings[ 'cas_attr_last_name_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] = $auth_multisite_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] ?? '';
+						$auth_settings[ 'cas_link_on_username_' . $cas_num_server ]     = $auth_multisite_settings[ 'cas_link_on_username_' . $cas_num_server ] ?? '';
+					}
+				}
+
+				// Override external service (LDAP) and associated options.
 				$auth_settings['ldap']                      = $auth_multisite_settings['ldap'];
 				$auth_settings['ldap_host']                 = $auth_multisite_settings['ldap_host'];
 				$auth_settings['ldap_port']                 = $auth_multisite_settings['ldap_port'];
@@ -405,6 +428,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
 			$auth_settings['cas_auto_login'] = '';
 		}
+		if ( ! array_key_exists( 'cas_num_servers', $auth_settings ) ) {
+			$auth_settings['cas_num_servers'] = '1';
+		}
 		if ( ! array_key_exists( 'cas_custom_label', $auth_settings ) ) {
 			$auth_settings['cas_custom_label'] = 'CAS';
 		}
@@ -437,6 +463,43 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'cas_link_on_username', $auth_settings ) ) {
 			$auth_settings['cas_link_on_username'] = '';
+		}
+		if ( intval( $auth_settings['cas_num_servers'] ) > 1 ) {
+			foreach ( range( 2, min( intval( $auth_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+				if ( ! array_key_exists( 'cas_custom_label_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_custom_label_' . $cas_num_server ] = 'CAS';
+				}
+				if ( ! array_key_exists( 'cas_host_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_host_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_port_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_port_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_path_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_path_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_method_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_method_' . $cas_num_server ] = Options\External\Cas::get_instance()->sanitize_cas_method();
+				}
+				if ( ! array_key_exists( 'cas_version_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_version_' . $cas_num_server ] = Options\External\Cas::get_instance()->sanitize_cas_version();
+				}
+				if ( ! array_key_exists( 'cas_attr_email_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_attr_email_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_attr_first_name_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_attr_first_name_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_attr_last_name_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_attr_last_name_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_attr_update_on_login_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'cas_link_on_username_' . $cas_num_server, $auth_settings ) ) {
+					$auth_settings[ 'cas_link_on_username_' . $cas_num_server ] = '';
+				}
+			}
 		}
 
 		if ( ! array_key_exists( 'ldap_host', $auth_settings ) ) {
@@ -623,6 +686,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'cas_auto_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_auto_login'] = '';
 			}
+			if ( ! array_key_exists( 'cas_num_servers', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['cas_num_servers'] = '1';
+			}
 			if ( ! array_key_exists( 'cas_custom_label', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_custom_label'] = 'CAS';
 			}
@@ -655,6 +721,43 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'cas_link_on_username', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['cas_link_on_username'] = '';
+			}
+			if ( intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
+				foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+					if ( ! array_key_exists( 'cas_custom_label_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_custom_label_' . $cas_num_server ] = 'CAS';
+					}
+					if ( ! array_key_exists( 'cas_host_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_host_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_port_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_port_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_path_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_path_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_method_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_method_' . $cas_num_server ] = Options\External\Cas::get_instance()->sanitize_cas_method();
+					}
+					if ( ! array_key_exists( 'cas_version_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_version_' . $cas_num_server ] = Options\External\Cas::get_instance()->sanitize_cas_version();
+					}
+					if ( ! array_key_exists( 'cas_attr_email_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_attr_email_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_attr_first_name_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_attr_first_name_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_attr_last_name_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_attr_last_name_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_attr_update_on_login_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'cas_link_on_username_' . $cas_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'cas_link_on_username_' . $cas_num_server ] = '';
+					}
+				}
 			}
 			if ( ! array_key_exists( 'ldap_host', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap_host'] = '';
@@ -802,8 +905,14 @@ class Options extends Singleton {
 		// Sanitize Enable CAS Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas'] = array_key_exists( 'cas', $auth_settings ) && strlen( $auth_settings['cas'] ) > 0 ? '1' : '';
 
-		// Sanitize CAS auto-login (checkbox: value can only be '1' or empty string).
-		$auth_settings['cas_auto_login'] = array_key_exists( 'cas_auto_login', $auth_settings ) && strlen( $auth_settings['cas_auto_login'] ) > 0 ? '1' : '';
+		// Sanitize CAS auto-login (select: value can be between '1' and '10' or empty string).
+		if ( ! isset( $auth_settings['cas_auto_login'] ) || ! in_array( $auth_settings['cas_auto_login'], array( '', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' ), true ) ) {
+			$auth_settings['cas_auto_login'] = '';
+		}
+
+		// Sanitize CAS number of servers (range: value can only be '1' to '10').
+		$auth_settings['cas_num_servers'] = filter_var( $auth_settings['cas_num_servers'], FILTER_SANITIZE_NUMBER_INT );
+		$auth_settings['cas_num_servers'] = intval( $auth_settings['cas_num_servers'] ) < 1 || intval( $auth_settings['cas_num_servers'] ) > 10 ? '1' : $auth_settings['cas_num_servers'];
 
 		// Sanitize CAS Host setting.
 		$auth_settings['cas_host'] = filter_var( $auth_settings['cas_host'], FILTER_SANITIZE_URL );
@@ -818,6 +927,25 @@ class Options extends Singleton {
 
 		// Sanitize CAS link on username (checkbox: value can only be '1' or empty string).
 		$auth_settings['cas_link_on_username'] = array_key_exists( 'cas_link_on_username', $auth_settings ) && strlen( $auth_settings['cas_link_on_username'] ) > 0 ? '1' : '';
+
+		// Sanitize settings for any additional CAS servers.
+		if ( intval( $auth_settings['cas_num_servers'] ) > 1 ) {
+			foreach ( range( 2, min( intval( $auth_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+				// Sanitize CAS Host setting.
+				$auth_settings[ 'cas_host_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_host_' . $cas_num_server ], FILTER_SANITIZE_URL );
+
+				// Sanitize CAS Port (int).
+				$auth_settings[ 'cas_port_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_port_' . $cas_num_server ], FILTER_SANITIZE_NUMBER_INT );
+
+				// Sanitize CAS attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+				if ( ! isset( $auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] ) || ! in_array( $auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ], array( '', '1', 'update-if-empty' ), true ) ) {
+					$auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] = '';
+				}
+
+				// Sanitize CAS link on username (checkbox: value can only be '1' or empty string).
+				$auth_settings[ 'cas_link_on_username_' . $cas_num_server ] = array_key_exists( 'cas_link_on_username_' . $cas_num_server, $auth_settings ) && strlen( $auth_settings[ 'cas_link_on_username_' . $cas_num_server ] ) > 0 ? '1' : '';
+			}
+		}
 
 		// Sanitize Enable LDAP Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['ldap'] = array_key_exists( 'ldap', $auth_settings ) && strlen( $auth_settings['ldap'] ) > 0 ? '1' : '';
