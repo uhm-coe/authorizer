@@ -1004,7 +1004,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'CAS server(s)', 'authorizer' ); ?></th>
 							<td><?php $cas->print_number_cas_num_servers( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-						<?php $cas_num_servers = max( 1, min( 10, intval( $auth_settings['cas_num_servers'] ) ) ); ?>
+						<?php $cas_num_servers = max( 1, min( 10, intval( $auth_settings['cas_num_servers'] ?? 1 ) ) ); ?>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS automatic login', 'authorizer' ); ?></th>
 							<td><?php $cas->print_select_cas_auto_login( array( 'context' => Helper::NETWORK_CONTEXT, 'cas_num_servers' => $cas_num_servers ) ); ?></td>

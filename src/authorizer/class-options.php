@@ -188,7 +188,7 @@ class Options extends Singleton {
 				// Override external service (CAS) and associated options.
 				$auth_settings['cas']                      = $auth_multisite_settings['cas'];
 				$auth_settings['cas_auto_login']           = $auth_multisite_settings['cas_auto_login'];
-				$auth_settings['cas_num_servers']          = $auth_multisite_settings['cas_num_servers'];
+				$auth_settings['cas_num_servers']          = $auth_multisite_settings['cas_num_servers'] ?? 1;
 				$auth_settings['cas_custom_label']         = $auth_multisite_settings['cas_custom_label'];
 				$auth_settings['cas_host']                 = $auth_multisite_settings['cas_host'];
 				$auth_settings['cas_port']                 = $auth_multisite_settings['cas_port'];
@@ -932,10 +932,10 @@ class Options extends Singleton {
 		if ( intval( $auth_settings['cas_num_servers'] ) > 1 ) {
 			foreach ( range( 2, min( intval( $auth_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
 				// Sanitize CAS Host setting.
-				$auth_settings[ 'cas_host_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_host_' . $cas_num_server ], FILTER_SANITIZE_URL );
+				$auth_settings[ 'cas_host_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_host_' . $cas_num_server ] ?? '', FILTER_SANITIZE_URL );
 
 				// Sanitize CAS Port (int).
-				$auth_settings[ 'cas_port_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_port_' . $cas_num_server ], FILTER_SANITIZE_NUMBER_INT );
+				$auth_settings[ 'cas_port_' . $cas_num_server ] = filter_var( $auth_settings[ 'cas_port_' . $cas_num_server ] ?? '', FILTER_SANITIZE_NUMBER_INT );
 
 				// Sanitize CAS attribute update (select: value can only be 'update-if-empty', '1', or empty string).
 				if ( ! isset( $auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ] ) || ! in_array( $auth_settings[ 'cas_attr_update_on_login_' . $cas_num_server ], array( '', '1', 'update-if-empty' ), true ) ) {
