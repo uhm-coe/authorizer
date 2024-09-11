@@ -1164,7 +1164,7 @@
 		params.cas_attr_update_on_login = $( '#auth_settings_cas_attr_update_on_login' ).val();
 		params.cas_link_on_username = $( '#auth_settings_cas_link_on_username' ).is( ':checked' ) ? '1' : '';
 		if ( params.cas_num_servers > 1 ) {
-			for ( var cas_num_server = 2; cas_num_server < params.cas_num_servers && cas_num_server <= 10; cas_num_server++ ) {
+			for ( var cas_num_server = 2; cas_num_server <= params.cas_num_servers && cas_num_server <= 10; cas_num_server++ ) {
 				params['cas_custom_label_' + cas_num_server] = $( '#auth_settings_cas_custom_label_' + cas_num_server ).val();
 				params['cas_host_' + cas_num_server] = $( '#auth_settings_cas_host_' + cas_num_server ).val();
 				params['cas_port_' + cas_num_server] = $( '#auth_settings_cas_port_' + cas_num_server ).val();
