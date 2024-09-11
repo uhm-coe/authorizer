@@ -527,7 +527,7 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
-		$cas_num_servers = max( 1, min( 10, intval( Options::get_instance()->get( 'cas_num_servers' ) ) ) );
+		$cas_num_servers = max( 1, min( 10, intval( Options::get_instance()->get( 'cas_num_servers', Helper::SINGLE_CONTEXT, 'allow override' ) ) ) );
 		add_settings_field(
 			'auth_settings_cas_auto_login',
 			__( 'CAS automatic login', 'authorizer' ),
