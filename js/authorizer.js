@@ -807,13 +807,14 @@
 	window.hideMultisiteOverriddenOptions = function() {
 		$( '.auth_multisite_override_overlay' ).each( function() {
 			// Option to hide is stored in the overlay's id with 'overlay-hide-' prefix.
-			var optionContainerToHide = $( this ).closest( 'tr' );
+			var optionContainerToHide = $( this ).closest( 'td' );
 			if ( optionContainerToHide.length > 0 ) {
 				$( this ).css({
 					'background-color': '#f1f1f1',
 					'z-index': 1,
 					opacity: 0.8,
 					position: 'absolute',
+					top: optionContainerToHide.css('padding-top'),
 					width: '100%',
 					height: optionContainerToHide.height(),
 				});
