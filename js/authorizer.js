@@ -208,7 +208,7 @@
 					var duplicateEmail = response.invalid_emails[i];
 					$( 'li.new-user .auth-email[value="' + duplicateEmail + '"]' )
 						.siblings( '.spinner' ).addClass( 'duplicate' ).append( '<span class="spinner-text"><span class="attention">' + authL10n.duplicate + '.</span></span>' )
-						.parent().fadeOut( spinnerWait, function() { $( this ).remove(); }); // jshint ignore:line
+						.parent().fadeOut( 2000, function() { $( this ).remove(); }); // jshint ignore:line
 				}
 			}
 
