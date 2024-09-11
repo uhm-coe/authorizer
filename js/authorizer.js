@@ -1219,6 +1219,12 @@
 
 			// Disable wait cursor.
 			$( 'html' ).removeClass( 'busy' );
+
+			// If the save was successful, and we have more than 1 CAS servers configured,
+			// reload the page to render the additional CAS server settings fields.
+			if ( succeeded && parseInt( params.cas_num_servers ) > 1 ) {
+				location.reload();
+			}
 		}).fail( function() {
 			// Fail fires if the server doesn't respond
 			var succeeded = false;
