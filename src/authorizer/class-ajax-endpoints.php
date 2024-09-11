@@ -215,7 +215,7 @@ class Ajax_Endpoints extends Singleton {
 		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
 			// Add options if more than one CAS server.
 			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
-				array_push( $allowed, array(
+				$allowed = array_merge( $allowed, array(
 					'cas_custom_label_' . $cas_num_server,
 					'cas_host_' . $cas_num_server,
 					'cas_port_' . $cas_num_server,
