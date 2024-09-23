@@ -521,6 +521,15 @@ class Authentication extends Singleton {
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
+				/**
+				 * Filter the azure oauth2 authenticated user email.
+				 *
+				 * @param  string $email      Discovered email (or empty string).
+				 *
+				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 */
+				$email = apply_filters( 'authorizer_oauth2_azure_authenticated_email', $email, $attributes );
+
 				// Set the username to the email prefix (if we don't have one).
 				if ( ! empty( $email ) && empty( $username ) ) {
 					if ( is_array( $email ) && ! empty( $email[0] ) ) {
