@@ -292,7 +292,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" class="wide" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  https://example.edu/login/oauth/authorize', 'authorizer' ); ?></p>
 		<?php
 	}
@@ -312,7 +312,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" class="wide" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  https://example.edu/login/oauth/access_token', 'authorizer' ); ?></p>
 		<?php
 	}
@@ -332,7 +332,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" class="wide" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  https://api.example.edu/user', 'authorizer' ); ?></p>
 		<?php
 	}
