@@ -60,16 +60,55 @@ class Cas extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
-	public function print_checkbox_cas_auto_login( $args = '' ) {
+	public function print_select_cas_auto_login( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
 		$option               = 'cas_auto_login';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$cas_num_servers      = max( 1, min( 10, intval( $args['cas_num_servers'] ?? 1 ) ) );
 
 		// Print option elements.
 		?>
-		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?></label>
-		<p class="description"><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></p>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<option value="" <?php selected( $auth_settings_option, '' ); ?>><?php echo esc_html_e( 'Off' ); ?></option>
+			<?php foreach ( range( 1, $cas_num_servers ) as $server_num ) : ?>
+					<option value="<?php echo esc_attr( $server_num ); ?>" <?php selected( $auth_settings_option, strval( $server_num ) ); ?>>
+						<?php
+						echo esc_html( sprintf(
+							/* TRANSLATORS: CAS server number */
+							__( 'Immediately redirect to CAS server #%s', 'authorizer' ),
+							strval( $server_num )
+						) );
+						?>
+					</option>
+			<?php endforeach; ?>
+		</select>
+		<p class="description">
+			<?php esc_html_e( "Immediately redirect to CAS login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?>
+			<br>
+			<small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if CAS is the only enabled service (i.e., no Google or LDAP). If you have enabled CAS Single Sign-On (SSO), and a user has already logged into CAS elsewhere, enabling this feature will allow automatic logins without any user interaction.', 'authorizer' ); ?></small>
+		</p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_number_cas_num_servers( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'cas_num_servers';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$auth_settings_option = max( 1, min( 10, intval( $auth_settings_option ) ) );
+
+		// Print option elements.
+		?>
+		<input type="number" min="1" max="10" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<p class="description"><?php esc_html_e( 'Note: Save changes after increasing this value to see the options for additional CAS servers below.', 'authorizer' ); ?></p>
 		<?php
 	}
 
@@ -83,7 +122,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_custom_label( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_custom_label';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_custom_label' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -103,7 +143,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_host( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_host';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_host' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -123,7 +164,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_port( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_port';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_port' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -143,7 +185,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_path( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_path';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_path' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -163,7 +206,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_select_cas_method( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_method';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_method' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 		$auth_settings_option = $this->sanitize_cas_method( $auth_settings_option );
 		$select_options       = array(
@@ -192,7 +236,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_select_cas_version( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_version';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_version' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 		$auth_settings_option = $this->sanitize_cas_version( $auth_settings_option );
 
@@ -290,7 +335,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_attr_email( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_attr_email';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_attr_email' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -314,7 +360,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_attr_first_name( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_attr_first_name';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_attr_first_name' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -334,7 +381,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_text_cas_attr_last_name( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_attr_last_name';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_attr_last_name' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -354,7 +402,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_select_cas_attr_update_on_login( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_attr_update_on_login';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_attr_update_on_login' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 		$values               = array(
 			''                => __( 'Do not update first and last name fields on login', 'authorizer' ),
@@ -382,7 +431,8 @@ class Cas extends \Authorizer\Singleton {
 	public function print_checkbox_cas_link_on_username( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'cas_link_on_username';
+		$suffix               = empty( $args['cas_num_server'] ) || 1 === $args['cas_num_server'] ? '' : '_' . $args['cas_num_server'];
+		$option               = 'cas_link_on_username' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.

@@ -336,6 +336,19 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_ID' ) ) {
+			$auth_settings['oauth2_clientid'] = \AUTHORIZER_OAUTH2_CLIENT_ID;
+		}
+		/**
+		 * Filters the Oauth2 Client ID used by Authorizer to authenticate.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @param string $oauth2_client_id  The stored Oauth2 Client ID.
+		 */
+		$auth_settings['oauth2_clientid'] = apply_filters( 'authorizer_oauth2_client_id', $auth_settings['oauth2_clientid'] );
+
 		// Fetch the Oauth2 Client Secret (allow overrides from filter or constant).
 		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
 			$auth_settings['oauth2_clientsecret'] = \AUTHORIZER_OAUTH2_CLIENT_SECRET;
@@ -714,6 +727,19 @@ class Authentication extends Singleton {
 			return null;
 		}
 
+		// Fetch the Google Client ID (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
+			$auth_settings['google_clientid'] = \AUTHORIZER_GOOGLE_CLIENT_ID;
+		}
+		/**
+		 * Filters the Google Client ID used by Authorizer to authenticate.
+		 *
+		 * @since 3.9.0
+		 *
+		 * @param string $google_client_id  The stored Google Client ID.
+		 */
+		$auth_settings['google_clientid'] = apply_filters( 'authorizer_google_client_id', $auth_settings['google_clientid'] );
+
 		// Fetch the Google Client Secret (allow overrides from filter or constant).
 		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
 			$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
@@ -730,8 +756,8 @@ class Authentication extends Singleton {
 		// Build the Google Client.
 		$client = new \Google_Client();
 		$client->setApplicationName( 'WordPress' );
-		$client->setClientId( $auth_settings['google_clientid'] );
-		$client->setClientSecret( $auth_settings['google_clientsecret'] );
+		$client->setClientId( trim( $auth_settings['google_clientid'] ) );
+		$client->setClientSecret( trim( $auth_settings['google_clientsecret'] ) );
 		$client->setRedirectUri( 'postmessage' );
 
 		/**
@@ -815,18 +841,31 @@ class Authentication extends Singleton {
 	 *                              object on failure, or null if not attempting a CAS login.
 	 */
 	protected function custom_authenticate_cas( $auth_settings ) {
-		// Move on if CAS hasn't been requested here.
+		// Move on if CAS hasn't been requested here or the CAS server ID is invalid.
 		// phpcs:ignore WordPress.Security.NonceVerification
-		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] ) {
+		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 10 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['cas_num_servers'] ) ) {
 			return null;
 		}
+		// Get the CAS server id (since multiple CAS servers can be configured), and
+		// the relevant CAS settings for that server.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$cas_server_id       = intval( $_GET['id'] );
+		$suffix              = $cas_server_id > 1 ? '_' . $cas_server_id : '';
+		$cas_host            = $auth_settings[ 'cas_host' . $suffix ];
+		$cas_port            = $auth_settings[ 'cas_port' . $suffix ];
+		$cas_path            = $auth_settings[ 'cas_path' . $suffix ];
+		$cas_method          = $auth_settings[ 'cas_method' . $suffix ];
+		$cas_version         = $auth_settings[ 'cas_version' . $suffix ];
+		$cas_attr_email      = $auth_settings[ 'cas_attr_email' . $suffix ];
+		$cas_attr_first_name = $auth_settings[ 'cas_attr_first_name' . $suffix ];
+		$cas_attr_last_name  = $auth_settings[ 'cas_attr_last_name' . $suffix ];
 
 		/**
 		 * Get the CAS server protocol version (default to SAML 1.1).
 		 *
 		 * @see: https://apereo.github.io/phpCAS/api/group__public.html#gadea9415f40b8d2afc39f140c9be83bbe
 		 */
-		$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $auth_settings['cas_version'] );
+		$cas_version = Options\External\Cas::get_instance()->sanitize_cas_version( $cas_version );
 
 		/**
 		 * Get valid service URLs for the CAS client to validate against.
@@ -836,10 +875,10 @@ class Authentication extends Singleton {
 		$valid_base_urls = Options\External\Cas::get_instance()->get_valid_cas_service_urls();
 
 		// Set the CAS client configuration.
-		if ( 'PROXY' === strtoupper( $auth_settings['cas_method'] ) ) {
-			\phpCAS::proxy( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
+		if ( 'PROXY' === strtoupper( $cas_method ) ) {
+			\phpCAS::proxy( $cas_version, $cas_host, intval( $cas_port ), $cas_path, $valid_base_urls );
 		} else {
-			\phpCAS::client( $cas_version, $auth_settings['cas_host'], intval( $auth_settings['cas_port'] ), $auth_settings['cas_path'], $valid_base_urls );
+			\phpCAS::client( $cas_version, $cas_host, intval( $cas_port ), $cas_path, $valid_base_urls );
 		}
 
 		// Allow redirects at the CAS server endpoint (e.g., allow connections
@@ -850,7 +889,7 @@ class Authentication extends Singleton {
 		\phpCAS::setCasServerCACert( ABSPATH . WPINC . '/certificates/ca-bundle.crt' );
 
 		// Set the CAS service URL (including the redirect URL for WordPress when it comes back from CAS).
-		$cas_service_url   = site_url( '/wp-login.php?external=cas' );
+		$cas_service_url   = site_url( '/wp-login.php?external=cas&id=' . $cas_server_id );
 		$login_querystring = array();
 		if ( isset( $_SERVER['QUERY_STRING'] ) ) {
 			parse_str( $_SERVER['QUERY_STRING'], $login_querystring ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -886,7 +925,7 @@ class Authentication extends Singleton {
 			// If we can't get the user's email address from a CAS attribute,
 			// try to guess the domain from the CAS server hostname. This will only
 			// be used if we can't discover the email address from CAS attributes.
-			$domain_guess                   = preg_match( '/[^.]*\.[^.]*$/', $auth_settings['cas_host'], $matches ) === 1 ? $matches[0] : '';
+			$domain_guess                   = preg_match( '/[^.]*\.[^.]*$/', $cas_host, $matches ) === 1 ? $matches[0] : '';
 			$externally_authenticated_email = Helper::lowercase( $username ) . '@' . $domain_guess;
 		}
 
@@ -894,55 +933,55 @@ class Authentication extends Singleton {
 		$cas_attributes = \phpCAS::getAttributes();
 
 		// Get user email if it is specified in another field.
-		if ( array_key_exists( 'cas_attr_email', $auth_settings ) && strlen( $auth_settings['cas_attr_email'] ) > 0 ) {
+		if ( ! empty( $cas_attr_email ) ) {
 			// If the email attribute starts with an at symbol (@), assume that the
 			// email domain is manually entered there (instead of a reference to a
 			// CAS attribute), and combine that with the username to create the email.
 			// Otherwise, look up the CAS attribute for email.
-			if ( substr( $auth_settings['cas_attr_email'], 0, 1 ) === '@' ) {
-				$externally_authenticated_email = Helper::lowercase( $username . $auth_settings['cas_attr_email'] );
+			if ( substr( $cas_attr_email, 0, 1 ) === '@' ) {
+				$externally_authenticated_email = Helper::lowercase( $username . $cas_attr_email );
 			} elseif (
 				// If a CAS attribute has been specified as containing the email address, use that instead.
 				// Email attribute can be a string or an array of strings.
-				array_key_exists( $auth_settings['cas_attr_email'], $cas_attributes ) && (
+				array_key_exists( $cas_attr_email, $cas_attributes ) && (
 					(
-						is_array( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) &&
-						count( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) > 0
+						is_array( $cas_attributes[ $cas_attr_email ] ) &&
+						count( $cas_attributes[ $cas_attr_email ] ) > 0
 					) || (
-						is_string( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) &&
-						strlen( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) > 0
+						is_string( $cas_attributes[ $cas_attr_email ] ) &&
+						strlen( $cas_attributes[ $cas_attr_email ] ) > 0
 					)
 				)
 			) {
 				// Each of the emails in the array needs to be set to lowercase.
-				if ( is_array( $cas_attributes[ $auth_settings['cas_attr_email'] ] ) ) {
+				if ( is_array( $cas_attributes[ $cas_attr_email ] ) ) {
 					$externally_authenticated_email = array();
-					foreach ( $cas_attributes[ $auth_settings['cas_attr_email'] ] as $external_email ) {
+					foreach ( $cas_attributes[ $cas_attr_email ] as $external_email ) {
 						$externally_authenticated_email[] = Helper::lowercase( $external_email );
 					}
 				} else {
-					$externally_authenticated_email = Helper::lowercase( $cas_attributes[ $auth_settings['cas_attr_email'] ] );
+					$externally_authenticated_email = Helper::lowercase( $cas_attributes[ $cas_attr_email ] );
 				}
 			}
 		}
 
 		// Get user first name (handle string or array results from CAS attribute).
 		$first_name = '';
-		if ( ! empty( $auth_settings['cas_attr_first_name'] ) && ! empty( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
-			if ( is_string( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
-				$first_name = $cas_attributes[ $auth_settings['cas_attr_first_name'] ];
-			} elseif ( is_array( $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) ) {
-				$first_name = trim( implode( ' ', $cas_attributes[ $auth_settings['cas_attr_first_name'] ] ) );
+		if ( ! empty( $cas_attr_first_name ) && ! empty( $cas_attributes[ $cas_attr_first_name ] ) ) {
+			if ( is_string( $cas_attributes[ $cas_attr_first_name ] ) ) {
+				$first_name = $cas_attributes[ $cas_attr_first_name ];
+			} elseif ( is_array( $cas_attributes[ $cas_attr_first_name ] ) ) {
+				$first_name = trim( implode( ' ', $cas_attributes[ $cas_attr_first_name ] ) );
 			}
 		}
 
 		// Get user last name (handle string or array results from CAS attribute).
 		$last_name = '';
-		if ( ! empty( $auth_settings['cas_attr_last_name'] ) && ! empty( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
-			if ( is_string( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
-				$last_name = $cas_attributes[ $auth_settings['cas_attr_last_name'] ];
-			} elseif ( is_array( $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) ) {
-				$last_name = trim( implode( ' ', $cas_attributes[ $auth_settings['cas_attr_last_name'] ] ) );
+		if ( ! empty( $cas_attr_last_name ) && ! empty( $cas_attributes[ $cas_attr_last_name ] ) ) {
+			if ( is_string( $cas_attributes[ $cas_attr_last_name ] ) ) {
+				$last_name = $cas_attributes[ $cas_attr_last_name ];
+			} elseif ( is_array( $cas_attributes[ $cas_attr_last_name ] ) ) {
+				$last_name = trim( implode( ' ', $cas_attributes[ $cas_attr_last_name ] ) );
 			}
 		}
 
@@ -1088,11 +1127,15 @@ class Authentication extends Singleton {
 		// Attempt each LDAP host until we have a valid connection.
 		$ldap_valid = false;
 		foreach ( $ldap_hosts as $ldap_host ) {
-			// Construct LDAP connection parameters. ldap_connect() takes either a
-			// hostname or a full LDAP URI as its first parameter (works with OpenLDAP
-			// 2.x.x or later). If it's an LDAP URI, the second parameter, $port, is
-			// ignored, and port must be specified in the full URI. An LDAP URI is of
-			// the form ldap://hostname:port or ldaps://hostname:port.
+			// Construct LDAP connection parameters. In PHP < 8.3, ldap_connect()
+			// takes either a hostname or a full LDAP URI as its first parameter
+			// (works with OpenLDAP 2.x.x or later). If it's an LDAP URI, the second
+			// parameter, $port, is ignored, and port must be specified in the full
+			// URI. An LDAP URI is of the form ldap://hostname:port or
+			// ldaps://hostname:port.
+			// In PHP 8.3, ldap_connect() only takes a single param (the signature
+			// with 2 params is deprecated). We thus convert all LDAP hosts to a full
+			// LDAP URI, defaulting to ldap:// if the full URI isn't provided.
 			$ldap_port   = intval( $auth_settings['ldap_port'] );
 			$parsed_host = wp_parse_url( $ldap_host );
 
@@ -1112,10 +1155,13 @@ class Authentication extends Singleton {
 					$parsed_host['port'] = $ldap_port;
 				}
 				$ldap_host = Helper::build_url( $parsed_host );
+			} else {
+				// Construct the LDAP URI from the provided host and port.
+				$ldap_host = 'ldap://' . $ldap_host . ':' . $ldap_port;
 			}
 
 			// Create LDAP connection.
-			$ldap = ldap_connect( $ldap_host, $ldap_port );
+			$ldap = ldap_connect( $ldap_host );
 			ldap_set_option( $ldap, LDAP_OPT_PROTOCOL_VERSION, 3 );
 			ldap_set_option( $ldap, LDAP_OPT_REFERRALS, 0 );
 
@@ -1490,6 +1536,19 @@ class Authentication extends Singleton {
 		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
 			$token = $_SESSION['token'];
 
+			// Fetch the Google Client ID (allow overrides from filter or constant).
+			if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
+				$auth_settings['google_clientid'] = \AUTHORIZER_GOOGLE_CLIENT_ID;
+			}
+			/**
+			 * Filters the Google Client ID used by Authorizer to authenticate.
+			 *
+			 * @since 3.9.0
+			 *
+			 * @param string $google_client_id  The stored Google Client ID.
+			 */
+			$auth_settings['google_clientid'] = apply_filters( 'authorizer_google_client_id', $auth_settings['google_clientid'] );
+
 			// Fetch the Google Client Secret (allow overrides from filter or constant).
 			if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
 				$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
@@ -1506,8 +1565,8 @@ class Authentication extends Singleton {
 			// Build the Google Client.
 			$client = new \Google_Client();
 			$client->setApplicationName( 'WordPress' );
-			$client->setClientId( $auth_settings['google_clientid'] );
-			$client->setClientSecret( $auth_settings['google_clientsecret'] );
+			$client->setClientId( trim( $auth_settings['google_clientid'] ) );
+			$client->setClientSecret( trim( $auth_settings['google_clientsecret'] ) );
 			$client->setRedirectUri( 'postmessage' );
 
 			// Revoke the token.

@@ -138,6 +138,44 @@ class OAuth2 extends \Authorizer\Singleton {
 				<li><a href="<?php echo esc_attr( $provider_data['instructions_url'] ); ?>" target="_blank"><?php echo esc_html( $provider_data['name'] ); ?></a></li>
 			<?php endforeach; ?>
 		</ol>
+		<?php
+		// If ID is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_oauth2_client_id' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_oauth2_client_id (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_oauth2_client_id</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_OAUTH2_CLIENT_ID' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_OAUTH2_CLIENT_ID (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
+		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
 		<p class="description"><?php esc_html_e( 'Example:  0123456789abcdef0123', 'authorizer' ); ?></p>
 		<?php
@@ -160,6 +198,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		// just print an informational message.
 		if ( has_filter( 'authorizer_oauth2_client_secret' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -175,6 +214,7 @@ class OAuth2 extends \Authorizer\Singleton {
 			return;
 		} elseif ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(

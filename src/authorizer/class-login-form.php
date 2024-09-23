@@ -187,7 +187,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			<?php if ( '1' === $auth_settings['google'] ) : ?>
 				<script src="https://accounts.google.com/gsi/client" async defer></script>
 				<div id="g_id_onload"
-					data-client_id="<?php echo esc_attr( $auth_settings['google_clientid'] ); ?>"
+					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
 					data-context="signin"
 					data-ux_mode="popup"
 					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
@@ -237,6 +237,29 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						?>
 					</span>
 				</a></p>
+				<?php
+				if ( $auth_settings['cas_num_servers'] > 1 ) :
+					for ( $i = 2; $i <= $auth_settings['cas_num_servers']; $i++ ) :
+						if ( empty( $auth_settings[ 'cas_host_' . $i ] ) ) :
+							continue;
+						endif;
+						?>
+						<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'cas', $i ) ); ?>">
+							<span class="dashicons dashicons-lock"></span>
+							<span class="label">
+								<?php
+								echo esc_html(
+									sprintf(
+										/* TRANSLATORS: %s: Custom CAS label from authorizer options */
+										__( 'Sign in with %s', 'authorizer' ),
+										$auth_settings[ 'cas_custom_label_' . $i ]
+									)
+								);
+								?>
+							</span>
+						</a></p>
+					<?php endfor; ?>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
@@ -298,14 +321,14 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		if (
 			isset( $_SERVER['QUERY_STRING'] ) &&
 			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			array_key_exists( 'cas_auto_login', $auth_settings ) && '1' === $auth_settings['cas_auto_login'] &&
+			array_key_exists( 'cas_auto_login', $auth_settings ) && in_array( intval( $auth_settings['cas_auto_login'] ), range( 1, 10 ), true ) &&
 			array_key_exists( 'cas', $auth_settings ) && '1' === $auth_settings['cas'] &&
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ), intval( $auth_settings['cas_auto_login'] ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 

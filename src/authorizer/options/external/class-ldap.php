@@ -212,6 +212,7 @@ class Ldap extends \Authorizer\Singleton {
 		// just print an informational message.
 		if ( has_filter( 'authorizer_ldap_user' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -227,6 +228,7 @@ class Ldap extends \Authorizer\Singleton {
 			return;
 		} elseif ( defined( 'AUTHORIZER_LDAP_USER' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -293,6 +295,7 @@ class Ldap extends \Authorizer\Singleton {
 		// just print an informational message.
 		if ( has_filter( 'authorizer_ldap_password' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -308,6 +311,7 @@ class Ldap extends \Authorizer\Singleton {
 			return;
 		} elseif ( defined( 'AUTHORIZER_LDAP_PASSWORD' ) ) {
 			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
 				<?php
 				echo wp_kses_post(
@@ -435,7 +439,7 @@ class Ldap extends \Authorizer\Singleton {
 		// Print option elements.
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="<?php esc_attr_e( 'username', 'authorizer' ); ?>" />
-		<input type="password" id="garbage_to_stop_autofill" name="garbage" value="" autocomplete="off" style="display:none;" />
+		<input type="password" id="garbage_to_stop_autofill_test" name="garbage" value="" autocomplete="off" style="display:none;" />
 		<input type="password" id="auth_settings_ldap_test_pass" value="" autocomplete="new-password" placeholder="<?php esc_attr_e( 'password', 'authorizer' ); ?>" />
 		<input type="button" id="<?php echo esc_attr( $option ); ?>_submit" class="button button-secondary" value="<?php esc_attr_e( 'Test', 'authorizer' ); ?>" />
 		<span class="spinner" id="<?php echo esc_attr( $option ); ?>_spinner"></span>

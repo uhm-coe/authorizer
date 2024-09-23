@@ -195,6 +195,15 @@
 			}
 		}
 	}
+
+	// Fix spinner text overlapping spinner icon and overflowing viewport boundaries.
+	.spinner:has(.spinner-text) {
+		width: auto;
+
+		.spinner-text {
+			margin-left: 24px;
+		}
+	}
 }
 
 
@@ -355,7 +364,7 @@
 			background: $color-white;
 			border: 1px solid $color-gray-30;
 			cursor: default;
-			margin: 11px 15em;
+			margin: 0 15em;
 			opacity: 0;
 			padding: 8px;
 			position: absolute;

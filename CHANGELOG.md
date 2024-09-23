@@ -1,5 +1,46 @@
 # Changelog
 
+= 3.9.1 =
+* Fix for global $wp_roles unavailable in some multisite contexts leading to a fatal error.
+* Update French translations. Props @julienlusson!
+
+= 3.9.0 =
+* Tested up to WordPress 6.6.
+* Fix ldap_connect() deprecation notice in PHP 8.3. Props @svyatoslavnetrunner for the [code](https://wordpress.org/support/topic/php8-ldap_connect-deprecation/)!
+* Trim whitespace from Google Client ID and Secret. Props @JSLittlefield for the [suggestion](https://wordpress.org/support/topic/solved-white-screen-using-google-authentication/)!
+* Allow defining Google Client ID and OAuth2 Client ID via filters (`authorizer_google_client_id` and `authorizer_oauth2_client_id`) or wp-config.php constants (`define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );` and `define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );`) to support integrations with third-party secrets managers (or simply to keep the secrets out of the database in plaintext). Client Secrets were already added in version 3.6.1, this update adds filters and constants for the Client IDs. Props @nks04747 for the [suggestion](https://wordpress.org/support/topic/storing-oauth2-client-id-in-wp-config/)!
+* Fix Google/LDAP/Oauth2 secrets fields not hiding in Authorizer Settings if overridden by a filter or constant, and the external service is disabled.
+* Fix warning about duplicate DOM IDs in Authorizer Settings.
+* Update composer dependencies: guzzlehttp/guzzle (7.8.1 => 7.9.1); guzzlehttp/promises (2.0.2 => 2.0.3); guzzlehttp/psr7 (2.6.2 => 2.7.0); monolog/monolog (2.9.2 => 2.9.3); paragonie/constant_time_encoding (v2.6.3 => v2.7.0); phpseclib/phpseclib (3.0.37 => 3.0.39); psr/http-factory (1.0.2 => 1.1.0); symfony/deprecation-contracts (v2.5.2 => v2.5.3).
+
+= 3.8.5 =
+* Fix database migrations re-running in complex multisite multi-network setups. Props @mpemburn for the research (and endurance) to discover the [root cause](https://wordpress.org/support/topic/numerous-set_default_options-calls-cause-site-to-crash/)!
+
+= 3.8.4 =
+* Update French translations. Props @julienlusson!
+* Fix TinyMCE settings fields sometimes uneditable. Props dorianborovina for the detailed [bug report](https://github.com/uhm-coe/authorizer/issues/152)!
+* Remove package-lock.json (development dependency).
+
+= 3.8.3 =
+* Disable caching on the Authorizer Settings page to reduce memory footprint. Props @timkite for the [report](https://wordpress.org/support/topic/authorizer-admin-page-using-too-much-memory/)!
+* Add zh_CN translation. Props pinke for the [pull request](https://github.com/uhm-coe/authorizer/pull/150)!
+* Update translatable strings.
+
+= 3.8.2 =
+* Fix new user always assigned default role on first login instead of role in approved list. Bug introduced in 3.8.1. Props @melidonis for the [report](https://wordpress.org/support/topic/new-users-role-reverted-to-subscriber/)!
+
+= 3.8.1 =
+* Add missing OAuth2 automatic login multisite option.
+
+= 3.8.0 =
+* Block the WordPress lost password endpoint if Authorizer is configured to disable WordPress logins. Props @manakuke for the [discovery](https://wordpress.org/support/topic/remove-block-forgot-password-page/)!
+* Allow immediately showing OAuth2 login form if it’s the only external service enabled and WordPress logins are hidden (e.g., skip showing the “Log In with OAuth2” button on wp-login.php). Props @dblas for the [suggestion](https://wordpress.org/support/topic/bypassing-the-wp-log-on-screen/)!
+* Generate performant translations from .mo files. See: https://make.wordpress.org/core/2024/02/27/i18n-improvements-6-5-performant-translations/
+* Fix role change in authorizer_custom_role filter not synced to approved list. Props mdebski for the [issue and research](https://github.com/uhm-coe/authorizer/issues/149)!
+* Fix duplicate delete option during uninstall routine.
+* Fix unneeded role dropdown for blocked users (since blocked users get their roles removed, this was causing php warnings on checking strlen() on the null role value).
+* Tested up to WordPress 6.5.3.
+
 = 3.7.1 =
 * Replace jquery.multi-select composer dependency with local copy (since the composer package was removed). Props @julienlusson the catch!
 
