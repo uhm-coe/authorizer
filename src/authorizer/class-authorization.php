@@ -62,6 +62,10 @@ class Authorization extends Singleton {
 					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
 					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->first_name ) ) )
 				)
 			);
 
@@ -76,6 +80,10 @@ class Authorization extends Singleton {
 					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
 					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->last_name ) ) )
 				)
 			);
 
