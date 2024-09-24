@@ -40,7 +40,7 @@ class OAuth2 extends \Authorizer\Singleton {
 			'instructions_url' => 'https://github.com/settings/applications/new',
 		),
 		'generic' => array(
-			'name'             => 'Other (generic OAuth2 provider)',
+			'name'             => __( 'Other (generic OAuth2 provider)', 'authorizer' ),
 			'instructions_url' => 'https://github.com/thephpleague/oauth2-client#authorization-code-grant',
 		),
 	);
