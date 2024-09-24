@@ -680,9 +680,7 @@ class Authentication extends Singleton {
 		// Get user first name (handle string or array results from CAS attribute).
 		$first_name             = '';
 		$oauth2_attr_first_name = $auth_settings['oauth2_attr_first_name'] ?? '';
-er($auth_settings['oauth2_attr_first_name']);
 		if ( ! empty( $oauth2_attr_first_name ) && ! empty( $attributes[ $oauth2_attr_first_name ] ) ) {
-er($attributes[ $oauth2_attr_first_name ]);
 			if ( is_string( $attributes[ $oauth2_attr_first_name ] ) ) {
 				$first_name = $attributes[ $oauth2_attr_first_name ];
 			} elseif ( is_array( $attributes[ $oauth2_attr_first_name ] ) ) {
