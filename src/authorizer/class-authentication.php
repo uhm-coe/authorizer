@@ -677,7 +677,7 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Get user first name (handle string or array results from CAS attribute).
+		// Get user first name (handle string or array results from attribute).
 		$first_name             = '';
 		$oauth2_attr_first_name = $auth_settings['oauth2_attr_first_name'] ?? '';
 		if ( ! empty( $oauth2_attr_first_name ) && ! empty( $attributes[ $oauth2_attr_first_name ] ) ) {
@@ -688,8 +688,8 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Get user last name (handle string or array results from CAS attribute).
-		$last_name          = '';
+		// Get user last name (handle string or array results from attribute).
+		$last_name             = '';
 		$oauth2_attr_last_name = $auth_settings['oauth2_attr_last_name'] ?? '';
 		if ( ! empty( $oauth2_attr_last_name ) && ! empty( $attributes[ $oauth2_attr_last_name ] ) ) {
 			if ( is_string( $attributes[ $oauth2_attr_last_name ] ) ) {
