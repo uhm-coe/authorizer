@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.6
-Stable tag: 3.9.1
+Stable tag: 3.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.10.1 =
+* Hotfix for CAS logins broken if new settings not saved.
 
 = 3.10.0 =
 * Allow multiple configured CAS endpoints ([details](https://github.com/uhm-coe/authorizer/issues/14)).

@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.10.1 =
+* Hotfix for CAS logins broken if new settings not saved.
+
 = 3.10.0 =
 * Allow multiple configured CAS endpoints ([details](https://github.com/uhm-coe/authorizer/issues/14)).
 * Allow fetching username and email from custom attributes in OAuth2 (generic) external service.
