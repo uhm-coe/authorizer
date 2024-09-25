@@ -277,7 +277,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="common" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="common" autocomplete="off" />
 		<p class="description"><?php esc_html_e( 'Example:  "common", or a specific Azure Directory Tenant ID', 'authorizer' ); ?></p>
 		<?php
 	}
@@ -357,7 +357,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" autocomplete="off" />
 		<p class="description">
 			<?php esc_html_e( 'Example: preferred_username', 'authorizer' ); ?>
 			<br>
@@ -381,7 +381,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" autocomplete="off" />
 		<p class="description">
 			<?php esc_html_e( 'Example: email', 'authorizer' ); ?>
 			<br>
@@ -405,7 +405,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" autocomplete="off" />
 		<p class="description"><?php esc_html_e( 'Example:  given_name', 'authorizer' ); ?></p>
 		<?php
 	}
@@ -425,7 +425,7 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" autocomplete="off" />
 		<p class="description"><?php esc_html_e( 'Example:  family_name', 'authorizer' ); ?></p>
 		<?php
 	}
