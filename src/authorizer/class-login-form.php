@@ -187,6 +187,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			<?php if ( '1' === $auth_settings['google'] ) : ?>
 				<script src="https://accounts.google.com/gsi/client" async defer></script>
 				<div id="g_id_onload"
+					data-use_fedcm_for_prompt="true"
 					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
 					data-context="signin"
 					data-ux_mode="popup"
