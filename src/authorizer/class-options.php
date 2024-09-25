@@ -178,6 +178,8 @@ class Options extends Singleton {
 				$auth_settings['oauth2_url_authorize']        = $auth_multisite_settings['oauth2_url_authorize'];
 				$auth_settings['oauth2_url_token']            = $auth_multisite_settings['oauth2_url_token'];
 				$auth_settings['oauth2_url_resource']         = $auth_multisite_settings['oauth2_url_resource'];
+				$auth_settings['oauth2_attr_username']        = $auth_multisite_settings['oauth2_attr_username'] ?? '';
+				$auth_settings['oauth2_attr_email']           = $auth_multisite_settings['oauth2_attr_email'] ?? '';
 				$auth_settings['oauth2_attr_first_name']      = $auth_multisite_settings['oauth2_attr_first_name'] ?? '';
 				$auth_settings['oauth2_attr_last_name']       = $auth_multisite_settings['oauth2_attr_last_name'] ?? '';
 				$auth_settings['oauth2_attr_update_on_login'] = $auth_multisite_settings['oauth2_attr_update_on_login'] ?? '';
@@ -423,6 +425,12 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'oauth2_url_resource', $auth_settings ) ) {
 			$auth_settings['oauth2_url_resource'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_attr_username', $auth_settings ) ) {
+			$auth_settings['oauth2_attr_username'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_attr_email', $auth_settings ) ) {
+			$auth_settings['oauth2_attr_email'] = '';
 		}
 		if ( ! array_key_exists( 'oauth2_attr_first_name', $auth_settings ) ) {
 			$auth_settings['oauth2_attr_first_name'] = '';
@@ -682,6 +690,12 @@ class Options extends Singleton {
 			}
 			if ( ! array_key_exists( 'oauth2_url_resource', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_url_resource'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_attr_username', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_attr_username'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_attr_email', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_attr_email'] = '';
 			}
 			if ( ! array_key_exists( 'oauth2_attr_first_name', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_attr_first_name'] = '';

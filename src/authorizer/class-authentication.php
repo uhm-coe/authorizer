@@ -616,12 +616,31 @@ class Authentication extends Singleton {
 					return null;
 				}
 
+				// Get custom username attribute, if specified (handle string or array results from attribute).
+				$oauth2_attr_username = $auth_settings['oauth2_attr_username'] ?? '';
+				if ( ! empty( $oauth2_attr_username ) && ! empty( $attributes[ $oauth2_attr_username ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( $attributes[ $oauth2_attr_username ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( array_shift( $attributes[ $oauth2_attr_username ] ) );
+					}
+				}
+
+				// Get custom email attribute, if specified.
+				$oauth2_attr_email = $auth_settings['oauth2_attr_email'] ?? '';
+				if ( ! empty( $oauth2_attr_email ) && ! empty( $attributes[ $oauth2_attr_email ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = trim( $attributes[ $oauth2_attr_email ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = $attributes[ $oauth2_attr_email ];
+					}
+				}
+
 				/**
 				 * Filter the generic oauth2 authenticated user email.
 				 *
-				 * @param  string $email      Discovered email (or empty string).
-				 *
-				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 * @param  string|array $email      Discovered email or array of emails (or empty string).
+				 * @param  array        $attributes Resource Owner attributes returned from oauth2 endpoint.
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
@@ -677,7 +696,7 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Get user first name (handle string or array results from CAS attribute).
+		// Get user first name (handle string or array results from attribute).
 		$first_name             = '';
 		$oauth2_attr_first_name = $auth_settings['oauth2_attr_first_name'] ?? '';
 		if ( ! empty( $oauth2_attr_first_name ) && ! empty( $attributes[ $oauth2_attr_first_name ] ) ) {
@@ -688,8 +707,8 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Get user last name (handle string or array results from CAS attribute).
-		$last_name          = '';
+		// Get user last name (handle string or array results from attribute).
+		$last_name             = '';
 		$oauth2_attr_last_name = $auth_settings['oauth2_attr_last_name'] ?? '';
 		if ( ! empty( $oauth2_attr_last_name ) && ! empty( $attributes[ $oauth2_attr_last_name ] ) ) {
 			if ( is_string( $attributes[ $oauth2_attr_last_name ] ) ) {

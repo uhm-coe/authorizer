@@ -171,6 +171,8 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_url_authorize',
 			'oauth2_url_token',
 			'oauth2_url_resource',
+			'oauth2_attr_username',
+			'oauth2_attr_email',
 			'oauth2_attr_first_name',
 			'oauth2_attr_last_name',
 			'oauth2_attr_update_on_login',
