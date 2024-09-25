@@ -639,9 +639,8 @@ class Authentication extends Singleton {
 				/**
 				 * Filter the generic oauth2 authenticated user email.
 				 *
-				 * @param  string $email      Discovered email (or empty string).
-				 *
-				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 * @param  string|array $email      Discovered email or array of emails (or empty string).
+				 * @param  array        $attributes Resource Owner attributes returned from oauth2 endpoint.
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
