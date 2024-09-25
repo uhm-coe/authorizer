@@ -156,8 +156,9 @@ class Authorization extends Singleton {
 		 *
 		 * @param bool $role Role of the user currently logging in.
 		 * @param array $user_data User data returned from external service.
+		 * @param WP_User|false|null|WP_Error $user User object if logging in user exists.
 		 */
-		$approved_role = apply_filters( 'authorizer_custom_role', $default_role, $user_data );
+		$approved_role = apply_filters( 'authorizer_custom_role', $default_role, $user_data, $user );
 
 		/**
 		 * Filter whether to automatically approve the currently logging in user
