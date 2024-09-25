@@ -40,7 +40,7 @@ class OAuth2 extends \Authorizer\Singleton {
 			'instructions_url' => 'https://github.com/settings/applications/new',
 		),
 		'generic' => array(
-			'name'             => __( 'Other (generic OAuth2 provider)', 'authorizer' ),
+			'name'             => 'Other (generic OAuth2 provider)',
 			'instructions_url' => 'https://github.com/thephpleague/oauth2-client#authorization-code-grant',
 		),
 	);
@@ -75,6 +75,11 @@ class OAuth2 extends \Authorizer\Singleton {
 		$options              = Options::get_instance();
 		$option               = 'oauth2_provider';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Override generic provider name to make it translatable (can't use functions above in the variable definition).
+		if ( ! empty( $this->providers['generic'] ) ) {
+			$this->providers['generic']['name'] = __( 'Other (generic OAuth2 provider)', 'authorizer' );
+		}
 
 		// Print option elements.
 		?>
