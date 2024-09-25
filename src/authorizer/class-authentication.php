@@ -616,6 +616,26 @@ class Authentication extends Singleton {
 					return null;
 				}
 
+				// Get custom username attribute, if specified (handle string or array results from attribute).
+				$oauth2_attr_username = $auth_settings['oauth2_attr_username'] ?? '';
+				if ( ! empty( $oauth2_attr_username ) && ! empty( $attributes[ $oauth2_attr_username ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( $attributes[ $oauth2_attr_username ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( array_shift( $attributes[ $oauth2_attr_username ] ) );
+					}
+				}
+
+				// Get custom email attribute, if specified.
+				$oauth2_attr_email = $auth_settings['oauth2_attr_email'] ?? '';
+				if ( ! empty( $oauth2_attr_email ) && ! empty( $attributes[ $oauth2_attr_email ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = trim( $attributes[ $oauth2_attr_email ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = $attributes[ $oauth2_attr_email ];
+					}
+				}
+
 				/**
 				 * Filter the generic oauth2 authenticated user email.
 				 *

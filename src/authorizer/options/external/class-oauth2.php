@@ -349,6 +349,54 @@ class OAuth2 extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_text_oauth2_attr_username( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'oauth2_attr_username';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<p class="description">
+			<?php esc_html_e( 'Example: preferred_username', 'authorizer' ); ?>
+			<br>
+			<?php esc_html_e( 'Leave blank to use the default username returned by the external service.', 'authorizer' ); ?>
+		</p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_text_oauth2_attr_email( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'oauth2_attr_email';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<p class="description">
+			<?php esc_html_e( 'Example: email', 'authorizer' ); ?>
+			<br>
+			<?php esc_html_e( 'Leave blank to use the default email returned by the external service.', 'authorizer' ); ?>
+		</p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_text_oauth2_attr_first_name( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
