@@ -239,6 +239,9 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 					</span>
 				</a></p>
 				<?php
+				if ( empty( $auth_settings['cas_num_servers'] ) ) :
+					$auth_settings['cas_num_servers'] = 1;
+				endif;
 				if ( $auth_settings['cas_num_servers'] > 1 ) :
 					for ( $i = 2; $i <= $auth_settings['cas_num_servers']; $i++ ) :
 						if ( empty( $auth_settings[ 'cas_host_' . $i ] ) ) :

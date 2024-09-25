@@ -869,6 +869,9 @@ class Authentication extends Singleton {
 	 */
 	protected function custom_authenticate_cas( $auth_settings ) {
 		// Move on if CAS hasn't been requested here or the CAS server ID is invalid.
+		if ( empty( $auth_settings['cas_num_servers'] ) ) {
+			$auth_settings['cas_num_servers'] = 1;
+		}
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 10 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['cas_num_servers'] ) ) {
 			return null;
