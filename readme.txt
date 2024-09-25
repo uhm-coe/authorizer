@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.6
-Stable tag: 3.9.1
+Stable tag: 3.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,17 @@ The [University of Hawai'i][uh], which provides authentication for student, facu
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.10.0 =
+* Allow multiple configured CAS endpoints ([details](https://github.com/uhm-coe/authorizer/issues/14)).
+* Allow fetching username and email from custom attributes in OAuth2 (generic) external service.
+* Add OAuth2 (generic) options for syncing first and last names from external service.
+* Force Google Logins to use FedCM to support upcoming removal of third-party cookies in chromium browsers. Props faeldray for the [report](https://github.com/uhm-coe/authorizer/issues/157)!
+* Revert [WPML fix](https://github.com/uhm-coe/authorizer/pull/25) from 2017 for displaying categories in the Private Pages list in the Public Access tab of Authorizer settings. Props tlebars for the [report](https://github.com/uhm-coe/authorizer/issues/153)!
+* Update French translations. Props @julienlusson!
+* Add $user param to `authorizer_custom_role` hook; can be used to inspect the roles of the logging in user if they already have a WordPress user account.
+* Add missing `authorizer_oauth2_azure_authenticated_email` hook (alongside `authorizer_oauth2_generic_authenticated_email` hook).
+* Update composer dependencies: guzzlehttp/guzzle (7.9.1 => 7.9.2); phpseclib/phpseclib (3.0.39 => 3.0.42).
 
 = 3.9.1 =
 * Fix for global $wp_roles unavailable in some multisite contexts leading to a fatal error.
