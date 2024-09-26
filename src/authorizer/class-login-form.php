@@ -332,7 +332,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ), intval( $auth_settings['cas_auto_login'] ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 
