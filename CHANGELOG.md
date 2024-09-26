@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.10.2 =
+* Fix for [redirect error on CAS logins](https://github.com/uhm-coe/authorizer/issues/167). Props greg-randall for the pull [request](https://github.com/uhm-coe/authorizer/pull/168)!
+
 = 3.10.1 =
 * Hotfix for CAS logins broken if new settings not saved.
 
