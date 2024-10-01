@@ -408,6 +408,13 @@ class Admin_Page extends Singleton {
 			)
 		);
 		add_settings_field(
+			'auth_settings_oauth2_auto_login',
+			__( 'OAuth2 automatic login', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_checkbox_oauth2_auto_login' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
 			'auth_settings_oauth2_provider',
 			__( 'Provider', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_select_oauth2_provider' ),
@@ -471,9 +478,37 @@ class Admin_Page extends Singleton {
 			'auth_settings_external'
 		);
 		add_settings_field(
-			'auth_settings_oauth2_auto_login',
-			__( 'OAuth2 automatic login', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_checkbox_oauth2_auto_login' ),
+			'auth_settings_oauth2_attr_username',
+			__( 'Attribute containing username', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_attr_username' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_attr_email',
+			__( 'Attribute containing email', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_attr_email' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_attr_first_name',
+			__( 'Attribute containing first name', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_attr_first_name' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_attr_last_name',
+			__( 'Attribute containing last name', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_text_oauth2_attr_last_name' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_oauth2_attr_update_on_login',
+			__( 'Name attribute update', 'authorizer' ),
+			array( Oauth2::get_instance(), 'print_select_oauth2_attr_update_on_login' ),
 			'authorizer',
 			'auth_settings_external'
 		);
@@ -940,6 +975,10 @@ class Admin_Page extends Singleton {
 							<td><?php $oauth2->print_checkbox_auth_external_oauth2( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 automatic login', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_checkbox_oauth2_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'OAuth2 Provider', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_select_oauth2_provider( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -976,8 +1015,26 @@ class Admin_Page extends Singleton {
 							<td><?php $oauth2->print_text_oauth2_url_resource( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
-							<th scope="row"><?php esc_html_e( 'OAuth2 automatic login', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_checkbox_oauth2_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing username', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_attr_username( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing email', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing first name', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing last name', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_text_oauth2_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Name attribute update', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_select_oauth2_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 
 						<tr class="border-top">

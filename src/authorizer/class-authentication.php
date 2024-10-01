@@ -535,6 +535,15 @@ class Authentication extends Singleton {
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
+				/**
+				 * Filter the azure oauth2 authenticated user email.
+				 *
+				 * @param  string $email      Discovered email (or empty string).
+				 *
+				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 */
+				$email = apply_filters( 'authorizer_oauth2_azure_authenticated_email', $email, $attributes );
+
 				// Set the username to the email prefix (if we don't have one).
 				if ( ! empty( $email ) && empty( $username ) ) {
 					if ( is_array( $email ) && ! empty( $email[0] ) ) {
@@ -629,12 +638,31 @@ class Authentication extends Singleton {
 					return null;
 				}
 
+				// Get custom username attribute, if specified (handle string or array results from attribute).
+				$oauth2_attr_username = $auth_settings['oauth2_attr_username'] ?? '';
+				if ( ! empty( $oauth2_attr_username ) && ! empty( $attributes[ $oauth2_attr_username ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( $attributes[ $oauth2_attr_username ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_username ] ) ) {
+						$username = trim( array_shift( $attributes[ $oauth2_attr_username ] ) );
+					}
+				}
+
+				// Get custom email attribute, if specified.
+				$oauth2_attr_email = $auth_settings['oauth2_attr_email'] ?? '';
+				if ( ! empty( $oauth2_attr_email ) && ! empty( $attributes[ $oauth2_attr_email ] ) ) {
+					if ( is_string( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = trim( $attributes[ $oauth2_attr_email ] );
+					} elseif ( is_array( $attributes[ $oauth2_attr_email ] ) ) {
+						$email = $attributes[ $oauth2_attr_email ];
+					}
+				}
+
 				/**
 				 * Filter the generic oauth2 authenticated user email.
 				 *
-				 * @param  string $email      Discovered email (or empty string).
-				 *
-				 * @param  array  $attributes Resource Owner attributes returned from oauth2 endpoint.
+				 * @param  string|array $email      Discovered email or array of emails (or empty string).
+				 * @param  array        $attributes Resource Owner attributes returned from oauth2 endpoint.
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
@@ -690,11 +718,33 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Get user first name (handle string or array results from attribute).
+		$first_name             = '';
+		$oauth2_attr_first_name = $auth_settings['oauth2_attr_first_name'] ?? '';
+		if ( ! empty( $oauth2_attr_first_name ) && ! empty( $attributes[ $oauth2_attr_first_name ] ) ) {
+			if ( is_string( $attributes[ $oauth2_attr_first_name ] ) ) {
+				$first_name = $attributes[ $oauth2_attr_first_name ];
+			} elseif ( is_array( $attributes[ $oauth2_attr_first_name ] ) ) {
+				$first_name = trim( implode( ' ', $attributes[ $oauth2_attr_first_name ] ) );
+			}
+		}
+
+		// Get user last name (handle string or array results from attribute).
+		$last_name             = '';
+		$oauth2_attr_last_name = $auth_settings['oauth2_attr_last_name'] ?? '';
+		if ( ! empty( $oauth2_attr_last_name ) && ! empty( $attributes[ $oauth2_attr_last_name ] ) ) {
+			if ( is_string( $attributes[ $oauth2_attr_last_name ] ) ) {
+				$last_name = $attributes[ $oauth2_attr_last_name ];
+			} elseif ( is_array( $attributes[ $oauth2_attr_last_name ] ) ) {
+				$last_name = trim( implode( ' ', $attributes[ $oauth2_attr_last_name ] ) );
+			}
+		}
+
 		return array(
 			'email'             => $externally_authenticated_email,
 			'username'          => sanitize_user( $username ),
-			'first_name'        => '',
-			'last_name'         => '',
+			'first_name'        => $first_name,
+			'last_name'         => $last_name,
 			'authenticated_by'  => 'oauth2',
 			'oauth2_provider'   => $auth_settings['oauth2_provider'],
 			'oauth2_attributes' => $attributes,
@@ -842,6 +892,9 @@ class Authentication extends Singleton {
 	 */
 	protected function custom_authenticate_cas( $auth_settings ) {
 		// Move on if CAS hasn't been requested here or the CAS server ID is invalid.
+		if ( empty( $auth_settings['cas_num_servers'] ) ) {
+			$auth_settings['cas_num_servers'] = 1;
+		}
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 10 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['cas_num_servers'] ) ) {
 			return null;

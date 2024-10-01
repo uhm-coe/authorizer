@@ -392,6 +392,11 @@
 		var auth_settings_external_oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).closest( 'tr' );
 		var auth_settings_external_oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).closest( 'tr' );
 		var auth_settings_external_oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).closest( 'tr' );
+		var auth_settings_external_oauth2_attr_username = $( '#auth_settings_oauth2_attr_username' ).closest( 'tr' );
+		var auth_settings_external_oauth2_attr_email = $( '#auth_settings_oauth2_attr_email' ).closest( 'tr' );
+		var auth_settings_external_oauth2_attr_first_name = $( '#auth_settings_oauth2_attr_first_name' ).closest( 'tr' );
+		var auth_settings_external_oauth2_attr_last_name = $( '#auth_settings_oauth2_attr_last_name' ).closest( 'tr' );
+		var auth_settings_external_oauth2_attr_update_on_login = $( '#auth_settings_oauth2_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_oauth2_auto_login = $( '#auth_settings_oauth2_auto_login' ).closest( 'tr' );
 		var auth_settings_external_google_clientid = $( '#auth_settings_google_clientid' ).closest( 'tr' );
 		var auth_settings_external_google_clientsecret = $( '#auth_settings_google_clientsecret' ).closest( 'tr' );
@@ -482,6 +487,11 @@
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_authorize );
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_token );
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_resource );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_username );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_email );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_first_name );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_last_name );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_update_on_login );
 		}
 
 		// Hide OAuth2 Tenant ID if azure isn't chosen.
@@ -579,6 +589,11 @@
 			animateOption( action, auth_settings_external_oauth2_url_authorize );
 			animateOption( action, auth_settings_external_oauth2_url_token );
 			animateOption( action, auth_settings_external_oauth2_url_resource );
+			animateOption( action, auth_settings_external_oauth2_attr_username );
+			animateOption( action, auth_settings_external_oauth2_attr_email );
+			animateOption( action, auth_settings_external_oauth2_attr_first_name );
+			animateOption( action, auth_settings_external_oauth2_attr_last_name );
+			animateOption( action, auth_settings_external_oauth2_attr_update_on_login );
 			action = 'azure' === $( this ).val() ? 'show' : 'hide';
 			animateOption( action, auth_settings_external_oauth2_tenant_id );
 		});
@@ -1142,6 +1157,11 @@
 		params.oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).val();
 		params.oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).val();
 		params.oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).val();
+		params.oauth2_attr_username = $( '#auth_settings_oauth2_attr_username' ).val();
+		params.oauth2_attr_email = $( '#auth_settings_oauth2_attr_email' ).val();
+		params.oauth2_attr_first_name = $( '#auth_settings_oauth2_attr_first_name' ).val();
+		params.oauth2_attr_last_name = $( '#auth_settings_oauth2_attr_last_name' ).val();
+		params.oauth2_attr_update_on_login = $( '#auth_settings_oauth2_attr_update_on_login' ).val();
 		params.oauth2_auto_login = $( '#auth_settings_oauth2_auto_login' ).is( ':checked' ) ? '1' : '';
 
 		params.google = $( '#auth_settings_google' ).is( ':checked' ) ? '1' : '';

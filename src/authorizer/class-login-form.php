@@ -187,6 +187,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			<?php if ( '1' === $auth_settings['google'] ) : ?>
 				<script src="https://accounts.google.com/gsi/client" async defer></script>
 				<div id="g_id_onload"
+					data-use_fedcm_for_prompt="true"
 					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
 					data-context="signin"
 					data-ux_mode="popup"
@@ -238,6 +239,9 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 					</span>
 				</a></p>
 				<?php
+				if ( empty( $auth_settings['cas_num_servers'] ) ) :
+					$auth_settings['cas_num_servers'] = 1;
+				endif;
 				if ( $auth_settings['cas_num_servers'] > 1 ) :
 					for ( $i = 2; $i <= $auth_settings['cas_num_servers']; $i++ ) :
 						if ( empty( $auth_settings[ 'cas_host_' . $i ] ) ) :
@@ -328,7 +332,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_external_login( 'cas' ), intval( $auth_settings['cas_auto_login'] ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'cas', intval( $auth_settings['cas_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 

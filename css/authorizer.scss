@@ -165,6 +165,10 @@
 		}
 	}
 
+	// Allow 100% width text fields with .wide class.
+	input[type="text"].wide {
+		width: 100%;
+	}
 
 	// Flex layout for user lists (pending, approved, blocked).
 	#list_auth_settings_access_users_pending li,

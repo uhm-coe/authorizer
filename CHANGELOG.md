@@ -1,5 +1,22 @@
 # Changelog
 
+= 3.10.2 =
+* Fix for [redirect error on CAS logins](https://github.com/uhm-coe/authorizer/issues/167). Props greg-randall for the pull [request](https://github.com/uhm-coe/authorizer/pull/168)!
+
+= 3.10.1 =
+* Hotfix for CAS logins broken if new settings not saved.
+
+= 3.10.0 =
+* Allow multiple configured CAS endpoints ([details](https://github.com/uhm-coe/authorizer/issues/14)).
+* Allow fetching username and email from custom attributes in OAuth2 (generic) external service.
+* Add OAuth2 (generic) options for syncing first and last names from external service.
+* Force Google Logins to use FedCM to support upcoming removal of third-party cookies in chromium browsers. Props faeldray for the [report](https://github.com/uhm-coe/authorizer/issues/157)!
+* Revert [WPML fix](https://github.com/uhm-coe/authorizer/pull/25) from 2017 for displaying categories in the Private Pages list in the Public Access tab of Authorizer settings. Props tlebars for the [report](https://github.com/uhm-coe/authorizer/issues/153)!
+* Update French translations. Props @julienlusson!
+* Add $user param to `authorizer_custom_role` hook; can be used to inspect the roles of the logging in user if they already have a WordPress user account.
+* Add missing `authorizer_oauth2_azure_authenticated_email` hook (alongside `authorizer_oauth2_generic_authenticated_email` hook).
+* Update composer dependencies: guzzlehttp/guzzle (7.9.1 => 7.9.2); phpseclib/phpseclib (3.0.39 => 3.0.42).
+
 = 3.9.1 =
 * Fix for global $wp_roles unavailable in some multisite contexts leading to a fatal error.
 * Update French translations. Props @julienlusson!
