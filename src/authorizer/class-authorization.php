@@ -164,11 +164,12 @@ class Authorization extends Singleton {
 		 * Filter whether to automatically approve the currently logging in user
 		 * based on any of their user attributes.
 		 *
-		 * @param bool  $automatically_approve_login
+		 * @param bool                        $automatically_approve_login
 		 *   Whether to automatically approve the currently logging in user.
-		 * @param array $user_data User data returned from external service.
+		 * @param array                       $user_data User data returned from external service.
+		 * @param WP_User|false|null|WP_Error $user      User object if logging in user exists.
 		 */
-		$automatically_approve_login = apply_filters( 'authorizer_automatically_approve_login', false, $user_data );
+		$automatically_approve_login = apply_filters( 'authorizer_automatically_approve_login', false, $user_data, $user );
 
 		// If this externally-authenticated user is an existing administrator (admin
 		// in single site mode, or super admin in network mode), and isn't blocked,
