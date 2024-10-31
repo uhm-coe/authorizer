@@ -1,7 +1,7 @@
 === Authorizer ===
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
-Tested up to: 6.6
+Tested up to: 6.7
 Stable tag: 3.10.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
