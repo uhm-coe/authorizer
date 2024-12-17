@@ -64,7 +64,7 @@ class WP_Plugin_Authorizer extends Singleton {
 		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_azure_login' ), 10, 2 );
 
 		// Enable localization. Translation files stored in /languages.
-		add_action( 'plugins_loaded', array( $this, 'load_textdomain' ) );
+		add_action( 'init', array( $this, 'load_textdomain' ) );
 
 		// Perform plugin updates if newer version installed.
 		add_action( 'plugins_loaded', array( Updates::get_instance(), 'auth_update_check' ) );
