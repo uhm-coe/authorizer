@@ -12,6 +12,7 @@ namespace Authorizer;
 use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
+use Authorizer\Save_Secure;
 
 /**
  * Implements the authentication (is user who they say they are?) features of
@@ -137,6 +138,7 @@ class Authentication extends Singleton {
 		$externally_authenticated_emails = array();
 		$authenticated_by                = '';
 		$result                          = null;
+		$encrypted_token				 = '';
 
 		// Try OAuth2 authentication if it's enabled and we don't have a
 		// successful login yet.
@@ -153,6 +155,10 @@ class Authentication extends Singleton {
 					$externally_authenticated_emails[] = $result['email'];
 				}
 				$authenticated_by = $result['authenticated_by'];
+
+				if (isset($result['encrypted_token'])){
+					$encrypted_token = $result['encrypted_token'];
+				}
 			}
 		}
 
@@ -294,6 +300,11 @@ class Authentication extends Singleton {
 			$user = $result;
 		}
 
+		if ($encrypted_token != ''){
+			//Save the Access Token in user_meta for later use, f.e in other Plugins
+			update_user_meta( $user->ID, 'encrypted_token', $encrypted_token );
+		}
+
 		// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 		return $user;
 	}
@@ -309,6 +320,9 @@ class Authentication extends Singleton {
 	 *                              or null if not attempting an oauth2 login.
 	 */
 	protected function custom_authenticate_oauth2( $auth_settings ) {
+		$encrypted_token = ''; //Maybe the access token from oauth2 service, encrypted
+
+		
 		// Move on if oauth2 hasn't been requested here.
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] ) {
@@ -585,6 +599,14 @@ class Authentication extends Singleton {
 					$token = $provider->getAccessToken( 'authorization_code', array(
 						'code' => $_REQUEST['code'],
 					) );
+
+					$token_json_prepared = $token->jsonSerialize();
+					$token_json = json_encode($token_json_prepared);
+
+					$save_secure = new Save_Secure;
+					$encrypted_token = $save_secure->encrypt($token_json);
+
+
 				} catch ( \Exception $e ) {
 					// Failed to get token; try again from the beginning.
 					$auth_url = $provider->getAuthorizationUrl(
@@ -726,6 +748,7 @@ class Authentication extends Singleton {
 			'authenticated_by'  => 'oauth2',
 			'oauth2_provider'   => $auth_settings['oauth2_provider'],
 			'oauth2_attributes' => $attributes,
+			'encrypted_token' 	=> $encrypted_token,
 		);
 	}
 
@@ -1496,6 +1519,11 @@ class Authentication extends Singleton {
 		if ( empty( self::$authenticated_by ) && ! empty( $_REQUEST['external'] ) ) {
 			self::$authenticated_by = $_REQUEST['external'];
 		}
+
+		$user_id = get_current_user_id();
+				//Delete token from usermeta
+				delete_user_meta( $user_id, 'encrypted_token');
+		
 	}
 
 	/**
