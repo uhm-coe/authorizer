@@ -294,6 +294,13 @@ class Authentication extends Singleton {
 			$user = $result;
 		}
 
+		// Integration: disable Cloudflare Turnstile verification from the
+		// simple-cloudflare-turnstile plugin if it is activated (conflicts with
+		// our redirects from external services). We assume that we dont't need bot
+		// protection from this plugin after coming back from a successful external
+		// service authentication.
+		add_filter( 'cfturnstile_widget_disable', '__return_true' );
+
 		// If we haven't exited yet, we have a valid/approved user, so authenticate them.
 		return $user;
 	}
