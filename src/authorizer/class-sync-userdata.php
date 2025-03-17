@@ -162,8 +162,34 @@ class Sync_Userdata extends Singleton {
 		$subject = $options->get( 'access_email_approved_users_subject' );
 		$body    = apply_filters( 'the_content', $options->get( 'access_email_approved_users_body' ) );
 
+		// Allow overriding the email subject via filter or constant.
+		if ( defined( 'AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT' ) ) {
+			$subject = \AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT;
+		}
+		/**
+		 * Filters the email subject sent to new users when approving them.
+		 *
+		 * @since 3.11.0
+		 *
+		 * @param string $subject The email subject.
+		 */
+		$subject = apply_filters( 'authorizer_email_approved_users_subject', $subject );
+
+		// Allow overriding the email body via filter or constant.
+		if ( defined( 'AUTHORIZER_EMAIL_APPROVED_USERS_BODY' ) ) {
+			$body = \AUTHORIZER_EMAIL_APPROVED_USERS_BODY;
+		}
+		/**
+		 * Filters the email body sent to new users when approving them.
+		 *
+		 * @since 3.11.0
+		 *
+		 * @param string $body The email body.
+		 */
+		$body = apply_filters( 'authorizer_email_approved_users_body', $body );
+
 		// Fail if the subject/body options don't exist or are empty.
-		if ( is_null( $subject ) || is_null( $body ) || strlen( $subject ) === 0 || strlen( $body ) === 0 ) {
+		if ( empty( $subject ) || empty( $body ) ) {
 			return false;
 		}
 

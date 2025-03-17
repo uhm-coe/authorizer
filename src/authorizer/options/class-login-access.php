@@ -183,7 +183,41 @@ class Login_Access extends \Authorizer\Singleton {
 		$option               = 'access_email_approved_users_subject';
 		$auth_settings_option = $options->get( $option );
 
-		// Print option elements.
+		// Print option elements. If setting is overriden by filter or constant,
+		// don't expose the value; just print an informational message.
+		if ( has_filter( 'authorizer_email_approved_users_subject' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_email_approved_users_subject (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_email_approved_users_subject</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 		?>
 		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="Welcome to [site_name]!" style="width:320px;" /><br /><small><?php echo wp_kses( __( 'You can use the <b>[site_name]</b> shortcode.', 'authorizer' ), Helper::$allowed_html ); ?></small>
 		<?php
@@ -202,7 +236,41 @@ class Login_Access extends \Authorizer\Singleton {
 		$option               = 'access_email_approved_users_body';
 		$auth_settings_option = $options->get( $option );
 
-		// Print option elements.
+		// Print option elements. If setting is overriden by filter or constant,
+		// don't expose the value; just print an informational message.
+		if ( has_filter( 'authorizer_email_approved_users_body' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_email_approved_users_body (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_email_approved_users_body</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_EMAIL_APPROVED_USERS_BODY' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_EMAIL_APPROVED_USERS_BODY (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_EMAIL_APPROVED_USERS_BODY', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 		wp_editor(
 			wpautop( $auth_settings_option ),
 			"auth_settings_$option",
