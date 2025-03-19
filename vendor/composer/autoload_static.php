@@ -92,8 +92,8 @@ class ComposerStaticInit3afe4a77f11b1a9be67c8c9e1abad910
         ),
         'League\\OAuth2\\Client\\' => 
         array (
-            0 => __DIR__ . '/..' . '/league/oauth2-client/src',
-            1 => __DIR__ . '/..' . '/league/oauth2-github/src',
+            0 => __DIR__ . '/..' . '/league/oauth2-github/src',
+            1 => __DIR__ . '/..' . '/league/oauth2-client/src',
         ),
         'GuzzleHttp\\Psr7\\' => 
         array (
