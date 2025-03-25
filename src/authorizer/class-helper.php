@@ -37,6 +37,7 @@ class Helper {
 		),
 		'b'      => array(),
 		'br'     => array(),
+		'code'   => array(),
 		'div'    => array(
 			'class' => array(),
 		),

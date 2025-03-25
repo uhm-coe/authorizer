@@ -69,10 +69,10 @@ class Login_Form extends Singleton {
 		 * under the "Advanced" tab in Authorizer options. Example:
 		 * function my_authorizer_add_branding_option( $branding_options ) {
 		 *   $new_branding_option = array(
-		 *    'value' => 'your_brand'
-		 *    'description' => 'Custom Your Brand Login Screen',
-		 *    'css_url' => 'http://url/to/your_brand.css',
-		 *    'js_url' => 'http://url/to/your_brand.js',
+		 *    'value'       => 'your_brand'
+		 *    'description' => 'Your Brand Login Screen',
+		 *    'css_url'     => 'https://example.edu/your_brand.css',
+		 *    'js_url'      => 'https://example.edu/your_brand.js',
 		 *   );
 		 *   array_push( $branding_options, $new_branding_option );
 		 *   return $branding_options;
@@ -80,7 +80,29 @@ class Login_Form extends Singleton {
 		 * add_filter( 'authorizer_add_branding_option', 'my_authorizer_add_branding_option' );
 		 */
 		$branding_options = array();
+
+		/**
+		 * Filter the branding options available in the "Advanced" tab of the
+		 * Authorizer settings page.
+		 *
+		 * @param @branding_options An array of branding options, each with keys 'value', 'description', 'css_url', and 'js_url'.
+		 */
 		$branding_options = apply_filters( 'authorizer_add_branding_option', $branding_options );
+
+		// Allow overriding the selected branding option from filter or constant.
+		if ( defined( 'AUTHORIZER_ADVANCED_BRANDING' ) ) {
+			$auth_settings['advanced_branding'] = \AUTHORIZER_ADVANCED_BRANDING;
+		}
+		/**
+		 * Filters the selected branding option value. Note: the selected branding
+		 * option value also needs to exist in the available options (via the
+		 * `authorizer_add_branding_option` filter above).
+		 *
+		 * @param string $advanced_branding The selected branding option value.
+		 * @param array  $branding_options  Existing branding options.
+		 */
+		$auth_settings['advanced_branding'] = apply_filters( 'authorizer_advanced_branding', $auth_settings['advanced_branding'], $branding_options );
+
 		foreach ( $branding_options as $branding_option ) {
 			// Make sure the custom brands have the required values.
 			if ( ! ( is_array( $branding_option ) && array_key_exists( 'value', $branding_option ) && array_key_exists( 'css_url', $branding_option ) && array_key_exists( 'js_url', $branding_option ) ) ) {
@@ -88,8 +110,7 @@ class Login_Form extends Singleton {
 			}
 			if ( $auth_settings['advanced_branding'] === $branding_option['value'] ) {
 				wp_enqueue_script( 'auth_login_custom_scripts-' . sanitize_title( $branding_option['value'] ), $branding_option['js_url'], array( 'jquery' ), '2.8.0', false );
-				wp_register_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.8.0' );
-				wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ) );
+				wp_enqueue_style( 'authorizer-login-custom-css-' . sanitize_title( $branding_option['value'] ), $branding_option['css_url'], array(), '2.8.0' );
 			}
 		}
 	}

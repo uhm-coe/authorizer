@@ -117,6 +117,42 @@ class Advanced extends \Authorizer\Singleton {
 		$option               = 'advanced_branding';
 		$auth_settings_option = $options->get( $option );
 
+		// If branding option is overridden by filter or constant, don't expose the
+		// value; just print an informational message.
+		if ( has_filter( 'authorizer_advanced_branding' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: authorizer_advanced_branding (filter name) */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_advanced_branding</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_ADVANCED_BRANDING' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: AUTHORIZER_ADVANCED_BRANDING (defined constant name) */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
 		// Print option elements.
 		?>
 		<fieldset>
@@ -154,7 +190,7 @@ class Advanced extends \Authorizer\Singleton {
 			// Print message about adding custom brands if there are none.
 			if ( count( $branding_options ) === 0 ) {
 				?>
-				<p class="description"><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the `authorizer_add_branding_option` filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ); ?></p>
+				<p class="description"><?php echo wp_kses( __( '<strong>Note for theme developers</strong>: Add more options here by using the <code>authorizer_add_branding_option</code> filter in your theme. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.', 'authorizer' ), Helper::$allowed_html ) . ' ' . wp_kses( __( "Note: you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );</code>, or you may set it in the <code>authorizer_advanced_branding</code> filter.", 'authorizer' ), Helper::$allowed_html ); ?></p>
 				<?php
 			}
 			?>
