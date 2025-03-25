@@ -154,11 +154,22 @@ class Authorization extends Singleton {
 		 * or the user's current role for existing users. This filter allows
 		 * changing user roles based on custom CAS/LDAP attributes.
 		 *
-		 * @param bool $role Role of the user currently logging in.
-		 * @param array $user_data User data returned from external service.
+		 * @param string $role                      Role of the user currently logging in.
+		 * @param array  $user_data                 User data returned from external service.
 		 * @param WP_User|false|null|WP_Error $user User object if logging in user exists.
+		 *
+		 * @return string|array Role of the user currently logging in, or an array with keys 'default_role' (string), 'roles_to_add' (array), and 'roles_to_remove' (array) if support for multiple roles is desired.
 		 */
 		$approved_role = apply_filters( 'authorizer_custom_role', $default_role, $user_data, $user );
+
+		// Support for multiple roles if supplied in the filter above. Note: this
+		// only has partial support for multisite (it will only add/remove roles
+		// to the current blog, not all blogs).
+		$roles_to_add    = empty( $approved_role['roles_to_add'] ) ? array() : $approved_role['roles_to_add'];
+		$roles_to_remove = empty( $approved_role['roles_to_remove'] ) ? array() : $approved_role['roles_to_remove'];
+		if ( ! empty( $approved_role['default_role'] ) ) {
+			$approved_role = $approved_role['default_role'];
+		}
 
 		/**
 		 * Filter whether to automatically approve the currently logging in user
@@ -415,8 +426,50 @@ class Authorization extends Singleton {
 				}
 
 				// Ensure user has the same role as their entry in the approved list.
+				// Note: if any additional roles are defined to be added or removed,
+				// use add_role() instead of set_role() so we retain existing roles.
 				if ( $user_info && ! in_array( $user_info['role'], $user->roles, true ) ) {
-					$user->set_role( $user_info['role'] );
+					if ( empty( $roles_to_add ) && empty( $roles_to_remove ) ) {
+						$user->set_role( $user_info['role'] );
+					} else {
+						$user->add_role( $user_info['role'] );
+					}
+				}
+
+				/**
+				 * Filter additional roles to add to the user currently logging in. This
+				 * filter allows changing user roles based on custom CAS/LDAP attributes.
+				 *
+				 * @param array $roles_to_add               Roles to add to the user currently logging in.
+				 * @param array $user_data                  User data returned from external service.
+				 * @param WP_User|false|null|WP_Error $user User object if logging in user exists.
+				 */
+				$roles_to_add = apply_filters( 'authorizer_custom_roles_to_add', $roles_to_add, $user_data, $user );
+
+				// Add additional roles to the user. Note: this only has partial support
+				// for multisite (it will only add roles to the current blog, not all blogs).
+				if ( ! empty( $roles_to_add ) ) {
+					foreach ( $roles_to_add as $role_to_add ) {
+						$user->add_role( $role_to_add );
+					}
+				}
+
+				/**
+				 * Filter additional roles to remove from the user currently logging in. This
+				 * filter allows changing user roles based on custom CAS/LDAP attributes.
+				 *
+				 * @param array $roles_to_remove            Roles to remove from the user currently logging in.
+				 * @param array $user_data                  User data returned from external service.
+				 * @param WP_User|false|null|WP_Error $user User object if logging in user exists.
+				 */
+				$roles_to_remove = apply_filters( 'authorizer_custom_roles_to_remove', $roles_to_remove, $user_data, $user );
+
+				// Remove roles from the user. Note: this only has partial support for
+				// multisite (it will only remove roles from the current blog, not all blogs).
+				if ( ! empty( $roles_to_remove ) ) {
+					foreach ( $roles_to_remove as $role_to_remove ) {
+						$user->remove_role( $role_to_remove );
+					}
 				}
 
 				return $user;
