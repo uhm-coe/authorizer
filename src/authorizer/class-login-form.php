@@ -287,7 +287,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<?php endif; ?>
 			<?php endif; ?>
 
-			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
+			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) && ( empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) || ! isset( $_SERVER['QUERY_STRING'] ) || false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
 				<style type="text/css">
 					body.login-action-login form {
 						padding-bottom: 8px;
@@ -617,6 +617,10 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	 * least one external service is enabled. Note: don't hide the link if LDAP
 	 * logins are enabled and a custom lost password URL is provided.
 	 *
+	 * Note: if WordPress logins are disabled but there are bypass users, they
+	 * will not be able to reset their password (an administrator must do this for
+	 * them).
+	 *
 	 * Filter: lost_password_html_link
 	 */
 	public function maybe_hide_lost_password_link( $html_link ) {
@@ -649,6 +653,10 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	 * Disable password reset form if WordPress logins are disabled and at least
 	 * one external service is enabled.
 	 *
+	 * Note: if WordPress logins are disabled but there are bypass users, they
+	 * will not be able to reset their password (an administrator must do this for
+	 * them).
+	 *
 	 * Action: lost_password
 	 */
 	public function maybe_hide_lost_password_form( $errors ) {
@@ -674,6 +682,10 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	/**
 	 * Ensure password retrieval emails are prevented from being sent if WordPress
 	 * logins are disabled and at least one external service is enabled.
+	 *
+	 * Note: if WordPress logins are disabled but there are bypass users, they
+	 * will not be able to reset their password (an administrator must do this for
+	 * them).
 	 *
 	 * Filter: lostpassword_errors
 	 */

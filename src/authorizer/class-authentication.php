@@ -225,6 +225,20 @@ class Authentication extends Singleton {
 					'1' === $auth_settings['ldap']
 				)
 			) {
+				// Edge case: if WordPress logins are disabled but the username/email
+				// attempting to login has been added to the list of users allowed to
+				// bypass disabled logins, then allow the login (proceed to WordPress
+				// authentication).
+				if ( ! empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) ) {
+					$bypass_usernames = explode( "\n", str_replace( "\r", '', $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) );
+					$bypass_users = get_users( array( 'login__in' => $bypass_usernames, 'count_total' => false ) );
+					foreach ( $bypass_users as $bypass_user ) {
+						if ( $bypass_user->user_login === $username || $bypass_user->user_email === $username ) {
+							return null;
+						}
+					}
+				}
+
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 

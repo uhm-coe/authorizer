@@ -212,6 +212,7 @@ class Ajax_Endpoints extends Singleton {
 			'advanced_lockouts',
 			'advanced_hide_wp_login',
 			'advanced_disable_wp_login',
+			'advanced_disable_wp_login_bypass_usernames',
 			'advanced_users_per_page',
 			'advanced_users_sort_by',
 			'advanced_users_sort_order',

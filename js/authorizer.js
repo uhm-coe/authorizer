@@ -448,6 +448,7 @@
 		var auth_settings_external_ldap_attr_last_name = $( '#auth_settings_ldap_attr_last_name' ).closest( 'tr' );
 		var auth_settings_external_ldap_attr_update_on_login = $( '#auth_settings_ldap_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_ldap_test_user = $( '#auth_settings_ldap_test_user' ).closest( 'tr' );
+		var auth_settings_advanced_disable_wp_login_bypass_usernames = $( '#auth_settings_advanced_disable_wp_login_bypass_usernames' ).closest( 'tr' );
 		/* eslint-enable */
 
 		// Hide settings unless "Only approved users" is checked
@@ -541,6 +542,11 @@
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_last_name );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_update_on_login );
 			animateOption( 'hide_immediately', auth_settings_external_ldap_test_user );
+		}
+
+		// Hide Bypass Usernames if Disable WordPress logins is unchecked.
+		if ( ! $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ) {
+			animateOption( 'hide_immediately', auth_settings_advanced_disable_wp_login_bypass_usernames );
 		}
 
 		// Event handler: Hide "Handle unauthorized visitors" option if access is granted to "Everyone"
@@ -643,6 +649,12 @@
 			animateOption( action, auth_settings_external_ldap_attr_last_name );
 			animateOption( action, auth_settings_external_ldap_attr_update_on_login );
 			animateOption( action, auth_settings_external_ldap_test_user );
+		});
+
+		// Event handler: Show/hide Bypass Usernames based on Disable WordPress Logins checkbox.
+		$( 'input[name="auth_settings[advanced_disable_wp_login]"]' ).on( 'change', function() {
+			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
+			animateOption( action, auth_settings_advanced_disable_wp_login_bypass_usernames );
 		});
 
 		// Event handler: Test LDAP settings.
@@ -778,6 +790,7 @@
 		$( 'textarea#auth_settings_ldap_search_filter' ).autogrow();
 		$( 'textarea#auth_settings_oauth2_hosteddomain' ).autogrow();
 		$( 'textarea#auth_settings_google_hosteddomain' ).autogrow();
+		$( 'textarea#auth_settings_advanced_disable_wp_login_bypass_usernames' ).autogrow();
 
 	});
 
@@ -1224,6 +1237,7 @@
 		};
 		params.advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
 		params.advanced_disable_wp_login = $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ? '1' : '';
+		params.advanced_disable_wp_login_bypass_usernames = $( '#auth_settings_advanced_disable_wp_login_bypass_usernames' ).val();
 		params.advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
 		params.advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
 		params.advanced_users_sort_by = $( '#auth_settings_advanced_users_sort_by' ).val();

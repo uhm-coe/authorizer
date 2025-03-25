@@ -828,6 +828,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_advanced'
 		);
 		add_settings_field(
+			'auth_settings_advanced_disable_wp_login_bypass_usernames',
+			__( 'Bypass Usernames', 'authorizer' ),
+			array( Advanced::get_instance(), 'print_text_advanced_disable_wp_login_bypass_usernames' ),
+			'authorizer',
+			'auth_settings_advanced'
+		);
+		add_settings_field(
 			'auth_settings_advanced_branding',
 			__( 'Custom WordPress login branding', 'authorizer' ),
 			array( Advanced::get_instance(), 'print_radio_auth_advanced_branding' ),
@@ -1270,6 +1277,10 @@ class Admin_Page extends Singleton {
 							<td><?php $advanced->print_checkbox_auth_advanced_disable_wp_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'Bypass Usernames', 'authorizer' ); ?></th>
+							<td><?php $advanced->print_text_advanced_disable_wp_login_bypass_usernames( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'Number of users per page', 'authorizer' ); ?></th>
 							<td><?php $advanced->print_text_auth_advanced_users_per_page( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
@@ -1357,7 +1368,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.10.0', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.11.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',

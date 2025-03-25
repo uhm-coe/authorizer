@@ -111,6 +111,26 @@ class Advanced extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_text_advanced_disable_wp_login_bypass_usernames( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'advanced_disable_wp_login_bypass_usernames';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<textarea id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" placeholder="" style="width:220px;"><?php echo esc_html( $auth_settings_option ); ?></textarea>
+		<p class="description"><?php esc_html_e( 'If you have specific WordPress users that need to bypass disabled WordPress logins and use their WordPress credentials to log in, list them here, one username per line. Leave this field blank to prevent all users from using their WordPress credentials to log in.', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_radio_auth_advanced_branding( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
