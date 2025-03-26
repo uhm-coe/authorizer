@@ -1,5 +1,18 @@
 # Changelog
 
+= 3.11.0 =
+* Fix for loading translations too early in WordPress 6.7.
+* Add $user param to `authorizer_automatically_approve_login` hook; can be used to inspect the roles of the logging in user if they already have a WordPress user account.
+* Disable Cloudflare Turnstile verification after a successful authentication provided by the simple-cloudflare-turnstile plugin. We assume we don’t need bot protection from this plugin after coming back from a successful external service authentication.
+* Allow defining approved user welcome email subject and body via filters (`authorizer_email_approved_users_subject` and `authorizer_email_approved_user_body`) or wp-config.php constants (`define( 'AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT', '...' );` and `define( 'AUTHORIZER_EMAIL_APPROVED_USER_BODY', '...' );`) to, e.g., allow a single custom message to be used on all sites in a multisite network. Props @monkeyleo13 for the [suggestion](https://wordpress.org/support/topic/global-welcome-message-subject-body/)!
+* Allow defining custom branding option via filter (`authorizer_advanced_branding`) or constant (`define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );`). Props oldfieldtc for the [request](https://github.com/uhm-coe/authorizer/issues/169)!
+* Allow specifying multiple roles to add and remove in the `authorizer_custom_role` filter by returning an array with keys `'default_role'`, `'roles_to_add'`, and `'roles_to_remove'`. Props nick-perry14 for the [pull request](https://github.com/uhm-coe/authorizer/pull/161)! (Note: you can also define additional roles in the `authorizer_custom_roles_to_add` and `authorizer_roles_to_remove` filters.)
+* Allow specifying a list of "bypass users" who can log in with their WordPress credentials even if Disable WordPress Logins has been checked. Useful if most accounts are authenticated with an external service, but certain accounts, like temporary vendors or new hires, are not able to authenticate with an external service. Props lc-sam for the [request](https://github.com/uhm-coe/authorizer/issues/170)!
+* Update helper text for OAuth Resource Owner URL. Props howardshand for the [suggestion](https://github.com/uhm-coe/authorizer/issues/171#issuecomment-2730341816)!
+* Update composer dependencies: guzzlehttp/promises (2.0.3 => 2.0.4), monolog/monolog (2.9.3 => 2.10.0), phpseclib/phpseclib (3.0.42 => 3.0.43), symfony/deprecation-contracts (v2.5.3 => v2.5.4).
+* Update translatable strings.
+* Tested up to WordPress 6.7.
+
 = 3.10.2 =
 * Fix for [redirect error on CAS logins](https://github.com/uhm-coe/authorizer/issues/167). Props greg-randall for the pull [request](https://github.com/uhm-coe/authorizer/pull/168)!
 
