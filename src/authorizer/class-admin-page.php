@@ -1384,10 +1384,10 @@ class Admin_Page extends Singleton {
 				'save_changes'         => esc_html__( 'Save Changes', 'authorizer' ),
 				'private_pages'        => esc_html__( 'Private Pages', 'authorizer' ),
 				'public_pages'         => esc_html__( 'Public Pages', 'authorizer' ),
-				'first_page'           => esc_html__( 'First page' ),
-				'previous_page'        => esc_html__( 'Previous page' ),
-				'next_page'            => esc_html__( 'Next page' ),
-				'last_page'            => esc_html__( 'Last page' ),
+				'first_page'           => esc_html__( 'First page', 'authorizer' ),
+				'previous_page'        => esc_html__( 'Previous page', 'authorizer' ),
+				'next_page'            => esc_html__( 'Next page', 'authorizer' ),
+				'last_page'            => esc_html__( 'Last page', 'authorizer' ),
 				'is_network_admin'     => is_network_admin() ? '1' : '0',
 			)
 		);

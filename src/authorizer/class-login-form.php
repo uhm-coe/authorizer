@@ -705,7 +705,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				'1' === $auth_settings['ldap']
 			)
 		) {
-			$errors->add( 'logins_disabled', __( '<strong>ERROR</strong>: The username field is empty.' ) );
+			$errors->add( 'logins_disabled', __( '<strong>ERROR</strong>: The username field is empty.', 'authorizer' ) );
 		}
 
 		return $errors;

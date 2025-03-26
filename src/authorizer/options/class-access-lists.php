@@ -331,7 +331,7 @@ class Access_Lists extends \Authorizer\Singleton {
 			$page_links[] = sprintf(
 				"<a class='button first-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 				esc_url( remove_query_arg( 'paged', $current_url ) ),
-				__( 'First page' ),
+				__( 'First page', 'authorizer' ),
 				'&laquo;'
 			);
 		}
@@ -342,18 +342,18 @@ class Access_Lists extends \Authorizer\Singleton {
 			$page_links[] = sprintf(
 				"<a class='button prev-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 				esc_url( add_query_arg( 'paged', max( 1, $current_page - 1 ), $current_url ) ),
-				__( 'Previous page' ),
+				__( 'Previous page', 'authorizer' ),
 				'&lsaquo;'
 			);
 		}
 
 		if ( 'bottom' === $which ) {
 			$html_current_page  = '<span class="current-page-text">' . $current_page . '</span>';
-			$total_pages_before = '<span class="screen-reader-text">' . __( 'Current Page' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
+			$total_pages_before = '<span class="screen-reader-text">' . __( 'Current Page', 'authorizer' ) . '</span><span id="table-paging" class="paging-input"><span class="tablenav-paging-text">';
 		} else {
 			$html_current_page = sprintf(
 				"%s<input class='current-page' id='current-page-selector' type='text' name='paged' value='%s' size='%d' aria-describedby='table-paging' /><span class='tablenav-paging-text'>",
-				'<label for="current-page-selector" class="screen-reader-text">' . __( 'Current Page' ) . '</label>',
+				'<label for="current-page-selector" class="screen-reader-text">' . __( 'Current Page', 'authorizer' ) . '</label>',
 				$current_page,
 				strlen( $total_pages )
 			);
@@ -361,7 +361,7 @@ class Access_Lists extends \Authorizer\Singleton {
 		/* TRANSLATORS: %s: number of pages */
 		$html_total_pages = sprintf( "<span class='total-pages'>%s</span>", number_format_i18n( $total_pages ) );
 		/* TRANSLATORS: 1: number of current page 2: number of total pages */
-		$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging' ), $html_current_page, $html_total_pages ) . $total_pages_after;
+		$page_links[] = $total_pages_before . sprintf( _x( '%1$s of %2$s', 'paging', 'authorizer' ), $html_current_page, $html_total_pages ) . $total_pages_after;
 
 		if ( $disable_next ) {
 			$page_links[] = '<span class="button disabled next-page tablenav-pages-navspan" aria-hidden="true">&rsaquo;</span>';
@@ -369,7 +369,7 @@ class Access_Lists extends \Authorizer\Singleton {
 			$page_links[] = sprintf(
 				"<a class='button next-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 				esc_url( add_query_arg( 'paged', min( $total_pages, $current_page + 1 ), $current_url ) ),
-				__( 'Next page' ),
+				__( 'Next page', 'authorizer' ),
 				'&rsaquo;'
 			);
 		}
@@ -380,7 +380,7 @@ class Access_Lists extends \Authorizer\Singleton {
 			$page_links[] = sprintf(
 				"<a class='button last-page' href='%s'><span class='screen-reader-text'>%s</span><span aria-hidden='true'>%s</span></a>",
 				esc_url( add_query_arg( 'paged', $total_pages, $current_url ) ),
-				__( 'Last page' ),
+				__( 'Last page', 'authorizer' ),
 				'&raquo;'
 			);
 		}

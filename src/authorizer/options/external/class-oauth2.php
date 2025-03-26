@@ -131,11 +131,11 @@ class OAuth2 extends \Authorizer\Singleton {
 		?>
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your selected provider by following their specific instructions.', 'authorizer' ); ?>
-			<?php esc_html_e( 'If asked for a redirect or callback URL, use:' ); ?>
+			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
 			<strong><?php echo esc_html( site_url( '/wp-login.php?external=oauth2' ) ); ?></strong>
 		</p>
 		<p>
-			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:' ); ?>
+			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
 			<strong><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 		</p>
 		<ol>

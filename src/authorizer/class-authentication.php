@@ -245,11 +245,11 @@ class Authentication extends Singleton {
 				$error = new \WP_Error();
 
 				if ( empty( $username ) ) {
-					$error->add( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.' ) );
+					$error->add( 'empty_username', __( '<strong>ERROR</strong>: The username field is empty.', 'authorizer' ) );
 				}
 
 				if ( empty( $password ) ) {
-					$error->add( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.' ) );
+					$error->add( 'empty_password', __( '<strong>ERROR</strong>: The password field is empty.', 'authorizer' ) );
 				}
 
 				return $error;
