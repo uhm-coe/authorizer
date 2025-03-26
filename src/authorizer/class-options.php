@@ -256,7 +256,7 @@ class Options extends Singleton {
 				$auth_settings['advanced_disable_wp_login'] = $auth_multisite_settings['advanced_disable_wp_login'];
 
 				// Override bypass users.
-				$auth_settings['advanced_disable_wp_login_bypass_users'] = $auth_multisite_settings['advanced_disable_wp_login_bypass_users'] ?? '';
+				$auth_settings['advanced_disable_wp_login_bypass_usernames'] = $auth_multisite_settings['advanced_disable_wp_login_bypass_usernames'] ?? '';
 
 				// Override Users per page.
 				$auth_settings['advanced_users_per_page'] = $auth_multisite_settings['advanced_users_per_page'];
@@ -584,8 +584,8 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'advanced_disable_wp_login', $auth_settings ) ) {
 			$auth_settings['advanced_disable_wp_login'] = '';
 		}
-		if ( ! array_key_exists( 'advanced_disable_wp_login_bypass_users', $auth_settings ) ) {
-			$auth_settings['advanced_disable_wp_login_bypass_users'] = '';
+		if ( ! array_key_exists( 'advanced_disable_wp_login_bypass_usernames', $auth_settings ) ) {
+			$auth_settings['advanced_disable_wp_login_bypass_usernames'] = '';
 		}
 		if ( ! array_key_exists( 'advanced_branding', $auth_settings ) ) {
 			$auth_settings['advanced_branding'] = 'default';
@@ -858,8 +858,8 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'advanced_disable_wp_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_disable_wp_login'] = '';
 			}
-			if ( ! array_key_exists( 'advanced_disable_wp_login_bypass_users', $auth_multisite_settings ) ) {
-				$auth_multisite_settings['advanced_disable_wp_login_bypass_users'] = '';
+			if ( ! array_key_exists( 'advanced_disable_wp_login_bypass_usernames', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['advanced_disable_wp_login_bypass_usernames'] = '';
 			}
 			if ( ! array_key_exists( 'advanced_users_per_page', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_users_per_page'] = 20;
