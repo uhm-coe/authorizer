@@ -802,7 +802,6 @@
 				dataType: 'json',
 				method: 'POST',
 				data: function ( params ) {
-					console.log(params)
 					return {
 						action: 'auth_settings_search_users',
 						nonce: $( '#nonce_save_auth_settings' ).val(),
