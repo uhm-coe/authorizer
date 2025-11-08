@@ -893,4 +893,66 @@ class Ajax_Endpoints extends Singleton {
 		wp_send_json( $response );
 		exit;
 	}
+
+
+	/**
+	 * Fetch users matching search query (for Login Access > Which users should
+	 * receive email notifications about pending users) for select2 field.
+	 *
+	 * Action: wp_ajax_auth_settings_search_users
+	 *
+	 * @return void
+	 */
+	public function ajax_auth_settings_search_users() {
+		// Fail silently if current user doesn't have permissions.
+		if ( ! current_user_can( 'create_users' ) ) {
+			die( '' );
+		}
+
+		// Nonce check.
+		if ( empty( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_key( $_POST['nonce'] ), 'save_auth_settings' ) ) {
+			die( '' );
+		}
+
+		// Fail if required post data doesn't exist.
+		if ( ! array_key_exists( 'query', $_POST ) || empty( $_POST['query'] ) ) {
+			die( '' );
+		}
+
+		// Get pagination settings.
+		$per_page = 10;
+		$page     = 1;
+		if ( ! empty( $_POST['page'] ) && intval( $_POST['page'] ) > 0 ) {
+			$page = intval( $_POST['page'] );
+		}
+
+		// Fetch users matching search query.
+		$matching_users = new \WP_User_Query( array(
+			'search'         => '*' . sanitize_text_field( wp_unslash( $_POST['query'] ) ) . '*',
+			'search_columns' => array( 'user_login', 'user_email', 'display_name', 'user_nicename' ),
+			'fields'         => array( 'user_login', 'user_email' ),
+			'number'         => $per_page,
+			'paged'          => $page,
+			'count_total'    => true,
+		) );
+
+		// Send response to client (formatted for select2).
+		// See: https://select2.org/data-sources/ajax.
+		$response = array(
+			'results'    => array_map(
+				function ( $user ) {
+					return array(
+						'id'   => $user->user_login,
+						'text' => sprintf( '%s (%s)', $user->user_login, $user->user_email ),
+					);
+				},
+				$matching_users->get_results()
+			),
+			'pagination' => array(
+				'more' => $page * $per_page < $matching_users->get_total(),
+			),
+		);
+		wp_send_json( $response );
+		exit;
+	}
 }

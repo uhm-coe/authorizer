@@ -374,6 +374,7 @@
 		// Grab references to form elements that we will show/hide on page load
 		/* eslint-disable camelcase */
 		var auth_settings_access_role_receive_pending_emails = $( '#auth_settings_access_role_receive_pending_emails' ).closest( 'tr' );
+		var auth_settings_access_users_receive_pending_emails = $( '#auth_settings_access_users_receive_pending_emails' ).closest( 'tr' );
 		var auth_settings_access_pending_redirect_to_message = $( '#wp-auth_settings_access_pending_redirect_to_message-wrap' ).closest( 'tr' );
 		var auth_settings_access_blocked_redirect_to_message = $( '#wp-auth_settings_access_blocked_redirect_to_message-wrap' ).closest( 'tr' );
 		var auth_settings_access_should_email_approved_users = $( '#auth_settings_access_should_email_approved_users' ).closest( 'tr' );
@@ -454,6 +455,7 @@
 		// Hide settings unless "Only approved users" is checked
 		if ( ! $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ) {
 			animateOption( 'hide_immediately', auth_settings_access_role_receive_pending_emails );
+			animateOption( 'hide_immediately', auth_settings_access_users_receive_pending_emails );
 			animateOption( 'hide_immediately', auth_settings_access_pending_redirect_to_message );
 			animateOption( 'hide_immediately', auth_settings_access_blocked_redirect_to_message );
 			animateOption( 'hide_immediately', auth_settings_access_should_email_approved_users );
@@ -554,6 +556,7 @@
 			// Hide settings unless "Only approved users" is checked
 			var action = $( '#radio_auth_settings_access_who_can_login_approved_users' ).is( ':checked' ) ? 'show' : 'hide';
 			animateOption( action, auth_settings_access_role_receive_pending_emails );
+			animateOption( action, auth_settings_access_users_receive_pending_emails );
 			animateOption( action, auth_settings_access_pending_redirect_to_message );
 			animateOption( action, auth_settings_access_blocked_redirect_to_message );
 			animateOption( action, auth_settings_access_should_email_approved_users );
@@ -792,6 +795,34 @@
 		$( 'textarea#auth_settings_google_hosteddomain' ).autogrow();
 		$( 'textarea#auth_settings_advanced_disable_wp_login_bypass_usernames' ).autogrow();
 
+		// Enable select2 new user email notification dropdown.
+		$( 'select#auth_settings_access_users_receive_pending_emails' ).select2({
+			ajax: {
+				url: ajaxurl,
+				dataType: 'json',
+				method: 'POST',
+				data: function ( params ) {
+					console.log(params)
+					return {
+						action: 'auth_settings_search_users',
+						nonce: $( '#nonce_save_auth_settings' ).val(),
+						query: params.term,
+						page: params.page || 1,
+					};
+				},
+				delay: 250, // Delay in milliseconds after user stops typing before sending the request.
+			},
+			closeOnSelect: true, // Controls whether the dropdown is closed after a selection is made.
+			maximumInputLength: 50, // Maximum number of characters that may be provided for a search term.
+			minimumInputLength: 1, // Minimum number of characters required to start a search.
+			placeholder: authL10n.select_users,
+			templateSelection: function( data ) {
+				// Show just the username (data.id); fall back to the full display: username (email).
+				return data.id || data.text;
+			},
+			width: '100%',
+			// minimumResultsForSearch: 10,
+		});
 	});
 
 

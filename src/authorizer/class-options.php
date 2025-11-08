@@ -323,6 +323,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'access_role_receive_pending_emails', $auth_settings ) ) {
 			$auth_settings['access_role_receive_pending_emails'] = '---';
 		}
+		if ( ! array_key_exists( 'access_users_receive_pending_emails', $auth_settings ) ) {
+			$auth_settings['access_users_receive_pending_emails'] = array();
+		}
 		if ( ! array_key_exists( 'access_pending_redirect_to_message', $auth_settings ) ) {
 			$auth_settings['access_pending_redirect_to_message'] = '<p>' . __( "You're not currently allowed to view this site. Your administrator has been notified, and once he/she has approved your request, you will be able to log in. If you need any other help, please contact your administrator.", 'authorizer' ) . '</p>';
 		}
@@ -918,6 +921,14 @@ class Options extends Singleton {
 		// Default to "Everyone" view access restriction.
 		if ( ! in_array( $auth_settings['access_who_can_view'], array( 'everyone', 'logged_in_users' ), true ) ) {
 			$auth_settings['access_who_can_view'] = 'everyone';
+		}
+
+		// Make sure users receiving pending user notifications is an empty array if
+		// it's empty.
+		// Note: this option doesn't exist in multisite options, so we first
+		// check to see if it exists.
+		if ( array_key_exists( 'access_users_receive_pending_emails', $auth_settings ) && ! is_array( $auth_settings['access_users_receive_pending_emails'] ) ) {
+			$auth_settings['access_users_receive_pending_emails'] = array();
 		}
 
 		// Default to WordPress login access redirect.

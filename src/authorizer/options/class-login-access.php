@@ -89,10 +89,34 @@ class Login_Access extends \Authorizer\Singleton {
 		// Print option elements.
 		?>
 		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-			<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php esc_html_e( "None (Don't send notification emails)", 'authorizer' ); ?></option>
+			<option value="---" <?php selected( $auth_settings_option, '---' ); ?>><?php esc_html_e( "None (Don't send notification emails to all users in a role)", 'authorizer' ); ?></option>
 			<?php wp_dropdown_roles( $auth_settings_option ); ?>
 		</select>
 		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_select_auth_access_users_receive_pending_emails( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'access_users_receive_pending_emails';
+		$auth_settings_option = $options->get( $option );
+
+		// Print option elements.
+		?>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>][]" multiple>
+			<?php foreach ( (array) $auth_settings_option as $username ) : ?>
+				<option value="<?php echo esc_attr( $username ); ?>" selected><?php echo esc_attr( $username ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<?php
+		/* <option value="<?php echo esc_attr( $username ); ?>" selected><?php echo esc_attr( $username ); ?> (<?php echo esc_html( get_userdata( $username )->user_email ); ?>)</option>*/
 	}
 
 

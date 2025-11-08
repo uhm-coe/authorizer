@@ -297,6 +297,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_access_login'
 		);
 		add_settings_field(
+			'auth_settings_access_users_receive_pending_emails',
+			__( 'Which users should receive email notifications about pending users?', 'authorizer' ),
+			array( Login_Access::get_instance(), 'print_select_auth_access_users_receive_pending_emails' ),
+			'authorizer',
+			'auth_settings_access_login'
+		);
+		add_settings_field(
 			'auth_settings_access_role_receive_pending_emails',
 			__( 'Which role should receive email notifications about pending users?', 'authorizer' ),
 			array( Login_Access::get_instance(), 'print_select_auth_access_role_receive_pending_emails' ),
@@ -1368,7 +1375,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.11.0', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.12.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
@@ -1389,6 +1396,7 @@ class Admin_Page extends Singleton {
 				'next_page'            => esc_html__( 'Next page', 'authorizer' ),
 				'last_page'            => esc_html__( 'Last page', 'authorizer' ),
 				'is_network_admin'     => is_network_admin() ? '1' : '0',
+				'select_users'         => esc_html__( 'Add individual users to notify, if any', 'authorizer' ),
 			)
 		);
 
@@ -1396,11 +1404,16 @@ class Admin_Page extends Singleton {
 
 		wp_enqueue_script( 'jquery.multi-select', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/js/jquery.multi-select.js', plugin_root() ), array( 'jquery' ), '0.9.12', true );
 
+		wp_enqueue_script( 'select2', plugins_url( 'vendor-custom/select2/4.0.13/dist/js/select2.min.js', plugin_root() ), array(), '4.0.13', true );
+
 		wp_register_style( 'authorizer-css', plugins_url( 'css/authorizer.css', plugin_root() ), array(), '3.10.0' );
 		wp_enqueue_style( 'authorizer-css' );
 
 		wp_register_style( 'jquery-multi-select-css', plugins_url( 'vendor-custom/jquery.multi-select/0.9.12/css/multi-select.css', plugin_root() ), array(), '0.9.12' );
 		wp_enqueue_style( 'jquery-multi-select-css' );
+
+		wp_register_style( 'select2', plugins_url( 'vendor-custom/select2/4.0.13/dist/css/select2.min.css', plugin_root() ), array(), '4.0.13' );
+		wp_enqueue_style( 'select2' );
 
 		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
 		add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.

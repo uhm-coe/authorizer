@@ -120,11 +120,23 @@
 		}
 
 		// Make Bootstrap button group label vertically centered.
-		@media screen and (max-width: 782px) {
-			.button-add-user {
-				line-height: 37px;
+		.button-add-user {
+			line-height: 37px;
+		}
+
+		// select2 dropdown tweaks.
+		.select2-container {
+			font-size: 16px;
+
+			.select2-selection__choice__remove {
+				padding: 8px;
 			}
 		}
+	}
+
+	// select2 dropdown tweaks.
+	.select2-selection__choice__remove {
+		padding: 5px;
 	}
 
 	// Expand/collapse option sections.
