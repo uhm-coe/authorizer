@@ -501,6 +501,7 @@ class Authorization extends Singleton {
 					// notifications about pending users?".
 					if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 || ! empty( $auth_settings['access_users_receive_pending_emails'] ) ) {
 						$emails_to_notify = array();
+						// Add users with specified role (if any).
 						if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 ) {
 							foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
 								if ( ! empty( $user_recipient->user_email ) ) {
@@ -508,6 +509,7 @@ class Authorization extends Singleton {
 								}
 							}
 						}
+						// Add individual users (if any).
 						if ( ! empty( $auth_settings['access_users_receive_pending_emails'] ) ) {
 							foreach ( $auth_settings['access_users_receive_pending_emails'] as $username ) {
 								$user_recipient = get_user_by( 'login', $username );
@@ -516,6 +518,10 @@ class Authorization extends Singleton {
 								}
 							}
 						}
+						// Remove any duplicate email addresses (a user could potentially be
+						// added via their role and again via their username).
+						$emails_to_notify = array_unique( $emails_to_notify );
+						// Email each recipient.
 						if ( count( $emails_to_notify ) > 0 ) {
 							foreach ( $emails_to_notify as $email ) {
 								wp_mail(
