@@ -146,7 +146,7 @@ class Advanced extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_advanced_branding (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_advanced_branding</code>'
 					)
@@ -162,7 +162,7 @@ class Advanced extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_ADVANCED_BRANDING (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );</code>"
 					)

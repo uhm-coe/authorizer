@@ -78,7 +78,7 @@ class Google extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_google_client_id (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_google_client_id</code>'
 					)
@@ -94,7 +94,7 @@ class Google extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_ID (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );</code>"
 					)
@@ -132,7 +132,7 @@ class Google extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_google_client_secret (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_google_client_secret</code>'
 					)
@@ -148,7 +148,7 @@ class Google extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_GOOGLE_CLIENT_SECRET (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );</code>"
 					)

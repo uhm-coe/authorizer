@@ -216,7 +216,7 @@ class Login_Access extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_email_approved_users_subject (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_email_approved_users_subject</code>'
 					)
@@ -232,7 +232,7 @@ class Login_Access extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_EMAIL_APPROVED_USERS_SUBJECT', '...' );</code>"
 					)
@@ -269,7 +269,7 @@ class Login_Access extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_email_approved_users_body (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_email_approved_users_body</code>'
 					)
@@ -285,7 +285,7 @@ class Login_Access extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_EMAIL_APPROVED_USERS_BODY (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_EMAIL_APPROVED_USERS_BODY', '...' );</code>"
 					)
