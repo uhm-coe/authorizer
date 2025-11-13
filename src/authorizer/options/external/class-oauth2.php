@@ -485,13 +485,16 @@ class OAuth2 extends \Authorizer\Singleton {
 	 * approved URI to visit after logging in, and cannot have a variable
 	 * redirect_to param in it like the normal WordPress redirect flow.
 	 *
+	 * It is also used after generic OAuth2 logins since many providers discard
+	 * client querystring params.
+	 *
 	 * @hook login_redirect
 	 *
 	 * @param string $redirect_to Destination URL.
 	 */
-	public function maybe_redirect_after_azure_login( $redirect_to ) {
-		if ( ! empty( $_SESSION['azure_redirect_to'] ) ) {
-			$redirect_to = sanitize_url( $_SESSION['azure_redirect_to'] );
+	public function maybe_redirect_after_oauth2_login( $redirect_to ) {
+		if ( ! empty( $_SESSION['oauth2_redirect_to'] ) ) {
+			$redirect_to = sanitize_url( $_SESSION['oauth2_redirect_to'] );
 		}
 
 		return $redirect_to;

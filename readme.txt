@@ -1,7 +1,7 @@
 === Authorizer ===
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
-Tested up to: 6.7
+Tested up to: 6.8
 Stable tag: 3.11.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -41,9 +41,11 @@ If you add external=wordpress to the wp-login.php URL querystring, you can alway
 
 = Where is this plugin used? =
 
-The [University of Hawai'i][uh], which provides authentication for student, faculty, and staff members via a centralized service (CAS or LDAP).
+The [University of Hawai'i][http://hawaii.edu/], which provides authentication for student, faculty, and staff members via a centralized service (CAS or LDAP).
 
-[uh]: http://hawaii.edu/
+= Need a tutorial on how to set up Keycloak as an OAuth2 server to integrate with Authorizer?
+
+WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.org/support/topic/tutorial-for-authorizer-keycloak/](https://wordpress.org/support/topic/tutorial-for-authorizer-keycloak/).
 
 == Screenshots ==
 

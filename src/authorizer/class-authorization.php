@@ -496,25 +496,51 @@ class Authorization extends Singleton {
 					$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
 
 					// Notify users with the role specified in "Which role should
-					// receive email notifications about pending users?".
-					if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 ) {
-						foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
-							wp_mail(
-								$user_recipient->user_email,
-								sprintf(
-									/* TRANSLATORS: 1: User email 2: Name of site */
-									__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
-									$pending_user['email'],
-									$site_name
-								),
-								sprintf(
-									/* TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer */
-									__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
-									$site_name,
-									$site_url,
-									$authorizer_options_url
-								)
-							);
+					// receive email notifications about pending users?" and any
+					// individual users specified in "Which users should receive email
+					// notifications about pending users?".
+					if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 || ! empty( $auth_settings['access_users_receive_pending_emails'] ) ) {
+						$emails_to_notify = array();
+						// Add users with specified role (if any).
+						if ( strlen( $auth_settings['access_role_receive_pending_emails'] ) > 0 ) {
+							foreach ( get_users( array( 'role' => $auth_settings['access_role_receive_pending_emails'] ) ) as $user_recipient ) {
+								if ( ! empty( $user_recipient->user_email ) ) {
+									$emails_to_notify[] = $user_recipient->user_email;
+								}
+							}
+						}
+						// Add individual users (if any).
+						if ( ! empty( $auth_settings['access_users_receive_pending_emails'] ) ) {
+							foreach ( $auth_settings['access_users_receive_pending_emails'] as $username ) {
+								$user_recipient = get_user_by( 'login', $username );
+								if ( ! empty( $user_recipient->user_email ) ) {
+									$emails_to_notify[] = $user_recipient->user_email;
+								}
+							}
+						}
+						// Remove any duplicate email addresses (a user could potentially be
+						// added via their role and again via their username).
+						$emails_to_notify = array_unique( $emails_to_notify );
+						// Email each recipient.
+						if ( count( $emails_to_notify ) > 0 ) {
+							foreach ( $emails_to_notify as $email ) {
+								wp_mail(
+									$email,
+									sprintf(
+										/* TRANSLATORS: 1: User email 2: Name of site */
+										__( 'Action required: Pending user %1$s at %2$s', 'authorizer' ),
+										$pending_user['email'],
+										$site_name
+									),
+									sprintf(
+										/* TRANSLATORS: 1: Name of site 2: URL of site 3: URL of authorizer */
+										__( "A new user has tried to access the %1\$s site you manage at:\n%2\$s\n\nPlease log in to approve or deny their request:\n%3\$s\n", 'authorizer' ),
+										$site_name,
+										$site_url,
+										$authorizer_options_url
+									)
+								);
+							}
 						}
 					}
 				}

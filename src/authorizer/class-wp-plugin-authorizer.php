@@ -60,8 +60,8 @@ class WP_Plugin_Authorizer extends Singleton {
 			add_filter( 'login_errors', array( Login_Form::get_instance(), 'show_advanced_login_error' ) );
 		}
 
-		// Redirect to wp-login.php?redirect_to=? destination after an Azure login.
-		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_azure_login' ), 10, 2 );
+		// Redirect to wp-login.php?redirect_to=? destination after an OAuth2 login.
+		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_oauth2_login' ), 10, 2 );
 
 		// Enable localization. Translation files stored in /languages.
 		add_action( 'init', array( $this, 'load_textdomain' ) );
@@ -153,6 +153,9 @@ class WP_Plugin_Authorizer extends Singleton {
 
 		// AJAX: Test LDAP user.
 		add_action( 'wp_ajax_auth_settings_ldap_test_user', array( Ajax_Endpoints::get_instance(), 'ajax_auth_settings_ldap_test_user' ) );
+
+		// AJAX: Search users for select2 dropdown.
+		add_action( 'wp_ajax_auth_settings_search_users', array( Ajax_Endpoints::get_instance(), 'ajax_auth_settings_search_users' ) );
 
 		// Add dashboard widget so instructors can add/edit users with access.
 		// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
