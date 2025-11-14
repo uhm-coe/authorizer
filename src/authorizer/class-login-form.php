@@ -42,7 +42,7 @@ class Login_Form extends Singleton {
 			 *
 			 * @since 3.12.0
 			 *
-			 * @param string $authorizer_message_anonymous_users The message content.
+			 * @param string $message The message content.
 			 */
 			$authorizer_message_anonymous_users = apply_filters( 'authorizer_message_anonymous_users', $authorizer_message_anonymous_users );
 
