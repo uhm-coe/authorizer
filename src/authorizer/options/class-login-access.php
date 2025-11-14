@@ -132,7 +132,41 @@ class Login_Access extends \Authorizer\Singleton {
 		$option               = 'access_pending_redirect_to_message';
 		$auth_settings_option = $options->get( $option );
 
-		// Print option elements.
+		// Print option elements. If setting is overriden by filter or constant,
+		// don't expose the value; just print an informational message.
+		if ( has_filter( 'authorizer_login_message_pending_users' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: filter name */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_login_message_pending_users</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_LOGIN_MESSAGE_PENDING_USERS' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: defined constant name */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_LOGIN_MESSAGE_PENDING_USERS', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 		wp_editor(
 			wpautop( $auth_settings_option ),
 			"auth_settings_$option",
@@ -160,7 +194,41 @@ class Login_Access extends \Authorizer\Singleton {
 		$option               = 'access_blocked_redirect_to_message';
 		$auth_settings_option = $options->get( $option );
 
-		// Print option elements.
+		// Print option elements. If setting is overriden by filter or constant,
+		// don't expose the value; just print an informational message.
+		if ( has_filter( 'authorizer_login_message_blocked_users' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: filter name */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_login_message_blocked_users</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_LOGIN_MESSAGE_BLOCKED_USERS' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: defined constant name */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_LOGIN_MESSAGE_BLOCKED_USERS', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 		wp_editor(
 			wpautop( $auth_settings_option ),
 			"auth_settings_$option",
