@@ -415,110 +415,170 @@ class Admin_Page extends Singleton {
 			)
 		);
 		add_settings_field(
+			'auth_settings_oauth2_num_servers',
+			__( 'OAuth2 server(s)', 'authorizer' ),
+			array( OAuth2::get_instance(), 'print_number_oauth2_num_servers' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		$oauth2_num_servers = max( 1, min( 20, intval( Options::get_instance()->get( 'oauth2_num_servers', Helper::SINGLE_CONTEXT, 'allow override' ) ) ) );
+		add_settings_field(
 			'auth_settings_oauth2_auto_login',
 			__( 'OAuth2 automatic login', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_checkbox_oauth2_auto_login' ),
+			array( OAuth2::get_instance(), 'print_select_oauth2_auto_login' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external',
+			array(
+				'oauth2_num_servers' => $oauth2_num_servers,
+			)
 		);
-		add_settings_field(
-			'auth_settings_oauth2_provider',
-			__( 'Provider', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_select_oauth2_provider' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_custom_label',
-			__( 'Custom label', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_custom_label' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_clientid',
-			__( 'Client ID', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_clientid' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_clientsecret',
-			__( 'Client Secret', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_clientsecret' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_hosteddomain',
-			__( 'OAuth2 Hosted Domain', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_hosteddomain' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_tenant_id',
-			__( 'Tenant ID', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_tenant_id' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_url_authorize',
-			__( 'Authorization URL', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_url_authorize' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_url_token',
-			__( 'Access Token URL', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_url_token' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_url_resource',
-			__( 'Resource Owner URL', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_url_resource' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_attr_username',
-			__( 'Attribute containing username', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_attr_username' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_attr_email',
-			__( 'Attribute containing email', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_attr_email' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_attr_first_name',
-			__( 'Attribute containing first name', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_attr_first_name' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_attr_last_name',
-			__( 'Attribute containing last name', 'authorizer' ),
-			array( OAuth2::get_instance(), 'print_text_oauth2_attr_last_name' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_oauth2_attr_update_on_login',
-			__( 'Name attribute update', 'authorizer' ),
-			array( Oauth2::get_instance(), 'print_select_oauth2_attr_update_on_login' ),
-			'authorizer',
-			'auth_settings_external'
-		);
+		foreach ( range( 1, $oauth2_num_servers ) as $oauth2_num_server ) {
+			$suffix = 1 === $oauth2_num_server ? '' : '_' . $oauth2_num_server;
+			$prefix = $oauth2_num_server . '. ';
+
+			add_settings_field(
+				'auth_settings_oauth2_provider' . $suffix,
+				$prefix . __( 'Provider', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_select_oauth2_provider' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'class'             => 'border-top-small',
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+
+			add_settings_field(
+				'auth_settings_oauth2_custom_label' . $suffix,
+				$prefix . __( 'Custom label', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_custom_label' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_clientid' . $suffix,
+				$prefix . __( 'Client ID', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_clientid' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_clientsecret' . $suffix,
+				$prefix . __( 'Client Secret', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_clientsecret' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_hosteddomain' . $suffix,
+				$prefix . __( 'OAuth2 Hosted Domain', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_hosteddomain' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_tenant_id' . $suffix,
+				$prefix . __( 'Tenant ID', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_tenant_id' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_url_authorize' . $suffix,
+				$prefix . __( 'Authorization URL', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_url_authorize' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_url_token' . $suffix,
+				$prefix . __( 'Access Token URL', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_url_token' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_url_resource' . $suffix,
+				$prefix . __( 'Resource Owner URL', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_url_resource' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_attr_username' . $suffix,
+				$prefix . __( 'Attribute containing username', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_attr_username' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_attr_email' . $suffix,
+				$prefix . __( 'Attribute containing email', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_attr_email' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_attr_first_name' . $suffix,
+				$prefix . __( 'Attribute containing first name', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_attr_first_name' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_attr_last_name' . $suffix,
+				$prefix . __( 'Attribute containing last name', 'authorizer' ),
+				array( OAuth2::get_instance(), 'print_text_oauth2_attr_last_name' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oauth2_attr_update_on_login' . $suffix,
+				$prefix . __( 'Name attribute update', 'authorizer' ),
+				array( Oauth2::get_instance(), 'print_select_oauth2_attr_update_on_login' ),
+				'authorizer',
+				'auth_settings_external',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+		}
 
 		add_settings_field(
 			'auth_settings_external_google',
@@ -989,67 +1049,180 @@ class Admin_Page extends Singleton {
 							<td><?php $oauth2->print_checkbox_auth_external_oauth2( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
+							<th scope="row"><?php esc_html_e( 'OAuth2 server(s)', 'authorizer' ); ?></th>
+							<td><?php $oauth2->print_number_oauth2_num_servers( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<?php $oauth2_num_servers = max( 1, min( 20, intval( $auth_settings['oauth2_num_servers'] ?? 1 ) ) ); ?>
+						<tr>
 							<th scope="row"><?php esc_html_e( 'OAuth2 automatic login', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_checkbox_oauth2_auto_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+							<td>
+								<?php
+								$oauth2->print_select_oauth2_auto_login( array(
+									'context' => Helper::NETWORK_CONTEXT,
+									'oauth2_num_servers' => $oauth2_num_servers,
+								) );
+								?>
+							</td>
 						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'OAuth2 Provider', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_select_oauth2_provider( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Custom Label', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Client ID', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Client Secret', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_clientsecret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'OAuth2 Hosted Domain', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Tenant ID', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_tenant_id( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Authorization URL', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_url_authorize( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Access Token URL', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_url_token( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Resource Owner URL', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_url_resource( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Attribute containing username', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_attr_username( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Attribute containing email', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Attribute containing first name', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Attribute containing last name', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_text_oauth2_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'Name attribute update', 'authorizer' ); ?></th>
-							<td><?php $oauth2->print_select_oauth2_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
+						<?php
+						foreach ( range( 1, $oauth2_num_servers ) as $oauth2_num_server ) :
+							$prefix = $oauth2_num_server . '. ';
+							?>
+							<tr class="border-top-small">
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'OAuth2 Provider', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_select_oauth2_provider( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Custom Label', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_custom_label( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Client ID', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_clientid( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Client Secret', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_clientsecret( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'OAuth2 Hosted Domain', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_hosteddomain( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Tenant ID', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_tenant_id( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Authorization URL', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_url_authorize( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Access Token URL', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_url_token( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Resource Owner URL', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_url_resource( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Attribute containing username', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_attr_username( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Attribute containing email', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_attr_email( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Attribute containing first name', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_attr_first_name( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Attribute containing last name', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_text_oauth2_attr_last_name( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Name attribute update', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_select_oauth2_attr_update_on_login( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
 
 						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
@@ -1067,6 +1240,7 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Google Hosted Domain', 'authorizer' ); ?></th>
 							<td><?php $google->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
+
 						<tr class="border-top">
 							<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
 							<td><?php $cas->print_checkbox_auth_external_cas( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>

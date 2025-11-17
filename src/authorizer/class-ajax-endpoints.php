@@ -162,6 +162,8 @@ class Ajax_Endpoints extends Singleton {
 			'access_who_can_view',
 			'access_default_role',
 			'oauth2',
+			'oauth2_auto_login',
+			'oauth2_num_servers',
 			'oauth2_provider',
 			'oauth2_custom_label',
 			'oauth2_clientid',
@@ -176,7 +178,6 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_attr_first_name',
 			'oauth2_attr_last_name',
 			'oauth2_attr_update_on_login',
-			'oauth2_auto_login',
 			'google',
 			'google_clientid',
 			'google_clientsecret',
@@ -218,6 +219,27 @@ class Ajax_Endpoints extends Singleton {
 			'advanced_users_sort_order',
 			'advanced_widget_enabled',
 		);
+		if ( ! empty( $auth_multisite_settings['oauth2_num_servers'] ) && intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {
+			// Add options if more than one OAuth2 server.
+			foreach ( range( 2, min( intval( $auth_multisite_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
+				$allowed = array_merge( $allowed, array(
+					'oauth2_provider_' . $oauth2_num_server,
+					'oauth2_custom_label_' . $oauth2_num_server,
+					'oauth2_clientid_' . $oauth2_num_server,
+					'oauth2_clientsecret_' . $oauth2_num_server,
+					'oauth2_hosteddomain_' . $oauth2_num_server,
+					'oauth2_tenant_id_' . $oauth2_num_server,
+					'oauth2_url_authorize_' . $oauth2_num_server,
+					'oauth2_url_token_' . $oauth2_num_server,
+					'oauth2_url_resource_' . $oauth2_num_server,
+					'oauth2_attr_username_' . $oauth2_num_server,
+					'oauth2_attr_email_' . $oauth2_num_server,
+					'oauth2_attr_first_name_' . $oauth2_num_server,
+					'oauth2_attr_last_name_' . $oauth2_num_server,
+					'oauth2_attr_update_on_login_' . $oauth2_num_server,
+				) );
+			}
+		}
 		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
 			// Add options if more than one CAS server.
 			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {

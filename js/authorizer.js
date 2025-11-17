@@ -384,21 +384,45 @@
 		var auth_settings_access_redirect_to_login = $( '#radio_auth_settings_access_redirect_to_login' ).closest( 'tr' );
 		var auth_settings_access_public_warning = $( '#radio_auth_settings_access_public_warning' ).closest( 'tr' );
 		var auth_settings_access_redirect_to_message = $( '#wp-auth_settings_access_redirect_to_message-wrap' ).closest( 'tr' );
-		var auth_settings_external_oauth2_provider = $( '#auth_settings_oauth2_provider' ).closest( 'tr' );
-		var auth_settings_external_oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).closest( 'tr' );
-		var auth_settings_external_oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).closest( 'tr' );
-		var auth_settings_external_oauth2_clientsecret = $( '#auth_settings_oauth2_clientsecret' ).closest( 'tr' );
-		var auth_settings_external_oauth2_hosteddomain = $( '#auth_settings_oauth2_hosteddomain' ).closest( 'tr' );
-		var auth_settings_external_oauth2_tenant_id = $( '#auth_settings_oauth2_tenant_id' ).closest( 'tr' );
-		var auth_settings_external_oauth2_url_authorize = $( '#auth_settings_oauth2_url_authorize' ).closest( 'tr' );
-		var auth_settings_external_oauth2_url_token = $( '#auth_settings_oauth2_url_token' ).closest( 'tr' );
-		var auth_settings_external_oauth2_url_resource = $( '#auth_settings_oauth2_url_resource' ).closest( 'tr' );
-		var auth_settings_external_oauth2_attr_username = $( '#auth_settings_oauth2_attr_username' ).closest( 'tr' );
-		var auth_settings_external_oauth2_attr_email = $( '#auth_settings_oauth2_attr_email' ).closest( 'tr' );
-		var auth_settings_external_oauth2_attr_first_name = $( '#auth_settings_oauth2_attr_first_name' ).closest( 'tr' );
-		var auth_settings_external_oauth2_attr_last_name = $( '#auth_settings_oauth2_attr_last_name' ).closest( 'tr' );
-		var auth_settings_external_oauth2_attr_update_on_login = $( '#auth_settings_oauth2_attr_update_on_login' ).closest( 'tr' );
 		var auth_settings_external_oauth2_auto_login = $( '#auth_settings_oauth2_auto_login' ).closest( 'tr' );
+		var auth_settings_external_oauth2_num_servers = $( '#auth_settings_oauth2_num_servers' ).closest( 'tr' );
+		var auth_settings_external_oauth2_servers = [];
+		// OAuth2 settings below are for the first configured OAuth2 server.
+		auth_settings_external_oauth2_servers.push( {
+			provider: $( '#auth_settings_oauth2_provider' ).closest( 'tr' ),
+			custom_label: $( '#auth_settings_oauth2_custom_label' ).closest( 'tr' ),
+			clientid: $( '#auth_settings_oauth2_clientid' ).closest( 'tr' ),
+			clientsecret: $( '#auth_settings_oauth2_clientsecret' ).closest( 'tr' ),
+			hosteddomain: $( '#auth_settings_oauth2_hosteddomain' ).closest( 'tr' ),
+			tenant_id: $( '#auth_settings_oauth2_tenant_id' ).closest( 'tr' ),
+			url_authorize: $( '#auth_settings_oauth2_url_authorize' ).closest( 'tr' ),
+			url_token: $( '#auth_settings_oauth2_url_token' ).closest( 'tr' ),
+			url_resource: $( '#auth_settings_oauth2_url_resource' ).closest( 'tr' ),
+			attr_username: $( '#auth_settings_oauth2_attr_username' ).closest( 'tr' ),
+			attr_email: $( '#auth_settings_oauth2_attr_email' ).closest( 'tr' ),
+			attr_first_name: $( '#auth_settings_oauth2_attr_first_name' ).closest( 'tr' ),
+			attr_last_name: $( '#auth_settings_oauth2_attr_last_name' ).closest( 'tr' ),
+			attr_update_on_login: $( '#auth_settings_oauth2_attr_update_on_login' ).closest( 'tr' ),
+		} );
+		// OAuth2 settings below are for any additional OAuth2 servers configured (up to 20).
+		for ( var i = 2; i <= parseInt( $( '#auth_settings_oauth2_num_servers' ).val() ) && i <= 20; i++ ) {
+			auth_settings_external_oauth2_servers.push( {
+				provider: $( '#auth_settings_oauth2_provider_' + i ).closest( 'tr' ),
+				custom_label: $( '#auth_settings_oauth2_custom_label_' + i ).closest( 'tr' ),
+				clientid: $( '#auth_settings_oauth2_clientid_' + i ).closest( 'tr' ),
+				clientsecret: $( '#auth_settings_oauth2_clientsecret_' + i ).closest( 'tr' ),
+				hosteddomain: $( '#auth_settings_oauth2_hosteddomain_' + i ).closest( 'tr' ),
+				tenant_id: $( '#auth_settings_oauth2_tenant_id_' + i ).closest( 'tr' ),
+				url_authorize: $( '#auth_settings_oauth2_url_authorize_' + i ).closest( 'tr' ),
+				url_token: $( '#auth_settings_oauth2_url_token_' + i ).closest( 'tr' ),
+				url_resource: $( '#auth_settings_oauth2_url_resource_' + i ).closest( 'tr' ),
+				attr_username: $( '#auth_settings_oauth2_attr_username_' + i ).closest( 'tr' ),
+				attr_email: $( '#auth_settings_oauth2_attr_email_' + i ).closest( 'tr' ),
+				attr_first_name: $( '#auth_settings_oauth2_attr_first_name_' + i ).closest( 'tr' ),
+				attr_last_name: $( '#auth_settings_oauth2_attr_last_name_' + i ).closest( 'tr' ),
+				attr_update_on_login: $( '#auth_settings_oauth2_attr_update_on_login_' + i ).closest( 'tr' ),
+			} );
+		}
 		var auth_settings_external_google_clientid = $( '#auth_settings_google_clientid' ).closest( 'tr' );
 		var auth_settings_external_google_clientsecret = $( '#auth_settings_google_clientsecret' ).closest( 'tr' );
 		var auth_settings_external_google_hosteddomain = $( '#auth_settings_google_hosteddomain' ).closest( 'tr' );
@@ -475,32 +499,36 @@
 			animateOption( 'hide_immediately', auth_settings_access_redirect_to_message );
 		}
 
-		// Hide OAuth2 options if unchecked.
+		// Hide OAuth2 options if OAuth2 provider is unchecked.
 		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) ) {
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_provider );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_custom_label );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientid );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_clientsecret );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_hosteddomain );
 			animateOption( 'hide_immediately', auth_settings_external_oauth2_auto_login );
+			animateOption( 'hide_immediately', auth_settings_external_oauth2_num_servers );
 		}
-
-		// Hide OAuth2 generic options if generic isn't chosen.
-		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'generic' !== $( '#auth_settings_oauth2_provider' ).val() ) {
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_authorize );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_token );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_url_resource );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_username );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_email );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_first_name );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_last_name );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_attr_update_on_login );
-		}
-
-		// Hide OAuth2 Tenant ID if azure isn't chosen.
-		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'azure' !== $( '#auth_settings_oauth2_provider' ).val() ) {
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_tenant_id );
-		}
+		auth_settings_external_oauth2_servers.forEach( function( server ) {
+			// Hide OAuth2 options if OAuth2 provider is unchecked.
+			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) ) {
+				animateOption( 'hide_immediately', server.provider );
+				animateOption( 'hide_immediately', server.custom_label );
+				animateOption( 'hide_immediately', server.clientid );
+				animateOption( 'hide_immediately', server.clientsecret );
+				animateOption( 'hide_immediately', server.hosteddomain );
+			}
+			// Hide OAuth2 generic options if OAuth2 provider is unchecked or generic isn't chosen.
+			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'generic' !== server.provider.find( 'select' ).val() ) {
+				animateOption( 'hide_immediately', server.url_authorize );
+				animateOption( 'hide_immediately', server.url_token );
+				animateOption( 'hide_immediately', server.url_resource );
+				animateOption( 'hide_immediately', server.attr_username );
+				animateOption( 'hide_immediately', server.attr_email );
+				animateOption( 'hide_immediately', server.attr_first_name );
+				animateOption( 'hide_immediately', server.attr_last_name );
+				animateOption( 'hide_immediately', server.attr_update_on_login );
+			}
+			// Hide OAuth2 Tenant ID if OAuth2 provider is unchecked or azure isn't chosen.
+			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'azure' !== server.provider.find( 'select' ).val() ) {
+				animateOption( 'hide_immediately', server.tenant_id );
+			}
+		} );
 
 		// Hide Google options if unchecked
 		if ( ! $( '#auth_settings_google' ).is( ':checked' ) ) {
@@ -584,27 +612,32 @@
 		// Event handler: Show/hide OAuth2 options based on checkbox.
 		$( 'input[name="auth_settings[oauth2]"]' ).on( 'change', function() {
 			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_oauth2_provider );
-			animateOption( action, auth_settings_external_oauth2_custom_label );
-			animateOption( action, auth_settings_external_oauth2_clientid );
-			animateOption( action, auth_settings_external_oauth2_clientsecret );
-			animateOption( action, auth_settings_external_oauth2_hosteddomain );
 			animateOption( action, auth_settings_external_oauth2_auto_login );
+			animateOption( action, auth_settings_external_oauth2_num_servers );
+			auth_settings_external_oauth2_servers.forEach( function( server ) {
+				animateOption( action, server.provider );
+				animateOption( action, server.custom_label );
+				animateOption( action, server.clientid );
+				animateOption( action, server.clientsecret );
+				animateOption( action, server.hosteddomain );
+			});
 		});
 
-		// Event handler: Show/hide OAuth2 generic options based on provider.
-		$( 'select[name="auth_settings[oauth2_provider]"]' ).on( 'change', function() {
-			var action = 'generic' === $( this ).val() ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_oauth2_url_authorize );
-			animateOption( action, auth_settings_external_oauth2_url_token );
-			animateOption( action, auth_settings_external_oauth2_url_resource );
-			animateOption( action, auth_settings_external_oauth2_attr_username );
-			animateOption( action, auth_settings_external_oauth2_attr_email );
-			animateOption( action, auth_settings_external_oauth2_attr_first_name );
-			animateOption( action, auth_settings_external_oauth2_attr_last_name );
-			animateOption( action, auth_settings_external_oauth2_attr_update_on_login );
-			action = 'azure' === $( this ).val() ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_oauth2_tenant_id );
+		// Event handler: Show/hide OAuth2 generic/azure options based on provider.
+		auth_settings_external_oauth2_servers.forEach( function( server ) {
+			server.provider.find( 'select' ).on( 'change', function() {
+				var action = 'generic' === $( this ).val() ? 'show' : 'hide';
+				animateOption( action, server.url_authorize );
+				animateOption( action, server.url_token );
+				animateOption( action, server.url_resource );
+				animateOption( action, server.attr_username );
+				animateOption( action, server.attr_email );
+				animateOption( action, server.attr_first_name );
+				animateOption( action, server.attr_last_name );
+				animateOption( action, server.attr_update_on_login );
+				action = 'azure' === $( this ).val() ? 'show' : 'hide';
+				animateOption( action, server.tenant_id );
+			});
 		});
 
 		// Event handler: Show/hide Google options based on checkbox
@@ -1191,6 +1224,8 @@
 		params.access_default_role = $( '#auth_settings_access_default_role' ).val();
 
 		params.oauth2 = $( '#auth_settings_oauth2' ).is( ':checked' ) ? '1' : '';
+		params.oauth2_auto_login = $( '#auth_settings_oauth2_auto_login' ).val();
+		params.oauth2_num_servers = parseInt( $( '#auth_settings_oauth2_num_servers' ).val() );
 		params.oauth2_provider = $( '#auth_settings_oauth2_provider' ).val();
 		params.oauth2_custom_label = $( '#auth_settings_oauth2_custom_label' ).val();
 		params.oauth2_clientid = $( '#auth_settings_oauth2_clientid' ).val();
@@ -1205,7 +1240,24 @@
 		params.oauth2_attr_first_name = $( '#auth_settings_oauth2_attr_first_name' ).val();
 		params.oauth2_attr_last_name = $( '#auth_settings_oauth2_attr_last_name' ).val();
 		params.oauth2_attr_update_on_login = $( '#auth_settings_oauth2_attr_update_on_login' ).val();
-		params.oauth2_auto_login = $( '#auth_settings_oauth2_auto_login' ).is( ':checked' ) ? '1' : '';
+		if ( params.oauth2_num_servers > 1 ) {
+			for ( var oauth2_num_server = 2; oauth2_num_server <= params.oauth2_num_servers && oauth2_num_server <= 20; oauth2_num_server++ ) {
+				params['oauth2_provider_' + oauth2_num_server] = $( '#auth_settings_oauth2_provider_' + oauth2_num_server ).val();
+				params['oauth2_custom_label_' + oauth2_num_server] = $( '#auth_settings_oauth2_custom_label_' + oauth2_num_server ).val();
+				params['oauth2_clientid_' + oauth2_num_server] = $( '#auth_settings_oauth2_clientid_' + oauth2_num_server ).val();
+				params['oauth2_clientsecret_' + oauth2_num_server] = $( '#auth_settings_oauth2_clientsecret_' + oauth2_num_server ).val();
+				params['oauth2_hosteddomain_' + oauth2_num_server] = $( '#auth_settings_oauth2_hosteddomain_' + oauth2_num_server ).val();
+				params['oauth2_tenant_id_' + oauth2_num_server] = $( '#auth_settings_oauth2_tenant_id_' + oauth2_num_server ).val();
+				params['oauth2_url_authorize_' + oauth2_num_server] = $( '#auth_settings_oauth2_url_authorize_' + oauth2_num_server ).val();
+				params['oauth2_url_token_' + oauth2_num_server] = $( '#auth_settings_oauth2_url_token_' + oauth2_num_server ).val();
+				params['oauth2_url_resource_' + oauth2_num_server] = $( '#auth_settings_oauth2_url_resource_' + oauth2_num_server ).val();
+				params['oauth2_attr_username_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_username_' + oauth2_num_server ).val();
+				params['oauth2_attr_email_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_email_' + oauth2_num_server ).val();
+				params['oauth2_attr_first_name_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_first_name_' + oauth2_num_server ).val();
+				params['oauth2_attr_last_name_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_last_name_' + oauth2_num_server ).val();
+				params['oauth2_attr_update_on_login_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_update_on_login_' + oauth2_num_server ).val();
+			}
+		}
 
 		params.google = $( '#auth_settings_google' ).is( ':checked' ) ? '1' : '';
 		params.google_clientid = $( '#auth_settings_google_clientid' ).val();
@@ -1285,9 +1337,10 @@
 			// Disable wait cursor.
 			$( 'html' ).removeClass( 'busy' );
 
-			// If the save was successful, and we have more than 1 CAS servers configured,
-			// reload the page to render the additional CAS server settings fields.
-			if ( succeeded && params.cas_num_servers > 1 ) {
+			// If the save was successful, and we have more than 1 CAS or OAuth2
+			// servers configured, reload the page to render the additional CAS/Oauth2
+			// server settings fields.
+			if ( succeeded && ( params.cas_num_servers > 1 || params.oauth2_num_servers > 1 ) ) {
 				location.reload();
 			}
 		}).fail( function() {

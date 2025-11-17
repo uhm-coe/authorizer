@@ -169,20 +169,40 @@ class Options extends Singleton {
 				// Override external service (Oauth2) and associated options.
 				$auth_settings['oauth2']                      = $auth_multisite_settings['oauth2'];
 				$auth_settings['oauth2_auto_login']           = $auth_multisite_settings['oauth2_auto_login'] ?? '';
-				$auth_settings['oauth2_provider']             = $auth_multisite_settings['oauth2_provider'];
-				$auth_settings['oauth2_custom_label']         = $auth_multisite_settings['oauth2_custom_label'];
-				$auth_settings['oauth2_clientid']             = $auth_multisite_settings['oauth2_clientid'];
-				$auth_settings['oauth2_clientsecret']         = $auth_multisite_settings['oauth2_clientsecret'];
-				$auth_settings['oauth2_hosteddomain']         = $auth_multisite_settings['oauth2_hosteddomain'];
-				$auth_settings['oauth2_tenant_id']            = $auth_multisite_settings['oauth2_tenant_id'];
-				$auth_settings['oauth2_url_authorize']        = $auth_multisite_settings['oauth2_url_authorize'];
-				$auth_settings['oauth2_url_token']            = $auth_multisite_settings['oauth2_url_token'];
-				$auth_settings['oauth2_url_resource']         = $auth_multisite_settings['oauth2_url_resource'];
+				$auth_settings['oauth2_num_servers']          = $auth_multisite_settings['oauth2_num_servers'] ?? 1;
+				$auth_settings['oauth2_provider']             = $auth_multisite_settings['oauth2_provider'] ?? '';
+				$auth_settings['oauth2_custom_label']         = $auth_multisite_settings['oauth2_custom_label'] ?? 'OAuth2';
+				$auth_settings['oauth2_clientid']             = $auth_multisite_settings['oauth2_clientid'] ?? '';
+				$auth_settings['oauth2_clientsecret']         = $auth_multisite_settings['oauth2_clientsecret'] ?? '';
+				$auth_settings['oauth2_hosteddomain']         = $auth_multisite_settings['oauth2_hosteddomain'] ?? '';
+				$auth_settings['oauth2_tenant_id']            = $auth_multisite_settings['oauth2_tenant_id'] ?? '';
+				$auth_settings['oauth2_url_authorize']        = $auth_multisite_settings['oauth2_url_authorize'] ?? '';
+				$auth_settings['oauth2_url_token']            = $auth_multisite_settings['oauth2_url_token'] ?? '';
+				$auth_settings['oauth2_url_resource']         = $auth_multisite_settings['oauth2_url_resource'] ?? '';
 				$auth_settings['oauth2_attr_username']        = $auth_multisite_settings['oauth2_attr_username'] ?? '';
 				$auth_settings['oauth2_attr_email']           = $auth_multisite_settings['oauth2_attr_email'] ?? '';
 				$auth_settings['oauth2_attr_first_name']      = $auth_multisite_settings['oauth2_attr_first_name'] ?? '';
 				$auth_settings['oauth2_attr_last_name']       = $auth_multisite_settings['oauth2_attr_last_name'] ?? '';
 				$auth_settings['oauth2_attr_update_on_login'] = $auth_multisite_settings['oauth2_attr_update_on_login'] ?? '';
+				// Add any options for extra OAuth2 servers.
+				if ( ! empty( $auth_multisite_settings['oauth2_num_servers'] ) && intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {
+					foreach ( range( 2, min( intval( $auth_multisite_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
+						$auth_settings[ 'oauth2_provider_' . $oauth2_num_server ]             = $auth_multisite_settings[ 'oauth2_provider_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_custom_label_' . $oauth2_num_server ]         = $auth_multisite_settings[ 'oauth2_custom_label_' . $oauth2_num_server ] ?? 'OAuth2';
+						$auth_settings[ 'oauth2_clientid_' . $oauth2_num_server ]             = $auth_multisite_settings[ 'oauth2_clientid_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_clientsecret_' . $oauth2_num_server ]         = $auth_multisite_settings[ 'oauth2_clientsecret_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_hosteddomain_' . $oauth2_num_server ]         = $auth_multisite_settings[ 'oauth2_hosteddomain_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_tenant_id_' . $oauth2_num_server ]            = $auth_multisite_settings[ 'oauth2_tenant_id_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_url_authorize_' . $oauth2_num_server ]        = $auth_multisite_settings[ 'oauth2_url_authorize_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_url_token_' . $oauth2_num_server ]            = $auth_multisite_settings[ 'oauth2_url_token_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_url_resource_' . $oauth2_num_server ]         = $auth_multisite_settings[ 'oauth2_url_resource_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_attr_username_' . $oauth2_num_server ]        = $auth_multisite_settings[ 'oauth2_attr_username_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_attr_email_' . $oauth2_num_server ]           = $auth_multisite_settings[ 'oauth2_attr_email_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ]      = $auth_multisite_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ]       = $auth_multisite_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = $auth_multisite_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] ?? '';
+					}
+				}
 
 				// Override external service (Google) and associated options.
 				$auth_settings['google']              = $auth_multisite_settings['google'];
@@ -405,6 +425,12 @@ class Options extends Singleton {
 			$auth_settings['google_hosteddomain'] = '';
 		}
 
+		if ( ! array_key_exists( 'oauth2_auto_login', $auth_settings ) ) {
+			$auth_settings['oauth2_auto_login'] = '';
+		}
+		if ( ! array_key_exists( 'oauth2_num_servers', $auth_settings ) ) {
+			$auth_settings['oauth2_num_servers'] = '1';
+		}
 		if ( ! array_key_exists( 'oauth2_provider', $auth_settings ) ) {
 			$auth_settings['oauth2_provider'] = '';
 		}
@@ -447,8 +473,51 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'oauth2_attr_update_on_login', $auth_settings ) ) {
 			$auth_settings['oauth2_attr_update_on_login'] = '';
 		}
-		if ( ! array_key_exists( 'oauth2_auto_login', $auth_settings ) ) {
-			$auth_settings['oauth2_auto_login'] = '';
+		if ( intval( $auth_settings['oauth2_num_servers'] ) > 1 ) {
+			foreach ( range( 2, min( intval( $auth_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
+				if ( ! array_key_exists( 'oauth2_provider_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_provider_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_custom_label_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_custom_label_' . $oauth2_num_server ] = 'OAuth2';
+				}
+				if ( ! array_key_exists( 'oauth2_clientid_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_clientid_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_clientsecret_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_clientsecret_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_hosteddomain_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_hosteddomain_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_tenant_id_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_tenant_id_' . $oauth2_num_server ] = 'common';
+				}
+				if ( ! array_key_exists( 'oauth2_url_authorize_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_url_authorize_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_url_token_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_url_token_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_url_resource_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_url_resource_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_attr_username_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_attr_username_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_attr_email_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_attr_email_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_attr_first_name_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_attr_last_name_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_attr_update_on_login_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
+				}
+			}
 		}
 
 		if ( ! array_key_exists( 'cas_auto_login', $auth_settings ) ) {
@@ -673,6 +742,12 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'ldap', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['ldap'] = '';
 			}
+			if ( ! array_key_exists( 'oauth2_auto_login', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_auto_login'] = '';
+			}
+			if ( ! array_key_exists( 'oauth2_num_servers', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_num_servers'] = '1';
+			}
 			if ( ! array_key_exists( 'oauth2_provider', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_provider'] = '';
 			}
@@ -715,8 +790,51 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'oauth2_attr_update_on_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_attr_update_on_login'] = '';
 			}
-			if ( ! array_key_exists( 'oauth2_auto_login', $auth_multisite_settings ) ) {
-				$auth_multisite_settings['oauth2_auto_login'] = '';
+			if ( intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {
+				foreach ( range( 2, min( intval( $auth_multisite_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
+					if ( ! array_key_exists( 'oauth2_provider_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_provider_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_custom_label_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_custom_label_' . $oauth2_num_server ] = 'OAuth2';
+					}
+					if ( ! array_key_exists( 'oauth2_clientid_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_clientid_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_clientsecret_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_clientsecret_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_hosteddomain_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_hosteddomain_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_tenant_id_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_tenant_id_' . $oauth2_num_server ] = 'common';
+					}
+					if ( ! array_key_exists( 'oauth2_url_authorize_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_url_authorize_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_url_token_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_url_token_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_url_resource_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_url_resource_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_attr_username_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_attr_username_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_attr_email_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_attr_email_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_attr_first_name_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_attr_last_name_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_attr_update_on_login_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
+					}
+				}
 			}
 			if ( ! array_key_exists( 'google_clientid', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['google_clientid'] = '';
@@ -951,12 +1069,28 @@ class Options extends Singleton {
 		// Sanitize Enable OAuth2 Logins (checkbox: value can only be '1' or empty string).
 		$auth_settings['oauth2'] = array_key_exists( 'oauth2', $auth_settings ) && strlen( $auth_settings['oauth2'] ) > 0 ? '1' : '';
 
-		// Sanitize OAuth2 auto-login (checkbox: value can only be '1' or empty string).
-		$auth_settings['oauth2_auto_login'] = array_key_exists( 'oauth2_auto_login', $auth_settings ) && strlen( $auth_settings['oauth2_auto_login'] ) > 0 ? '1' : '';
+		// Sanitize OAuth2 auto-login (select: value can be between '1' and '20' or empty string).
+		if ( ! isset( $auth_settings['oauth2_auto_login'] ) || ! in_array( $auth_settings['oauth2_auto_login'], array( '', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20' ), true ) ) {
+			$auth_settings['oauth2_auto_login'] = '';
+		}
+
+		// Sanitize OAuth2 number of servers (range: value can only be '1' to '20').
+		$auth_settings['oauth2_num_servers'] = filter_var( $auth_settings['oauth2_num_servers'], FILTER_SANITIZE_NUMBER_INT );
+		$auth_settings['oauth2_num_servers'] = intval( $auth_settings['oauth2_num_servers'] ) < 1 || intval( $auth_settings['oauth2_num_servers'] ) > 20 ? '1' : $auth_settings['oauth2_num_servers'];
 
 		// Sanitize Oauth2 attribute update (select: value can only be 'update-if-empty', '1', or empty string).
 		if ( ! isset( $auth_settings['oauth2_attr_update_on_login'] ) || ! in_array( $auth_settings['oauth2_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
 			$auth_settings['oauth2_attr_update_on_login'] = '';
+		}
+
+		// Sanitize settings for any additional OAuth2 servers.
+		if ( intval( $auth_settings['oauth2_num_servers'] ) > 1 ) {
+			foreach ( range( 2, min( intval( $auth_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
+				// Sanitize Oauth2 attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+				if ( ! isset( $auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] ) || ! in_array( $auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ], array( '', '1', 'update-if-empty' ), true ) ) {
+					$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
+				}
+			}
 		}
 
 		// Sanitize Enable Google Logins (checkbox: value can only be '1' or empty string).
