@@ -124,6 +124,19 @@ class Authorization extends Singleton {
 					update_user_meta( $user->ID, 'auth_blocked', 'yes' );
 				}
 
+				// Allow overriding the message blocked users see after logging in.
+				if ( defined( 'AUTHORIZER_LOGIN_MESSAGE_BLOCKED_USERS' ) ) {
+					$auth_settings['access_blocked_redirect_to_message'] = \AUTHORIZER_LOGIN_MESSAGE_BLOCKED_USERS;
+				}
+				/**
+				 * Filters the message blocked users see after logging in.
+				 *
+				 * @since 3.12.0
+				 *
+				 * @param string $message The message content.
+				 */
+				$auth_settings['access_blocked_redirect_to_message'] = apply_filters( 'authorizer_login_message_blocked_users', $auth_settings['access_blocked_redirect_to_message'] );
+
 				// Notify user about blocked status and return without authenticating them.
 				// phpcs:ignore WordPress.Security.NonceVerification
 				$redirect_to = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
@@ -552,6 +565,19 @@ class Authorization extends Singleton {
 				// "authenticated_by" usermeta that is normally used to do this.
 				$external_param = isset( $user_data['authenticated_by'] ) ? '&external=' . $user_data['authenticated_by'] : '';
 
+				// Allow overriding the message pending users see after logging in.
+				if ( defined( 'AUTHORIZER_LOGIN_MESSAGE_PENDING_USERS' ) ) {
+					$auth_settings['access_pending_redirect_to_message'] = \AUTHORIZER_LOGIN_MESSAGE_PENDING_USERS;
+				}
+				/**
+				 * Filters the message pending users see after logging in.
+				 *
+				 * @since 3.12.0
+				 *
+				 * @param string $message The message content.
+				 */
+				$auth_settings['access_pending_redirect_to_message'] = apply_filters( 'authorizer_login_message_pending_users', $auth_settings['access_pending_redirect_to_message'] );
+
 				// Notify user about pending status and return without authenticating them.
 				// phpcs:ignore WordPress.Security.NonceVerification
 				$redirect_to   = ! empty( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : home_url();
@@ -707,6 +733,19 @@ class Authorization extends Singleton {
 			}
 		}
 
+		// Allow overriding the message anonymous users see.
+		if ( defined( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS' ) ) {
+			$auth_settings['access_redirect_to_message'] = \AUTHORIZER_MESSAGE_ANONYMOUS_USERS;
+		}
+		/**
+		 * Filters the message anonymous users see when visiting public pages on a private site.
+		 *
+		 * @since 3.12.0
+		 *
+		 * @param string $message The message content.
+		 */
+		$auth_settings['access_redirect_to_message'] = apply_filters( 'authorizer_message_anonymous_users', $auth_settings['access_redirect_to_message'] );
+
 		// User is denied access, so show them the error message. Render as JSON
 		// if this is a REST API call; otherwise, show the error message via
 		// wp_die() (rendered html), or redirect to the login URL.
@@ -834,6 +873,19 @@ class Authorization extends Singleton {
 				'logged_in_users' === $auth_settings['access_who_can_view'] &&
 				false === apply_filters( 'authorizer_has_access', false, $GLOBALS['wp'] )
 			) {
+				// Allow overriding the message anonymous users see.
+				if ( defined( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS' ) ) {
+					$auth_settings['access_redirect_to_message'] = \AUTHORIZER_MESSAGE_ANONYMOUS_USERS;
+				}
+				/**
+				 * Filters the message anonymous users see when visiting public pages on a private site.
+				 *
+				 * @since 3.12.0
+				 *
+				 * @param string $message The message content.
+				 */
+				$auth_settings['access_redirect_to_message'] = apply_filters( 'authorizer_message_anonymous_users', $auth_settings['access_redirect_to_message'] );
+
 				return new \WP_Error(
 					'rest_cannot_view',
 					wp_strip_all_tags( $auth_settings['access_redirect_to_message'] ),

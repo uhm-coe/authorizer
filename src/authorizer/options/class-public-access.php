@@ -131,7 +131,41 @@ class Public_Access extends \Authorizer\Singleton {
 		$option               = 'access_redirect_to_message';
 		$auth_settings_option = $options->get( $option );
 
-		// Print option elements.
+		// Print option elements. If setting is overriden by filter or constant,
+		// don't expose the value; just print an informational message.
+		if ( has_filter( 'authorizer_message_anonymous_users' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: filter name */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_message_anonymous_users</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: defined constant name */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
 		wp_editor(
 			wpautop( $auth_settings_option ),
 			"auth_settings_$option",

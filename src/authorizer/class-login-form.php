@@ -32,11 +32,25 @@ class Login_Form extends Singleton {
 			'warning' === $options->get( 'access_public_warning' ) &&
 			get_option( 'auth_settings_advanced_public_notice' )
 		) {
+			// Allow overriding the message anonymous users see.
+			$authorizer_message_anonymous_users = $options->get( 'access_redirect_to_message' );
+			if ( defined( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS' ) ) {
+				$authorizer_message_anonymous_users = \AUTHORIZER_MESSAGE_ANONYMOUS_USERS;
+			}
+			/**
+			 * Filters the message anonymous users see when visiting public pages on a private site.
+			 *
+			 * @since 3.12.0
+			 *
+			 * @param string $message The message content.
+			 */
+			$authorizer_message_anonymous_users = apply_filters( 'authorizer_message_anonymous_users', $authorizer_message_anonymous_users );
+
 			$current_path = ! empty( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : home_url();
 			wp_enqueue_script( 'auth_public_scripts', plugins_url( '/js/authorizer-public.js', plugin_root() ), array( 'jquery' ), '3.2.2', false );
 			$auth_localized = array(
 				'wpLoginUrl'      => wp_login_url( $current_path ),
-				'anonymousNotice' => $options->get( 'access_redirect_to_message' ),
+				'anonymousNotice' => $authorizer_message_anonymous_users,
 				'logIn'           => esc_html__( 'Log In', 'authorizer' ),
 			);
 			wp_localize_script( 'auth_public_scripts', 'auth', $auth_localized );

@@ -217,7 +217,7 @@ class Ldap extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_ldap_user (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_ldap_user</code>'
 					)
@@ -233,7 +233,7 @@ class Ldap extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_LDAP_USER (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_LDAP_USER', '...' );</code>"
 					)
@@ -300,7 +300,7 @@ class Ldap extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: authorizer_ldap_password (filter name) */
+						/* TRANSLATORS: %s: filter name */
 						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
 						'<code>authorizer_ldap_password</code>'
 					)
@@ -316,7 +316,7 @@ class Ldap extends \Authorizer\Singleton {
 				<?php
 				echo wp_kses_post(
 					sprintf(
-						/* TRANSLATORS: %s: AUTHORIZER_LDAP_PASSWORD (defined constant name) */
+						/* TRANSLATORS: %s: defined constant name */
 						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
 						"<code>define( 'AUTHORIZER_LDAP_PASSWORD', '...' );</code>"
 					)
