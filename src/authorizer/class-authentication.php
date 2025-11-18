@@ -439,6 +439,20 @@ class Authentication extends Singleton {
 						'scope' => 'user:email',
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
@@ -536,6 +550,20 @@ class Authentication extends Singleton {
 						'scope' => $provider->scope,
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
@@ -653,6 +681,20 @@ class Authentication extends Singleton {
 						apply_filters( 'authorizer_oauth2_generic_authorization_parameters', array() )
 					);
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
