@@ -994,6 +994,15 @@ class Authentication extends Singleton {
 			error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) ); // phpcs:ignore
 			error_log( $e->getMessage() ); // phpcs:ignore
 
+			// Also log the error to the Simple History plugin (if it is active).
+			apply_filters(
+				'simple_history_log_warning',
+				__( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ),
+				array(
+					'error' => $e->getMessage(),
+				)
+			);
+
 			// CAS server is throwing errors on this login, so try logging the
 			// user out of CAS and redirecting them to the login page.
 			\phpCAS::logoutWithRedirectService( wp_login_url() );
