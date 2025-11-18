@@ -256,6 +256,32 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						?>
 					</span>
 				</a></p>
+				<?php
+				if ( empty( $auth_settings['oauth2_num_servers'] ) ) :
+					$auth_settings['oauth2_num_servers'] = 1;
+				endif;
+				if ( $auth_settings['oauth2_num_servers'] > 1 ) :
+					for ( $i = 2; $i <= $auth_settings['oauth2_num_servers']; $i++ ) :
+						if ( empty( $auth_settings[ 'oauth2_custom_label_' . $i ] ) ) :
+							continue;
+						endif;
+						?>
+						<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2', $i ) ); ?>">
+							<span class="dashicons dashicons-lock"></span>
+							<span class="label">
+								<?php
+								echo esc_html(
+									sprintf(
+										/* TRANSLATORS: %s: Custom OAuth2 label from authorizer options */
+										__( 'Sign in with %s', 'authorizer' ),
+										$auth_settings[ 'oauth2_custom_label_' . $i ]
+									)
+								);
+								?>
+							</span>
+						</a></p>
+					<?php endfor; ?>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( '1' === $auth_settings['cas'] ) : ?>
@@ -412,14 +438,14 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		if (
 			isset( $_SERVER['QUERY_STRING'] ) &&
 			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-			array_key_exists( 'oauth2_auto_login', $auth_settings ) && '1' === $auth_settings['oauth2_auto_login'] &&
+			array_key_exists( 'oauth2_auto_login', $auth_settings ) && in_array( intval( $auth_settings['oauth2_auto_login'] ), range( 1, 20 ), true ) &&
 			array_key_exists( 'oauth2', $auth_settings ) && '1' === $auth_settings['oauth2'] &&
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 			( ! array_key_exists( 'cas', $auth_settings ) || '1' !== $auth_settings['cas'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
-			wp_redirect( Helper::modify_current_url_for_external_login( 'oauth2' ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			wp_redirect( Helper::modify_current_url_for_external_login( 'oauth2', intval( $auth_settings['oauth2_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 

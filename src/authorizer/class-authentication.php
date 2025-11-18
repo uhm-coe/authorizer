@@ -330,22 +330,46 @@ class Authentication extends Singleton {
 	 *                              or null if not attempting an oauth2 login.
 	 */
 	protected function custom_authenticate_oauth2( $auth_settings ) {
-		// Move on if oauth2 hasn't been requested here.
+		// Move on if oauth2 hasn't been requested here or OAuth2 server ID is invalid.
+		if ( empty( $auth_settings['oauth2_num_servers'] ) ) {
+			$auth_settings['oauth2_num_servers'] = 1;
+		}
 		// phpcs:ignore WordPress.Security.NonceVerification
-		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] ) {
+		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 20 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['oauth2_num_servers'] ) ) {
 			// Note: because Azure oauth2 provider doesn't let us specify a querystring
 			// in the redirect_uri, we have to detect those redirects separately because
 			// we can't include external=oauth2 in the redirect_uri. Instead, detect the
 			// absence of the `external` param, and the presence of `code` and `state`
 			// params.
+			// Note: This implies that an Azure oauth2 server must be configured as
+			// the first oauth2 server (id=1) if multiple oauth2 servers are used.
 			if ( ! empty( $_GET['external'] ) || ( empty( $_GET['code'] ) && empty( $_GET['state'] ) ) ) {
 				return null;
 			}
 		}
 
+		// Get the OAuth2 server id (since multiple OAuth2 servers can be configured),
+		// and the relevant settings for that server.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$oauth2_server_id       = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
+		$suffix                 = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
+		$oauth2_provider        = $auth_settings[ 'oauth2_provider' . $suffix ] ?? '';
+		$oauth2_clientid        = $auth_settings[ 'oauth2_clientid' . $suffix ] ?? '';
+		$oauth2_clientsecret    = $auth_settings[ 'oauth2_clientsecret' . $suffix ] ?? '';
+		$oauth2_hosteddomain    = $auth_settings[ 'oauth2_hosteddomain' . $suffix ] ?? '';
+		$oauth2_tenant_id       = $auth_settings[ 'oauth2_tenant_id' . $suffix ] ?? '';
+		$oauth2_url_authorize   = $auth_settings[ 'oauth2_url_authorize' . $suffix ] ?? '';
+		$oauth2_url_token       = $auth_settings[ 'oauth2_url_token' . $suffix ] ?? '';
+		$oauth2_url_resource    = $auth_settings[ 'oauth2_url_resource' . $suffix ] ?? '';
+		$oauth2_attr_username   = $auth_settings[ 'oauth2_attr_username' . $suffix ] ?? '';
+		$oauth2_attr_email      = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
+		$oauth2_attr_first_name = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
+		$oauth2_attr_last_name  = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
+
 		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
+		// Note: constant/filter overrides are only supported for a single OAuth2 server.
 		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_ID' ) ) {
-			$auth_settings['oauth2_clientid'] = \AUTHORIZER_OAUTH2_CLIENT_ID;
+			$oauth2_clientid = \AUTHORIZER_OAUTH2_CLIENT_ID;
 		}
 		/**
 		 * Filters the Oauth2 Client ID used by Authorizer to authenticate.
@@ -354,11 +378,12 @@ class Authentication extends Singleton {
 		 *
 		 * @param string $oauth2_client_id  The stored Oauth2 Client ID.
 		 */
-		$auth_settings['oauth2_clientid'] = apply_filters( 'authorizer_oauth2_client_id', $auth_settings['oauth2_clientid'] );
+		$oauth2_clientid = apply_filters( 'authorizer_oauth2_client_id', $oauth2_clientid );
 
 		// Fetch the Oauth2 Client Secret (allow overrides from filter or constant).
+		// Note: constant/filter overrides are only supported for a single OAuth2 server.
 		if ( defined( 'AUTHORIZER_OAUTH2_CLIENT_SECRET' ) ) {
-			$auth_settings['oauth2_clientsecret'] = \AUTHORIZER_OAUTH2_CLIENT_SECRET;
+			$oauth2_clientsecret = \AUTHORIZER_OAUTH2_CLIENT_SECRET;
 		}
 		/**
 		 * Filters the Oauth2 Client Secret used by Authorizer to authenticate.
@@ -367,24 +392,24 @@ class Authentication extends Singleton {
 		 *
 		 * @param string $oauth2_client_secret  The stored Oauth2 Client Secret.
 		 */
-		$auth_settings['oauth2_clientsecret'] = apply_filters( 'authorizer_oauth2_client_secret', $auth_settings['oauth2_clientsecret'] );
+		$oauth2_clientsecret = apply_filters( 'authorizer_oauth2_client_secret', $oauth2_clientsecret );
 
 		// Move on if required params aren't specified in settings.
 		if (
-			empty( $auth_settings['oauth2_clientid'] ) ||
-			empty( $auth_settings['oauth2_clientsecret'] )
+			empty( $oauth2_clientid ) ||
+			empty( $oauth2_clientsecret )
 		) {
 			return null;
 		}
 
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
-		if ( 'github' === $auth_settings['oauth2_provider'] ) {
+		if ( 'github' === $oauth2_provider ) {
 			session_start();
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
-				'clientId'     => $auth_settings['oauth2_clientid'],
-				'clientSecret' => $auth_settings['oauth2_clientsecret'],
-				'redirectUri'  => site_url( '/wp-login.php?external=oauth2' ),
+				'clientId'     => $oauth2_clientid,
+				'clientSecret' => $oauth2_clientsecret,
+				'redirectUri'  => site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ),
 			) );
 
 			// If we don't have an authorization code, then get one.
@@ -446,7 +471,7 @@ class Authentication extends Singleton {
 					return null;
 				}
 			}
-		} elseif ( 'azure' === $auth_settings['oauth2_provider'] ) {
+		} elseif ( 'azure' === $oauth2_provider ) {
 			// Authenticate with the Microsoft Azure oauth2 client.
 			// See: https://github.com/thenetworg/oauth2-azure.
 			session_start();
@@ -464,10 +489,10 @@ class Authentication extends Singleton {
 				}
 
 				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
-					'clientId'     => $auth_settings['oauth2_clientid'],
-					'clientSecret' => $auth_settings['oauth2_clientsecret'],
+					'clientId'     => $oauth2_clientid,
+					'clientSecret' => $oauth2_clientsecret,
 					'redirectUri'  => site_url( '/wp-login.php' ),
-					'tenant'       => empty( $auth_settings['oauth2_tenant_id'] ) ? 'common' : $auth_settings['oauth2_tenant_id'],
+					'tenant'       => empty( $oauth2_tenant_id ) ? 'common' : $oauth2_tenant_id,
 				) );
 				// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
 				$provider->defaultEndPointVersion = \TheNetworg\OAuth2\Client\Provider\Azure::ENDPOINT_VERSION_2_0;
@@ -560,14 +585,14 @@ class Authentication extends Singleton {
 					}
 				}
 			}
-		} elseif ( 'generic' === $auth_settings['oauth2_provider'] ) {
+		} elseif ( 'generic' === $oauth2_provider ) {
 			// Authenticate with the generic oauth2 client.
 			// See: https://github.com/thephpleague/oauth2-client.
 			// Move on if required params aren't specified in settings.
 			if (
-				empty( $auth_settings['oauth2_url_authorize'] ) ||
-				empty( $auth_settings['oauth2_url_token'] ) ||
-				empty( $auth_settings['oauth2_url_resource'] )
+				empty( $oauth2_url_authorize ) ||
+				empty( $oauth2_url_token ) ||
+				empty( $oauth2_url_resource )
 			) {
 				return null;
 			}
@@ -584,12 +609,12 @@ class Authentication extends Singleton {
 			}
 
 			$provider = new \League\OAuth2\Client\Provider\GenericProvider( array(
-				'clientId'                => $auth_settings['oauth2_clientid'],
-				'clientSecret'            => $auth_settings['oauth2_clientsecret'],
-				'redirectUri'             => site_url( '/wp-login.php?external=oauth2' ),
-				'urlAuthorize'            => $auth_settings['oauth2_url_authorize'],
-				'urlAccessToken'          => $auth_settings['oauth2_url_token'],
-				'urlResourceOwnerDetails' => $auth_settings['oauth2_url_resource'],
+				'clientId'                => $oauth2_clientid,
+				'clientSecret'            => $oauth2_clientsecret,
+				'redirectUri'             => site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ),
+				'urlAuthorize'            => $oauth2_url_authorize,
+				'urlAccessToken'          => $oauth2_url_token,
+				'urlResourceOwnerDetails' => $oauth2_url_resource,
 			) );
 
 			// If we don't have an authorization code, then get one.
@@ -648,7 +673,6 @@ class Authentication extends Singleton {
 				}
 
 				// Get custom username attribute, if specified (handle string or array results from attribute).
-				$oauth2_attr_username = $auth_settings['oauth2_attr_username'] ?? '';
 				if ( ! empty( $oauth2_attr_username ) && ! empty( $attributes[ $oauth2_attr_username ] ) ) {
 					if ( is_string( $attributes[ $oauth2_attr_username ] ) ) {
 						$username = trim( $attributes[ $oauth2_attr_username ] );
@@ -658,7 +682,6 @@ class Authentication extends Singleton {
 				}
 
 				// Get custom email attribute, if specified.
-				$oauth2_attr_email = $auth_settings['oauth2_attr_email'] ?? '';
 				if ( ! empty( $oauth2_attr_email ) && ! empty( $attributes[ $oauth2_attr_email ] ) ) {
 					if ( is_string( $attributes[ $oauth2_attr_email ] ) ) {
 						$email = trim( $attributes[ $oauth2_attr_email ] );
@@ -710,10 +733,10 @@ class Authentication extends Singleton {
 		 */
 		if (
 			array_key_exists( 'oauth2_hosteddomain', $auth_settings ) &&
-			strlen( $auth_settings['oauth2_hosteddomain'] ) > 0
+			strlen( $oauth2_hosteddomain ) > 0
 		) {
 			// Allow multiple whitelisted domains.
-			$oauth2_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['oauth2_hosteddomain'] ) );
+			$oauth2_hosteddomains = explode( "\n", str_replace( "\r", '', $oauth2_hosteddomain ) );
 			$valid_domain         = false;
 			foreach ( $externally_authenticated_email as $email ) {
 				$email_domain = substr( strrchr( $email, '@' ), 1 );
@@ -729,7 +752,7 @@ class Authentication extends Singleton {
 
 		// Get user first name (handle string or array results from attribute).
 		$first_name             = '';
-		$oauth2_attr_first_name = $auth_settings['oauth2_attr_first_name'] ?? '';
+		$oauth2_attr_first_name = $oauth2_attr_first_name ?? '';
 		if ( ! empty( $oauth2_attr_first_name ) && ! empty( $attributes[ $oauth2_attr_first_name ] ) ) {
 			if ( is_string( $attributes[ $oauth2_attr_first_name ] ) ) {
 				$first_name = $attributes[ $oauth2_attr_first_name ];
@@ -740,7 +763,7 @@ class Authentication extends Singleton {
 
 		// Get user last name (handle string or array results from attribute).
 		$last_name             = '';
-		$oauth2_attr_last_name = $auth_settings['oauth2_attr_last_name'] ?? '';
+		$oauth2_attr_last_name = $oauth2_attr_last_name ?? '';
 		if ( ! empty( $oauth2_attr_last_name ) && ! empty( $attributes[ $oauth2_attr_last_name ] ) ) {
 			if ( is_string( $attributes[ $oauth2_attr_last_name ] ) ) {
 				$last_name = $attributes[ $oauth2_attr_last_name ];
@@ -755,7 +778,7 @@ class Authentication extends Singleton {
 			'first_name'        => $first_name,
 			'last_name'         => $last_name,
 			'authenticated_by'  => 'oauth2',
-			'oauth2_provider'   => $auth_settings['oauth2_provider'],
+			'oauth2_provider'   => $oauth2_provider,
 			'oauth2_attributes' => $attributes,
 		);
 	}

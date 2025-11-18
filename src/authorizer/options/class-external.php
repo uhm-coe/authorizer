@@ -38,6 +38,66 @@ class External extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_section_info_external_oauth2( $args = '' ) {
+		?>
+		<div id="section_info_external_oauth2" class="section_info">
+			<p><?php esc_html_e( 'Enter your OAuth2 server settings below.', 'authorizer' ); ?></p>
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_section_info_external_google( $args = '' ) {
+		?>
+		<div id="section_info_external_google" class="section_info">
+			<p><?php esc_html_e( 'Enter your Google server settings below.', 'authorizer' ); ?></p>
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_section_info_external_cas( $args = '' ) {
+		?>
+		<div id="section_info_external_cas" class="section_info">
+			<p><?php esc_html_e( 'Enter your CAS server settings below.', 'authorizer' ); ?></p>
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_section_info_external_ldap( $args = '' ) {
+		?>
+		<div id="section_info_external_ldap" class="section_info">
+			<p><?php esc_html_e( 'Enter your LDAP server settings below.', 'authorizer' ); ?></p>
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_select_auth_access_default_role( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
