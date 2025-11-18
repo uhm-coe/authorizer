@@ -85,14 +85,25 @@ class Admin_Page extends Singleton {
 			)
 		);
 
-		// Add help tab for External Service (CAS, LDAP) Settings.
+		// Add help tab for External Service (CAS, LDAP, OAuth, Google) Settings.
 		$help_auth_settings_external_content = '
+			<p>' . __( '<strong>Default role for new users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable OAuth2 Logins</strong>: Choose if you want to allow users to log in with one of the supported OAuth2 providers. You will need to enter your API Client ID and Secret to enable these logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable Google Logins</strong>: Choose if you want to allow users to log in with their Google Account credentials. You will need to enter your API Client ID and Secret to enable Google Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable CAS Logins</strong>: Choose if you want to allow users to log in with via CAS (Central Authentication Service). You will need to enter details about your CAS server (host, port, and path) to enable CAS Logins.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Enable LDAP Logins</strong>: Choose if you want to allow users to log in with their LDAP (Lightweight Directory Access Protocol) credentials. You will need to enter details about your LDAP server (host, port, search base, uid attribute, directory user, directory user password, and whether to use STARTTLS) to enable LDAP Logins.', 'authorizer' ) . '</p>
-			<p>' . __( '<strong>Default role for new CAS users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
+		';
+		$screen->add_help_tab(
+			array(
+				'id'      => 'help_auth_settings_external_content',
+				'title'   => __( 'External Service', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_content ),
+			)
+		);
+
+		// Add (indented) help tab for OAuth2 Settings.
+		$help_auth_settings_external_oauth2_content = '
 			<p><strong><em>' . __( 'If you enable OAuth2 logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
 				<li>' . __( '<strong>Client ID</strong>: You can generate this ID following the instructions for your specific provider.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OAUTH2_CLIENT_ID', '...' );</code>, or you may fetch it from an external service like AWS Secrets Manager by hooking into the <code>authorizer_oauth2_client_id</code> filter. This will prevent it from being stored in plaintext in the WordPress database.", 'authorizer' ) . '</li>
@@ -101,11 +112,33 @@ class Admin_Page extends Singleton {
 				<li>' . __( '<strong>Access Token URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the second: the endpoint that is contacted after initiation to retrieve an access token for the user that just authenticated.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>Resource Owner URL</strong>: For the generic OAuth2 provider, you will need to specify the 3 endpoints required for the oauth2 authentication flow. This is the third: the endpoint that is contacted after successfully receiving an authentication token to retrieve details on the user that just authenticated.', 'authorizer' ) . '</li>
 			</ul>
+		';
+		$screen->add_help_tab(
+			array(
+				'id'      => 'help_auth_settings_external_oauth2_content',
+				'title'   => '&nbsp; - ' . __( 'OAuth2', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_oauth2_content ),
+			)
+		);
+
+		// Add (indented) help tab for Google Settings.
+		$help_auth_settings_external_google_content = '
 			<p><strong><em>' . __( 'If you enable Google logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
 				<li>' . __( "<strong>Google Client ID</strong>: You can generate this ID by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client ID typically looks something like this: 1234567890123-kdjr85yt6vjr6d8g7dhr8g7d6durjf7g.apps.googleusercontent.com", 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_GOOGLE_CLIENT_ID', '...' );</code>, or you may fetch it from an external service like AWS Secrets Manager by hooking into the <code>authorizer_google_client_id</code> filter. This will prevent it from being stored in plaintext in the WordPress database.", 'authorizer' ) . '</li>
 				<li>' . __( "<strong>Google Client Secret</strong>: You can generate this secret by creating a new Project in the <a href='https://cloud.google.com/console'>Google Developers Console</a>. A Client Secret typically looks something like this: sDNgX5_pr_5bly-frKmvp8jT", 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_GOOGLE_CLIENT_SECRET', '...' );</code>, or you may fetch it from an external service like AWS Secrets Manager by hooking into the <code>authorizer_google_client_secret</code> filter. This will prevent it from being stored in plaintext in the WordPress database.", 'authorizer' ) . '</li>
 			</ul>
+		';
+		$screen->add_help_tab(
+			array(
+				'id'      => 'help_auth_settings_external_google_content',
+				'title'   => '&nbsp; - ' . __( 'Google', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_google_content ),
+			)
+		);
+
+		// Add (indented) help tab for CAS Settings.
+		$help_auth_settings_external_cas_content = '
 			<p><strong><em>' . __( 'If you enable CAS logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
 				<li>' . __( '<strong>CAS server hostname</strong>: Enter the hostname of the CAS server you authenticate against (e.g., authn.example.edu).', 'authorizer' ) . '</li>
@@ -116,6 +149,17 @@ class Admin_Page extends Singleton {
 				<li>' . __( "<strong>CAS attribute containing last name</strong>: Enter the CAS attribute that has the user's last name. When this user first logs in, their WordPress account will have their last name retrieved from CAS and added to their WordPress profile.", 'authorizer' ) . '</li>
 				<li>' . __( '<strong>CAS attribute update</strong>: Select whether the first and last names retrieved from CAS should overwrite any value the user has entered in the first and last name fields in their WordPress profile. If this is not set, this only happens the first time they log in.', 'authorizer' ) . '</li>
 			</ul>
+		';
+		$screen->add_help_tab(
+			array(
+				'id'      => 'help_auth_settings_external_cas_content',
+				'title'   => '&nbsp; - ' . __( 'CAS', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_cas_content ),
+			)
+		);
+
+		// Add (indented) help tab for LDAP Settings.
+		$help_auth_settings_external_ldap_content = '
 			<p><strong><em>' . __( 'If you enable LDAP logins:', 'authorizer' ) . '</em></strong></p>
 			<ul>
 				<li>' . __( '<strong>LDAP Host</strong>: Enter the URL of the LDAP server you authenticate against.', 'authorizer' ) . '</li>
@@ -134,9 +178,9 @@ class Admin_Page extends Singleton {
 		';
 		$screen->add_help_tab(
 			array(
-				'id'      => 'help_auth_settings_external_content',
-				'title'   => __( 'External Service', 'authorizer' ),
-				'content' => wp_kses_post( $help_auth_settings_external_content ),
+				'id'      => 'help_auth_settings_external_ldap_content',
+				'title'   => '&nbsp; - ' . __( 'LDAP', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_ldap_content ),
 			)
 		);
 
@@ -403,23 +447,48 @@ class Admin_Page extends Singleton {
 			'authorizer',
 			'auth_settings_external'
 		);
-
 		add_settings_field(
 			'auth_settings_external_oauth2',
 			__( 'OAuth2 Logins', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_checkbox_auth_external_oauth2' ),
 			'authorizer',
-			'auth_settings_external',
-			array(
-				'class' => 'border-top',
-			)
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_external_google',
+			__( 'Google Logins', 'authorizer' ),
+			array( Google::get_instance(), 'print_checkbox_auth_external_google' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_external_cas',
+			__( 'CAS Logins', 'authorizer' ),
+			array( Cas::get_instance(), 'print_checkbox_auth_external_cas' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_external_ldap',
+			__( 'LDAP Logins', 'authorizer' ),
+			array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+
+		// Create External Service (OAuth2) Settings section.
+		add_settings_section(
+			'auth_settings_external_oauth2',
+			'',
+			array( External::get_instance(), 'print_section_info_external_oauth2' ),
+			'authorizer'
 		);
 		add_settings_field(
 			'auth_settings_oauth2_num_servers',
 			__( 'OAuth2 server(s)', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_number_oauth2_num_servers' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_oauth2'
 		);
 		$oauth2_num_servers = max( 1, min( 20, intval( Options::get_instance()->get( 'oauth2_num_servers', Helper::SINGLE_CONTEXT, 'allow override' ) ) ) );
 		add_settings_field(
@@ -427,7 +496,7 @@ class Admin_Page extends Singleton {
 			__( 'OAuth2 automatic login', 'authorizer' ),
 			array( OAuth2::get_instance(), 'print_select_oauth2_auto_login' ),
 			'authorizer',
-			'auth_settings_external',
+			'auth_settings_external_oauth2',
 			array(
 				'oauth2_num_servers' => $oauth2_num_servers,
 			)
@@ -441,9 +510,9 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Provider', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_select_oauth2_provider' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
-					'class'             => 'border-top-small',
+					'class'             => 'border-top',
 					'oauth2_num_server' => $oauth2_num_server,
 				)
 			);
@@ -453,7 +522,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Custom label', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_custom_label' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -463,7 +532,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Client ID', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_clientid' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -473,7 +542,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Client Secret', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_clientsecret' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -483,7 +552,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'OAuth2 Hosted Domain', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_hosteddomain' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -493,7 +562,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Tenant ID', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_tenant_id' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -503,7 +572,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Authorization URL', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_url_authorize' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -513,7 +582,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Access Token URL', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_url_token' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -523,7 +592,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Resource Owner URL', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_url_resource' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -533,7 +602,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Attribute containing username', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_attr_username' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -543,7 +612,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Attribute containing email', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_attr_email' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -553,7 +622,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Attribute containing first name', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_attr_first_name' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -563,7 +632,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Attribute containing last name', 'authorizer' ),
 				array( OAuth2::get_instance(), 'print_text_oauth2_attr_last_name' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
@@ -573,61 +642,55 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'Name attribute update', 'authorizer' ),
 				array( Oauth2::get_instance(), 'print_select_oauth2_attr_update_on_login' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_oauth2',
 				array(
 					'oauth2_num_server' => $oauth2_num_server,
 				)
 			);
 		}
 
-		add_settings_field(
+		// Create External Service (Google) Settings section.
+		add_settings_section(
 			'auth_settings_external_google',
-			__( 'Google Logins', 'authorizer' ),
-			array( Google::get_instance(), 'print_checkbox_auth_external_google' ),
-			'authorizer',
-			'auth_settings_external',
-			array(
-				'class' => 'border-top',
-			)
+			'',
+			array( External::get_instance(), 'print_section_info_external_google' ),
+			'authorizer'
 		);
 		add_settings_field(
 			'auth_settings_google_clientid',
 			__( 'Google Client ID', 'authorizer' ),
 			array( Google::get_instance(), 'print_text_google_clientid' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_google'
 		);
 		add_settings_field(
 			'auth_settings_google_clientsecret',
 			__( 'Google Client Secret', 'authorizer' ),
 			array( Google::get_instance(), 'print_text_google_clientsecret' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_google'
 		);
 		add_settings_field(
 			'auth_settings_google_hosteddomain',
 			__( 'Google Hosted Domain', 'authorizer' ),
 			array( Google::get_instance(), 'print_text_google_hosteddomain' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_google'
 		);
 
-		add_settings_field(
+		// Create External Service (CAS) Settings section.
+		add_settings_section(
 			'auth_settings_external_cas',
-			__( 'CAS Logins', 'authorizer' ),
-			array( Cas::get_instance(), 'print_checkbox_auth_external_cas' ),
-			'authorizer',
-			'auth_settings_external',
-			array(
-				'class' => 'border-top',
-			)
+			'',
+			array( External::get_instance(), 'print_section_info_external_cas' ),
+			'authorizer'
 		);
 		add_settings_field(
 			'auth_settings_cas_num_servers',
 			__( 'CAS server(s)', 'authorizer' ),
 			array( Cas::get_instance(), 'print_number_cas_num_servers' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_cas'
 		);
 		$cas_num_servers = max( 1, min( 10, intval( Options::get_instance()->get( 'cas_num_servers', Helper::SINGLE_CONTEXT, 'allow override' ) ) ) );
 		add_settings_field(
@@ -635,7 +698,7 @@ class Admin_Page extends Singleton {
 			__( 'CAS automatic login', 'authorizer' ),
 			array( Cas::get_instance(), 'print_select_cas_auto_login' ),
 			'authorizer',
-			'auth_settings_external',
+			'auth_settings_external_cas',
 			array(
 				'cas_num_servers' => $cas_num_servers,
 			)
@@ -649,9 +712,9 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS custom label', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_custom_label' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
-					'class'          => 'border-top-small',
+					'class'          => 'border-top',
 					'cas_num_server' => $cas_num_server,
 				)
 			);
@@ -660,7 +723,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS server hostname', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_host' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -670,7 +733,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS server port', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_port' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -680,7 +743,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS server path/context', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_path' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -690,7 +753,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS server method', 'authorizer' ),
 				array( Cas::get_instance(), 'print_select_cas_method' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -700,7 +763,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS server protocol', 'authorizer' ),
 				array( Cas::get_instance(), 'print_select_cas_version' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -710,7 +773,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS attribute containing email address', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_attr_email' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -720,7 +783,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS attribute containing first name', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_attr_first_name' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -730,7 +793,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS attribute containing last name', 'authorizer' ),
 				array( Cas::get_instance(), 'print_text_cas_attr_last_name' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -740,7 +803,7 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS attribute update', 'authorizer' ),
 				array( Cas::get_instance(), 'print_select_cas_attr_update_on_login' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
@@ -750,120 +813,117 @@ class Admin_Page extends Singleton {
 				$prefix . __( 'CAS users linked by username', 'authorizer' ),
 				array( Cas::get_instance(), 'print_checkbox_cas_link_on_username' ),
 				'authorizer',
-				'auth_settings_external',
+				'auth_settings_external_cas',
 				array(
 					'cas_num_server' => $cas_num_server,
 				)
 			);
 		}
 
-		add_settings_field(
+		// Create External Service (LDAP) Settings section.
+		add_settings_section(
 			'auth_settings_external_ldap',
-			__( 'LDAP Logins', 'authorizer' ),
-			array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
-			'authorizer',
-			'auth_settings_external',
-			array(
-				'class' => 'border-top',
-			)
+			'',
+			array( External::get_instance(), 'print_section_info_external_ldap' ),
+			'authorizer'
 		);
 		add_settings_field(
 			'auth_settings_ldap_host',
 			__( 'LDAP Host', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_host' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_port',
 			__( 'LDAP Port', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_port' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_tls',
 			__( 'Use STARTTLS', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_ldap_tls' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_search_base',
 			__( 'LDAP Search Base', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_search_base' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_search_filter',
 			__( 'LDAP Search Filter', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_search_filter' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_uid',
 			__( 'LDAP attribute containing username', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_uid' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_attr_email',
 			__( 'LDAP attribute containing email address', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_attr_email' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_user',
 			__( 'LDAP Directory User', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_user' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_password',
 			__( 'LDAP Directory User Password', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_password_ldap_password' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_lostpassword_url',
 			__( 'Custom lost password URL', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_lostpassword_url' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_attr_first_name',
 			__( 'LDAP attribute containing first name', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_attr_first_name' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_attr_last_name',
 			__( 'LDAP attribute containing last name', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_ldap_attr_last_name' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_attr_update_on_login',
 			__( 'LDAP attribute update', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_select_ldap_attr_update_on_login' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 		add_settings_field(
 			'auth_settings_ldap_test_user',
 			__( 'LDAP test connection', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_text_button_ldap_test_user' ),
 			'authorizer',
-			'auth_settings_external'
+			'auth_settings_external_ldap'
 		);
 
 		// Create Advanced Settings section.
@@ -1043,11 +1103,26 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Default role for new users', 'authorizer' ); ?></th>
 							<td><?php $external->print_select_auth_access_default_role( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
-
-						<tr class="border-top">
+						<tr>
 							<th scope="row"><?php esc_html_e( 'OAuth2 Logins', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_checkbox_auth_external_oauth2( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
+							<td><?php $google->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
+							<td><?php $cas->print_checkbox_auth_external_cas( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
+							<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+					</tbody></table>
+
+					<?php $external->print_section_info_external_oauth2(); ?>
+					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'OAuth2 server(s)', 'authorizer' ); ?></th>
 							<td><?php $oauth2->print_number_oauth2_num_servers( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
@@ -1068,7 +1143,7 @@ class Admin_Page extends Singleton {
 						foreach ( range( 1, $oauth2_num_servers ) as $oauth2_num_server ) :
 							$prefix = $oauth2_num_server . '. ';
 							?>
-							<tr class="border-top-small">
+							<tr class="border-top">
 								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'OAuth2 Provider', 'authorizer' ); ?></th>
 								<td>
 									<?php
@@ -1223,11 +1298,10 @@ class Admin_Page extends Singleton {
 								</td>
 							</tr>
 						<?php endforeach; ?>
+					</tbody></table>
 
-						<tr class="border-top">
-							<th scope="row"><?php esc_html_e( 'Google Logins', 'authorizer' ); ?></th>
-							<td><?php $google->print_checkbox_auth_external_google( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
+					<?php $external->print_section_info_external_google(); ?>
+					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Google Client ID', 'authorizer' ); ?></th>
 							<td><?php $google->print_text_google_clientid( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
@@ -1240,11 +1314,10 @@ class Admin_Page extends Singleton {
 							<th scope="row"><?php esc_html_e( 'Google Hosted Domain', 'authorizer' ); ?></th>
 							<td><?php $google->print_text_google_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
+					</tbody></table>
 
-						<tr class="border-top">
-							<th scope="row"><?php esc_html_e( 'CAS Logins', 'authorizer' ); ?></th>
-							<td><?php $cas->print_checkbox_auth_external_cas( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
+					<?php $external->print_section_info_external_cas(); ?>
+					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS server(s)', 'authorizer' ); ?></th>
 							<td><?php $cas->print_number_cas_num_servers( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
@@ -1258,7 +1331,7 @@ class Admin_Page extends Singleton {
 						foreach ( range( 1, $cas_num_servers ) as $cas_num_server ) :
 							$prefix = $cas_num_server . '. ';
 							?>
-							<tr class="border-top-small">
+							<tr class="border-top">
 								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'CAS Custom Label', 'authorizer' ); ?></th>
 								<td>
 									<?php
@@ -1380,11 +1453,10 @@ class Admin_Page extends Singleton {
 								</td>
 							</tr>
 						<?php endforeach; ?>
+					</tbody></table>
 
-						<tr class="border-top">
-							<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
-							<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
+					<?php $external->print_section_info_external_ldap(); ?>
+					<table class="form-table"><tbody>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP Host', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_text_ldap_host( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>

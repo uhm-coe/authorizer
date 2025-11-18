@@ -1291,6 +1291,10 @@ class Options extends Singleton {
 			<h2 class="nav-tab-wrapper">
 				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
 		<?php else : ?>
@@ -1299,6 +1303,10 @@ class Options extends Singleton {
 				<a class="nav-tab nav-tab-access_login" href="javascript:chooseTab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
 			<?php

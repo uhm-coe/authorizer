@@ -499,22 +499,16 @@
 			animateOption( 'hide_immediately', auth_settings_access_redirect_to_message );
 		}
 
-		// Hide OAuth2 options if OAuth2 provider is unchecked.
-		if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) ) {
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_auto_login );
-			animateOption( 'hide_immediately', auth_settings_external_oauth2_num_servers );
-		}
+		// Hide External Service tabs if provider is unchecked.
+		$( '.nav-tab-wrapper .nav-tab-external_oauth2' ).toggle( $( '#auth_settings_oauth2' ).is( ':checked' ) );
+		$( '.nav-tab-wrapper .nav-tab-external_google' ).toggle( $( '#auth_settings_google' ).is( ':checked' ) );
+		$( '.nav-tab-wrapper .nav-tab-external_cas' ).toggle( $( '#auth_settings_cas' ).is( ':checked' ) );
+		$( '.nav-tab-wrapper .nav-tab-external_ldap' ).toggle( $( '#auth_settings_ldap' ).is( ':checked' ) );
+
+		// Hide some OAuth2 options based on current settings.
 		auth_settings_external_oauth2_servers.forEach( function( server ) {
-			// Hide OAuth2 options if OAuth2 provider is unchecked.
-			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) ) {
-				animateOption( 'hide_immediately', server.provider );
-				animateOption( 'hide_immediately', server.custom_label );
-				animateOption( 'hide_immediately', server.clientid );
-				animateOption( 'hide_immediately', server.clientsecret );
-				animateOption( 'hide_immediately', server.hosteddomain );
-			}
 			// Hide OAuth2 generic options if OAuth2 provider is unchecked or generic isn't chosen.
-			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'generic' !== server.provider.find( 'select' ).val() ) {
+			if ( 'generic' !== server.provider.find( 'select' ).val() ) {
 				animateOption( 'hide_immediately', server.url_authorize );
 				animateOption( 'hide_immediately', server.url_token );
 				animateOption( 'hide_immediately', server.url_resource );
@@ -525,54 +519,10 @@
 				animateOption( 'hide_immediately', server.attr_update_on_login );
 			}
 			// Hide OAuth2 Tenant ID if OAuth2 provider is unchecked or azure isn't chosen.
-			if ( ! $( '#auth_settings_oauth2' ).is( ':checked' ) || 'azure' !== server.provider.find( 'select' ).val() ) {
+			if ( 'azure' !== server.provider.find( 'select' ).val() ) {
 				animateOption( 'hide_immediately', server.tenant_id );
 			}
 		} );
-
-		// Hide Google options if unchecked
-		if ( ! $( '#auth_settings_google' ).is( ':checked' ) ) {
-			animateOption( 'hide_immediately', auth_settings_external_google_clientid );
-			animateOption( 'hide_immediately', auth_settings_external_google_clientsecret );
-			animateOption( 'hide_immediately', auth_settings_external_google_hosteddomain );
-		}
-
-		// Hide CAS options if unchecked
-		if ( ! $( '#auth_settings_cas' ).is( ':checked' ) ) {
-			animateOption( 'hide_immediately', auth_settings_external_cas_auto_login );
-			animateOption( 'hide_immediately', auth_settings_external_cas_num_servers );
-			auth_settings_external_cas_servers.forEach( function( server ) {
-				animateOption( 'hide_immediately', server.custom_label );
-				animateOption( 'hide_immediately', server.host );
-				animateOption( 'hide_immediately', server.port );
-				animateOption( 'hide_immediately', server.path );
-				animateOption( 'hide_immediately', server.method );
-				animateOption( 'hide_immediately', server.version );
-				animateOption( 'hide_immediately', server.attr_email );
-				animateOption( 'hide_immediately', server.attr_first_name );
-				animateOption( 'hide_immediately', server.attr_last_name );
-				animateOption( 'hide_immediately', server.attr_update_on_login );
-				animateOption( 'hide_immediately', server.link_on_username );
-			} );
-		}
-
-		// Hide LDAP options if unchecked
-		if ( ! $( '#auth_settings_ldap' ).is( ':checked' ) ) {
-			animateOption( 'hide_immediately', auth_settings_external_ldap_host );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_port );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_search_base );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_search_filter );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_uid );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_email );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_user );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_password );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_tls );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_lostpassword_url );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_first_name );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_last_name );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_attr_update_on_login );
-			animateOption( 'hide_immediately', auth_settings_external_ldap_test_user );
-		}
 
 		// Hide Bypass Usernames if Disable WordPress logins is unchecked.
 		if ( ! $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ) {
@@ -609,18 +559,9 @@
 			animateOption( action, auth_settings_access_public_warning );
 		});
 
-		// Event handler: Show/hide OAuth2 options based on checkbox.
+		// Event handler: Show/hide OAuth2 tab based on checkbox.
 		$( 'input[name="auth_settings[oauth2]"]' ).on( 'change', function() {
-			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_oauth2_auto_login );
-			animateOption( action, auth_settings_external_oauth2_num_servers );
-			auth_settings_external_oauth2_servers.forEach( function( server ) {
-				animateOption( action, server.provider );
-				animateOption( action, server.custom_label );
-				animateOption( action, server.clientid );
-				animateOption( action, server.clientsecret );
-				animateOption( action, server.hosteddomain );
-			});
+			$( '.nav-tab-wrapper .nav-tab-external_oauth2' ).toggle( $( this ).is( ':checked' ) );
 		});
 
 		// Event handler: Show/hide OAuth2 generic/azure options based on provider.
@@ -640,51 +581,19 @@
 			});
 		});
 
-		// Event handler: Show/hide Google options based on checkbox
+		// Event handler: Show/hide Google tab based on checkbox
 		$( 'input[name="auth_settings[google]"]' ).on( 'change', function() {
-			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_google_clientid );
-			animateOption( action, auth_settings_external_google_clientsecret );
-			animateOption( action, auth_settings_external_google_hosteddomain );
+			$( '.nav-tab-wrapper .nav-tab-external_google' ).toggle( $( this ).is( ':checked' ) );
 		});
 
-		// Event handler: Show/hide CAS options based on checkbox
+		// Event handler: Show/hide CAS tab based on checkbox
 		$( 'input[name="auth_settings[cas]"]' ).on( 'change', function() {
-			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_cas_auto_login );
-			animateOption( action, auth_settings_external_cas_num_servers );
-			auth_settings_external_cas_servers.forEach( function( server ) {
-				animateOption( action, server.custom_label );
-				animateOption( action, server.host );
-				animateOption( action, server.port );
-				animateOption( action, server.path );
-				animateOption( action, server.method );
-				animateOption( action, server.version );
-				animateOption( action, server.attr_email );
-				animateOption( action, server.attr_first_name );
-				animateOption( action, server.attr_last_name );
-				animateOption( action, server.attr_update_on_login );
-				animateOption( action, server.link_on_username );
-			} );
+			$( '.nav-tab-wrapper .nav-tab-external_cas' ).toggle( $( this ).is( ':checked' ) );
 		});
 
-		// Event handler: Show/hide LDAP options based on checkbox
+		// Event handler: Show/hide LDAP tab based on checkbox
 		$( 'input[name="auth_settings[ldap]"]' ).on( 'change', function() {
-			var action = $( this ).is( ':checked' ) ? 'show' : 'hide';
-			animateOption( action, auth_settings_external_ldap_host );
-			animateOption( action, auth_settings_external_ldap_port );
-			animateOption( action, auth_settings_external_ldap_search_base );
-			animateOption( action, auth_settings_external_ldap_search_filter );
-			animateOption( action, auth_settings_external_ldap_uid );
-			animateOption( action, auth_settings_external_ldap_attr_email );
-			animateOption( action, auth_settings_external_ldap_user );
-			animateOption( action, auth_settings_external_ldap_password );
-			animateOption( action, auth_settings_external_ldap_tls );
-			animateOption( action, auth_settings_external_ldap_lostpassword_url );
-			animateOption( action, auth_settings_external_ldap_attr_first_name );
-			animateOption( action, auth_settings_external_ldap_attr_last_name );
-			animateOption( action, auth_settings_external_ldap_attr_update_on_login );
-			animateOption( action, auth_settings_external_ldap_test_user );
+			$( '.nav-tab-wrapper .nav-tab-external_ldap' ).toggle( $( this ).is( ':checked' ) );
 		});
 
 		// Event handler: Show/hide Bypass Usernames based on Disable WordPress Logins checkbox.
@@ -762,7 +671,7 @@
 			} else if ( sessionStorage.getItem( 'tab' ) ) {
 				tab = sessionStorage.getItem( 'tab' );
 			}
-			if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'advanced' ] ) < 0 ) {
+			if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'external_oauth2', 'external_google', 'external_cas', 'external_ldap', 'advanced' ] ) < 0 ) {
 				tab = 'access_lists';
 			}
 			window.chooseTab( tab, animationSpeed );
