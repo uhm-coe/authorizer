@@ -43,10 +43,70 @@ class Oidc extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_select_oidc_auto_login( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'oidc_auto_login';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$oidc_num_servers      = max( 1, min( 20, intval( $args['oidc_num_servers'] ?? 1 ) ) );
+
+		// Print option elements.
+		?>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<option value="" <?php selected( $auth_settings_option, '' ); ?>><?php echo esc_html_e( 'Off', 'default' ); ?></option>
+			<?php foreach ( range( 1, $oidc_num_servers ) as $server_num ) : ?>
+					<option value="<?php echo esc_attr( $server_num ); ?>" <?php selected( $auth_settings_option, strval( $server_num ) ); ?>>
+						<?php
+						echo esc_html( sprintf(
+							/* TRANSLATORS: OIDC server number */
+							__( 'Immediately redirect to OIDC server #%s', 'authorizer' ),
+							strval( $server_num )
+						) );
+						?>
+					</option>
+			<?php endforeach; ?>
+		</select>
+		<p class="description">
+			<?php esc_html_e( "Immediately redirect to OIDC login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?>
+			<br>
+			<small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if OIDC is the only enabled service (i.e., no Google, LDAP, OAuth2, or CAS).', 'authorizer' ); ?></small>
+		</p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @return void
+	 */
+	public function print_number_oidc_num_servers( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'oidc_num_servers';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$auth_settings_option = max( 1, min( 20, intval( $auth_settings_option ) ) );
+
+		// Print option elements.
+		?>
+		<input type="number" min="1" max="20" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="" />
+		<p class="description"><?php esc_html_e( 'Note: Save changes after increasing this value to see the options for additional OIDC servers below.', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @return void
+	 */
 	public function print_text_oidc_custom_label( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_custom_label';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_custom_label' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -60,13 +120,14 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_issuer( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_issuer';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_issuer' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -80,13 +141,15 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_client_id( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_client_id';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$oidc_num_server      = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? 1 : intval( $args['oidc_num_server'] );
+		$option               = 'oidc_client_id' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -94,12 +157,17 @@ class Oidc extends \Authorizer\Singleton {
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your OIDC provider by following their specific instructions.', 'authorizer' ); ?>
 			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
-			<strong><?php echo esc_html( site_url( '/wp-login.php?external=oidc' ) ); ?></strong>
+			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oidc&id=' . $oidc_num_server ) ); ?></strong>
+		</p>
+		<p>
+			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
+			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 		</p>
 		<?php
 		// If ID is overridden by filter or constant, don't expose the value;
 		// just print an informational message.
-		if ( has_filter( 'authorizer_oidc_client_id' ) ) {
+		// Note: constant/filter overrides are only supported for a single OIDC server (server 1).
+		if ( has_filter( 'authorizer_oidc_client_id' ) && 1 === $oidc_num_server ) {
 			?>
 			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
@@ -115,7 +183,7 @@ class Oidc extends \Authorizer\Singleton {
 			</p>
 			<?php
 			return;
-		} elseif ( defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
+		} elseif ( defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) && 1 === $oidc_num_server ) {
 			?>
 			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
@@ -143,18 +211,21 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_client_secret( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_client_secret';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$oidc_num_server      = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? 1 : intval( $args['oidc_num_server'] );
+		$option               = 'oidc_client_secret' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// If secret is overridden by filter or constant, don't expose the value;
 		// just print an informational message.
-		if ( has_filter( 'authorizer_oidc_client_secret' ) ) {
+		// Note: constant/filter overrides are only supported for a single OIDC server (server 1).
+		if ( has_filter( 'authorizer_oidc_client_secret' ) && 1 === $oidc_num_server ) {
 			?>
 			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
@@ -170,7 +241,7 @@ class Oidc extends \Authorizer\Singleton {
 			</p>
 			<?php
 			return;
-		} elseif ( defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
+		} elseif ( defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) && 1 === $oidc_num_server ) {
 			?>
 			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
 			<p class="description">
@@ -205,7 +276,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_scopes( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_scopes';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_scopes' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -225,7 +297,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_prompt( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_prompt';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_prompt' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -245,7 +318,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_login_hint( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_login_hint';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_login_hint' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -265,7 +339,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_max_age( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_max_age';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_max_age' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -285,7 +360,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_attr_username( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_attr_username';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_attr_username' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -309,7 +385,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_attr_email( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_attr_email';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_attr_email' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -333,7 +410,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_attr_first_name( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_attr_first_name';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_attr_first_name' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -353,7 +431,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_attr_last_name( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_attr_last_name';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_attr_last_name' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -373,7 +452,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_select_oidc_attr_update_on_login( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_attr_update_on_login';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_attr_update_on_login' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 		$values               = array(
 			''                => __( 'Do not update first and last name fields on login', 'authorizer' ),
@@ -401,7 +481,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_checkbox_oidc_require_verified_email( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_require_verified_email';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_require_verified_email' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -421,7 +502,8 @@ class Oidc extends \Authorizer\Singleton {
 	public function print_text_oidc_hosteddomain( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$option               = 'oidc_hosteddomain';
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_hosteddomain' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
 		// Print option elements.
@@ -440,15 +522,10 @@ class Oidc extends \Authorizer\Singleton {
 	 * @hook login_redirect
 	 *
 	 * @param string $redirect_to Destination URL.
-	 * @return string             Destination URL.
 	 */
 	public function maybe_redirect_after_oidc_login( $redirect_to ) {
-		if ( session_status() === PHP_SESSION_NONE ) {
-			session_start();
-		}
 		if ( ! empty( $_SESSION['oidc_redirect_to'] ) ) {
 			$redirect_to = sanitize_url( $_SESSION['oidc_redirect_to'] );
-			unset( $_SESSION['oidc_redirect_to'] );
 		}
 
 		return $redirect_to;

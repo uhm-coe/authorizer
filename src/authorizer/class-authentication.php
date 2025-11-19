@@ -873,28 +873,53 @@ class Authentication extends Singleton {
 	 *                              or null if not attempting an OIDC login.
 	 */
 	protected function custom_authenticate_oidc( $auth_settings ) {
-		// Move on if OIDC auth hasn't been requested here.
+		// Move on if oidc hasn't been requested here or OIDC server ID is invalid.
+		if ( empty( $auth_settings['oidc_num_servers'] ) ) {
+			$auth_settings['oidc_num_servers'] = 1;
+		}
+
+		// Workaround: because some OIDC providers don't let us specify a querystring in a
+		// redirect_uri, we have to detect those redirects separately because we
+		// can't include external=oidc or id={oidc_server_id} in the URL.
+		// Instead, detect the absence of the `external` param, and the presence of
+		// `code` and `state` params (OIDC uses authorization code flow).
+		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
+			// Fetch the OIDC server id from the session variable created during the
+			// initial request.
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+				session_start();
+			}
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			$_GET['id']       = $_SESSION['oidc_server_id'] ?? 1;
+			$_GET['external'] = 'oidc';
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification
-		if ( empty( $_GET['external'] ) || 'oidc' !== $_GET['external'] ) {
+		if ( empty( $_GET['external'] ) || 'oidc' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 20 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['oidc_num_servers'] ) ) {
 			return null;
 		}
 
-		// Get OIDC settings.
-		$oidc_issuer                = $auth_settings['oidc_issuer'] ?? '';
-		$oidc_client_id             = $auth_settings['oidc_client_id'] ?? '';
-		$oidc_client_secret         = $auth_settings['oidc_client_secret'] ?? '';
-		$oidc_scopes                = $auth_settings['oidc_scopes'] ?? 'openid email profile';
-		$oidc_prompt                = $auth_settings['oidc_prompt'] ?? '';
-		$oidc_login_hint            = $auth_settings['oidc_login_hint'] ?? '';
-		$oidc_max_age               = $auth_settings['oidc_max_age'] ?? '';
-		$oidc_attr_username         = $auth_settings['oidc_attr_username'] ?? 'preferred_username';
-		$oidc_attr_email            = $auth_settings['oidc_attr_email'] ?? 'email';
-		$oidc_attr_first_name       = $auth_settings['oidc_attr_first_name'] ?? 'given_name';
-		$oidc_attr_last_name        = $auth_settings['oidc_attr_last_name'] ?? 'family_name';
-		$oidc_require_verified_email = $auth_settings['oidc_require_verified_email'] ?? '';
-		$oidc_hosteddomain          = $auth_settings['oidc_hosteddomain'] ?? '';
+		// Get the OIDC server id (since multiple OIDC servers can be configured),
+		// and the relevant settings for that server.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$oidc_server_id            = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
+		$suffix                     = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+		$oidc_issuer                = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
+		$oidc_client_id             = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
+		$oidc_client_secret         = $auth_settings[ 'oidc_client_secret' . $suffix ] ?? '';
+		$oidc_scopes                = $auth_settings[ 'oidc_scopes' . $suffix ] ?? 'openid email profile';
+		$oidc_prompt                = $auth_settings[ 'oidc_prompt' . $suffix ] ?? '';
+		$oidc_login_hint            = $auth_settings[ 'oidc_login_hint' . $suffix ] ?? '';
+		$oidc_max_age               = $auth_settings[ 'oidc_max_age' . $suffix ] ?? '';
+		$oidc_attr_username         = $auth_settings[ 'oidc_attr_username' . $suffix ] ?? 'preferred_username';
+		$oidc_attr_email            = $auth_settings[ 'oidc_attr_email' . $suffix ] ?? 'email';
+		$oidc_attr_first_name       = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
+		$oidc_attr_last_name        = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
+		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
+		$oidc_hosteddomain          = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
 
 		// Fetch the OIDC Client ID (allow overrides from filter or constant).
+		// Note: constant/filter overrides are only supported for a single OIDC server.
 		if ( defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
 			$oidc_client_id = \AUTHORIZER_OIDC_CLIENT_ID;
 		}
@@ -908,6 +933,7 @@ class Authentication extends Singleton {
 		$oidc_client_id = apply_filters( 'authorizer_oidc_client_id', $oidc_client_id );
 
 		// Fetch the OIDC Client Secret (allow overrides from filter or constant).
+		// Note: constant/filter overrides are only supported for a single OIDC server.
 		if ( defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
 			$oidc_client_secret = \AUTHORIZER_OIDC_CLIENT_SECRET;
 		}
@@ -949,8 +975,16 @@ class Authentication extends Singleton {
 			);
 
 			// Set redirect URL.
-			$redirect_url = site_url( '/wp-login.php?external=oidc' );
+			// Note: Some OIDC providers (like Azure AD) don't allow querystring parameters
+			// in the redirect_uri. For those cases, we store the server ID in session and
+			// detect the callback by checking for code/state params without external param.
+			$redirect_url = site_url( '/wp-login.php?external=oidc&id=' . $oidc_server_id );
 			$oidc->setRedirectURL( $redirect_url );
+
+			// Save the OIDC server id so we can restore it after a successful
+			// login (note: we can't add the id querystring param to the redirectUri
+			// param above because some providers won't match the approved URI set in their portal).
+			$_SESSION['oidc_server_id'] = $oidc_server_id;
 
 			// Enable PKCE with S256.
 			$oidc->setCodeChallengeMethod( 'S256' );
@@ -982,7 +1016,8 @@ class Authentication extends Singleton {
 			}
 			$id_token = $oidc->getIdToken();
 			if ( ! empty( $id_token ) ) {
-				$_SESSION['oidc_id_token'] = $id_token;
+				$id_token_key = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
+				$_SESSION[ $id_token_key ] = $id_token;
 			}
 
 			// Get user info from userinfo endpoint (if available).
@@ -1072,7 +1107,7 @@ class Authentication extends Singleton {
 				'first_name'       => $first_name,
 				'last_name'        => $last_name,
 				'authenticated_by' => 'oidc',
-				'oidc_attributes' => $user_info,
+				'oidc_attributes'  => $user_info,
 			);
 		} catch ( \Exception $e ) {
 			return new \WP_Error( 'oidc_error', __( '<strong>ERROR</strong>: OIDC authentication failed.', 'authorizer' ) . ' ' . esc_html( $e->getMessage() ) );
@@ -1964,7 +1999,33 @@ class Authentication extends Singleton {
 
 		// If logged in via OIDC, perform RP-initiated logout if supported.
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
-			$oidc_issuer = $auth_settings['oidc_issuer'] ?? '';
+			// Determine which OIDC server was used by checking session for ID tokens.
+			$oidc_server_id = 1;
+			$id_token_hint = '';
+			if ( session_status() === PHP_SESSION_NONE ) {
+				session_start();
+			}
+			// Check for ID token from any OIDC server.
+			if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
+				$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
+				unset( $_SESSION['oidc_id_token'] );
+			} else {
+				// Check for numbered ID token keys (oidc_id_token_2, oidc_id_token_3, etc.).
+				$oidc_num_servers = max( 1, min( 20, intval( $auth_settings['oidc_num_servers'] ?? 1 ) ) );
+				for ( $i = 2; $i <= $oidc_num_servers; $i++ ) {
+					$token_key = 'oidc_id_token_' . $i;
+					if ( ! empty( $_SESSION[ $token_key ] ) ) {
+						$id_token_hint = wp_unslash( $_SESSION[ $token_key ] );
+						unset( $_SESSION[ $token_key ] );
+						$oidc_server_id = $i;
+						break;
+					}
+				}
+			}
+
+			// Get issuer for the server that was used.
+			$suffix = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+			$oidc_issuer = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
 			if ( ! empty( $oidc_issuer ) ) {
 				try {
 					// Get discovery document (cached).
@@ -1987,18 +2048,6 @@ class Authentication extends Singleton {
 						$redirect_to     = site_url( '/wp-login.php' );
 						if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
-						}
-
-						// Get ID token from session if available.
-						$id_token_hint = '';
-						if ( session_status() === PHP_SESSION_NONE ) {
-							session_start();
-						}
-						if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
-							// Don't sanitize JWT token - it contains dots and base64url chars.
-							// add_query_arg() will properly URL-encode it.
-							$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
-							unset( $_SESSION['oidc_id_token'] );
 						}
 
 						$logout_params = array(

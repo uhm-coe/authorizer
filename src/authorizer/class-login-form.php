@@ -342,6 +342,32 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						?>
 					</span>
 				</a></p>
+				<?php
+				if ( empty( $auth_settings['oidc_num_servers'] ) ) :
+					$auth_settings['oidc_num_servers'] = 1;
+				endif;
+				if ( $auth_settings['oidc_num_servers'] > 1 ) :
+					for ( $i = 2; $i <= $auth_settings['oidc_num_servers']; $i++ ) :
+						if ( empty( $auth_settings[ 'oidc_custom_label_' . $i ] ) ) :
+							continue;
+						endif;
+						?>
+						<p><a class="button button-primary button-external button-oidc" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oidc', $i ) ); ?>">
+							<span class="dashicons dashicons-lock"></span>
+							<span class="label">
+								<?php
+								echo esc_html(
+									sprintf(
+										/* TRANSLATORS: %s: Custom OIDC label from authorizer options */
+										__( 'Sign in with %s', 'authorizer' ),
+										$auth_settings[ 'oidc_custom_label_' . $i ]
+									)
+								);
+								?>
+							</span>
+						</a></p>
+					<?php endfor; ?>
+				<?php endif; ?>
 			<?php endif; ?>
 
 			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oidc'] ) && ( empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) || ! isset( $_SERVER['QUERY_STRING'] ) || false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
@@ -465,6 +491,52 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
 			wp_redirect( Helper::modify_current_url_for_external_login( 'oauth2', intval( $auth_settings['oauth2_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+			exit;
+		}
+
+		return $errors;
+	}
+
+
+	/**
+	 * Redirect to OIDC login if auto-login is enabled.
+	 *
+	 * @param  WP_Error $errors      WP_Error object (passed by reference).
+	 * @param  string   $redirect_to Redirect URL.
+	 * @return WP_Error              WP_Error object.
+	 */
+	public function wp_login_errors__maybe_redirect_to_oidc( $errors, $redirect_to ) {
+		// If the query string 'checkemail=confirm' is set, we do not want to automatically redirect to
+		// the OIDC login screen using 'external=oidc', and instead want to directly access the check email
+		// confirmation page.  So we will instead set the URL parameter 'external=wordpress' and redirect.
+		// This is to prevent issues when going through the normal WordPress password reset process.
+		if (
+			isset( $_REQUEST['checkemail'] ) && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			'confirm' === $_REQUEST['checkemail'] && // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			isset( $_SERVER['QUERY_STRING'] ) &&
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		) {
+					wp_redirect( Helper::modify_current_url_for_external_login( 'wordpress' ) );  // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
+					exit;
+		}
+
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
+
+		// Check whether we should redirect to OIDC.
+		if (
+			isset( $_SERVER['QUERY_STRING'] ) &&
+			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			array_key_exists( 'oidc_auto_login', $auth_settings ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) &&
+			array_key_exists( 'oidc', $auth_settings ) && '1' === $auth_settings['oidc'] &&
+			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
+			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
+			( ! array_key_exists( 'cas', $auth_settings ) || '1' !== $auth_settings['cas'] ) &&
+			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
+			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
+		) {
+			wp_redirect( Helper::modify_current_url_for_external_login( 'oidc', intval( $auth_settings['oidc_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
 
