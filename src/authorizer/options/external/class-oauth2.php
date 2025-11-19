@@ -145,15 +145,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		?>
 		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
 			<option value=""<?php selected( '' === $auth_settings_option ); ?>><?php esc_html_e( '-- None --', 'authorizer' ); ?></option>
-			<?php
-			foreach ( $this->providers as $provider => $provider_data ) :
-				// Only show Azure as an option on the first server (since Azure AD does
-				// not support querystring params in redirect URIs, meaning we can't
-				// detect which server the request came from).
-				if ( 'azure' === $provider && ! empty( $args['oauth2_num_server'] ) && 1 !== $args['oauth2_num_server'] ) {
-					continue;
-				}
-				?>
+			<?php foreach ( $this->providers as $provider => $provider_data ) : ?>
 				<option value="<?php echo esc_attr( $provider ); ?>"<?php selected( $provider, $auth_settings_option ); ?>><?php echo esc_html( $provider_data['name'] ); ?></option>
 			<?php endforeach; ?>
 		</select>
@@ -191,7 +183,8 @@ class OAuth2 extends \Authorizer\Singleton {
 	public function print_text_oauth2_clientid( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
-		$suffix               = empty( $args['oauth2_num_server'] ) || 1 === $args['oauth2_num_server'] ? '' : '_' . $args['oauth2_num_server'];
+		$oauth2_server_id     = $args['oauth2_num_server'] ?? 1;
+		$suffix               = 1 === $oauth2_server_id ? '' : '_' . $oauth2_server_id;
 		$option               = 'oauth2_clientid' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
@@ -200,25 +193,17 @@ class OAuth2 extends \Authorizer\Singleton {
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your selected provider by following their specific instructions.', 'authorizer' ); ?>
 			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
-			<strong><?php echo esc_html( site_url( '/wp-login.php?external=oauth2' ) ); ?></strong>
+			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ) ); ?></strong>
 		</p>
-		<?php if ( empty( $args['oauth2_num_server'] ) || 1 === $args['oauth2_num_server'] ) : ?>
+		<?php if ( 1 === $oauth2_server_id ) : ?>
 			<p>
 				<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
-				<strong><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
+				<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 			</p>
 			<p><?php esc_html_e( 'Note: Since Microsoft Azure does not support querystring parameters in redirect URIs, it can only be configured here as the first OAuth2 server.', 'authorizer' ); ?></p>
 		<?php endif; ?>
 		<ol>
-			<?php
-			foreach ( $this->providers as $provider => $provider_data ) :
-				// Only show Azure as an option on the first server (since Azure AD does
-				// not support querystring params in redirect URIs, meaning we can't
-				// detect which server the request came from).
-				if ( 'azure' === $provider && ! empty( $args['oauth2_num_server'] ) && 1 !== $args['oauth2_num_server'] ) {
-					continue;
-				}
-				?>
+			<?php foreach ( $this->providers as $provider => $provider_data ) : ?>
 				<li><a href="<?php echo esc_attr( $provider_data['instructions_url'] ); ?>" target="_blank"><?php echo esc_html( $provider_data['name'] ); ?></a></li>
 			<?php endforeach; ?>
 		</ol>
