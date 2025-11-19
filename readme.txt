@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.8
-Stable tag: 3.11.0
+Stable tag: 3.12.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,20 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.12.0 =
+* Released Tue Nov 18, 2025.
+* Add setting to send pending user notification emails to individual users (instead of using the setting to send to all users in a role). Props lc-sam for the [suggestion](https://github.com/uhm-coe/authorizer/issues/175)!
+* Add ability to define multiple configured OAuth2 endpoints ([details](https://github.com/uhm-coe/authorizer/issues/172)).
+* Add ability to define the messages pending and blocked users see after logging in, and the message anonymous users see when visiting public pages on a private site, via filters (`authorizer_login_message_pending_users`, `authorizer_login_message_blocked_users`, and `authorizer_message_anonymous_users`) or wp-config.php constants (`define( 'AUTHORIZER_LOGIN_MESSAGE_PENDING_USERS', '...' );`, `define( 'AUTHORIZER_LOGIN_MESSAGE_BLOCKED_USERS', '...' );`, and `define( 'AUTHORIZER_MESSAGE_ANONYMOUS_USERS', '...' );`) to, e.g., allow a single custom message to be used on all sites in a multisite network. Props @monkeyleo13 for the [suggestion](https://wordpress.org/support/topic/global-blocked-pending-messages-subject-body/)!
+* Add Simple History logging on CAS authentication errors.
+* Add logging (Simple History, and error_log) on OAuth2 authentication errors.
+* Update French translations. Props @julienlusson!
+* Update composer dependencies guzzlehttp/guzzle (7.9.2 => 7.10.0), guzzlehttp/promises (2.0.4 => 2.3.0), guzzlehttp/psr7 (2.7.0 => 2.8.0), league/oauth2-client (2.7.0 => 2.8.1), paragonie/constant_time_encoding (v2.7.0 => v2.8.2), phpseclib/phpseclib (3.0.43 => 3.0.47).
+* Move OAuth2/Google/CAS/LDAP settings into separate tabs.
+* Fix redirect_to param discarded by some OAuth2 (generic) servers.
+* Fix typo in bypass usernames.
+* Tested up to WordPress 6.8.
 
 = 3.11.0 =
 * Fix for loading translations too early in WordPress 6.7.

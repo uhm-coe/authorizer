@@ -43,12 +43,12 @@ if ( is_multisite() ) {
  * current user (the user uninstalling the plugin).
  */
 if ( ! is_multisite() ) {
-	$reassign_user = wp_get_current_user();
-	$blocked_users = get_users( array(
+	$authorizer_reassign_user = wp_get_current_user();
+	$authorizer_blocked_users = get_users( array(
 		'meta_key'   => 'auth_blocked', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
 		'meta_value' => 'yes', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 	) );
-	foreach ( $blocked_users as $blocked_user ) {
-		wp_delete_user( $blocked_user->ID, $reassign_user->ID );
+	foreach ( $authorizer_blocked_users as $authorizer_blocked_user ) {
+		wp_delete_user( $authorizer_blocked_user->ID, $authorizer_reassign_user->ID );
 	}
 }

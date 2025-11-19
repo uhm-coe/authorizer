@@ -334,18 +334,26 @@ class Authentication extends Singleton {
 		if ( empty( $auth_settings['oauth2_num_servers'] ) ) {
 			$auth_settings['oauth2_num_servers'] = 1;
 		}
+
+		// Workaround: because Azure doesn't let us specify a querystring in a
+		// redirect_uri, we have to detect those redirects separately because we
+		// can't include external=oauth2 or id={oauth_server_id} in the URL.
+		// Instead, detect the absence of the `external` param, and the presence of
+		// `code` and `state` params.
+		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
+			// Fetch the OAuth2 server id from the session variable created during the
+			// initial request.
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+				session_start();
+			}
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			$_GET['id']       = $_SESSION['oauth2_server_id'] ?? 1;
+			$_GET['external'] = 'oauth2';
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 20 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['oauth2_num_servers'] ) ) {
-			// Note: because Azure oauth2 provider doesn't let us specify a querystring
-			// in the redirect_uri, we have to detect those redirects separately because
-			// we can't include external=oauth2 in the redirect_uri. Instead, detect the
-			// absence of the `external` param, and the presence of `code` and `state`
-			// params.
-			// Note: This implies that an Azure oauth2 server must be configured as
-			// the first oauth2 server (id=1) if multiple oauth2 servers are used.
-			if ( ! empty( $_GET['external'] ) || ( empty( $_GET['code'] ) && empty( $_GET['state'] ) ) ) {
-				return null;
-			}
+			return null;
 		}
 
 		// Get the OAuth2 server id (since multiple OAuth2 servers can be configured),
@@ -405,7 +413,9 @@ class Authentication extends Singleton {
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $oauth2_provider ) {
-			session_start();
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+				session_start();
+			}
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
 				'clientId'     => $oauth2_clientid,
 				'clientSecret' => $oauth2_clientsecret,
@@ -439,6 +449,20 @@ class Authentication extends Singleton {
 						'scope' => 'user:email',
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
@@ -474,7 +498,9 @@ class Authentication extends Singleton {
 		} elseif ( 'azure' === $oauth2_provider ) {
 			// Authenticate with the Microsoft Azure oauth2 client.
 			// See: https://github.com/thenetworg/oauth2-azure.
-			session_start();
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+				session_start();
+			}
 			try {
 				// Save the redirect URL for WordPress so we can restore it after a
 				// successful login (note: we can't add the redirect_to querystring
@@ -487,6 +513,11 @@ class Authentication extends Singleton {
 				if ( isset( $login_querystring['redirect_to'] ) ) {
 					$_SESSION['oauth2_redirect_to'] = $login_querystring['redirect_to'];
 				}
+				// Save the OAuth2 server id so we can restore it after a successful
+				// login (note: we can't add the id querystring param to the redirectUri
+				// param below because it won't match the approved URI set in the Azure
+				// portal).
+				$_SESSION['oauth2_server_id'] = $oauth2_server_id;
 
 				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
 					'clientId'     => $oauth2_clientid,
@@ -536,6 +567,20 @@ class Authentication extends Singleton {
 						'scope' => $provider->scope,
 					) );
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
@@ -597,7 +642,9 @@ class Authentication extends Singleton {
 				return null;
 			}
 
-			session_start();
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+				session_start();
+			}
 			// Save the redirect URL for WordPress so we can restore it after a
 			// successful login (note: many OAuth2 providers discard the param).
 			$login_querystring = array();
@@ -653,6 +700,20 @@ class Authentication extends Singleton {
 						apply_filters( 'authorizer_oauth2_generic_authorization_parameters', array() )
 					);
 					$_SESSION['oauth2state'] = $provider->getState();
+
+					// Log the error for debugging.
+					error_log( __( 'OAuth2 server returned an Exception. Details:', 'authorizer' ) ); // phpcs:ignore
+					error_log( $e->getMessage() ); // phpcs:ignore
+
+					// Also log the error to the Simple History plugin (if it is active).
+					apply_filters(
+						'simple_history_log_warning',
+						__( 'OAuth2 server returned an Exception. Details:', 'authorizer' ),
+						array(
+							'error' => $e->getMessage(),
+						)
+					);
+
 					header( 'Location: ' . $auth_url );
 					exit;
 				}
@@ -800,7 +861,9 @@ class Authentication extends Singleton {
 		}
 
 		// Get one time use token.
-		session_start();
+		if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			session_start();
+		}
 		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
 
 		// No token, so this is not a succesful Google login.
@@ -993,6 +1056,15 @@ class Authentication extends Singleton {
 			// the cached ticket is outdated. Try renewing the authentication.
 			error_log( __( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ) ); // phpcs:ignore
 			error_log( $e->getMessage() ); // phpcs:ignore
+
+			// Also log the error to the Simple History plugin (if it is active).
+			apply_filters(
+				'simple_history_log_warning',
+				__( 'CAS server returned an Authentication Exception. Details:', 'authorizer' ),
+				array(
+					'error' => $e->getMessage(),
+				)
+			);
 
 			// CAS server is throwing errors on this login, so try logging the
 			// user out of CAS and redirecting them to the login page.
@@ -1609,7 +1681,7 @@ class Authentication extends Singleton {
 		}
 
 		// If session token set, log out of Google.
-		if ( session_id() === '' ) {
+		if ( PHP_SESSION_ACTIVE !== session_status() ) {
 			session_start();
 		}
 		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {

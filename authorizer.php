@@ -3,7 +3,7 @@
  * Plugin Name:       Authorizer
  * Plugin URI:        https://github.com/uhm-coe/authorizer
  * Description:       Authorizer limits login attempts, restricts access to specified users, and authenticates against external sources (e.g., OAuth2, Google, LDAP, or CAS).
- * Version:           3.11.0
+ * Version:           3.12.0
  * Requires at least: 4.9
  * Requires PHP:      7.4
  * Author:            Paul Ryan <prar@hawaii.edu>
