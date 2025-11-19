@@ -163,6 +163,7 @@ class Ajax_Endpoints extends Singleton {
 			'access_default_role',
 			'oauth2',
 			'oauth2_auto_login',
+			'oidc_auto_login',
 			'oauth2_num_servers',
 			'oauth2_provider',
 			'oauth2_custom_label',

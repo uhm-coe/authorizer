@@ -505,8 +505,9 @@ class Helper {
 		}
 		unset( $querystring['reauth'] );
 		$querystring['external'] = $provider;
-		// OIDC doesn't use id parameter (single config).
-		if ( 'oidc' !== $provider ) {
+		// OIDC and OAuth2 always use id parameter (even for server 1).
+		// CAS uses id parameter only for servers > 1.
+		if ( 'oidc' === $provider || 'oauth2' === $provider || ( 'cas' === $provider && $id > 1 ) ) {
 			$querystring['id'] = $id;
 		}
 		$parsed_url['query'] = http_build_query( $querystring );

@@ -117,6 +117,7 @@ class WP_Plugin_Authorizer extends Singleton {
 		// output is started (so the redirect header doesn't complain about data
 		// already being sent).
 		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_oauth2' ), 10, 2 );
+		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_oidc' ), 10, 2 );
 
 		// Prevent access to password reset if WordPress logins are disabled.
 		add_filter( 'lost_password_html_link', array( Login_Form::get_instance(), 'maybe_hide_lost_password_link' ), PHP_INT_MAX, 1 );
