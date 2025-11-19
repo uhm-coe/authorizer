@@ -179,6 +179,24 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_attr_first_name',
 			'oauth2_attr_last_name',
 			'oauth2_attr_update_on_login',
+			'oidc',
+			'oidc_num_servers',
+			'oidc_custom_label',
+			'oidc_issuer',
+			'oidc_client_id',
+			'oidc_client_secret',
+			'oidc_scopes',
+			'oidc_prompt',
+			'oidc_login_hint',
+			'oidc_max_age',
+			'oidc_attr_username',
+			'oidc_attr_email',
+			'oidc_attr_first_name',
+			'oidc_attr_last_name',
+			'oidc_attr_update_on_login',
+			'oidc_require_verified_email',
+			'oidc_link_on_username',
+			'oidc_hosteddomain',
 			'google',
 			'google_clientid',
 			'google_clientsecret',
@@ -256,6 +274,29 @@ class Ajax_Endpoints extends Singleton {
 					'cas_attr_last_name_' . $cas_num_server,
 					'cas_attr_update_on_login_' . $cas_num_server,
 					'cas_link_on_username_' . $cas_num_server,
+				) );
+			}
+		}
+		if ( ! empty( $auth_multisite_settings['oidc_num_servers'] ) && intval( $auth_multisite_settings['oidc_num_servers'] ) > 1 ) {
+			// Add options if more than one OIDC server.
+			foreach ( range( 2, min( intval( $auth_multisite_settings['oidc_num_servers'] ), 20 ) ) as $oidc_num_server ) {
+				$allowed = array_merge( $allowed, array(
+					'oidc_custom_label_' . $oidc_num_server,
+					'oidc_issuer_' . $oidc_num_server,
+					'oidc_client_id_' . $oidc_num_server,
+					'oidc_client_secret_' . $oidc_num_server,
+					'oidc_scopes_' . $oidc_num_server,
+					'oidc_prompt_' . $oidc_num_server,
+					'oidc_login_hint_' . $oidc_num_server,
+					'oidc_max_age_' . $oidc_num_server,
+					'oidc_attr_username_' . $oidc_num_server,
+					'oidc_attr_email_' . $oidc_num_server,
+					'oidc_attr_first_name_' . $oidc_num_server,
+					'oidc_attr_last_name_' . $oidc_num_server,
+					'oidc_attr_update_on_login_' . $oidc_num_server,
+					'oidc_require_verified_email_' . $oidc_num_server,
+					'oidc_link_on_username_' . $oidc_num_server,
+					'oidc_hosteddomain_' . $oidc_num_server,
 				) );
 			}
 		}

@@ -277,6 +277,7 @@ class Options extends Singleton {
 				$auth_settings['oidc_attr_last_name']       = $auth_multisite_settings['oidc_attr_last_name'] ?? 'family_name';
 				$auth_settings['oidc_attr_update_on_login'] = $auth_multisite_settings['oidc_attr_update_on_login'] ?? '';
 				$auth_settings['oidc_require_verified_email'] = $auth_multisite_settings['oidc_require_verified_email'] ?? '';
+				$auth_settings['oidc_link_on_username']     = $auth_multisite_settings['oidc_link_on_username'] ?? '';
 				$auth_settings['oidc_hosteddomain']         = $auth_multisite_settings['oidc_hosteddomain'] ?? '';
 				// Add any options for extra OIDC servers.
 				if ( ! empty( $auth_multisite_settings['oidc_num_servers'] ) && intval( $auth_multisite_settings['oidc_num_servers'] ) > 1 ) {
@@ -295,6 +296,7 @@ class Options extends Singleton {
 						$auth_settings[ 'oidc_attr_last_name_' . $oidc_num_server ]       = $auth_multisite_settings[ 'oidc_attr_last_name_' . $oidc_num_server ] ?? 'family_name';
 						$auth_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] = $auth_multisite_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = $auth_multisite_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ]     = $auth_multisite_settings[ 'oidc_link_on_username_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_hosteddomain_' . $oidc_num_server ]         = $auth_multisite_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] ?? '';
 					}
 				}
@@ -725,6 +727,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'oidc_require_verified_email', $auth_settings ) ) {
 			$auth_settings['oidc_require_verified_email'] = '';
 		}
+		if ( ! array_key_exists( 'oidc_link_on_username', $auth_settings ) ) {
+			$auth_settings['oidc_link_on_username'] = '';
+		}
 		if ( ! array_key_exists( 'oidc_hosteddomain', $auth_settings ) ) {
 			$auth_settings['oidc_hosteddomain'] = '';
 		}
@@ -779,6 +784,9 @@ class Options extends Singleton {
 				}
 				if ( ! array_key_exists( 'oidc_require_verified_email_' . $oidc_num_server, $auth_settings ) ) {
 					$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oidc_link_on_username_' . $oidc_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ] = '';
 				}
 				if ( ! array_key_exists( 'oidc_hosteddomain_' . $oidc_num_server, $auth_settings ) ) {
 					$auth_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] = '';
@@ -1160,6 +1168,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'oidc_require_verified_email', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oidc_require_verified_email'] = '';
 			}
+			if ( ! array_key_exists( 'oidc_link_on_username', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oidc_link_on_username'] = '';
+			}
 			if ( ! array_key_exists( 'oidc_hosteddomain', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oidc_hosteddomain'] = '';
 			}
@@ -1206,6 +1217,9 @@ class Options extends Singleton {
 					}
 					if ( ! array_key_exists( 'oidc_require_verified_email_' . $oidc_num_server, $auth_multisite_settings ) ) {
 						$auth_multisite_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oidc_link_on_username_' . $oidc_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oidc_link_on_username_' . $oidc_num_server ] = '';
 					}
 					if ( ! array_key_exists( 'oidc_hosteddomain_' . $oidc_num_server, $auth_multisite_settings ) ) {
 						$auth_multisite_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] = '';
@@ -1439,6 +1453,9 @@ class Options extends Singleton {
 		// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
 		$auth_settings['oidc_require_verified_email'] = array_key_exists( 'oidc_require_verified_email', $auth_settings ) && strlen( $auth_settings['oidc_require_verified_email'] ) > 0 ? '1' : '';
 
+		// Sanitize OIDC link on username (checkbox: value can only be '1' or empty string).
+		$auth_settings['oidc_link_on_username'] = array_key_exists( 'oidc_link_on_username', $auth_settings ) && strlen( $auth_settings['oidc_link_on_username'] ) > 0 ? '1' : '';
+
 		// Sanitize settings for any additional OIDC servers.
 		if ( intval( $auth_settings['oidc_num_servers'] ) > 1 ) {
 			foreach ( range( 2, min( intval( $auth_settings['oidc_num_servers'] ), 20 ) ) as $oidc_num_server ) {
@@ -1452,6 +1469,9 @@ class Options extends Singleton {
 
 				// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
 				$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = array_key_exists( 'oidc_require_verified_email_' . $oidc_num_server, $auth_settings ) && strlen( $auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ) > 0 ? '1' : '';
+
+				// Sanitize OIDC link on username (checkbox: value can only be '1' or empty string).
+				$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ] = array_key_exists( 'oidc_link_on_username_' . $oidc_num_server, $auth_settings ) && strlen( $auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ] ) > 0 ? '1' : '';
 			}
 		}
 

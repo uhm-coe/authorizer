@@ -289,12 +289,25 @@ class Authentication extends Singleton {
 
 		// Look for an existing WordPress account matching the externally
 		// authenticated user. Perform the match either by username or email.
-		if ( isset( $auth_settings['cas_link_on_username'] ) && 1 === intval( $auth_settings['cas_link_on_username'] ) ) {
+		$link_on_username = false;
+		if ( 'cas' === $authenticated_by && isset( $auth_settings['cas_link_on_username'] ) && 1 === intval( $auth_settings['cas_link_on_username'] ) ) {
+			$link_on_username = true;
+		} elseif ( 'oidc' === $authenticated_by ) {
+			// Check the specific OIDC server's link_on_username setting.
+			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
+			$suffix = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+			$oidc_link_on_username_key = 'oidc_link_on_username' . $suffix;
+			if ( isset( $auth_settings[ $oidc_link_on_username_key ] ) && 1 === intval( $auth_settings[ $oidc_link_on_username_key ] ) ) {
+				$link_on_username = true;
+			}
+		}
+
+		if ( $link_on_username ) {
 			// Get the external user's WordPress account by username. This is less
 			// secure, but a user reported having an installation where a previous
 			// CAS plugin had created over 9000 WordPress accounts without email
 			// addresses. This option was created to support that case, and any
-			// other CAS servers where emails are not used as account identifiers.
+			// other CAS/OIDC servers where emails are not used as account identifiers.
 			$user = get_user_by( 'login', $result['username'] );
 		} else {
 			// Get the external user's WordPress account by email address. This is
@@ -938,6 +951,7 @@ class Authentication extends Singleton {
 		$oidc_attr_first_name       = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
 		$oidc_attr_last_name        = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
 		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
+		$oidc_link_on_username      = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
 		$oidc_hosteddomain          = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
 
 		// Fetch the OIDC Client ID (allow overrides from filter or constant).
@@ -1073,26 +1087,6 @@ class Authentication extends Singleton {
 				$email = Helper::lowercase( sanitize_email( $user_info['email'] ) );
 			}
 
-			if ( empty( $email ) ) {
-				return new \WP_Error( 'oidc_no_email', __( '<strong>ERROR</strong>: OIDC provider did not return an email address.', 'authorizer' ) );
-			}
-
-			// Enforce email verification if required.
-			if ( '1' === $oidc_require_verified_email ) {
-				if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
-					return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
-				}
-			}
-
-			// Enforce hosted domain allowlist if configured.
-			if ( ! empty( $oidc_hosteddomain ) ) {
-				$allowed_domains = array_filter( array_map( 'trim', explode( "\n", str_replace( "\r", '', $oidc_hosteddomain ) ) ) );
-				$email_domain    = substr( strrchr( $email, '@' ), 1 );
-				if ( ! in_array( $email_domain, $allowed_domains, true ) ) {
-					return new \WP_Error( 'oidc_domain_not_allowed', __( '<strong>ERROR</strong>: Your email domain is not allowed to log in.', 'authorizer' ) );
-				}
-			}
-
 			// Extract username.
 			$username = '';
 			if ( ! empty( $oidc_attr_username ) && ! empty( $user_info[ $oidc_attr_username ] ) ) {
@@ -1102,9 +1096,39 @@ class Authentication extends Singleton {
 			} elseif ( ! empty( $user_info['sub'] ) ) {
 				$username = sanitize_user( $user_info['sub'] );
 			}
-			if ( empty( $username ) ) {
-				// Fallback to email username part.
-				$username = sanitize_user( substr( $email, 0, strpos( $email, '@' ) ) );
+
+			// If linking by username is enabled, email is optional.
+			// Otherwise, email is required.
+			if ( '1' !== $oidc_link_on_username ) {
+				if ( empty( $email ) ) {
+					return new \WP_Error( 'oidc_no_email', __( '<strong>ERROR</strong>: OIDC provider did not return an email address.', 'authorizer' ) );
+				}
+
+				// Enforce email verification if required.
+				if ( '1' === $oidc_require_verified_email ) {
+					if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
+						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
+					}
+				}
+
+				// Enforce hosted domain allowlist if configured.
+				if ( ! empty( $oidc_hosteddomain ) ) {
+					$allowed_domains = array_filter( array_map( 'trim', explode( "\n", str_replace( "\r", '', $oidc_hosteddomain ) ) ) );
+					$email_domain    = substr( strrchr( $email, '@' ), 1 );
+					if ( ! in_array( $email_domain, $allowed_domains, true ) ) {
+						return new \WP_Error( 'oidc_domain_not_allowed', __( '<strong>ERROR</strong>: Your email domain is not allowed to log in.', 'authorizer' ) );
+					}
+				}
+
+				// Fallback username to email username part if username is empty.
+				if ( empty( $username ) ) {
+					$username = sanitize_user( substr( $email, 0, strpos( $email, '@' ) ) );
+				}
+			} else {
+				// When linking by username, username is required.
+				if ( empty( $username ) ) {
+					return new \WP_Error( 'oidc_no_username', __( '<strong>ERROR</strong>: OIDC provider did not return a username.', 'authorizer' ) );
+				}
 			}
 
 			// Extract first name.
@@ -1130,8 +1154,22 @@ class Authentication extends Singleton {
 				'last_name'        => $last_name,
 				'authenticated_by' => 'oidc',
 				'oidc_attributes'  => $user_info,
+				'oidc_server_id'   => $oidc_server_id,
 			);
 		} catch ( \Exception $e ) {
+			// Log the error to error_log.
+			error_log( __( 'OIDC authentication failed. Details:', 'authorizer' ) ); // phpcs:ignore
+			error_log( $e->getMessage() ); // phpcs:ignore
+
+			// Also log the error to the Simple History plugin (if it is active).
+			apply_filters(
+				'simple_history_log_warning',
+				__( 'OIDC authentication failed. Details:', 'authorizer' ),
+				array(
+					'error' => $e->getMessage(),
+				)
+			);
+
 			return new \WP_Error( 'oidc_error', __( '<strong>ERROR</strong>: OIDC authentication failed.', 'authorizer' ) . ' ' . esc_html( $e->getMessage() ) );
 		}
 	}
