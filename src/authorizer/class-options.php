@@ -259,6 +259,24 @@ class Options extends Singleton {
 				$auth_settings['ldap_attr_update_on_login'] = $auth_multisite_settings['ldap_attr_update_on_login'];
 				$auth_settings['ldap_test_user']            = $auth_multisite_settings['ldap_test_user'] ?? '';
 
+				// Override external service (OIDC) and associated options.
+				$auth_settings['oidc']                      = $auth_multisite_settings['oidc'] ?? '';
+				$auth_settings['oidc_custom_label']         = $auth_multisite_settings['oidc_custom_label'] ?? 'OIDC';
+				$auth_settings['oidc_issuer']                = $auth_multisite_settings['oidc_issuer'] ?? '';
+				$auth_settings['oidc_client_id']             = $auth_multisite_settings['oidc_client_id'] ?? '';
+				$auth_settings['oidc_client_secret']        = $auth_multisite_settings['oidc_client_secret'] ?? '';
+				$auth_settings['oidc_scopes']                = $auth_multisite_settings['oidc_scopes'] ?? 'openid email profile';
+				$auth_settings['oidc_prompt']                = $auth_multisite_settings['oidc_prompt'] ?? '';
+				$auth_settings['oidc_login_hint']            = $auth_multisite_settings['oidc_login_hint'] ?? '';
+				$auth_settings['oidc_max_age']               = $auth_multisite_settings['oidc_max_age'] ?? '';
+				$auth_settings['oidc_attr_username']         = $auth_multisite_settings['oidc_attr_username'] ?? 'preferred_username';
+				$auth_settings['oidc_attr_email']            = $auth_multisite_settings['oidc_attr_email'] ?? 'email';
+				$auth_settings['oidc_attr_first_name']       = $auth_multisite_settings['oidc_attr_first_name'] ?? 'given_name';
+				$auth_settings['oidc_attr_last_name']       = $auth_multisite_settings['oidc_attr_last_name'] ?? 'family_name';
+				$auth_settings['oidc_attr_update_on_login'] = $auth_multisite_settings['oidc_attr_update_on_login'] ?? '';
+				$auth_settings['oidc_require_verified_email'] = $auth_multisite_settings['oidc_require_verified_email'] ?? '';
+				$auth_settings['oidc_hosteddomain']         = $auth_multisite_settings['oidc_hosteddomain'] ?? '';
+
 				// Override access_who_can_login and access_who_can_view.
 				$auth_settings['access_who_can_login'] = $auth_multisite_settings['access_who_can_login'];
 				$auth_settings['access_who_can_view']  = $auth_multisite_settings['access_who_can_view'];
@@ -638,6 +656,55 @@ class Options extends Singleton {
 		}
 		if ( ! array_key_exists( 'ldap_test_user', $auth_settings ) ) {
 			$auth_settings['ldap_test_user'] = '';
+		}
+
+		if ( ! array_key_exists( 'oidc', $auth_settings ) ) {
+			$auth_settings['oidc'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_custom_label', $auth_settings ) ) {
+			$auth_settings['oidc_custom_label'] = 'OIDC';
+		}
+		if ( ! array_key_exists( 'oidc_issuer', $auth_settings ) ) {
+			$auth_settings['oidc_issuer'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_client_id', $auth_settings ) ) {
+			$auth_settings['oidc_client_id'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_client_secret', $auth_settings ) ) {
+			$auth_settings['oidc_client_secret'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_scopes', $auth_settings ) ) {
+			$auth_settings['oidc_scopes'] = 'openid email profile';
+		}
+		if ( ! array_key_exists( 'oidc_prompt', $auth_settings ) ) {
+			$auth_settings['oidc_prompt'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_login_hint', $auth_settings ) ) {
+			$auth_settings['oidc_login_hint'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_max_age', $auth_settings ) ) {
+			$auth_settings['oidc_max_age'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_attr_username', $auth_settings ) ) {
+			$auth_settings['oidc_attr_username'] = 'preferred_username';
+		}
+		if ( ! array_key_exists( 'oidc_attr_email', $auth_settings ) ) {
+			$auth_settings['oidc_attr_email'] = 'email';
+		}
+		if ( ! array_key_exists( 'oidc_attr_first_name', $auth_settings ) ) {
+			$auth_settings['oidc_attr_first_name'] = 'given_name';
+		}
+		if ( ! array_key_exists( 'oidc_attr_last_name', $auth_settings ) ) {
+			$auth_settings['oidc_attr_last_name'] = 'family_name';
+		}
+		if ( ! array_key_exists( 'oidc_attr_update_on_login', $auth_settings ) ) {
+			$auth_settings['oidc_attr_update_on_login'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_require_verified_email', $auth_settings ) ) {
+			$auth_settings['oidc_require_verified_email'] = '';
+		}
+		if ( ! array_key_exists( 'oidc_hosteddomain', $auth_settings ) ) {
+			$auth_settings['oidc_hosteddomain'] = '';
 		}
 
 		// Advanced defaults.
@@ -1167,6 +1234,20 @@ class Options extends Singleton {
 			$auth_settings['ldap_attr_update_on_login'] = '';
 		}
 
+		// Sanitize Enable OIDC Logins (checkbox: value can only be '1' or empty string).
+		$auth_settings['oidc'] = array_key_exists( 'oidc', $auth_settings ) && strlen( $auth_settings['oidc'] ) > 0 ? '1' : '';
+
+		// Sanitize OIDC Issuer URL.
+		$auth_settings['oidc_issuer'] = filter_var( $auth_settings['oidc_issuer'] ?? '', FILTER_SANITIZE_URL );
+
+		// Sanitize OIDC attribute update (select: value can only be 'update-if-empty', '1', or empty string).
+		if ( ! isset( $auth_settings['oidc_attr_update_on_login'] ) || ! in_array( $auth_settings['oidc_attr_update_on_login'], array( '', '1', 'update-if-empty' ), true ) ) {
+			$auth_settings['oidc_attr_update_on_login'] = '';
+		}
+
+		// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
+		$auth_settings['oidc_require_verified_email'] = array_key_exists( 'oidc_require_verified_email', $auth_settings ) && strlen( $auth_settings['oidc_require_verified_email'] ) > 0 ? '1' : '';
+
 		// Make sure public pages is an empty array if it's empty.
 		// Note: this option doesn't exist in multisite options, so we first
 		// check to see if it exists.
@@ -1294,6 +1375,7 @@ class Options extends Singleton {
 				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
@@ -1306,6 +1388,7 @@ class Options extends Singleton {
 				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>

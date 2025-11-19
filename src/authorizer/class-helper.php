@@ -505,8 +505,11 @@ class Helper {
 		}
 		unset( $querystring['reauth'] );
 		$querystring['external'] = $provider;
-		$querystring['id']       = $id;
-		$parsed_url['query']     = http_build_query( $querystring );
+		// OIDC doesn't use id parameter (single config).
+		if ( 'oidc' !== $provider ) {
+			$querystring['id'] = $id;
+		}
+		$parsed_url['query'] = http_build_query( $querystring );
 
 		// Return the URL as a string.
 		return self::unparse_url( $parsed_url );

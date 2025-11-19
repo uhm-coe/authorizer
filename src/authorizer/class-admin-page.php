@@ -19,6 +19,7 @@ use Authorizer\Options\External\OAuth2;
 use Authorizer\Options\External\Google;
 use Authorizer\Options\External\Cas;
 use Authorizer\Options\External\Ldap;
+use Authorizer\Options\External\Oidc;
 use Authorizer\Options\Advanced;
 
 /**
@@ -57,7 +58,7 @@ class Admin_Page extends Singleton {
 
 		// Add help tab for Login Access Settings.
 		$help_auth_settings_access_login_content = '
-			<p>' . __( "<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.", 'authorizer' ) . '</p>
+			<p>' . __( "<strong>Who can log in to the site?</strong>: Choose the level of access restriction you'd like to use on your site here. You can leave the site open to anyone with a WordPress account or an account on an external service like Google, CAS, OIDC, or LDAP, or restrict it to WordPress users and only the external users that you specify via the <em>Access Lists</em>.", 'authorizer' ) . '</p>
 			<p>' . __( "<strong>Which role should receive email notifications about pending users?</strong>: If you've restricted access to <strong>approved users</strong>, you can determine which WordPress users will receive a notification email everytime a new external user successfully logs in and is added to the pending list. All users of the specified role will receive an email, and the external user will get a message (specified below) telling them their access is pending approval.", 'authorizer' ) . '</p>
 			<p>' . __( '<strong>What message should pending users see after attempting to log in?</strong>: Here you can specify the exact message a new external user will see once they try to log in to the site for the first time.', 'authorizer' ) . '</p>
 		';
@@ -85,7 +86,7 @@ class Admin_Page extends Singleton {
 			)
 		);
 
-		// Add help tab for External Service (CAS, LDAP, OAuth, Google) Settings.
+		// Add help tab for External Service (CAS, LDAP, OAuth, OIDC, Google) Settings.
 		$help_auth_settings_external_content = '
 			<p>' . __( '<strong>Default role for new users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
@@ -155,6 +156,34 @@ class Admin_Page extends Singleton {
 				'id'      => 'help_auth_settings_external_cas_content',
 				'title'   => '&nbsp; - ' . __( 'CAS', 'authorizer' ),
 				'content' => wp_kses_post( $help_auth_settings_external_cas_content ),
+			)
+		);
+
+		// Add (indented) help tab for OIDC Settings.
+		$help_auth_settings_external_oidc_content = '
+			<p><strong><em>' . __( 'If you enable OIDC logins:', 'authorizer' ) . '</em></strong></p>
+			<ul>
+				<li>' . __( '<strong>Issuer URL</strong>: Enter the base URL of your OIDC provider (e.g., https://login.microsoftonline.com/{tenant}/v2.0 or https://keycloak.example.com/realms/{realm}). The plugin will use discovery to find the authorization and token endpoints.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Client ID</strong>: Enter the Client ID provided by your OIDC provider.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OIDC_CLIENT_ID', '...' );</code>, or you may fetch it from an external service by hooking into the <code>authorizer_oidc_client_id</code> filter.", 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Client Secret</strong>: Enter the Client Secret provided by your OIDC provider.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OIDC_CLIENT_SECRET', '...' );</code>, or you may fetch it from an external service by hooking into the <code>authorizer_oidc_client_secret</code> filter.", 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Scopes</strong>: Enter space-separated scopes to request (default: openid email profile).', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Prompt parameter</strong>: Optional parameter to control authentication prompt behavior (e.g., login, consent, select_account).', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Login hint parameter</strong>: Optional parameter to pre-fill the username (e.g., user@example.com).', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Max age parameter</strong>: Optional parameter specifying maximum authentication age in seconds.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Attribute containing username</strong>: Enter the claim name that contains the username (default: preferred_username). If not found, the plugin will fallback to the sub claim.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Attribute containing email</strong>: Enter the claim name that contains the email address (default: email).', 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Attribute containing first name</strong>: Enter the claim name that has the user's first name (default: given_name).", 'authorizer' ) . '</li>
+				<li>' . __( "<strong>Attribute containing last name</strong>: Enter the claim name that has the user's last name (default: family_name).", 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Name attribute update</strong>: Select whether the first and last names retrieved from OIDC should overwrite any value the user has entered in the first and last name fields in their WordPress profile.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Require verified email</strong>: If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>OIDC Hosted Domain</strong>: Restrict OIDC logins to specific email domains (one per line). Leave blank to allow all valid sign-ins.', 'authorizer' ) . '</li>
+			</ul>
+		';
+		$screen->add_help_tab(
+			array(
+				'id'      => 'help_auth_settings_external_oidc_content',
+				'title'   => '&nbsp; - ' . __( 'OIDC', 'authorizer' ),
+				'content' => wp_kses_post( $help_auth_settings_external_oidc_content ),
 			)
 		);
 
@@ -472,6 +501,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_external_ldap',
 			__( 'LDAP Logins', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
+			'authorizer',
+			'auth_settings_external'
+		);
+		add_settings_field(
+			'auth_settings_external_oidc',
+			__( 'OIDC Logins', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_checkbox_auth_external_oidc' ),
 			'authorizer',
 			'auth_settings_external'
 		);
@@ -820,6 +856,119 @@ class Admin_Page extends Singleton {
 			);
 		}
 
+		// Create External Service (OIDC) Settings section.
+		add_settings_section(
+			'auth_settings_external_oidc',
+			'',
+			array( External::get_instance(), 'print_section_info_external_oidc' ),
+			'authorizer'
+		);
+		add_settings_field(
+			'auth_settings_oidc_custom_label',
+			__( 'Custom label', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_custom_label' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_issuer',
+			__( 'Issuer URL', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_issuer' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_client_id',
+			__( 'Client ID', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_client_id' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_client_secret',
+			__( 'Client Secret', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_client_secret' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_scopes',
+			__( 'Scopes', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_scopes' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_prompt',
+			__( 'Prompt parameter', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_prompt' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_login_hint',
+			__( 'Login hint parameter', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_login_hint' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_max_age',
+			__( 'Max age parameter', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_max_age' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_attr_username',
+			__( 'Attribute containing username', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_attr_username' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_attr_email',
+			__( 'Attribute containing email', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_attr_email' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_attr_first_name',
+			__( 'Attribute containing first name', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_attr_first_name' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_attr_last_name',
+			__( 'Attribute containing last name', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_attr_last_name' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_attr_update_on_login',
+			__( 'Name attribute update', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_select_oidc_attr_update_on_login' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_require_verified_email',
+			__( 'Require verified email', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_checkbox_oidc_require_verified_email' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+		add_settings_field(
+			'auth_settings_oidc_hosteddomain',
+			__( 'OIDC Hosted Domain', 'authorizer' ),
+			array( Oidc::get_instance(), 'print_text_oidc_hosteddomain' ),
+			'authorizer',
+			'auth_settings_external_oidc'
+		);
+
 		// Create External Service (LDAP) Settings section.
 		add_settings_section(
 			'auth_settings_external_ldap',
@@ -1060,6 +1209,7 @@ class Admin_Page extends Singleton {
 		$cas           = Cas::get_instance();
 		$ldap          = Ldap::get_instance();
 		$oauth2        = OAuth2::get_instance();
+		$oidc          = Oidc::get_instance();
 		$advanced      = Advanced::get_instance();
 		$auth_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 		?>
@@ -1118,6 +1268,10 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OIDC Logins', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_checkbox_auth_external_oidc( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 					</tbody></table>
 
@@ -1519,6 +1673,70 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP test connection', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_text_button_ldap_test_user( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+					</tbody></table>
+
+					<?php $external->print_section_info_external_oidc(); ?>
+					<table class="form-table"><tbody>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Custom label', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_custom_label( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Issuer URL', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_issuer( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Client ID', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_client_id( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Client Secret', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_client_secret( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Scopes', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_scopes( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Prompt parameter', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_prompt( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Login hint parameter', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_login_hint( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Max age parameter', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_max_age( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing username', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_attr_username( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing email', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_attr_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing first name', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_attr_first_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Attribute containing last name', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_attr_last_name( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Name attribute update', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_select_oidc_attr_update_on_login( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Require verified email', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_checkbox_oidc_require_verified_email( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'OIDC Hosted Domain', 'authorizer' ); ?></th>
+							<td><?php $oidc->print_text_oidc_hosteddomain( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 					</tbody></table>
 
