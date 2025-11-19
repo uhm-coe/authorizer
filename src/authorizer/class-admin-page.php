@@ -218,7 +218,7 @@ class Admin_Page extends Singleton {
 			<p>' . __( '<strong>Limit invalid login attempts</strong>: Choose how soon (and for how long) to restrict access to individuals (or bots) making repeated invalid login attempts. You may set a shorter delay first, and then a longer delay after repeated invalid attempts; you may also set how much time must pass before the delays will be reset to normal.', 'authorizer' ) . '</p>
 			<p>' . __( '<strong>Hide WordPress Logins</strong>: If you want to hide the WordPress username and password fields and the Log In button on the wp-login screen, enable this option. Note: You can always access the WordPress logins by adding external=wordpress to the wp-login URL, like so:', 'authorizer' ) . ' <a href="' . wp_login_url() . '?external=wordpress" target="_blank">' . wp_login_url() . '?external=wordpress</a>.</p>
 			<p>' . __( '<strong>Disable WordPress Logins</strong>: If you want to prevent users from logging in with their WordPress passwords and instead only allow logins from external services, enable this option. Note: enabling this will also hide WordPress logins unless the LDAP external service is enabled.', 'authorizer' ) . '</p>
-			<p>' . __( "<strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the <code>authorizer_add_branding_option</code> filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.", 'authorizer' ) . ' ' . __( "Note: you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );</code>, or you may set it in the <code>authorizer_advanced_branding</code> filter.", 'authorizer' ) .  '</p>
+			<p>' . __( "<strong>Custom WordPress login branding</strong>: If you'd like to use custom branding on the WordPress login page, select that here. You will need to use the <code>authorizer_add_branding_option</code> filter in your theme to add it. You can see an example theme that implements this filter in the plugin directory under sample-theme-add-branding.", 'authorizer' ) . ' ' . __( "Note: you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_ADVANCED_BRANDING', '...' );</code>, or you may set it in the <code>authorizer_advanced_branding</code> filter.", 'authorizer' ) . '</p>
 		';
 		$screen->add_help_tab(
 			array(
@@ -1366,7 +1366,7 @@ class Admin_Page extends Singleton {
 							<td>
 								<?php
 								$oauth2->print_select_oauth2_auto_login( array(
-									'context' => Helper::NETWORK_CONTEXT,
+									'context'            => Helper::NETWORK_CONTEXT,
 									'oauth2_num_servers' => $oauth2_num_servers,
 								) );
 								?>
@@ -1558,7 +1558,14 @@ class Admin_Page extends Singleton {
 						<?php $cas_num_servers = max( 1, min( 10, intval( $auth_settings['cas_num_servers'] ?? 1 ) ) ); ?>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'CAS automatic login', 'authorizer' ); ?></th>
-							<td><?php $cas->print_select_cas_auto_login( array( 'context' => Helper::NETWORK_CONTEXT, 'cas_num_servers' => $cas_num_servers ) ); ?></td>
+							<td>
+								<?php
+								$cas->print_select_cas_auto_login( array(
+									'context'         => Helper::NETWORK_CONTEXT,
+									'cas_num_servers' => $cas_num_servers,
+								) );
+								?>
+							</td>
 						</tr>
 						<?php
 						foreach ( range( 1, $cas_num_servers ) as $cas_num_server ) :
