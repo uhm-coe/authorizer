@@ -515,6 +515,27 @@ class Oidc extends \Authorizer\Singleton {
 
 
 	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @return void
+	 */
+	public function print_checkbox_oidc_link_on_username( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_link_on_username' . $suffix;
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Link OIDC accounts to WordPress accounts by their username (leave this off to link by email address)', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( "Note: The default (and most secure) behavior is to associate WordPress accounts with OIDC accounts by the email they have in common. However, some uncommon OIDC provider configurations don't contain email addresses for users. Enable this option if your OIDC provider doesn't have an attribute containing an email, or if you have WordPress accounts that don't have emails.", 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
 	 * Restore any redirect_to value saved during an OIDC login (in the
 	 * `authenticate` hook). This is needed since OIDC providers may drop
 	 * querystring parameters during the authentication flow.

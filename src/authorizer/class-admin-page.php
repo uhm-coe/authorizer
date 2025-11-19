@@ -1027,6 +1027,16 @@ class Admin_Page extends Singleton {
 				)
 			);
 			add_settings_field(
+				'auth_settings_oidc_link_on_username' . $suffix,
+				$prefix . __( 'OIDC users linked by username', 'authorizer' ),
+				array( Oidc::get_instance(), 'print_checkbox_oidc_link_on_username' ),
+				'authorizer',
+				'auth_settings_external_oidc',
+				array(
+					'oidc_num_server' => $oidc_num_server,
+				)
+			);
+			add_settings_field(
 				'auth_settings_oidc_hosteddomain' . $suffix,
 				$prefix . __( 'OIDC Hosted Domain', 'authorizer' ),
 				array( Oidc::get_instance(), 'print_text_oidc_hosteddomain' ),
@@ -1908,6 +1918,17 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_checkbox_oidc_require_verified_email( array(
+										'context' => Helper::NETWORK_CONTEXT,
+										'oidc_num_server' => $oidc_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'OIDC users linked by username', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oidc->print_checkbox_oidc_link_on_username( array(
 										'context' => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
