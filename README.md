@@ -3,7 +3,7 @@
 * WordPress Plugin: [https://wordpress.org/plugins/authorizer/][wp]
 * Changelog: [https://github.com/uhm-coe/authorizer/blob/master/readme.txt][changelog]
 
-*Authorizer* is a WordPress plugin that restricts access to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, LDAP, or an OAuth2 provider. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
+*Authorizer* is a WordPress plugin that restricts access to specific users, typically students enrolled in a university course. It maintains a list of approved users that you can edit to determine who has access. It also replaces the default WordPress login/authorization system with one relying on an external server, such as Google, CAS, LDAP, OAuth2, or an OIDC provider. Finally, *Authorizer* lets you limit invalid login attempts to prevent bots from compromising your users' accounts.
 
 *Authorizer* requires the following:
 
@@ -12,7 +12,7 @@
 
 *Authorizer* provides the following options:
 
-* **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts; OAuth2 accounts
+* **Authentication**: WordPress accounts; Google accounts; CAS accounts; LDAP accounts; OAuth2 accounts; OIDC (OpenID Connect) accounts
 * **Login Access**: All authenticated users (all local and all external can log in); Only specific users (all local and approved external users can log in)
 * **View Access**: Everyone (open access); Only logged in users
 * **Limit Login Attempts**: Progressively increase the amount of time required between invalid login attempts.
