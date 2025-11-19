@@ -63,6 +63,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Redirect to wp-login.php?redirect_to=? destination after an OAuth2 login.
 		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_oauth2_login' ), 10, 2 );
 
+		// Redirect to wp-login.php?redirect_to=? destination after an OIDC login.
+		add_filter( 'login_redirect', array( Options\External\Oidc::get_instance(), 'maybe_redirect_after_oidc_login' ), 10, 2 );
+
 		// Perform plugin updates if newer version installed.
 		add_action( 'plugins_loaded', array( Updates::get_instance(), 'auth_update_check' ) );
 

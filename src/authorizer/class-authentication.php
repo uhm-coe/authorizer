@@ -156,6 +156,24 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Try OIDC authentication if it's enabled and we don't have a
+		// successful login yet.
+		if (
+			'1' === $auth_settings['oidc'] &&
+			0 === count( $externally_authenticated_emails ) &&
+			! is_wp_error( $result )
+		) {
+			$result = $this->custom_authenticate_oidc( $auth_settings );
+			if ( ! is_null( $result ) && ! is_wp_error( $result ) ) {
+				if ( is_array( $result['email'] ) ) {
+					$externally_authenticated_emails = $result['email'];
+				} else {
+					$externally_authenticated_emails[] = $result['email'];
+				}
+				$authenticated_by = $result['authenticated_by'];
+			}
+		}
+
 		// Try Google authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
@@ -222,6 +240,7 @@ class Authentication extends Singleton {
 					'1' === $auth_settings['cas'] ||
 					'1' === $auth_settings['oauth2'] ||
 					'1' === $auth_settings['google'] ||
+					'1' === $auth_settings['oidc'] ||
 					'1' === $auth_settings['ldap']
 				)
 			) {
@@ -781,6 +800,222 @@ class Authentication extends Singleton {
 			'oauth2_provider'   => $oauth2_provider,
 			'oauth2_attributes' => $attributes,
 		);
+	}
+
+	/**
+	 * Validate this user's credentials against OIDC provider.
+	 *
+	 * @param  array $auth_settings Plugin settings.
+	 * @return array|WP_Error       Array containing email, authenticated_by, first_name,
+	 *                              last_name, and username strings for the successfully
+	 *                              authenticated user, or WP_Error() object on failure,
+	 *                              or null if not attempting an OIDC login.
+	 */
+	protected function custom_authenticate_oidc( $auth_settings ) {
+		// Move on if OIDC auth hasn't been requested here.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		if ( empty( $_GET['external'] ) || 'oidc' !== $_GET['external'] ) {
+			return null;
+		}
+
+		// Get OIDC settings.
+		$oidc_issuer                = $auth_settings['oidc_issuer'] ?? '';
+		$oidc_client_id             = $auth_settings['oidc_client_id'] ?? '';
+		$oidc_client_secret         = $auth_settings['oidc_client_secret'] ?? '';
+		$oidc_scopes                = $auth_settings['oidc_scopes'] ?? 'openid email profile';
+		$oidc_prompt                = $auth_settings['oidc_prompt'] ?? '';
+		$oidc_login_hint            = $auth_settings['oidc_login_hint'] ?? '';
+		$oidc_max_age               = $auth_settings['oidc_max_age'] ?? '';
+		$oidc_attr_username         = $auth_settings['oidc_attr_username'] ?? 'preferred_username';
+		$oidc_attr_email            = $auth_settings['oidc_attr_email'] ?? 'email';
+		$oidc_attr_first_name       = $auth_settings['oidc_attr_first_name'] ?? 'given_name';
+		$oidc_attr_last_name        = $auth_settings['oidc_attr_last_name'] ?? 'family_name';
+		$oidc_require_verified_email = $auth_settings['oidc_require_verified_email'] ?? '';
+		$oidc_hosteddomain          = $auth_settings['oidc_hosteddomain'] ?? '';
+
+		// Fetch the OIDC Client ID (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
+			$oidc_client_id = \AUTHORIZER_OIDC_CLIENT_ID;
+		}
+		/**
+		 * Filters the OIDC Client ID used by Authorizer to authenticate.
+		 *
+		 * @since 3.11.0
+		 *
+		 * @param string $oidc_client_id  The stored OIDC Client ID.
+		 */
+		$oidc_client_id = apply_filters( 'authorizer_oidc_client_id', $oidc_client_id );
+
+		// Fetch the OIDC Client Secret (allow overrides from filter or constant).
+		if ( defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
+			$oidc_client_secret = \AUTHORIZER_OIDC_CLIENT_SECRET;
+		}
+		/**
+		 * Filters the OIDC Client Secret used by Authorizer to authenticate.
+		 *
+		 * @since 3.11.0
+		 *
+		 * @param string $oidc_client_secret  The stored OIDC Client Secret.
+		 */
+		$oidc_client_secret = apply_filters( 'authorizer_oidc_client_secret', $oidc_client_secret );
+
+		// Move on if required params aren't specified in settings.
+		if (
+			empty( $oidc_issuer ) ||
+			empty( $oidc_client_id ) ||
+			empty( $oidc_client_secret )
+		) {
+			return null;
+		}
+
+		// Start session for state/nonce/PKCE storage.
+		if ( session_status() === PHP_SESSION_NONE ) {
+			session_start();
+		}
+
+		// Save redirect_to parameter if present.
+		// phpcs:ignore WordPress.Security.NonceVerification
+		if ( ! empty( $_GET['redirect_to'] ) ) {
+			$_SESSION['oidc_redirect_to'] = sanitize_url( wp_unslash( $_GET['redirect_to'] ) );
+		}
+
+		// Initialize jumbojett OIDC client.
+		try {
+			$oidc = new \Jumbojett\OpenIDConnectClient(
+				$oidc_issuer,
+				$oidc_client_id,
+				$oidc_client_secret
+			);
+
+			// Set redirect URL.
+			$redirect_url = site_url( '/wp-login.php?external=oidc' );
+			$oidc->setRedirectURL( $redirect_url );
+
+			// Enable PKCE with S256.
+			$oidc->setCodeChallengeMethod( 'S256' );
+
+			// Add scopes.
+			$scopes = array_filter( array_map( 'trim', explode( ' ', $oidc_scopes ) ) );
+			if ( empty( $scopes ) ) {
+				$scopes = array( 'openid', 'email', 'profile' );
+			}
+			$oidc->addScope( $scopes );
+
+			// Add optional parameters.
+			if ( ! empty( $oidc_prompt ) ) {
+				$oidc->addAuthParam( array( 'prompt' => $oidc_prompt ) );
+			}
+			if ( ! empty( $oidc_login_hint ) ) {
+				$oidc->addAuthParam( array( 'login_hint' => $oidc_login_hint ) );
+			}
+			if ( ! empty( $oidc_max_age ) ) {
+				$oidc->addAuthParam( array( 'max_age' => $oidc_max_age ) );
+			}
+
+			// Authenticate (library handles PKCE, nonce, state).
+			$oidc->authenticate();
+
+			// Store ID token in session for RP-initiated logout.
+			if ( session_status() === PHP_SESSION_NONE ) {
+				session_start();
+			}
+			$id_token = $oidc->getIdToken();
+			if ( ! empty( $id_token ) ) {
+				$_SESSION['oidc_id_token'] = $id_token;
+			}
+
+			// Get user info from userinfo endpoint (if available).
+			// Convert stdClass object to array to match codebase pattern (like OAuth2).
+			$user_info = array();
+			try {
+				$user_info = (array) $oidc->requestUserInfo();
+			} catch ( \Exception $e ) {
+				// Userinfo endpoint may not be available or may fail, continue with ID token.
+			}
+
+			// Also get ID token payload (email is often in ID token).
+			$id_token_payload = array();
+			try {
+				$id_token_payload_obj = $oidc->getIdTokenPayload();
+				if ( $id_token_payload_obj ) {
+					$id_token_payload = (array) $id_token_payload_obj;
+				}
+			} catch ( \Exception $e ) {
+				// ID token payload unavailable.
+			}
+
+			// Merge ID token claims with userinfo (userinfo takes precedence).
+			$user_info = array_merge( $id_token_payload, $user_info );
+
+			// Extract email.
+			$email = '';
+			if ( ! empty( $oidc_attr_email ) && ! empty( $user_info[ $oidc_attr_email ] ) ) {
+				$email = Helper::lowercase( sanitize_email( $user_info[ $oidc_attr_email ] ) );
+			} elseif ( ! empty( $user_info['email'] ) ) {
+				$email = Helper::lowercase( sanitize_email( $user_info['email'] ) );
+			}
+
+			if ( empty( $email ) ) {
+				return new \WP_Error( 'oidc_no_email', __( '<strong>ERROR</strong>: OIDC provider did not return an email address.', 'authorizer' ) );
+			}
+
+			// Enforce email verification if required.
+			if ( '1' === $oidc_require_verified_email ) {
+				if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
+					return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
+				}
+			}
+
+			// Enforce hosted domain allowlist if configured.
+			if ( ! empty( $oidc_hosteddomain ) ) {
+				$allowed_domains = array_filter( array_map( 'trim', explode( "\n", str_replace( "\r", '', $oidc_hosteddomain ) ) ) );
+				$email_domain    = substr( strrchr( $email, '@' ), 1 );
+				if ( ! in_array( $email_domain, $allowed_domains, true ) ) {
+					return new \WP_Error( 'oidc_domain_not_allowed', __( '<strong>ERROR</strong>: Your email domain is not allowed to log in.', 'authorizer' ) );
+				}
+			}
+
+			// Extract username.
+			$username = '';
+			if ( ! empty( $oidc_attr_username ) && ! empty( $user_info[ $oidc_attr_username ] ) ) {
+				$username = sanitize_user( $user_info[ $oidc_attr_username ] );
+			} elseif ( ! empty( $user_info['preferred_username'] ) ) {
+				$username = sanitize_user( $user_info['preferred_username'] );
+			} elseif ( ! empty( $user_info['sub'] ) ) {
+				$username = sanitize_user( $user_info['sub'] );
+			}
+			if ( empty( $username ) ) {
+				// Fallback to email username part.
+				$username = sanitize_user( substr( $email, 0, strpos( $email, '@' ) ) );
+			}
+
+			// Extract first name.
+			$first_name = '';
+			if ( ! empty( $oidc_attr_first_name ) && ! empty( $user_info[ $oidc_attr_first_name ] ) ) {
+				$first_name = sanitize_text_field( $user_info[ $oidc_attr_first_name ] );
+			} elseif ( ! empty( $user_info['given_name'] ) ) {
+				$first_name = sanitize_text_field( $user_info['given_name'] );
+			}
+
+			// Extract last name.
+			$last_name = '';
+			if ( ! empty( $oidc_attr_last_name ) && ! empty( $user_info[ $oidc_attr_last_name ] ) ) {
+				$last_name = sanitize_text_field( $user_info[ $oidc_attr_last_name ] );
+			} elseif ( ! empty( $user_info['family_name'] ) ) {
+				$last_name = sanitize_text_field( $user_info['family_name'] );
+			}
+
+			return array(
+				'email'            => $email,
+				'username'         => $username,
+				'first_name'       => $first_name,
+				'last_name'        => $last_name,
+				'authenticated_by' => 'oidc',
+				'oidc_attributes' => $user_info,
+			);
+		} catch ( \Exception $e ) {
+			return new \WP_Error( 'oidc_error', __( '<strong>ERROR</strong>: OIDC authentication failed.', 'authorizer' ) . ' ' . esc_html( $e->getMessage() ) );
+		}
 	}
 
 	/**
@@ -1653,6 +1888,63 @@ class Authentication extends Singleton {
 
 			// Remove the credentials from the user's session.
 			unset( $_SESSION['token'] );
+		}
+
+		// If logged in via OIDC, perform RP-initiated logout if supported.
+		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
+			$oidc_issuer = $auth_settings['oidc_issuer'] ?? '';
+			if ( ! empty( $oidc_issuer ) ) {
+				try {
+					// Get discovery document (cached).
+					$discovery_cache_key = 'authorizer_oidc_discovery_' . md5( $oidc_issuer );
+					$discovery           = get_transient( $discovery_cache_key );
+					if ( false === $discovery ) {
+						$discovery_url = rtrim( $oidc_issuer, '/' ) . '/.well-known/openid-configuration';
+						$response       = wp_remote_get( $discovery_url, array( 'timeout' => 10 ) );
+						if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+							$discovery = json_decode( wp_remote_retrieve_body( $response ), true );
+							if ( is_array( $discovery ) ) {
+								set_transient( $discovery_cache_key, $discovery, 6 * HOUR_IN_SECONDS );
+							}
+						}
+					}
+
+					// If discovery has end_session_endpoint, redirect to it.
+					if ( is_array( $discovery ) && ! empty( $discovery['end_session_endpoint'] ) ) {
+						$end_session_url = $discovery['end_session_endpoint'];
+						$redirect_to     = site_url( '/wp-login.php' );
+						if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
+							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+						}
+
+						// Get ID token from session if available.
+						$id_token_hint = '';
+						if ( session_status() === PHP_SESSION_NONE ) {
+							session_start();
+						}
+						if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
+							// Don't sanitize JWT token - it contains dots and base64url chars.
+							// add_query_arg() will properly URL-encode it.
+							$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
+							unset( $_SESSION['oidc_id_token'] );
+						}
+
+						$logout_params = array(
+							'post_logout_redirect_uri' => $redirect_to,
+						);
+						if ( ! empty( $id_token_hint ) ) {
+							$logout_params['id_token_hint'] = $id_token_hint;
+						}
+
+						$logout_url = add_query_arg( $logout_params, $end_session_url );
+						wp_safe_redirect( $logout_url );
+						exit;
+					}
+				} catch ( \Exception $e ) {
+					// Fallback to local logout if RP-initiated logout fails.
+					// Continue with normal WordPress logout.
+				}
+			}
 		}
 	}
 }

@@ -327,7 +327,24 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<?php endif; ?>
 			<?php endif; ?>
 
-			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] ) && ( empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) || ! isset( $_SERVER['QUERY_STRING'] ) || false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
+			<?php if ( '1' === $auth_settings['oidc'] ) : ?>
+				<p><a class="button button-primary button-external button-oidc" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oidc' ) ); ?>">
+					<span class="dashicons dashicons-lock"></span>
+					<span class="label">
+						<?php
+						echo esc_html(
+							sprintf(
+								/* TRANSLATORS: %s: Custom OIDC label from authorizer options */
+								__( 'Sign in with %s', 'authorizer' ),
+								$auth_settings['oidc_custom_label']
+							)
+						);
+						?>
+					</span>
+				</a></p>
+			<?php endif; ?>
+
+			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oidc'] ) && ( empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) || ! isset( $_SERVER['QUERY_STRING'] ) || false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
 				<style type="text/css">
 					body.login-action-login form {
 						padding-bottom: 8px;
@@ -341,7 +358,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						display: none;
 					}
 				</style>
-			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oauth2'] ) : ?>
+			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oauth2'] || '1' === $auth_settings['oidc'] ) : ?>
 				<h3> &mdash; <?php esc_html_e( 'or', 'authorizer' ); ?> &mdash; </h3>
 			<?php endif; ?>
 		</div>
@@ -391,6 +408,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
+			( ! array_key_exists( 'oidc', $auth_settings ) || '1' !== $auth_settings['oidc'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
 			wp_redirect( Helper::modify_current_url_for_external_login( 'cas', intval( $auth_settings['cas_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
@@ -443,6 +461,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			( ! array_key_exists( 'ldap', $auth_settings ) || '1' !== $auth_settings['ldap'] ) &&
 			( ! array_key_exists( 'google', $auth_settings ) || '1' !== $auth_settings['google'] ) &&
 			( ! array_key_exists( 'cas', $auth_settings ) || '1' !== $auth_settings['cas'] ) &&
+			( ! array_key_exists( 'oidc', $auth_settings ) || '1' !== $auth_settings['oidc'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
 		) {
 			wp_redirect( Helper::modify_current_url_for_external_login( 'oauth2', intval( $auth_settings['oauth2_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect

@@ -25,7 +25,7 @@ class Authorization extends Singleton {
 	 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
 	 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
 	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes,
-	 *                             oauth2_attributes.
+	 *                             oauth2_attributes, oidc_attributes.
 	 * @return WP_Error|WP_User
 	 *                             WP_Error if there was an error on user creation / adding user to blog.
 	 *                             WP_Error / wp_die() if user does not have access.
@@ -66,6 +66,10 @@ class Authorization extends Singleton {
 					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
 					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->first_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'oidc' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['oidc_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['oidc_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oidc_attr_update_on_login'] && empty( $user->first_name ) ) )
 				)
 			);
 
@@ -84,6 +88,10 @@ class Authorization extends Singleton {
 					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
 					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
 					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->last_name ) ) )
+				) || (
+					! empty( $user_data['authenticated_by'] ) && 'oidc' === $user_data['authenticated_by'] &&
+					! empty( $auth_settings['oidc_attr_update_on_login'] ) &&
+					( '1' === $auth_settings['oidc_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oidc_attr_update_on_login'] && empty( $user->last_name ) ) )
 				)
 			);
 

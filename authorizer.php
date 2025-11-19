@@ -52,6 +52,7 @@ require_once __DIR__ . '/src/authorizer/options/external/class-oauth2.php';
 require_once __DIR__ . '/src/authorizer/options/external/class-google.php';
 require_once __DIR__ . '/src/authorizer/options/external/class-cas.php';
 require_once __DIR__ . '/src/authorizer/options/external/class-ldap.php';
+require_once __DIR__ . '/src/authorizer/options/external/class-oidc.php';
 
 require_once __DIR__ . '/src/authorizer/options/class-advanced.php';
 
