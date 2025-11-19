@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Authorizer en français\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authorizer\n"
-"POT-Creation-Date: 2025-11-18 08:31+0100\n"
+"POT-Creation-Date: 2025-11-19 08:36+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: Paul Ryan <paul.ryan@hawaii.edu>\n"
@@ -1329,76 +1329,86 @@ msgstr "<strong>Erreur</strong> : L’identifiant n’est pas renseigné."
 msgid "<strong>ERROR</strong>: The password field is empty."
 msgstr "<strong>Erreur</strong>: Le mot de passe n’est pas renseigné."
 
-#: src/authorizer/class-authentication.php:749
+#: src/authorizer/class-authentication.php:454
+#: src/authorizer/class-authentication.php:460
+#: src/authorizer/class-authentication.php:572
+#: src/authorizer/class-authentication.php:578
+#: src/authorizer/class-authentication.php:705
+#: src/authorizer/class-authentication.php:711
+msgid "OAuth2 server returned an Exception. Details:"
+msgstr "Le serveur OAuth2 a indiqué une erreur d’authentification. Détails :"
+
+#: src/authorizer/class-authentication.php:810
 msgid "Email address does not match the allowed hosted domain"
 msgstr "L'adresse électronique ne correspond pas au domaine hébergé autorisé"
 
-#: src/authorizer/class-authentication.php:867
+#: src/authorizer/class-authentication.php:930
 msgid "The authentication timestamp is too old, please try again."
 msgstr ""
 "L’horodatage de l’authentification est trop ancien, veuillez réessayer."
 
-#: src/authorizer/class-authentication.php:870
-#: src/authorizer/class-authentication.php:875
+#: src/authorizer/class-authentication.php:933
+#: src/authorizer/class-authentication.php:938
 msgid "Invalid Google credentials provided."
 msgstr "Identifiants Google fournis invalides."
 
-#: src/authorizer/class-authentication.php:901
+#: src/authorizer/class-authentication.php:964
 msgid "Google credentials do not match the allowed hosted domain"
 msgstr ""
 "Les informations d’authentification Google ne correspondent pas au domaine "
 "hébergé autorisé"
 
-#: src/authorizer/class-authentication.php:994
+#: src/authorizer/class-authentication.php:1057
+#: src/authorizer/class-authentication.php:1063
 msgid "CAS server returned an Authentication Exception. Details:"
 msgstr "Le serveur CAS a indiqué une erreur d’authentification. Détails :"
 
 #. TRANSLATORS: Current time
-#: src/authorizer/class-authentication.php:1123
+#: src/authorizer/class-authentication.php:1195
 #, php-format
 msgid "[%s] Attempting to authenticate via LDAP."
 msgstr "[%s] Tentative de connexion via LDAP."
 
-#: src/authorizer/class-authentication.php:1133
+#: src/authorizer/class-authentication.php:1205
 msgid "Failed: no LDAP Host(s) specified."
 msgstr "Échec : aucun hôte LDAP renseigné."
 
-#: src/authorizer/class-authentication.php:1144
+#: src/authorizer/class-authentication.php:1216
 msgid "Failed: no LDAP Search Base(s) specified."
 msgstr "Échec : aucune Base de recherche LDAP renseignée."
 
-#: src/authorizer/class-authentication.php:1177
+#: src/authorizer/class-authentication.php:1249
 msgid "Failed: empty username and password."
 msgstr "Échec : identifiant et mot de passe vides."
 
-#: src/authorizer/class-authentication.php:1185
+#: src/authorizer/class-authentication.php:1257
 msgid "Failed: empty username."
 msgstr "Échec : mot de passe vide."
 
-#: src/authorizer/class-authentication.php:1187
+#: src/authorizer/class-authentication.php:1259
 msgid "You must provide a username or email."
 msgstr "Vous devez fournir un identifiant ou adresse électronique."
 
-#: src/authorizer/class-authentication.php:1191
+#: src/authorizer/class-authentication.php:1263
 msgid "Failed: empty password."
 msgstr "Échec : mot de passe vide."
 
-#: src/authorizer/class-authentication.php:1193
+#: src/authorizer/class-authentication.php:1265
 msgid "You must provide a password."
 msgstr "Vous devez fournir un mot de passe."
 
-#: src/authorizer/class-authentication.php:1199
+#: src/authorizer/class-authentication.php:1271
 msgid "Failed: php-ldap extension not installed."
 msgstr "Échec : l’extension php-ldap n’est pas installée."
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1230
+#: src/authorizer/class-authentication.php:1302
 #, php-format
 msgid "Warning: could not parse host %s with wp_parse_url()."
 msgstr "Attention : impossible d’analyser l’hôte %s avec wp_parse_url()."
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1256
+#: src/authorizer/class-authentication.php:1328
 #, php-format
 msgid "Warning: syntax check failed on host %s in ldap_connect()."
 msgstr ""
@@ -1406,19 +1416,19 @@ msgstr ""
 "ldap_connect()."
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1267
+#: src/authorizer/class-authentication.php:1339
 #, php-format
 msgid "Warning: unable to start TLS on host %s:"
 msgstr "Attention : impossible de démarrer TLS sur l’hôte %s :"
 
 #. TRANSLATORS: LDAP User DN
-#: src/authorizer/class-authentication.php:1321
+#: src/authorizer/class-authentication.php:1393
 #, php-format
 msgid "Performing bind as user logging in: %s."
 msgstr "Liaison avec l’utilisateur se connectant : %s."
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1331
+#: src/authorizer/class-authentication.php:1403
 #, php-format
 msgid "Warning: unable to bind on host %1$s using directory user:"
 msgstr ""
@@ -1426,7 +1436,7 @@ msgstr ""
 "l’annuaire :"
 
 #. TRANSLATORS: LDAP User DN
-#: src/authorizer/class-authentication.php:1345
+#: src/authorizer/class-authentication.php:1417
 #, php-format
 msgid "Successful bind using LDAP user DN %s instead of directory user."
 msgstr ""
@@ -1434,36 +1444,36 @@ msgstr ""
 "utilisateur de service de l'annuaire."
 
 #. TRANSLATORS: LDAP User
-#: src/authorizer/class-authentication.php:1355
-#: src/authorizer/class-authentication.php:1502
+#: src/authorizer/class-authentication.php:1427
+#: src/authorizer/class-authentication.php:1574
 #, php-format
 msgid "Failed: password incorrect for LDAP user %s."
 msgstr "Échec : Mot de passe incorrect pour l’utilisateur LDAP %s."
 
 #. TRANSLATORS: LDAP Host
-#: src/authorizer/class-authentication.php:1368
+#: src/authorizer/class-authentication.php:1440
 #, php-format
 msgid "Connected to LDAP host %s."
 msgstr "Connecté à l’hôte LDAP %s."
 
-#: src/authorizer/class-authentication.php:1376
+#: src/authorizer/class-authentication.php:1448
 msgid "Failed: unable to connect to any LDAP host."
 msgstr "Échec : impossible de se connecter aux hôtes LDAP."
 
 #. TRANSLATORS: LDAP search filter
-#: src/authorizer/class-authentication.php:1437
+#: src/authorizer/class-authentication.php:1509
 #, php-format
 msgid "Using LDAP search filter: %s"
 msgstr "Utilisation du filtre de recherche LDAP : %s"
 
 #. TRANSLATORS: 1: LDAP user 2: LDAP search base
-#: src/authorizer/class-authentication.php:1452
+#: src/authorizer/class-authentication.php:1524
 #, php-format
 msgid "Found user %1$s in search base: %2$s"
 msgstr "Utilisateur %1$s trouvé dans la base de recherche : %2$s"
 
 #. TRANSLATORS: 1: LDAP user 2: LDAP search base
-#: src/authorizer/class-authentication.php:1457
+#: src/authorizer/class-authentication.php:1529
 #, php-format
 msgid "Failed to find user %1$s in %2$s. Trying next search base."
 msgstr ""
@@ -1471,13 +1481,13 @@ msgstr ""
 "recherche suivante."
 
 #. TRANSLATORS: LDAP User
-#: src/authorizer/class-authentication.php:1465
+#: src/authorizer/class-authentication.php:1537
 #, php-format
 msgid "Failed: no LDAP user %s found."
 msgstr "Échec : aucun utilisateur LDAP %s trouvé."
 
 #. TRANSLATORS: 1: Current time 2: LDAP User 3: LDAP user email
-#: src/authorizer/class-authentication.php:1521
+#: src/authorizer/class-authentication.php:1593
 #, php-format
 msgid "[%1$s] Successfully authenticated user %2$s (%3$s) via LDAP."
 msgstr "[%1$s] Authentification LDAP réussie de l’utilisateur %2$s (%3$s)."
@@ -1818,8 +1828,8 @@ msgstr ""
 #: src/authorizer/options/external/class-google.php:136
 #: src/authorizer/options/external/class-ldap.php:221
 #: src/authorizer/options/external/class-ldap.php:304
-#: src/authorizer/options/external/class-oauth2.php:236
-#: src/authorizer/options/external/class-oauth2.php:292
+#: src/authorizer/options/external/class-oauth2.php:218
+#: src/authorizer/options/external/class-oauth2.php:274
 #, php-format
 msgid ""
 "This setting is not editable since it has been defined in the %s filter."
@@ -1837,8 +1847,8 @@ msgstr ""
 #: src/authorizer/options/external/class-google.php:152
 #: src/authorizer/options/external/class-ldap.php:237
 #: src/authorizer/options/external/class-ldap.php:320
-#: src/authorizer/options/external/class-oauth2.php:252
-#: src/authorizer/options/external/class-oauth2.php:308
+#: src/authorizer/options/external/class-oauth2.php:234
+#: src/authorizer/options/external/class-oauth2.php:290
 #, php-format
 msgid ""
 "This setting is not editable since it has been defined in wp-config.php via "
@@ -2106,12 +2116,12 @@ msgstr ""
 "dessous."
 
 #: src/authorizer/options/external/class-cas.php:130
-#: src/authorizer/options/external/class-oauth2.php:178
+#: src/authorizer/options/external/class-oauth2.php:170
 msgid "The button on the login page will read:"
 msgstr "Le bouton dans la page d’authentification ressemblera à ceci :"
 
 #: src/authorizer/options/external/class-cas.php:132
-#: src/authorizer/options/external/class-oauth2.php:180
+#: src/authorizer/options/external/class-oauth2.php:172
 msgid "Sign in with"
 msgstr "S’authentifier avec"
 
@@ -2166,19 +2176,19 @@ msgstr "Exemple : sn"
 
 #: src/authorizer/options/external/class-cas.php:409
 #: src/authorizer/options/external/class-ldap.php:411
-#: src/authorizer/options/external/class-oauth2.php:536
+#: src/authorizer/options/external/class-oauth2.php:518
 msgid "Do not update first and last name fields on login"
 msgstr "Ne pas mettre à jour les champs nom et prénom lors de la connexion"
 
 #: src/authorizer/options/external/class-cas.php:410
 #: src/authorizer/options/external/class-ldap.php:412
-#: src/authorizer/options/external/class-oauth2.php:537
+#: src/authorizer/options/external/class-oauth2.php:519
 msgid "Update first and last name fields on login"
 msgstr "Uniquement mettre à jour les champs nom et prénom lors de la connexion"
 
 #: src/authorizer/options/external/class-cas.php:411
 #: src/authorizer/options/external/class-ldap.php:413
-#: src/authorizer/options/external/class-oauth2.php:538
+#: src/authorizer/options/external/class-oauth2.php:520
 msgid "Update first and last name fields on login only if they are empty"
 msgstr ""
 "Mettre à jour les champs prénom et nom lors de l’authentification uniquement "
@@ -2302,7 +2312,7 @@ msgstr ""
 "Google."
 
 #: src/authorizer/options/external/class-google.php:186
-#: src/authorizer/options/external/class-oauth2.php:342
+#: src/authorizer/options/external/class-oauth2.php:324
 msgid "If restricting to multiple domains, add one domain per line."
 msgstr ""
 "En cas de limitation à plusieurs domaines, ajoutez un domaine par ligne."
@@ -2499,7 +2509,7 @@ msgstr ""
 msgid "Other (generic OAuth2 provider)"
 msgstr "Autre (fournisseur générique OAuth2)"
 
-#: src/authorizer/options/external/class-oauth2.php:201
+#: src/authorizer/options/external/class-oauth2.php:194
 msgid ""
 "Generate your Client ID and Secret for your selected provider by following "
 "their specific instructions."
@@ -2507,32 +2517,23 @@ msgstr ""
 "Générez votre ID client et la clef en suivant les instructions du "
 "fournisseur spécifique choisi."
 
-#: src/authorizer/options/external/class-oauth2.php:202
+#: src/authorizer/options/external/class-oauth2.php:195
 msgid "If asked for a redirect or callback URL, use:"
 msgstr "Si une adresse de redirection ou de rappel est demandée, utilisez :"
 
-#: src/authorizer/options/external/class-oauth2.php:207
+#: src/authorizer/options/external/class-oauth2.php:199
 msgid "If using Microsoft Azure, omit the querystring; use:"
 msgstr "Pour Microsoft Azure, omettez la querystring, utilisez :"
 
-#: src/authorizer/options/external/class-oauth2.php:210
-msgid ""
-"Note: Since Microsoft Azure does not support querystring parameters in "
-"redirect URIs, it can only be configured here as the first OAuth2 server."
-msgstr ""
-"Remarque : Microsoft Azure ne prend pas en charge les paramètres querystring "
-"dans les URIs de redirection, il peut être uniquement configuré ici que "
-"comme premier serveur OAuth2."
-
-#: src/authorizer/options/external/class-oauth2.php:264
+#: src/authorizer/options/external/class-oauth2.php:246
 msgid "Example:  0123456789abcdef0123"
 msgstr "Exemple : 0123456789abcdef0123"
 
-#: src/authorizer/options/external/class-oauth2.php:321
+#: src/authorizer/options/external/class-oauth2.php:303
 msgid "Example:  0123456789abcdef0123456789abcdef"
 msgstr "Exemple : 0123456789abcdef0123456789abcdef"
 
-#: src/authorizer/options/external/class-oauth2.php:342
+#: src/authorizer/options/external/class-oauth2.php:324
 msgid ""
 "Restrict OAuth2 logins to a specific domain (for example, mycollege.edu). "
 "Leave blank to allow all valid sign-ins."
@@ -2541,51 +2542,59 @@ msgstr ""
 "mycollege.edu). Laissez vide pour autoriser toutes les authentifications "
 "valides."
 
-#: src/authorizer/options/external/class-oauth2.php:363
+#: src/authorizer/options/external/class-oauth2.php:345
 msgid "Example:  \"common\", or a specific Azure Directory Tenant ID"
 msgstr ""
 "Exemple : « common », ou un ID de locataire Azure Active Directory spécifique"
 
-#: src/authorizer/options/external/class-oauth2.php:384
+#: src/authorizer/options/external/class-oauth2.php:366
 msgid "Example:  https://example.edu/login/oauth/authorize"
 msgstr "Exemple : https://site.test/login/oauth/authorize"
 
-#: src/authorizer/options/external/class-oauth2.php:405
+#: src/authorizer/options/external/class-oauth2.php:387
 msgid "Example:  https://example.edu/login/oauth/access_token"
 msgstr "Exemple : https://site.test/login/oauth/access_token"
 
-#: src/authorizer/options/external/class-oauth2.php:426
+#: src/authorizer/options/external/class-oauth2.php:408
 msgid "Example:  https://example.edu/login/oauth/userinfo"
 msgstr "Exemple : https://site.test/login/oauth/userinfo"
 
-#: src/authorizer/options/external/class-oauth2.php:448
+#: src/authorizer/options/external/class-oauth2.php:430
 msgid "Example: preferred_username"
 msgstr "Exemple : preferred_username"
 
-#: src/authorizer/options/external/class-oauth2.php:450
+#: src/authorizer/options/external/class-oauth2.php:432
 msgid ""
 "Leave blank to use the default username returned by the external service."
 msgstr ""
 "Laisser vide pour utiliser l’identifiant par défaut renvoyé par le service "
 "externe."
 
-#: src/authorizer/options/external/class-oauth2.php:473
+#: src/authorizer/options/external/class-oauth2.php:455
 msgid "Example: email"
 msgstr "Exemple : ad"
 
-#: src/authorizer/options/external/class-oauth2.php:475
+#: src/authorizer/options/external/class-oauth2.php:457
 msgid "Leave blank to use the default email returned by the external service."
 msgstr ""
 "Laisser vide pour utiliser l’adresse électronique par défaut renvoyée par le "
 "service externe."
 
-#: src/authorizer/options/external/class-oauth2.php:497
+#: src/authorizer/options/external/class-oauth2.php:479
 msgid "Example:  given_name"
 msgstr "Exemple :  given_name"
 
-#: src/authorizer/options/external/class-oauth2.php:518
+#: src/authorizer/options/external/class-oauth2.php:500
 msgid "Example:  family_name"
 msgstr "Exemple :  family_name"
+
+#~ msgid ""
+#~ "Note: Since Microsoft Azure does not support querystring parameters in "
+#~ "redirect URIs, it can only be configured here as the first OAuth2 server."
+#~ msgstr ""
+#~ "Remarque : Microsoft Azure ne prend pas en charge les paramètres "
+#~ "querystring dans les URIs de redirection, il peut être uniquement "
+#~ "configuré ici que comme premier serveur OAuth2."
 
 #~ msgid "Authorizer"
 #~ msgstr "Authorizer"
