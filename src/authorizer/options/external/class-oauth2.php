@@ -195,13 +195,10 @@ class OAuth2 extends \Authorizer\Singleton {
 			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
 			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ) ); ?></strong>
 		</p>
-		<?php if ( 1 === $oauth2_server_id ) : ?>
-			<p>
-				<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
-				<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
-			</p>
-			<p><?php esc_html_e( 'Note: Since Microsoft Azure does not support querystring parameters in redirect URIs, it can only be configured here as the first OAuth2 server.', 'authorizer' ); ?></p>
-		<?php endif; ?>
+		<p>
+			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
+			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
+		</p>
 		<ol>
 			<?php foreach ( $this->providers as $provider => $provider_data ) : ?>
 				<li><a href="<?php echo esc_attr( $provider_data['instructions_url'] ); ?>" target="_blank"><?php echo esc_html( $provider_data['name'] ); ?></a></li>
