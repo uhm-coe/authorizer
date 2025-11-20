@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.12.1 =
+* Restore original redirectUri (omit id=1 param) for already-configured OAuth2 servers. This fixes existing clients breaking because the redirectUri no longer matches after updating to Authorizer 3.12.1. Props mdebski for the [report](https://github.com/uhm-coe/authorizer/commit/f8155808e57679ecccd60d63785fe78111f99da5#r170993356)!
+
 = 3.12.0 =
 * Released Tue Nov 18, 2025.
 * Add setting to send pending user notification emails to individual users (instead of using the setting to send to all users in a role). Props lc-sam for the [suggestion](https://github.com/uhm-coe/authorizer/issues/175)!
