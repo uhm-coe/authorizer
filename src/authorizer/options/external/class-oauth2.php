@@ -188,12 +188,18 @@ class OAuth2 extends \Authorizer\Singleton {
 		$option               = 'oauth2_clientid' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
+		// Omit server id=1 from redirect_uri for backwards compatibility.
+		$redirect_uri = site_url( '/wp-login.php?external=oauth2' );
+		if ( $oauth2_server_id > 1 ) {
+			$redirect_uri .= '&id=' . $oauth2_server_id;
+		}
+
 		// Print option elements.
 		?>
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your selected provider by following their specific instructions.', 'authorizer' ); ?>
 			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
-			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ) ); ?></strong>
+			<strong style="white-space:nowrap;"><?php echo esc_html( $redirect_uri ); ?></strong>
 		</p>
 		<p>
 			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
