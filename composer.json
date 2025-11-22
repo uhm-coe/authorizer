@@ -6,6 +6,7 @@
     "require": {
         "apereo/phpcas": "^1.3",
         "google/apiclient": "^2.7",
+        "jumbojett/openid-connect-php": "^1.0",
         "league/oauth2-client": "^2.6",
         "league/oauth2-github": "^2.0",
         "thenetworg/oauth2-azure": "^2.0"

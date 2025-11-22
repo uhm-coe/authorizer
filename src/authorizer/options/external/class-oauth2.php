@@ -96,7 +96,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		<p class="description">
 			<?php esc_html_e( "Immediately redirect to OAuth2 login form if it's the only enabled external service and WordPress logins are hidden", 'authorizer' ); ?>
 			<br>
-			<small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if OAuth2 is the only enabled service (i.e., no Google, LDAP, or CAS).', 'authorizer' ); ?></small>
+			<small><?php esc_html_e( 'Note: This feature will only work if you have checked "Hide WordPress Logins" in Advanced settings, and if OAuth2 is the only enabled service (i.e., no Google, LDAP, OIDC, or CAS).', 'authorizer' ); ?></small>
 		</p>
 		<?php
 	}

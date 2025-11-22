@@ -505,8 +505,12 @@ class Helper {
 		}
 		unset( $querystring['reauth'] );
 		$querystring['external'] = $provider;
-		$querystring['id']       = $id;
-		$parsed_url['query']     = http_build_query( $querystring );
+		// OIDC and OAuth2 always use id parameter (even for server 1).
+		// CAS uses id parameter only for servers > 1.
+		if ( 'oidc' === $provider || 'oauth2' === $provider || ( 'cas' === $provider && $id > 1 ) ) {
+			$querystring['id'] = $id;
+		}
+		$parsed_url['query'] = http_build_query( $querystring );
 
 		// Return the URL as a string.
 		return self::unparse_url( $parsed_url );

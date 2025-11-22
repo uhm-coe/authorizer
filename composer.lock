@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b84c16c6ff6e12376c07520b3d6f099a",
+    "content-hash": "f17eba698d3add88bc3f02736ba3725c",
     "packages": [
         {
             "name": "apereo/phpcas",
@@ -636,6 +636,48 @@
                 }
             ],
             "time": "2025-08-23T21:21:41+00:00"
+        },
+        {
+            "name": "jumbojett/openid-connect-php",
+            "version": "v1.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jumbojett/OpenID-Connect-PHP.git",
+                "reference": "f327e7eb0626d55ddb6abc7b7c9e6ad3af4e5d51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jumbojett/OpenID-Connect-PHP/zipball/f327e7eb0626d55ddb6abc7b7c9e6ad3af4e5d51",
+                "reference": "f327e7eb0626d55ddb6abc7b7c9e6ad3af4e5d51",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-json": "*",
+                "php": ">=7.0",
+                "phpseclib/phpseclib": "^3.0.7"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "<10",
+                "roave/security-advisories": "dev-latest",
+                "yoast/phpunit-polyfills": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "Apache-2.0"
+            ],
+            "description": "Bare-bones OpenID Connect client",
+            "support": {
+                "issues": "https://github.com/jumbojett/OpenID-Connect-PHP/issues",
+                "source": "https://github.com/jumbojett/OpenID-Connect-PHP/tree/v1.0.2"
+            },
+            "time": "2024-09-13T07:08:11+00:00"
         },
         {
             "name": "league/oauth2-client",
@@ -1532,5 +1574,5 @@
     "platform-overrides": {
         "php": "7.2.5"
     },
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }

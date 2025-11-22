@@ -79,5 +79,7 @@ return array(
     'Google_Task_Retryable' => $vendorDir . '/google/apiclient/src/aliases.php',
     'Google_Task_Runner' => $vendorDir . '/google/apiclient/src/aliases.php',
     'Google_Utils_UriTemplate' => $vendorDir . '/google/apiclient/src/aliases.php',
+    'Jumbojett\\OpenIDConnectClient' => $vendorDir . '/jumbojett/openid-connect-php/src/OpenIDConnectClient.php',
+    'Jumbojett\\OpenIDConnectClientException' => $vendorDir . '/jumbojett/openid-connect-php/src/OpenIDConnectClient.php',
     'phpCAS' => $vendorDir . '/apereo/phpcas/source/CAS.php',
 );

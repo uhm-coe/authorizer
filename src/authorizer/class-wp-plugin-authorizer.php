@@ -63,6 +63,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Redirect to wp-login.php?redirect_to=? destination after an OAuth2 login.
 		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_oauth2_login' ), 10, 2 );
 
+		// Redirect to wp-login.php?redirect_to=? destination after an OIDC login.
+		add_filter( 'login_redirect', array( Options\External\Oidc::get_instance(), 'maybe_redirect_after_oidc_login' ), 10, 2 );
+
 		// Perform plugin updates if newer version installed.
 		add_action( 'plugins_loaded', array( Updates::get_instance(), 'auth_update_check' ) );
 
@@ -114,6 +117,7 @@ class WP_Plugin_Authorizer extends Singleton {
 		// output is started (so the redirect header doesn't complain about data
 		// already being sent).
 		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_oauth2' ), 10, 2 );
+		add_filter( 'wp_login_errors', array( Login_Form::get_instance(), 'wp_login_errors__maybe_redirect_to_oidc' ), 10, 2 );
 
 		// Prevent access to password reset if WordPress logins are disabled.
 		add_filter( 'lost_password_html_link', array( Login_Form::get_instance(), 'maybe_hide_lost_password_link' ), PHP_INT_MAX, 1 );

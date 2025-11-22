@@ -83,6 +83,21 @@ class External extends \Authorizer\Singleton {
 	 * @param  string $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_section_info_external_oidc( $args = '' ) {
+		?>
+		<div id="section_info_external_oidc" class="section_info">
+			<p><?php esc_html_e( 'Enter your OIDC server settings below.', 'authorizer' ); ?></p>
+		</div>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_section_info_external_ldap( $args = '' ) {
 		?>
 		<div id="section_info_external_ldap" class="section_info">
