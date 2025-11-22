@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.12.0
+Stable tag: 3.12.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.12.1 =
+* Restore original redirectUri (omit id=1 param) for already-configured OAuth2 servers. This fixes existing clients breaking because the redirectUri no longer matches after updating to Authorizer 3.12.1. Props mdebski for the [report](https://github.com/uhm-coe/authorizer/commit/f8155808e57679ecccd60d63785fe78111f99da5#r170993356)!
 
 = 3.12.0 =
 * Released Tue Nov 18, 2025.
@@ -336,6 +339,9 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
 
 == Upgrade Notice ==
+
+= 3.12.1 =
+* Notice for OAuth2 users: if you modified the `redirectUri` in your server configuration to add the new `id=1` param after updating to version 3.12.0, this update reverts that change for already existing OAuth2 server configs. The first OAuth2 server configured will now omit the `id` querystring param. Please remove `&id=1` from the configured `redirectUri` on your external OAuth2 provider. Any additional configured OAuth2 servers (id=2, id=3, etc.) will have the param included, as shown in the helper text in Authorizer settings.
 
 = 3.5.0 =
 **Upgrade Notice**: Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!

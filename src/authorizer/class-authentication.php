@@ -383,6 +383,12 @@ class Authentication extends Singleton {
 			$_GET['external'] = 'oauth2';
 		}
 
+		// If this is an OAuth2 login attempt and the id param is missing, default
+		// it to 1.
+		if ( ! empty( $_GET['external'] ) && 'oauth2' === $_GET['external'] && empty( $_GET['id'] ) ) {
+			$_GET['id'] = 1;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'oauth2' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 20 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['oauth2_num_servers'] ) ) {
 			return null;
@@ -442,6 +448,22 @@ class Authentication extends Singleton {
 			return null;
 		}
 
+		// Build the redirectUri for the OAuth2 provider to redirect back to.
+		// Note: omit the id param if it is 1 (default server) for backwards
+		// compatibility with installations already configured before Authorizer
+		// supported multiple OAuth2 servers (so it doesn't break existing
+		// redirectUris authorized on the external service).
+		$redirect_uri = site_url( '/wp-login.php?external=oauth2' );
+		if ( $oauth2_server_id > 1 ) {
+			$redirect_uri .= '&id=' . $oauth2_server_id;
+		}
+		if ( 'azure' === $oauth2_provider ) {
+			// Microsoft Azure does not support querystrings in the redirectUri, so
+			// we have to use the base wp-login.php URL. We save parameters in the
+			// session instead (see below).
+			$redirect_uri = site_url( '/wp-login.php' );
+		}
+
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $oauth2_provider ) {
@@ -451,7 +473,7 @@ class Authentication extends Singleton {
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
 				'clientId'     => $oauth2_clientid,
 				'clientSecret' => $oauth2_clientsecret,
-				'redirectUri'  => site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ),
+				'redirectUri'  => $redirect_uri,
 			) );
 
 			// If we don't have an authorization code, then get one.
@@ -554,7 +576,7 @@ class Authentication extends Singleton {
 				$provider = new \TheNetworg\OAuth2\Client\Provider\Azure( array(
 					'clientId'     => $oauth2_clientid,
 					'clientSecret' => $oauth2_clientsecret,
-					'redirectUri'  => site_url( '/wp-login.php' ),
+					'redirectUri'  => $redirect_uri,
 					'tenant'       => empty( $oauth2_tenant_id ) ? 'common' : $oauth2_tenant_id,
 				) );
 				// Use v2 API. Set to Azure::ENDPOINT_VERSION_1_0 to use v1 API.
@@ -690,7 +712,7 @@ class Authentication extends Singleton {
 			$provider = new \League\OAuth2\Client\Provider\GenericProvider( array(
 				'clientId'                => $oauth2_clientid,
 				'clientSecret'            => $oauth2_clientsecret,
-				'redirectUri'             => site_url( '/wp-login.php?external=oauth2&id=' . $oauth2_server_id ),
+				'redirectUri'             => $redirect_uri,
 				'urlAuthorize'            => $oauth2_url_authorize,
 				'urlAccessToken'          => $oauth2_url_token,
 				'urlResourceOwnerDetails' => $oauth2_url_resource,
