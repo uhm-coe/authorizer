@@ -324,6 +324,14 @@ class Authentication extends Singleton {
 		// We'll track how this user was authenticated in user meta.
 		if ( $user ) {
 			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+			
+			// Store OIDC ID token and server ID in user meta for RP-initiated logout.
+			if ( 'oidc' === $authenticated_by && isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ) {
+				update_user_meta( $user->ID, 'oidc_id_token', $result['oidc_id_token'] );
+				if ( isset( $result['oidc_server_id'] ) ) {
+					update_user_meta( $user->ID, 'oidc_server_id', intval( $result['oidc_server_id'] ) );
+				}
+			}
 		}
 
 		// Check this external user's access against the access lists
@@ -1046,15 +1054,8 @@ class Authentication extends Singleton {
 			// Authenticate (library handles PKCE, nonce, state).
 			$oidc->authenticate();
 
-			// Store ID token in session for RP-initiated logout.
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
-			}
+			// Get ID token for RP-initiated logout (will be stored in user meta after user is found).
 			$id_token = $oidc->getIdToken();
-			if ( ! empty( $id_token ) ) {
-				$id_token_key = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
-				$_SESSION[ $id_token_key ] = $id_token;
-			}
 
 			// Get user info from userinfo endpoint (if available).
 			// Convert stdClass object to array to match codebase pattern (like OAuth2).
@@ -1155,6 +1156,7 @@ class Authentication extends Singleton {
 				'authenticated_by' => 'oidc',
 				'oidc_attributes'  => $user_info,
 				'oidc_server_id'   => $oidc_server_id,
+				'oidc_id_token'    => $id_token,
 			);
 		} catch ( \Exception $e ) {
 			// Log the error to error_log.
@@ -2059,28 +2061,12 @@ class Authentication extends Singleton {
 
 		// If logged in via OIDC, perform RP-initiated logout if supported.
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
-			// Determine which OIDC server was used by checking session for ID tokens.
-			$oidc_server_id = 1;
-			$id_token_hint = '';
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
-			}
-			// Check for ID token from any OIDC server.
-			if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
-				$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
-				unset( $_SESSION['oidc_id_token'] );
-			} else {
-				// Check for numbered ID token keys (oidc_id_token_2, oidc_id_token_3, etc.).
-				$oidc_num_servers = max( 1, min( 20, intval( $auth_settings['oidc_num_servers'] ?? 1 ) ) );
-				for ( $i = 2; $i <= $oidc_num_servers; $i++ ) {
-					$token_key = 'oidc_id_token_' . $i;
-					if ( ! empty( $_SESSION[ $token_key ] ) ) {
-						$id_token_hint = wp_unslash( $_SESSION[ $token_key ] );
-						unset( $_SESSION[ $token_key ] );
-						$oidc_server_id = $i;
-						break;
-					}
-				}
+			// Get ID token and server ID from user meta (stored during authentication).
+			$user_id = get_current_user_id();
+			$id_token_hint = get_user_meta( $user_id, 'oidc_id_token', true );
+			$oidc_server_id = get_user_meta( $user_id, 'oidc_server_id', true );
+			if ( empty( $oidc_server_id ) ) {
+				$oidc_server_id = 1;
 			}
 
 			// Get issuer for the server that was used.
@@ -2118,12 +2104,26 @@ class Authentication extends Singleton {
 						}
 
 						$logout_url = add_query_arg( $logout_params, $end_session_url );
+						
+						// Clean up user meta after retrieving ID token.
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+						
 						wp_safe_redirect( $logout_url );
 						exit;
 					}
+					// Clean up user meta if no end_session_endpoint is available.
+					if ( ! empty( $user_id ) ) {
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+					}
 				} catch ( \Exception $e ) {
 					// Fallback to local logout if RP-initiated logout fails.
-					// Continue with normal WordPress logout.
+					// Clean up user meta even if logout fails.
+					if ( ! empty( $user_id ) ) {
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+					}
 				}
 			}
 		}
