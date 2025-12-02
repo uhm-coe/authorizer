@@ -892,7 +892,7 @@ class Admin_Page extends Singleton {
 				'authorizer',
 				'auth_settings_external_oidc',
 				array(
-					'class'             => 'border-top',
+					'class'           => 'border-top',
 					'oidc_num_server' => $oidc_num_server,
 				)
 			);
@@ -1767,7 +1767,7 @@ class Admin_Page extends Singleton {
 							<td>
 								<?php
 								$oidc->print_select_oidc_auto_login( array(
-									'context' => Helper::NETWORK_CONTEXT,
+									'context'          => Helper::NETWORK_CONTEXT,
 									'oidc_num_servers' => $oidc_num_servers,
 								) );
 								?>
@@ -1782,7 +1782,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_custom_label( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1793,7 +1793,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_issuer( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1804,7 +1804,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_client_id( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1815,7 +1815,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_client_secret( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1826,7 +1826,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_scopes( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1837,7 +1837,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_prompt( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1848,7 +1848,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_login_hint( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1859,7 +1859,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_max_age( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1870,7 +1870,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_attr_username( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1881,7 +1881,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_attr_email( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1892,7 +1892,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_attr_first_name( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1903,7 +1903,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_attr_last_name( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1914,7 +1914,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_select_oidc_attr_update_on_login( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1925,7 +1925,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_checkbox_oidc_require_verified_email( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1936,7 +1936,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_checkbox_oidc_link_on_username( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
@@ -1947,7 +1947,7 @@ class Admin_Page extends Singleton {
 								<td>
 									<?php
 									$oidc->print_text_oidc_hosteddomain( array(
-										'context' => Helper::NETWORK_CONTEXT,
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oidc_num_server' => $oidc_num_server,
 									) );
 									?>
