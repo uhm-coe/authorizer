@@ -152,6 +152,14 @@ class Oidc extends \Authorizer\Singleton {
 		$option               = 'oidc_client_id' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
+
+		// Omit server id=1 from redirect_uri for consistency with CAS and OAuth2
+		// implementations.
+		$redirect_uri = site_url( '/wp-login.php?external=oidc' );
+		if ( $oidc_num_server > 1 ) {
+			$redirect_uri .= '&id=' . $oidc_num_server;
+		}
+
 		// Print option elements.
 		?>
 		<p>

@@ -938,6 +938,12 @@ class Authentication extends Singleton {
 			$_GET['external'] = 'oidc';
 		}
 
+		// If this is an OAuth2 login attempt and the id param is missing, default
+		// it to 1.
+		if ( ! empty( $_GET['external'] ) && 'oidc' === $_GET['external'] && empty( $_GET['id'] ) ) {
+			$_GET['id'] = 1;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'oidc' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 20 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['oidc_num_servers'] ) ) {
 			return null;
@@ -1000,14 +1006,22 @@ class Authentication extends Singleton {
 			return null;
 		}
 
+		// Build the redirectUri for the OIDC provider to redirect back to.
+		// Note: omit the id param if it is 1 (default server) for consistency with
+		// the CAS and OAuth2 implementations.
+		$redirect_uri = site_url( '/wp-login.php?external=oidc' );
+		if ( $oidc_server_id > 1 ) {
+			$redirect_uri .= '&id=' . $oidc_server_id;
+		}
+
 		// Start session for state/nonce/PKCE storage.
 		if ( session_status() === PHP_SESSION_NONE ) {
 			session_start();
 		}
 
 		// Save redirect_to parameter if present.
-		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( ! empty( $_GET['redirect_to'] ) ) {
+			// phpcs:ignore WordPress.Security.NonceVerification
 			$_SESSION['oidc_redirect_to'] = sanitize_url( wp_unslash( $_GET['redirect_to'] ) );
 		}
 
@@ -1020,11 +1034,7 @@ class Authentication extends Singleton {
 			);
 
 			// Set redirect URL.
-			// Note: Some OIDC providers (like Azure AD) don't allow querystring parameters
-			// in the redirect_uri. For those cases, we store the server ID in session and
-			// detect the callback by checking for code/state params without external param.
-			$redirect_url = site_url( '/wp-login.php?external=oidc&id=' . $oidc_server_id );
-			$oidc->setRedirectURL( $redirect_url );
+			$oidc->setRedirectURL( $redirect_uri );
 
 			// Save the OIDC server id so we can restore it after a successful
 			// login (note: we can't add the id querystring param to the redirectUri
