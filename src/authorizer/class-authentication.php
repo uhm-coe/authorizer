@@ -290,8 +290,14 @@ class Authentication extends Singleton {
 		// Look for an existing WordPress account matching the externally
 		// authenticated user. Perform the match either by username or email.
 		$link_on_username = false;
-		if ( 'cas' === $authenticated_by && isset( $auth_settings['cas_link_on_username'] ) && 1 === intval( $auth_settings['cas_link_on_username'] ) ) {
-			$link_on_username = true;
+		if ( 'cas' === $authenticated_by ) {
+			// Check the specific CAS server's link_on_username setting.
+			$cas_server_id            = isset( $result['cas_server_id'] ) ? intval( $result['cas_server_id'] ) : 1;
+			$suffix                   = $cas_server_id > 1 ? '_' . $cas_server_id : '';
+			$cas_link_on_username_key = 'cas_link_on_username' . $suffix;
+			if ( isset( $auth_settings[ $cas_link_on_username_key ] ) && 1 === intval( $auth_settings[ $cas_link_on_username_key ] ) ) {
+				$link_on_username = true;
+			}
 		} elseif ( 'oidc' === $authenticated_by ) {
 			// Check the specific OIDC server's link_on_username setting.
 			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
@@ -1488,6 +1494,7 @@ class Authentication extends Singleton {
 			'last_name'        => $last_name,
 			'authenticated_by' => 'cas',
 			'cas_attributes'   => $cas_attributes,
+			'cas_server_id'    => $cas_server_id,
 		);
 	}
 
