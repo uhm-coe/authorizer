@@ -48,7 +48,7 @@ class Oidc extends \Authorizer\Singleton {
 		$options              = Options::get_instance();
 		$option               = 'oidc_auto_login';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-		$oidc_num_servers      = max( 1, min( 20, intval( $args['oidc_num_servers'] ?? 1 ) ) );
+		$oidc_num_servers     = max( 1, min( 20, intval( $args['oidc_num_servers'] ?? 1 ) ) );
 
 		// Print option elements.
 		?>

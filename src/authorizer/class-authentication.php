@@ -250,7 +250,10 @@ class Authentication extends Singleton {
 				// authentication).
 				if ( ! empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) ) {
 					$bypass_usernames = explode( "\n", str_replace( "\r", '', $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) );
-					$bypass_users = get_users( array( 'login__in' => $bypass_usernames, 'count_total' => false ) );
+					$bypass_users     = get_users( array(
+						'login__in'   => $bypass_usernames,
+						'count_total' => false,
+					) );
 					foreach ( $bypass_users as $bypass_user ) {
 						if ( $bypass_user->user_login === $username || $bypass_user->user_email === $username ) {
 							return null;
@@ -300,8 +303,8 @@ class Authentication extends Singleton {
 			}
 		} elseif ( 'oidc' === $authenticated_by ) {
 			// Check the specific OIDC server's link_on_username setting.
-			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
-			$suffix = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+			$oidc_server_id            = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
+			$suffix                    = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
 			$oidc_link_on_username_key = 'oidc_link_on_username' . $suffix;
 			if ( isset( $auth_settings[ $oidc_link_on_username_key ] ) && 1 === intval( $auth_settings[ $oidc_link_on_username_key ] ) ) {
 				$link_on_username = true;
@@ -949,22 +952,22 @@ class Authentication extends Singleton {
 		// Get the OIDC server id (since multiple OIDC servers can be configured),
 		// and the relevant settings for that server.
 		// phpcs:ignore WordPress.Security.NonceVerification
-		$oidc_server_id            = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
-		$suffix                     = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
-		$oidc_issuer                = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
-		$oidc_client_id             = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
-		$oidc_client_secret         = $auth_settings[ 'oidc_client_secret' . $suffix ] ?? '';
-		$oidc_scopes                = $auth_settings[ 'oidc_scopes' . $suffix ] ?? 'openid email profile';
-		$oidc_prompt                = $auth_settings[ 'oidc_prompt' . $suffix ] ?? '';
-		$oidc_login_hint            = $auth_settings[ 'oidc_login_hint' . $suffix ] ?? '';
-		$oidc_max_age               = $auth_settings[ 'oidc_max_age' . $suffix ] ?? '';
-		$oidc_attr_username         = $auth_settings[ 'oidc_attr_username' . $suffix ] ?? 'preferred_username';
-		$oidc_attr_email            = $auth_settings[ 'oidc_attr_email' . $suffix ] ?? 'email';
-		$oidc_attr_first_name       = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
-		$oidc_attr_last_name        = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
+		$oidc_server_id              = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
+		$suffix                      = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+		$oidc_issuer                 = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
+		$oidc_client_id              = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
+		$oidc_client_secret          = $auth_settings[ 'oidc_client_secret' . $suffix ] ?? '';
+		$oidc_scopes                 = $auth_settings[ 'oidc_scopes' . $suffix ] ?? 'openid email profile';
+		$oidc_prompt                 = $auth_settings[ 'oidc_prompt' . $suffix ] ?? '';
+		$oidc_login_hint             = $auth_settings[ 'oidc_login_hint' . $suffix ] ?? '';
+		$oidc_max_age                = $auth_settings[ 'oidc_max_age' . $suffix ] ?? '';
+		$oidc_attr_username          = $auth_settings[ 'oidc_attr_username' . $suffix ] ?? 'preferred_username';
+		$oidc_attr_email             = $auth_settings[ 'oidc_attr_email' . $suffix ] ?? 'email';
+		$oidc_attr_first_name        = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
+		$oidc_attr_last_name         = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
 		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
-		$oidc_link_on_username      = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
-		$oidc_hosteddomain          = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
+		$oidc_link_on_username       = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
+		$oidc_hosteddomain           = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
 
 		// Fetch the OIDC Client ID (allow overrides from filter or constant).
 		// Note: constant/filter overrides are only supported for a single OIDC server.
@@ -1068,7 +1071,7 @@ class Authentication extends Singleton {
 			}
 			$id_token = $oidc->getIdToken();
 			if ( ! empty( $id_token ) ) {
-				$id_token_key = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
+				$id_token_key              = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
 				$_SESSION[ $id_token_key ] = $id_token;
 			}
 
@@ -1140,11 +1143,9 @@ class Authentication extends Singleton {
 				if ( empty( $username ) ) {
 					$username = sanitize_user( substr( $email, 0, strpos( $email, '@' ) ) );
 				}
-			} else {
+			} elseif ( empty( $username ) ) {
 				// When linking by username, username is required.
-				if ( empty( $username ) ) {
-					return new \WP_Error( 'oidc_no_username', __( '<strong>ERROR</strong>: OIDC provider did not return a username.', 'authorizer' ) );
-				}
+				return new \WP_Error( 'oidc_no_username', __( '<strong>ERROR</strong>: OIDC provider did not return a username.', 'authorizer' ) );
 			}
 
 			// Extract first name.
@@ -2078,7 +2079,7 @@ class Authentication extends Singleton {
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
 			// Determine which OIDC server was used by checking session for ID tokens.
 			$oidc_server_id = 1;
-			$id_token_hint = '';
+			$id_token_hint  = '';
 			if ( session_status() === PHP_SESSION_NONE ) {
 				session_start();
 			}
@@ -2101,7 +2102,7 @@ class Authentication extends Singleton {
 			}
 
 			// Get issuer for the server that was used.
-			$suffix = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+			$suffix      = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
 			$oidc_issuer = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
 			if ( ! empty( $oidc_issuer ) ) {
 				try {
