@@ -1011,9 +1011,6 @@ class Authentication extends Singleton {
 			);
 
 			// Set redirect URL.
-			// Note: Some OIDC providers (like Azure AD) don't allow querystring parameters
-			// in the redirect_uri. For those cases, we store the server ID in session and
-			// detect the callback by checking for code/state params without external param.
 			$redirect_url = site_url( '/wp-login.php?external=oidc&id=' . $oidc_server_id );
 			$oidc->setRedirectURL( $redirect_url );
 

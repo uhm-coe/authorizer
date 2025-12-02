@@ -156,12 +156,6 @@ class Oidc extends \Authorizer\Singleton {
 		?>
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your OIDC provider by following their specific instructions.', 'authorizer' ); ?>
-			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
-			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oidc&id=' . $oidc_num_server ) ); ?></strong>
-		</p>
-		<p>
-			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
-			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 		</p>
 		<?php
 		// If ID is overridden by filter or constant, don't expose the value;
