@@ -1075,10 +1075,6 @@ class Authentication extends Singleton {
 
 			// Get ID token for RP-initiated logout (will be stored in user meta after user is found).
 			$id_token = $oidc->getIdToken();
-			if ( ! empty( $id_token ) ) {
-				$id_token_key              = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
-				$_SESSION[ $id_token_key ] = $id_token;
-			}
 
 			// Get user info from userinfo endpoint (if available).
 			// Convert stdClass object to array to match codebase pattern (like OAuth2).
@@ -2083,28 +2079,12 @@ class Authentication extends Singleton {
 
 		// If logged in via OIDC, perform RP-initiated logout if supported.
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
-			// Determine which OIDC server was used by checking session for ID tokens.
-			$oidc_server_id = 1;
-			$id_token_hint  = '';
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
-			}
-			// Check for ID token from any OIDC server.
-			if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
-				$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
-				unset( $_SESSION['oidc_id_token'] );
-			} else {
-				// Check for numbered ID token keys (oidc_id_token_2, oidc_id_token_3, etc.).
-				$oidc_num_servers = max( 1, min( 20, intval( $auth_settings['oidc_num_servers'] ?? 1 ) ) );
-				for ( $i = 2; $i <= $oidc_num_servers; $i++ ) {
-					$token_key = 'oidc_id_token_' . $i;
-					if ( ! empty( $_SESSION[ $token_key ] ) ) {
-						$id_token_hint = wp_unslash( $_SESSION[ $token_key ] );
-						unset( $_SESSION[ $token_key ] );
-						$oidc_server_id = $i;
-						break;
-					}
-				}
+			// Get ID token and server ID from user meta (stored during authentication).
+			$user_id = get_current_user_id();
+			$id_token_hint = get_user_meta( $user_id, 'oidc_id_token', true );
+			$oidc_server_id = get_user_meta( $user_id, 'oidc_server_id', true );
+			if ( empty( $oidc_server_id ) ) {
+				$oidc_server_id = 1;
 			}
 
 			// Get issuer for the server that was used.
