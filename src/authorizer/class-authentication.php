@@ -1065,10 +1065,6 @@ class Authentication extends Singleton {
 			// Authenticate (library handles PKCE, nonce, state).
 			$oidc->authenticate();
 
-			// Store ID token in session for RP-initiated logout.
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
-			}
 			$id_token = $oidc->getIdToken();
 			if ( ! empty( $id_token ) ) {
 				$id_token_key              = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
