@@ -384,7 +384,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OAuth2 server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -476,7 +476,7 @@ class Authentication extends Singleton {
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $oauth2_provider ) {
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
@@ -561,7 +561,7 @@ class Authentication extends Singleton {
 		} elseif ( 'azure' === $oauth2_provider ) {
 			// Authenticate with the Microsoft Azure oauth2 client.
 			// See: https://github.com/thenetworg/oauth2-azure.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			try {
@@ -705,7 +705,7 @@ class Authentication extends Singleton {
 				return null;
 			}
 
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// Save the redirect URL for WordPress so we can restore it after a
@@ -930,7 +930,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OIDC server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -1015,7 +1015,7 @@ class Authentication extends Singleton {
 		}
 
 		// Start session for state/nonce/PKCE storage.
-		if ( session_status() === PHP_SESSION_NONE ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 
@@ -1204,7 +1204,7 @@ class Authentication extends Singleton {
 		}
 
 		// Get one time use token.
-		if ( PHP_SESSION_ACTIVE !== session_status() ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
@@ -2025,7 +2025,7 @@ class Authentication extends Singleton {
 		}
 
 		// If session token set, log out of Google.
-		if ( PHP_SESSION_ACTIVE !== session_status() ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
@@ -2076,7 +2076,7 @@ class Authentication extends Singleton {
 			// Determine which OIDC server was used by checking session for ID tokens.
 			$oidc_server_id = 1;
 			$id_token_hint  = '';
-			if ( session_status() === PHP_SESSION_NONE ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// Check for ID token from any OIDC server.
