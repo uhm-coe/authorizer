@@ -48,7 +48,7 @@ class Oidc extends \Authorizer\Singleton {
 		$options              = Options::get_instance();
 		$option               = 'oidc_auto_login';
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-		$oidc_num_servers      = max( 1, min( 20, intval( $args['oidc_num_servers'] ?? 1 ) ) );
+		$oidc_num_servers     = max( 1, min( 20, intval( $args['oidc_num_servers'] ?? 1 ) ) );
 
 		// Print option elements.
 		?>
@@ -152,16 +152,18 @@ class Oidc extends \Authorizer\Singleton {
 		$option               = 'oidc_client_id' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
 
+
+		// Omit server id=1 from redirect_uri for consistency with CAS and OAuth2
+		// implementations.
+		$redirect_uri = site_url( '/wp-login.php?external=oidc' );
+		if ( $oidc_num_server > 1 ) {
+			$redirect_uri .= '&id=' . $oidc_num_server;
+		}
+
 		// Print option elements.
 		?>
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your OIDC provider by following their specific instructions.', 'authorizer' ); ?>
-			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
-			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php?external=oidc&id=' . $oidc_num_server ) ); ?></strong>
-		</p>
-		<p>
-			<?php esc_html_e( 'If using Microsoft Azure, omit the querystring; use:', 'authorizer' ); ?>
-			<strong style="white-space:nowrap;"><?php echo esc_html( site_url( '/wp-login.php' ) ); ?></strong>
 		</p>
 		<?php
 		// If ID is overridden by filter or constant, don't expose the value;

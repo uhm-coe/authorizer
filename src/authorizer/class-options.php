@@ -260,44 +260,44 @@ class Options extends Singleton {
 				$auth_settings['ldap_test_user']            = $auth_multisite_settings['ldap_test_user'] ?? '';
 
 				// Override external service (OIDC) and associated options.
-				$auth_settings['oidc']                      = $auth_multisite_settings['oidc'] ?? '';
-				$auth_settings['oidc_num_servers']          = $auth_multisite_settings['oidc_num_servers'] ?? 1;
-				$auth_settings['oidc_auto_login']           = $auth_multisite_settings['oidc_auto_login'] ?? '';
-				$auth_settings['oidc_custom_label']         = $auth_multisite_settings['oidc_custom_label'] ?? 'OIDC';
-				$auth_settings['oidc_issuer']                = $auth_multisite_settings['oidc_issuer'] ?? '';
-				$auth_settings['oidc_client_id']             = $auth_multisite_settings['oidc_client_id'] ?? '';
-				$auth_settings['oidc_client_secret']        = $auth_multisite_settings['oidc_client_secret'] ?? '';
-				$auth_settings['oidc_scopes']                = $auth_multisite_settings['oidc_scopes'] ?? 'openid email profile';
-				$auth_settings['oidc_prompt']                = $auth_multisite_settings['oidc_prompt'] ?? '';
-				$auth_settings['oidc_login_hint']            = $auth_multisite_settings['oidc_login_hint'] ?? '';
-				$auth_settings['oidc_max_age']               = $auth_multisite_settings['oidc_max_age'] ?? '';
-				$auth_settings['oidc_attr_username']         = $auth_multisite_settings['oidc_attr_username'] ?? 'preferred_username';
-				$auth_settings['oidc_attr_email']            = $auth_multisite_settings['oidc_attr_email'] ?? 'email';
-				$auth_settings['oidc_attr_first_name']       = $auth_multisite_settings['oidc_attr_first_name'] ?? 'given_name';
-				$auth_settings['oidc_attr_last_name']       = $auth_multisite_settings['oidc_attr_last_name'] ?? 'family_name';
-				$auth_settings['oidc_attr_update_on_login'] = $auth_multisite_settings['oidc_attr_update_on_login'] ?? '';
+				$auth_settings['oidc']                        = $auth_multisite_settings['oidc'] ?? '';
+				$auth_settings['oidc_num_servers']            = $auth_multisite_settings['oidc_num_servers'] ?? 1;
+				$auth_settings['oidc_auto_login']             = $auth_multisite_settings['oidc_auto_login'] ?? '';
+				$auth_settings['oidc_custom_label']           = $auth_multisite_settings['oidc_custom_label'] ?? 'OIDC';
+				$auth_settings['oidc_issuer']                 = $auth_multisite_settings['oidc_issuer'] ?? '';
+				$auth_settings['oidc_client_id']              = $auth_multisite_settings['oidc_client_id'] ?? '';
+				$auth_settings['oidc_client_secret']          = $auth_multisite_settings['oidc_client_secret'] ?? '';
+				$auth_settings['oidc_scopes']                 = $auth_multisite_settings['oidc_scopes'] ?? 'openid email profile';
+				$auth_settings['oidc_prompt']                 = $auth_multisite_settings['oidc_prompt'] ?? '';
+				$auth_settings['oidc_login_hint']             = $auth_multisite_settings['oidc_login_hint'] ?? '';
+				$auth_settings['oidc_max_age']                = $auth_multisite_settings['oidc_max_age'] ?? '';
+				$auth_settings['oidc_attr_username']          = $auth_multisite_settings['oidc_attr_username'] ?? 'preferred_username';
+				$auth_settings['oidc_attr_email']             = $auth_multisite_settings['oidc_attr_email'] ?? 'email';
+				$auth_settings['oidc_attr_first_name']        = $auth_multisite_settings['oidc_attr_first_name'] ?? 'given_name';
+				$auth_settings['oidc_attr_last_name']         = $auth_multisite_settings['oidc_attr_last_name'] ?? 'family_name';
+				$auth_settings['oidc_attr_update_on_login']   = $auth_multisite_settings['oidc_attr_update_on_login'] ?? '';
 				$auth_settings['oidc_require_verified_email'] = $auth_multisite_settings['oidc_require_verified_email'] ?? '';
-				$auth_settings['oidc_link_on_username']     = $auth_multisite_settings['oidc_link_on_username'] ?? '';
-				$auth_settings['oidc_hosteddomain']         = $auth_multisite_settings['oidc_hosteddomain'] ?? '';
+				$auth_settings['oidc_link_on_username']       = $auth_multisite_settings['oidc_link_on_username'] ?? '';
+				$auth_settings['oidc_hosteddomain']           = $auth_multisite_settings['oidc_hosteddomain'] ?? '';
 				// Add any options for extra OIDC servers.
 				if ( ! empty( $auth_multisite_settings['oidc_num_servers'] ) && intval( $auth_multisite_settings['oidc_num_servers'] ) > 1 ) {
 					foreach ( range( 2, min( intval( $auth_multisite_settings['oidc_num_servers'] ), 20 ) ) as $oidc_num_server ) {
-						$auth_settings[ 'oidc_custom_label_' . $oidc_num_server ]         = $auth_multisite_settings[ 'oidc_custom_label_' . $oidc_num_server ] ?? 'OIDC';
-						$auth_settings[ 'oidc_issuer_' . $oidc_num_server ]                = $auth_multisite_settings[ 'oidc_issuer_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_client_id_' . $oidc_num_server ]             = $auth_multisite_settings[ 'oidc_client_id_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_client_secret_' . $oidc_num_server ]        = $auth_multisite_settings[ 'oidc_client_secret_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_scopes_' . $oidc_num_server ]                = $auth_multisite_settings[ 'oidc_scopes_' . $oidc_num_server ] ?? 'openid email profile';
-						$auth_settings[ 'oidc_prompt_' . $oidc_num_server ]                = $auth_multisite_settings[ 'oidc_prompt_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_login_hint_' . $oidc_num_server ]            = $auth_multisite_settings[ 'oidc_login_hint_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_max_age_' . $oidc_num_server ]               = $auth_multisite_settings[ 'oidc_max_age_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_attr_username_' . $oidc_num_server ]         = $auth_multisite_settings[ 'oidc_attr_username_' . $oidc_num_server ] ?? 'preferred_username';
-						$auth_settings[ 'oidc_attr_email_' . $oidc_num_server ]            = $auth_multisite_settings[ 'oidc_attr_email_' . $oidc_num_server ] ?? 'email';
-						$auth_settings[ 'oidc_attr_first_name_' . $oidc_num_server ]       = $auth_multisite_settings[ 'oidc_attr_first_name_' . $oidc_num_server ] ?? 'given_name';
-						$auth_settings[ 'oidc_attr_last_name_' . $oidc_num_server ]       = $auth_multisite_settings[ 'oidc_attr_last_name_' . $oidc_num_server ] ?? 'family_name';
-						$auth_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] = $auth_multisite_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_custom_label_' . $oidc_num_server ]           = $auth_multisite_settings[ 'oidc_custom_label_' . $oidc_num_server ] ?? 'OIDC';
+						$auth_settings[ 'oidc_issuer_' . $oidc_num_server ]                 = $auth_multisite_settings[ 'oidc_issuer_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_client_id_' . $oidc_num_server ]              = $auth_multisite_settings[ 'oidc_client_id_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_client_secret_' . $oidc_num_server ]          = $auth_multisite_settings[ 'oidc_client_secret_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_scopes_' . $oidc_num_server ]                 = $auth_multisite_settings[ 'oidc_scopes_' . $oidc_num_server ] ?? 'openid email profile';
+						$auth_settings[ 'oidc_prompt_' . $oidc_num_server ]                 = $auth_multisite_settings[ 'oidc_prompt_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_login_hint_' . $oidc_num_server ]             = $auth_multisite_settings[ 'oidc_login_hint_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_max_age_' . $oidc_num_server ]                = $auth_multisite_settings[ 'oidc_max_age_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_attr_username_' . $oidc_num_server ]          = $auth_multisite_settings[ 'oidc_attr_username_' . $oidc_num_server ] ?? 'preferred_username';
+						$auth_settings[ 'oidc_attr_email_' . $oidc_num_server ]             = $auth_multisite_settings[ 'oidc_attr_email_' . $oidc_num_server ] ?? 'email';
+						$auth_settings[ 'oidc_attr_first_name_' . $oidc_num_server ]        = $auth_multisite_settings[ 'oidc_attr_first_name_' . $oidc_num_server ] ?? 'given_name';
+						$auth_settings[ 'oidc_attr_last_name_' . $oidc_num_server ]         = $auth_multisite_settings[ 'oidc_attr_last_name_' . $oidc_num_server ] ?? 'family_name';
+						$auth_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ]   = $auth_multisite_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = $auth_multisite_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ]     = $auth_multisite_settings[ 'oidc_link_on_username_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_hosteddomain_' . $oidc_num_server ]         = $auth_multisite_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ]       = $auth_multisite_settings[ 'oidc_link_on_username_' . $oidc_num_server ] ?? '';
+						$auth_settings[ 'oidc_hosteddomain_' . $oidc_num_server ]           = $auth_multisite_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] ?? '';
 					}
 				}
 

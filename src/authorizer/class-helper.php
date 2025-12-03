@@ -468,11 +468,11 @@ class Helper {
 
 
 	/**
-	 * Generate CAS or OAuth2 authentication URL (wp-login.php URL with reauth=1 removed
-	 * and external=cas or external=oauth2 added).
+	 * Generate CAS/OAuth2/OIDC authentication URL (wp-login.php URL with reauth=1
+	 * removed and external=cas, external=oauth2, or external=oidc added).
 	 *
-	 * @param string $provider External service provider type (e.g., 'cas', or 'oauth2').
-	 * @param int    $id       CAS/OAuth2 server number (e.g., 1).
+	 * @param string $provider External service provider type (e.g., 'cas', 'oauth2', or 'oidc').
+	 * @param int    $id       CAS/OAuth2/OIDC server number (e.g., 1).
 	 */
 	public static function modify_current_url_for_external_login( $provider = 'cas', $id = 1 ) {
 		// Construct the URL of the current page (wp-login.php).
@@ -498,16 +498,15 @@ class Helper {
 		// Parse the URL into its components.
 		$parsed_url = wp_parse_url( $url );
 
-		// Fix up the querystring values (remove reauth, make sure external=cas).
+		// Fix up the querystring values (remove reauth, set external={cas|oauth2|oidc}).
 		$querystring = array();
 		if ( array_key_exists( 'query', $parsed_url ) ) {
 			parse_str( $parsed_url['query'], $querystring );
 		}
 		unset( $querystring['reauth'] );
 		$querystring['external'] = $provider;
-		// OIDC and OAuth2 always use id parameter (even for server 1).
-		// CAS uses id parameter only for servers > 1.
-		if ( 'oidc' === $provider || 'oauth2' === $provider || ( 'cas' === $provider && $id > 1 ) ) {
+		// Use id parameter only for servers > 1.
+		if ( $id > 1 ) {
 			$querystring['id'] = $id;
 		}
 		$parsed_url['query'] = http_build_query( $querystring );
