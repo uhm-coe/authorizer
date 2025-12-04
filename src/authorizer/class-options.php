@@ -1865,7 +1865,6 @@ class Options extends Singleton {
 				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
@@ -1879,7 +1878,6 @@ class Options extends Singleton {
 				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
 				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>

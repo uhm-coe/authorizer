@@ -219,28 +219,6 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 		?>
 		<div id="auth-external-service-login">
-			<?php if ( '1' === $auth_settings['google'] ) : ?>
-				<script src="https://accounts.google.com/gsi/client" async defer></script>
-				<div id="g_id_onload"
-					data-use_fedcm_for_prompt="true"
-					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
-					data-context="signin"
-					data-ux_mode="popup"
-					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
-					data-callback="signInCallback">
-				</div>
-				<div class="g_id_signin"
-					data-type="standard"
-					data-shape="pill"
-					data-theme="filled_blue"
-					data-text="signin_with"
-					data-size="large"
-					data-logo_alignment="left"
-					data-width="270">
-				</div>
-				<br>
-			<?php endif; ?>
-
 			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
 				<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
@@ -327,6 +305,28 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<?php endif; ?>
 			<?php endif; ?>
 
+			<?php if ( '1' === $auth_settings['google'] ) : ?>
+				<script src="https://accounts.google.com/gsi/client" async defer></script>
+				<div id="g_id_onload"
+					data-use_fedcm_for_prompt="true"
+					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
+					data-context="signin"
+					data-ux_mode="popup"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
+					data-callback="signInCallback">
+				</div>
+				<div class="g_id_signin"
+					data-type="standard"
+					data-shape="pill"
+					data-theme="filled_blue"
+					data-text="signin_with"
+					data-size="large"
+					data-logo_alignment="left"
+					data-width="270">
+				</div>
+				<br>
+			<?php endif; ?>
+
 			<?php if ( '1' === $auth_settings['cas'] ) : ?>
 				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'cas' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
@@ -361,56 +361,6 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 										/* TRANSLATORS: %s: Custom CAS label from authorizer options */
 										__( 'Sign in with %s', 'authorizer' ),
 										$auth_settings[ 'cas_custom_label_' . $i ]
-									)
-								);
-								?>
-							</span>
-						</a></p>
-					<?php endfor; ?>
-				<?php endif; ?>
-			<?php endif; ?>
-
-			<? 
-			/*
-			TODO: VERIFY IF THIS SUCCESSFULLY RESOLVED THE MERGE -- LINEA CREATIVE
-
-			*/
-			?>
-
-			<?php if ( '1' === $auth_settings['oidc'] ) : ?>
-				<p><a class="button button-primary button-external button-oidc" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oidc' ) ); ?>">
-					<span class="dashicons dashicons-lock"></span>
-					<span class="label">
-						<?php
-						echo esc_html(
-							sprintf(
-								/* TRANSLATORS: %s: Custom OIDC label from authorizer options */
-								__( 'Sign in with %s', 'authorizer' ),
-								$auth_settings['oidc_custom_label']
-							)
-						);
-						?>
-					</span>
-				</a></p>
-				<?php
-				if ( empty( $auth_settings['oidc_num_servers'] ) ) :
-					$auth_settings['oidc_num_servers'] = 1;
-				endif;
-				if ( $auth_settings['oidc_num_servers'] > 1 ) :
-					for ( $i = 2; $i <= $auth_settings['oidc_num_servers']; $i++ ) :
-						if ( empty( $auth_settings[ 'oidc_custom_label_' . $i ] ) ) :
-							continue;
-						endif;
-						?>
-						<p><a class="button button-primary button-external button-oidc" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oidc', $i ) ); ?>">
-							<span class="dashicons dashicons-lock"></span>
-							<span class="label">
-								<?php
-								echo esc_html(
-									sprintf(
-										/* TRANSLATORS: %s: Custom OIDC label from authorizer options */
-										__( 'Sign in with %s', 'authorizer' ),
-										$auth_settings[ 'oidc_custom_label_' . $i ]
 									)
 								);
 								?>

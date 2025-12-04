@@ -504,7 +504,6 @@
 		$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( '#auth_settings_oidc' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_google' ).toggle( $( '#auth_settings_google' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_cas' ).toggle( $( '#auth_settings_cas' ).is( ':checked' ) );
-		$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( '#auth_settings_oidc' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_ldap' ).toggle( $( '#auth_settings_ldap' ).is( ':checked' ) );
 
 		// Hide some OAuth2 options based on current settings.
