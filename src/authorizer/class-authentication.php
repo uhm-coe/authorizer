@@ -349,11 +349,15 @@ class Authentication extends Singleton {
 		if ( $user ) {
 			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
 			
-			// Store OIDC ID token and server ID in user meta for RP-initiated logout.
-			if ( 'oidc' === $authenticated_by && isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ) {
-				update_user_meta( $user->ID, 'oidc_id_token', $result['oidc_id_token'] );
+			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
+			if ( 'oidc' === $authenticated_by ) {
+				// Always store server ID if present (needed to determine which OIDC server was used).
 				if ( isset( $result['oidc_server_id'] ) ) {
 					update_user_meta( $user->ID, 'oidc_server_id', intval( $result['oidc_server_id'] ) );
+				}
+				// Store ID token only if present and non-empty (needed for RP-initiated logout).
+				if ( isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ) {
+					update_user_meta( $user->ID, 'oidc_id_token', $result['oidc_id_token'] );
 				}
 			}
 		}
