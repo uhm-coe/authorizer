@@ -904,6 +904,7 @@ class Authentication extends Singleton {
 			'authenticated_by'  => 'oauth2',
 			'oauth2_provider'   => $oauth2_provider,
 			'oauth2_attributes' => $attributes,
+			'oauth2_server_id'  => $oauth2_server_id,
 		);
 	}
 
