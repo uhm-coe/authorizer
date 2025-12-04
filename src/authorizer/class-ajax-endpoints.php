@@ -259,6 +259,29 @@ class Ajax_Endpoints extends Singleton {
 				) );
 			}
 		}
+		if ( ! empty( $auth_multisite_settings['oidc_num_servers'] ) && intval( $auth_multisite_settings['oidc_num_servers'] ) > 1 ) {
+			// Add options if more than one OIDC server.
+			foreach ( range( 2, min( intval( $auth_multisite_settings['oidc_num_servers'] ), 20 ) ) as $oidc_num_server ) {
+				$allowed = array_merge( $allowed, array(
+					'oidc_custom_label_' . $oidc_num_server,
+					'oidc_issuer_' . $oidc_num_server,
+					'oidc_client_id_' . $oidc_num_server,
+					'oidc_client_secret_' . $oidc_num_server,
+					'oidc_scopes_' . $oidc_num_server,
+					'oidc_prompt_' . $oidc_num_server,
+					'oidc_login_hint_' . $oidc_num_server,
+					'oidc_max_age_' . $oidc_num_server,
+					'oidc_attr_username_' . $oidc_num_server,
+					'oidc_attr_email_' . $oidc_num_server,
+					'oidc_attr_first_name_' . $oidc_num_server,
+					'oidc_attr_last_name_' . $oidc_num_server,
+					'oidc_attr_update_on_login_' . $oidc_num_server,
+					'oidc_require_verified_email_' . $oidc_num_server,
+					'oidc_link_on_username_' . $oidc_num_server,
+					'oidc_hosteddomain_' . $oidc_num_server,
+				) );
+			}
+		}
 		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
 			// Add options if more than one CAS server.
 			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {

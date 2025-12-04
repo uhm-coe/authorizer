@@ -498,12 +498,16 @@ class Helper {
 		// Parse the URL into its components.
 		$parsed_url = wp_parse_url( $url );
 
-		// Fix up the querystring values (remove reauth, set external={cas|oauth2|oidc}).
+		// Fix up the querystring values (remove reauth; remove any code or state
+		// params from a previous oauth2 or oidc authentication attempt; set
+		// external={cas|oauth2|oidc}).
 		$querystring = array();
 		if ( array_key_exists( 'query', $parsed_url ) ) {
 			parse_str( $parsed_url['query'], $querystring );
 		}
 		unset( $querystring['reauth'] );
+		unset( $querystring['code'] );
+		unset( $querystring['state'] );
 		$querystring['external'] = $provider;
 		// Use id parameter only for servers > 1.
 		if ( $id > 1 ) {

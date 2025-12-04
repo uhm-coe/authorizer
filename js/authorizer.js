@@ -501,6 +501,7 @@
 
 		// Hide External Service tabs if provider is unchecked.
 		$( '.nav-tab-wrapper .nav-tab-external_oauth2' ).toggle( $( '#auth_settings_oauth2' ).is( ':checked' ) );
+		$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( '#auth_settings_oidc' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_google' ).toggle( $( '#auth_settings_google' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_cas' ).toggle( $( '#auth_settings_cas' ).is( ':checked' ) );
 		$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( '#auth_settings_oidc' ).is( ':checked' ) );
@@ -677,7 +678,7 @@
 			} else if ( sessionStorage.getItem( 'tab' ) ) {
 				tab = sessionStorage.getItem( 'tab' );
 			}
-			if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'external_oauth2', 'external_google', 'external_cas', 'external_oidc', 'external_ldap', 'advanced' ] ) < 0 ) {
+			if ( $.inArray( tab, [ 'access_lists', 'access_login', 'access_public', 'external', 'external_oauth2', 'external_oidc', 'external_google', 'external_cas', 'external_ldap', 'advanced' ] ) < 0 ) {
 				tab = 'access_lists';
 			}
 			window.chooseTab( tab, animationSpeed );
