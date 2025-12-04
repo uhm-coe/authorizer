@@ -345,21 +345,19 @@ class Authentication extends Singleton {
 			unset( $_SESSION['oidc_server_id'] );
 		}
 
+		// Save OIDC data before check_user_access() overwrites $result.
+		$oidc_server_id = null;
+		$oidc_id_token  = null;
+		if ( 'oidc' === $authenticated_by && is_array( $result ) ) {
+			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : null;
+			$oidc_id_token  = isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ? $result['oidc_id_token'] : null;
+		}
+
 		// We'll track how this user was authenticated in user meta.
+		// Note: For existing users, we store authenticated_by here. For newly created users,
+		// we'll store it after check_user_access() returns (see below).
 		if ( $user ) {
 			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
-			
-			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
-			if ( 'oidc' === $authenticated_by ) {
-				// Always store server ID if present (needed to determine which OIDC server was used).
-				if ( isset( $result['oidc_server_id'] ) ) {
-					update_user_meta( $user->ID, 'oidc_server_id', intval( $result['oidc_server_id'] ) );
-				}
-				// Store ID token only if present and non-empty (needed for RP-initiated logout).
-				if ( isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ) {
-					update_user_meta( $user->ID, 'oidc_id_token', $result['oidc_id_token'] );
-				}
-			}
 		}
 
 		// Check this external user's access against the access lists
@@ -378,6 +376,25 @@ class Authentication extends Singleton {
 		// If we have a valid user from check_user_access(), log that user in.
 		if ( get_class( $result ) === 'WP_User' ) {
 			$user = $result;
+		}
+
+		// Store user meta for the authenticated user (handles both existing and newly created users).
+		// This must happen after check_user_access() because new users are created during that call.
+		if ( $user ) {
+			// Store authenticated_by if not already stored (for newly created users).
+			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+			
+			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
+			if ( 'oidc' === $authenticated_by ) {
+				// Always store server ID if present (needed to determine which OIDC server was used).
+				if ( ! is_null( $oidc_server_id ) ) {
+					update_user_meta( $user->ID, 'oidc_server_id', $oidc_server_id );
+				}
+				// Store ID token only if present and non-empty (needed for RP-initiated logout).
+				if ( ! is_null( $oidc_id_token ) ) {
+					update_user_meta( $user->ID, 'oidc_id_token', $oidc_id_token );
+				}
+			}
 		}
 
 		// Integration: disable Cloudflare Turnstile verification from the
