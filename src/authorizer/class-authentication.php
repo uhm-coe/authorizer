@@ -339,9 +339,10 @@ class Authentication extends Singleton {
 
 		// Always clean up OIDC session variables after authentication attempt, regardless of user lookup result.
 		// This prevents session pollution if OIDC authentication succeeds but user verification fails.
+		// Note: oidc_redirect_to is preserved here and cleaned up later in maybe_redirect_after_oidc_login()
+		// after it's used for the login redirect.
 		if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
 			unset( $_SESSION['oidc_server_id'] );
-			unset( $_SESSION['oidc_redirect_to'] );
 		}
 
 		// We'll track how this user was authenticated in user meta.
@@ -363,6 +364,10 @@ class Authentication extends Singleton {
 
 		// Fail with message if there was an error creating/adding the user.
 		if ( is_wp_error( $result ) || 0 === $result ) {
+			// Clean up oidc_redirect_to if access check fails (redirect filter won't run).
+			if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
+				unset( $_SESSION['oidc_redirect_to'] );
+			}
 			return $result;
 		}
 
