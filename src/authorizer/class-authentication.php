@@ -2181,7 +2181,7 @@ class Authentication extends Singleton {
 					// If discovery has end_session_endpoint, redirect to it.
 					if ( is_array( $discovery ) && ! empty( $discovery['end_session_endpoint'] ) ) {
 						$end_session_url = $discovery['end_session_endpoint'];
-						$redirect_to     = site_url( '/wp-login.php' );
+						$redirect_to     = site_url( '/' );
 						if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 						}
