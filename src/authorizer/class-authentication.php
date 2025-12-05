@@ -2201,17 +2201,27 @@ class Authentication extends Singleton {
 						
 						wp_safe_redirect( $logout_url );
 						exit;
+					} else {
+						// No end_session_endpoint found - clean up and continue with normal WordPress logout.
+						if ( ! empty( $user_id ) ) {
+							delete_user_meta( $user_id, 'oidc_id_token' );
+							delete_user_meta( $user_id, 'oidc_server_id' );
+						}
 					}
 				} catch ( \Exception $e ) {
 					// Fallback to local logout if RP-initiated logout fails.
-					// Continue with normal WordPress logout.
+					// Clean up and continue with normal WordPress logout.
+					if ( ! empty( $user_id ) ) {
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+					}
 				}
-			}
-			
-			// Always clean up user meta, regardless of whether RP-initiated logout was performed.
-			if ( ! empty( $user_id ) ) {
-				delete_user_meta( $user_id, 'oidc_id_token' );
-				delete_user_meta( $user_id, 'oidc_server_id' );
+			} else {
+				// No OIDC issuer configured - clean up and continue with normal WordPress logout.
+				if ( ! empty( $user_id ) ) {
+					delete_user_meta( $user_id, 'oidc_id_token' );
+					delete_user_meta( $user_id, 'oidc_server_id' );
+				}
 			}
 		}
 	}
