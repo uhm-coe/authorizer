@@ -27,6 +27,13 @@ class Authentication extends Singleton {
 	private static $authenticated_by = '';
 
 	/**
+	 * Tracks the user ID of the user currently logging out.
+	 *
+	 * @var int
+	 */
+	private static $logging_out_user_id = 0;
+
+	/**
 	 * Authenticate against an external service.
 	 *
 	 * Filter: authenticate
@@ -330,7 +337,25 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// Always clean up OIDC session variables after authentication attempt, regardless of user lookup result.
+		// This prevents session pollution if OIDC authentication succeeds but user verification fails.
+		// Note: oidc_redirect_to is preserved here and cleaned up later in maybe_redirect_after_oidc_login()
+		// after it's used for the login redirect.
+		if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
+			unset( $_SESSION['oidc_server_id'] );
+		}
+
+		// Save OIDC data before check_user_access() overwrites $result.
+		$oidc_server_id = null;
+		$oidc_id_token  = null;
+		if ( 'oidc' === $authenticated_by && is_array( $result ) ) {
+			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : null;
+			$oidc_id_token  = isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ? $result['oidc_id_token'] : null;
+		}
+
 		// We'll track how this user was authenticated in user meta.
+		// Note: For existing users, we store authenticated_by here. For newly created users,
+		// we'll store it after check_user_access() returns (see below).
 		if ( $user ) {
 			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
 		}
@@ -341,12 +366,35 @@ class Authentication extends Singleton {
 
 		// Fail with message if there was an error creating/adding the user.
 		if ( is_wp_error( $result ) || 0 === $result ) {
+			// Clean up oidc_redirect_to if access check fails (redirect filter won't run).
+			if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
+				unset( $_SESSION['oidc_redirect_to'] );
+			}
 			return $result;
 		}
 
 		// If we have a valid user from check_user_access(), log that user in.
 		if ( get_class( $result ) === 'WP_User' ) {
 			$user = $result;
+		}
+
+		// Store user meta for the authenticated user (handles both existing and newly created users).
+		// This must happen after check_user_access() because new users are created during that call.
+		if ( $user ) {
+			// Store authenticated_by if not already stored (for newly created users).
+			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
+			
+			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
+			if ( 'oidc' === $authenticated_by ) {
+				// Always store server ID if present (needed to determine which OIDC server was used).
+				if ( ! is_null( $oidc_server_id ) ) {
+					update_user_meta( $user->ID, 'oidc_server_id', $oidc_server_id );
+				}
+				// Store ID token only if present and non-empty (needed for RP-initiated logout).
+				if ( ! is_null( $oidc_id_token ) ) {
+					update_user_meta( $user->ID, 'oidc_id_token', $oidc_id_token );
+				}
+			}
 		}
 
 		// Integration: disable Cloudflare Turnstile verification from the
@@ -384,7 +432,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OAuth2 server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -476,7 +524,7 @@ class Authentication extends Singleton {
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $oauth2_provider ) {
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
@@ -561,7 +609,7 @@ class Authentication extends Singleton {
 		} elseif ( 'azure' === $oauth2_provider ) {
 			// Authenticate with the Microsoft Azure oauth2 client.
 			// See: https://github.com/thenetworg/oauth2-azure.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			try {
@@ -705,7 +753,7 @@ class Authentication extends Singleton {
 				return null;
 			}
 
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// Save the redirect URL for WordPress so we can restore it after a
@@ -904,6 +952,7 @@ class Authentication extends Singleton {
 			'authenticated_by'  => 'oauth2',
 			'oauth2_provider'   => $oauth2_provider,
 			'oauth2_attributes' => $attributes,
+			'oauth2_server_id'  => $oauth2_server_id,
 		);
 	}
 
@@ -930,7 +979,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OIDC server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_ACTIVE !== session_status() ) {
+			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -1015,7 +1064,7 @@ class Authentication extends Singleton {
 		}
 
 		// Start session for state/nonce/PKCE storage.
-		if ( session_status() === PHP_SESSION_NONE ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 
@@ -1065,15 +1114,8 @@ class Authentication extends Singleton {
 			// Authenticate (library handles PKCE, nonce, state).
 			$oidc->authenticate();
 
-			// Store ID token in session for RP-initiated logout.
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
-			}
+			// Get ID token for RP-initiated logout (will be stored in user meta after user is found).
 			$id_token = $oidc->getIdToken();
-			if ( ! empty( $id_token ) ) {
-				$id_token_key              = 1 === $oidc_server_id ? 'oidc_id_token' : 'oidc_id_token_' . $oidc_server_id;
-				$_SESSION[ $id_token_key ] = $id_token;
-			}
 
 			// Get user info from userinfo endpoint (if available).
 			// Convert stdClass object to array to match codebase pattern (like OAuth2).
@@ -1120,12 +1162,22 @@ class Authentication extends Singleton {
 			// Otherwise, email is required.
 			if ( '1' !== $oidc_link_on_username ) {
 				if ( empty( $email ) ) {
+					// Clean up session variables before returning error.
+					if ( PHP_SESSION_NONE !== session_status() ) {
+						unset( $_SESSION['oidc_server_id'] );
+						unset( $_SESSION['oidc_redirect_to'] );
+					}
 					return new \WP_Error( 'oidc_no_email', __( '<strong>ERROR</strong>: OIDC provider did not return an email address.', 'authorizer' ) );
 				}
 
 				// Enforce email verification if required.
 				if ( '1' === $oidc_require_verified_email ) {
 					if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
+						// Clean up session variables before returning error.
+						if ( PHP_SESSION_NONE !== session_status() ) {
+							unset( $_SESSION['oidc_server_id'] );
+							unset( $_SESSION['oidc_redirect_to'] );
+						}
 						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
@@ -1135,6 +1187,11 @@ class Authentication extends Singleton {
 					$allowed_domains = array_filter( array_map( 'trim', explode( "\n", str_replace( "\r", '', $oidc_hosteddomain ) ) ) );
 					$email_domain    = substr( strrchr( $email, '@' ), 1 );
 					if ( ! in_array( $email_domain, $allowed_domains, true ) ) {
+						// Clean up session variables before returning error.
+						if ( PHP_SESSION_NONE !== session_status() ) {
+							unset( $_SESSION['oidc_server_id'] );
+							unset( $_SESSION['oidc_redirect_to'] );
+						}
 						return new \WP_Error( 'oidc_domain_not_allowed', __( '<strong>ERROR</strong>: Your email domain is not allowed to log in.', 'authorizer' ) );
 					}
 				}
@@ -1145,6 +1202,11 @@ class Authentication extends Singleton {
 				}
 			} elseif ( empty( $username ) ) {
 				// When linking by username, username is required.
+				// Clean up session variables before returning error.
+				if ( PHP_SESSION_NONE !== session_status() ) {
+					unset( $_SESSION['oidc_server_id'] );
+					unset( $_SESSION['oidc_redirect_to'] );
+				}
 				return new \WP_Error( 'oidc_no_username', __( '<strong>ERROR</strong>: OIDC provider did not return a username.', 'authorizer' ) );
 			}
 
@@ -1172,8 +1234,15 @@ class Authentication extends Singleton {
 				'authenticated_by' => 'oidc',
 				'oidc_attributes'  => $user_info,
 				'oidc_server_id'   => $oidc_server_id,
+				'oidc_id_token'    => $id_token,
 			);
 		} catch ( \Exception $e ) {
+			// Clean up session variables on exception.
+			if ( PHP_SESSION_NONE !== session_status() ) {
+				unset( $_SESSION['oidc_server_id'] );
+				unset( $_SESSION['oidc_redirect_to'] );
+			}
+
 			// Log the error to error_log.
 			error_log( __( 'OIDC authentication failed. Details:', 'authorizer' ) ); // phpcs:ignore
 			error_log( $e->getMessage() ); // phpcs:ignore
@@ -1208,7 +1277,7 @@ class Authentication extends Singleton {
 		}
 
 		// Get one time use token.
-		if ( PHP_SESSION_ACTIVE !== session_status() ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
@@ -1961,7 +2030,8 @@ class Authentication extends Singleton {
 	 * @return void
 	 */
 	public function pre_logout() {
-		self::$authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
+		self::$logging_out_user_id = get_current_user_id();
+		self::$authenticated_by = get_user_meta( self::$logging_out_user_id, 'authenticated_by', true );
 
 		// If we didn't find an authenticated method, check $_REQUEST (if this is a
 		// pending user facing the "no access" message, their logout link will
@@ -2029,7 +2099,7 @@ class Authentication extends Singleton {
 		}
 
 		// If session token set, log out of Google.
-		if ( PHP_SESSION_ACTIVE !== session_status() ) {
+		if ( PHP_SESSION_NONE === session_status() ) {
 			session_start();
 		}
 		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
@@ -2077,28 +2147,16 @@ class Authentication extends Singleton {
 
 		// If logged in via OIDC, perform RP-initiated logout if supported.
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
-			// Determine which OIDC server was used by checking session for ID tokens.
-			$oidc_server_id = 1;
-			$id_token_hint  = '';
-			if ( session_status() === PHP_SESSION_NONE ) {
-				session_start();
+			// Get ID token and server ID from user meta (stored during authentication).
+			// Use stored user ID from pre_logout() since get_current_user_id() returns 0 after logout.
+			$user_id = self::$logging_out_user_id;
+			if ( empty( $user_id ) ) {
+				return;
 			}
-			// Check for ID token from any OIDC server.
-			if ( ! empty( $_SESSION['oidc_id_token'] ) ) {
-				$id_token_hint = wp_unslash( $_SESSION['oidc_id_token'] );
-				unset( $_SESSION['oidc_id_token'] );
-			} else {
-				// Check for numbered ID token keys (oidc_id_token_2, oidc_id_token_3, etc.).
-				$oidc_num_servers = max( 1, min( 20, intval( $auth_settings['oidc_num_servers'] ?? 1 ) ) );
-				for ( $i = 2; $i <= $oidc_num_servers; $i++ ) {
-					$token_key = 'oidc_id_token_' . $i;
-					if ( ! empty( $_SESSION[ $token_key ] ) ) {
-						$id_token_hint = wp_unslash( $_SESSION[ $token_key ] );
-						unset( $_SESSION[ $token_key ] );
-						$oidc_server_id = $i;
-						break;
-					}
-				}
+			$id_token_hint = get_user_meta( $user_id, 'oidc_id_token', true );
+			$oidc_server_id = get_user_meta( $user_id, 'oidc_server_id', true );
+			if ( empty( $oidc_server_id ) ) {
+				$oidc_server_id = 1;
 			}
 
 			// Get issuer for the server that was used.
@@ -2123,9 +2181,20 @@ class Authentication extends Singleton {
 					// If discovery has end_session_endpoint, redirect to it.
 					if ( is_array( $discovery ) && ! empty( $discovery['end_session_endpoint'] ) ) {
 						$end_session_url = $discovery['end_session_endpoint'];
-						$redirect_to     = site_url( '/wp-login.php' );
+						$redirect_to     = site_url( '/' );
 						if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
 							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+						}
+
+						// Set session flag to prevent auto-login after logout redirect (only if auto-login is enabled).
+						// This survives the external redirect through the IDP and works regardless
+						// of where the IDP redirects back to (wp-login.php, wp-admin, /, etc.).
+						// Only needed if auto-login is enabled; if disabled, there's no auto-login to prevent.
+						if ( ! empty( $auth_settings['oidc_auto_login'] ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) ) {
+							if ( PHP_SESSION_NONE === session_status() ) {
+								session_start();
+							}
+							$_SESSION['oidc_logged_out'] = true;
 						}
 
 						$logout_params = array(
@@ -2136,12 +2205,33 @@ class Authentication extends Singleton {
 						}
 
 						$logout_url = add_query_arg( $logout_params, $end_session_url );
+						
+						// Clean up user meta after retrieving ID token.
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+						
 						wp_safe_redirect( $logout_url );
 						exit;
+					} else {
+						// No end_session_endpoint found - clean up and continue with normal WordPress logout.
+						if ( ! empty( $user_id ) ) {
+							delete_user_meta( $user_id, 'oidc_id_token' );
+							delete_user_meta( $user_id, 'oidc_server_id' );
+						}
 					}
 				} catch ( \Exception $e ) {
 					// Fallback to local logout if RP-initiated logout fails.
-					// Continue with normal WordPress logout.
+					// Clean up and continue with normal WordPress logout.
+					if ( ! empty( $user_id ) ) {
+						delete_user_meta( $user_id, 'oidc_id_token' );
+						delete_user_meta( $user_id, 'oidc_server_id' );
+					}
+				}
+			} else {
+				// No OIDC issuer configured - clean up and continue with normal WordPress logout.
+				if ( ! empty( $user_id ) ) {
+					delete_user_meta( $user_id, 'oidc_id_token' );
+					delete_user_meta( $user_id, 'oidc_server_id' );
 				}
 			}
 		}

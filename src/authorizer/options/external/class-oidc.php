@@ -549,6 +549,7 @@ class Oidc extends \Authorizer\Singleton {
 	public function maybe_redirect_after_oidc_login( $redirect_to ) {
 		if ( ! empty( $_SESSION['oidc_redirect_to'] ) ) {
 			$redirect_to = sanitize_url( $_SESSION['oidc_redirect_to'] );
+			unset( $_SESSION['oidc_redirect_to'] );
 		}
 
 		return $redirect_to;
