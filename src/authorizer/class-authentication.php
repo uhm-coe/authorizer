@@ -2186,6 +2186,17 @@ class Authentication extends Singleton {
 							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 						}
 
+						// Set session flag to prevent auto-login after logout redirect (only if auto-login is enabled).
+						// This survives the external redirect through the IDP and works regardless
+						// of where the IDP redirects back to (wp-login.php, wp-admin, /, etc.).
+						// Only needed if auto-login is enabled; if disabled, there's no auto-login to prevent.
+						if ( ! empty( $auth_settings['oidc_auto_login'] ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) ) {
+							if ( PHP_SESSION_NONE === session_status() ) {
+								session_start();
+							}
+							$_SESSION['oidc_logged_out'] = true;
+						}
+
 						$logout_params = array(
 							'post_logout_redirect_uri' => $redirect_to,
 						);
