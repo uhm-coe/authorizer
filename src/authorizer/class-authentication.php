@@ -2159,65 +2159,84 @@ class Authentication extends Singleton {
 				$oidc_server_id = 1;
 			}
 
-			// Get issuer for the server that was used.
+			// Get issuer and credentials for the server that was used.
 			$suffix      = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
 			$oidc_issuer = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
-			if ( ! empty( $oidc_issuer ) ) {
+			$oidc_client_id = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
+			$oidc_client_secret = $auth_settings[ 'oidc_client_secret' . $suffix ] ?? '';
+
+			// Fetch the OIDC Client ID (allow overrides from filter or constant).
+			// Note: constant/filter overrides are only supported for a single OIDC server.
+			if ( 1 === $oidc_server_id && defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
+				$oidc_client_id = \AUTHORIZER_OIDC_CLIENT_ID;
+			}
+			/**
+			 * Filters the OIDC Client ID used by Authorizer to authenticate.
+			 *
+			 * @since 3.11.0
+			 *
+			 * @param string $oidc_client_id  The stored OIDC Client ID.
+			 */
+			if ( 1 === $oidc_server_id ) {
+				$oidc_client_id = apply_filters( 'authorizer_oidc_client_id', $oidc_client_id );
+			}
+
+			// Fetch the OIDC Client Secret (allow overrides from filter or constant).
+			// Note: constant/filter overrides are only supported for a single OIDC server.
+			if ( 1 === $oidc_server_id && defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
+				$oidc_client_secret = \AUTHORIZER_OIDC_CLIENT_SECRET;
+			}
+			/**
+			 * Filters the OIDC Client Secret used by Authorizer to authenticate.
+			 *
+			 * @since 3.11.0
+			 *
+			 * @param string $oidc_client_secret  The stored OIDC Client Secret.
+			 */
+			if ( 1 === $oidc_server_id ) {
+				$oidc_client_secret = apply_filters( 'authorizer_oidc_client_secret', $oidc_client_secret );
+			}
+
+			if ( ! empty( $oidc_issuer ) && ! empty( $oidc_client_id ) && ! empty( $oidc_client_secret ) ) {
 				try {
-					// Get discovery document (cached).
-					$discovery_cache_key = 'authorizer_oidc_discovery_' . md5( $oidc_issuer );
-					$discovery           = get_transient( $discovery_cache_key );
-					if ( false === $discovery ) {
-						$discovery_url = rtrim( $oidc_issuer, '/' ) . '/.well-known/openid-configuration';
-						$response       = wp_remote_get( $discovery_url, array( 'timeout' => 10 ) );
-						if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
-							$discovery = json_decode( wp_remote_retrieve_body( $response ), true );
-							if ( is_array( $discovery ) ) {
-								set_transient( $discovery_cache_key, $discovery, 6 * HOUR_IN_SECONDS );
-							}
-						}
+					// Initialize OIDC client (library handles discovery automatically).
+					$oidc = new \Jumbojett\OpenIDConnectClient(
+						$oidc_issuer,
+						$oidc_client_id,
+						$oidc_client_secret
+					);
+
+					// Determine redirect URL.
+					$redirect_to = site_url( '/' );
+					if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
+						$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
 					}
 
-					// If discovery has end_session_endpoint, redirect to it.
-					if ( is_array( $discovery ) && ! empty( $discovery['end_session_endpoint'] ) ) {
-						$end_session_url = $discovery['end_session_endpoint'];
-						$redirect_to     = site_url( '/' );
-						if ( ! empty( $_REQUEST['redirect_to'] ) && isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_key( $_REQUEST['_wpnonce'] ), 'log-out' ) ) {
-							$redirect_to = esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) );
+					// Set session flag to prevent auto-login after logout redirect (only if auto-login is enabled).
+					// This survives the external redirect through the IDP and works regardless
+					// of where the IDP redirects back to (wp-login.php, wp-admin, /, etc.).
+					// Only needed if auto-login is enabled; if disabled, there's no auto-login to prevent.
+					if ( ! empty( $auth_settings['oidc_auto_login'] ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) ) {
+						if ( PHP_SESSION_NONE === session_status() ) {
+							session_start();
 						}
+						$_SESSION['oidc_logged_out'] = true;
+					}
 
-						// Set session flag to prevent auto-login after logout redirect (only if auto-login is enabled).
-						// This survives the external redirect through the IDP and works regardless
-						// of where the IDP redirects back to (wp-login.php, wp-admin, /, etc.).
-						// Only needed if auto-login is enabled; if disabled, there's no auto-login to prevent.
-						if ( ! empty( $auth_settings['oidc_auto_login'] ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) ) {
-							if ( PHP_SESSION_NONE === session_status() ) {
-								session_start();
-							}
-							$_SESSION['oidc_logged_out'] = true;
-						}
+					// Clean up user meta before redirect (library's signOut() will exit).
+					delete_user_meta( $user_id, 'oidc_id_token' );
+					delete_user_meta( $user_id, 'oidc_server_id' );
 
-						$logout_params = array(
-							'post_logout_redirect_uri' => $redirect_to,
-						);
-						if ( ! empty( $id_token_hint ) ) {
-							$logout_params['id_token_hint'] = $id_token_hint;
-						}
-
-						$logout_url = add_query_arg( $logout_params, $end_session_url );
-						
-						// Clean up user meta after retrieving ID token.
+					// Use library's signOut() method (handles discovery, URL building, and redirect).
+					// Pass empty string if no ID token (library will still include it in params).
+					$oidc->signOut( $id_token_hint ?? '', $redirect_to );
+					// signOut() calls exit, so this line should never be reached.
+				} catch ( \Jumbojett\OpenIDConnectClientException $e ) {
+					// Provider doesn't support RP-initiated logout (no end_session_endpoint) or other error.
+					// Clean up and continue with normal WordPress logout.
+					if ( ! empty( $user_id ) ) {
 						delete_user_meta( $user_id, 'oidc_id_token' );
 						delete_user_meta( $user_id, 'oidc_server_id' );
-						
-						wp_safe_redirect( $logout_url );
-						exit;
-					} else {
-						// No end_session_endpoint found - clean up and continue with normal WordPress logout.
-						if ( ! empty( $user_id ) ) {
-							delete_user_meta( $user_id, 'oidc_id_token' );
-							delete_user_meta( $user_id, 'oidc_server_id' );
-						}
 					}
 				} catch ( \Exception $e ) {
 					// Fallback to local logout if RP-initiated logout fails.
@@ -2228,7 +2247,7 @@ class Authentication extends Singleton {
 					}
 				}
 			} else {
-				// No OIDC issuer configured - clean up and continue with normal WordPress logout.
+				// No OIDC issuer/credentials configured - clean up and continue with normal WordPress logout.
 				if ( ! empty( $user_id ) ) {
 					delete_user_meta( $user_id, 'oidc_id_token' );
 					delete_user_meta( $user_id, 'oidc_server_id' );
