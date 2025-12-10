@@ -339,45 +339,39 @@ class Authentication extends Singleton {
 			unset( $_SESSION['oidc_server_id'] );
 		}
 
-		// Save OIDC data before check_user_access() overwrites $result.
-		$oidc_server_id = null;
-		$oidc_id_token  = null;
-		if ( 'oidc' === $authenticated_by && is_array( $result ) ) {
-			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : null;
-			$oidc_id_token  = isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ? $result['oidc_id_token'] : null;
-		}
-
 		// Check this external user's access against the access lists
 		// (pending, approved, blocked).
-		$result = Authorization::get_instance()->check_user_access( $user, $externally_authenticated_emails, $result );
+		$check_user_access_result = Authorization::get_instance()->check_user_access(
+			$user,
+			$externally_authenticated_emails,
+			$result
+		);
 
 		// Fail with message if there was an error creating/adding the user.
-		if ( is_wp_error( $result ) || 0 === $result ) {
+		if ( is_wp_error( $check_user_access_result ) || 0 === $check_user_access_result ) {
 			// Clean up oidc_redirect_to if access check fails (redirect filter won't run).
 			if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
 				unset( $_SESSION['oidc_redirect_to'] );
 			}
-			return $result;
+
+			return $check_user_access_result;
 		}
 
 		// If we have a valid user from check_user_access(), log that user in.
-		if ( get_class( $result ) === 'WP_User' ) {
-			$user = $result;
+		if ( get_class( $check_user_access_result ) === 'WP_User' ) {
+			$user = $check_user_access_result;
 		}
 
-		// Store user meta for the authenticated user (handles both existing and newly created users).
-		// This must happen after check_user_access() because new users are created during that call.
-		if ( $user ) {
-			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
-			if ( 'oidc' === $authenticated_by ) {
-				// Always store server ID if present (needed to determine which OIDC server was used).
-				if ( ! is_null( $oidc_server_id ) ) {
-					update_user_meta( $user->ID, 'oidc_server_id', $oidc_server_id );
-				}
-				// Store ID token only if present and non-empty (needed for RP-initiated logout).
-				if ( ! is_null( $oidc_id_token ) ) {
-					update_user_meta( $user->ID, 'oidc_id_token', $oidc_id_token );
-				}
+		// If this is an OIDC login, update OIDC user meta for the successfully
+		// logged in user.
+		if ( $user && 'oidc' === $authenticated_by ) {
+			// Always store server ID if present (needed to determine which OIDC server was used).
+			if ( isset( $result['oidc_server_id'] ) ) {
+				update_user_meta( $user->ID, 'oidc_server_id', intval( $result['oidc_server_id'] ) );
+			}
+			// Store ID token only if present and non-empty (needed for RP-initiated logout).
+			if ( ! empty( $result['oidc_id_token'] ) ) {
+				update_user_meta( $user->ID, 'oidc_id_token', $result['oidc_id_token'] );
 			}
 		}
 
