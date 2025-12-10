@@ -554,5 +554,17 @@ class Oidc extends \Authorizer\Singleton {
 
 		return $redirect_to;
 	}
+
+	/**
+	 * Unset OIDC session variables to prevent session pollution during any of the
+	 * login failure cases (e.g., successful OIDC authentication, but user blocked
+	 * in WordPress).
+	 */
+	public function maybe_unset_oidc_session_vars() {
+		if ( PHP_SESSION_NONE !== session_status() ) {
+			unset( $_SESSION['oidc_server_id'] );
+			unset( $_SESSION['oidc_redirect_to'] );
+		}
+	}
 }
 

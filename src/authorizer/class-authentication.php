@@ -1156,10 +1156,7 @@ class Authentication extends Singleton {
 			if ( '1' !== $oidc_link_on_username ) {
 				if ( empty( $email ) ) {
 					// Clean up session variables before returning error.
-					if ( PHP_SESSION_NONE !== session_status() ) {
-						unset( $_SESSION['oidc_server_id'] );
-						unset( $_SESSION['oidc_redirect_to'] );
-					}
+					\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 					return new \WP_Error( 'oidc_no_email', __( '<strong>ERROR</strong>: OIDC provider did not return an email address.', 'authorizer' ) );
 				}
 
@@ -1167,10 +1164,7 @@ class Authentication extends Singleton {
 				if ( '1' === $oidc_require_verified_email ) {
 					if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
 						// Clean up session variables before returning error.
-						if ( PHP_SESSION_NONE !== session_status() ) {
-							unset( $_SESSION['oidc_server_id'] );
-							unset( $_SESSION['oidc_redirect_to'] );
-						}
+						\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
@@ -1181,10 +1175,7 @@ class Authentication extends Singleton {
 					$email_domain    = substr( strrchr( $email, '@' ), 1 );
 					if ( ! in_array( $email_domain, $allowed_domains, true ) ) {
 						// Clean up session variables before returning error.
-						if ( PHP_SESSION_NONE !== session_status() ) {
-							unset( $_SESSION['oidc_server_id'] );
-							unset( $_SESSION['oidc_redirect_to'] );
-						}
+						\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 						return new \WP_Error( 'oidc_domain_not_allowed', __( '<strong>ERROR</strong>: Your email domain is not allowed to log in.', 'authorizer' ) );
 					}
 				}
@@ -1196,10 +1187,7 @@ class Authentication extends Singleton {
 			} elseif ( empty( $username ) ) {
 				// When linking by username, username is required.
 				// Clean up session variables before returning error.
-				if ( PHP_SESSION_NONE !== session_status() ) {
-					unset( $_SESSION['oidc_server_id'] );
-					unset( $_SESSION['oidc_redirect_to'] );
-				}
+				\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 				return new \WP_Error( 'oidc_no_username', __( '<strong>ERROR</strong>: OIDC provider did not return a username.', 'authorizer' ) );
 			}
 
@@ -1231,10 +1219,7 @@ class Authentication extends Singleton {
 			);
 		} catch ( \Exception $e ) {
 			// Clean up session variables on exception.
-			if ( PHP_SESSION_NONE !== session_status() ) {
-				unset( $_SESSION['oidc_server_id'] );
-				unset( $_SESSION['oidc_redirect_to'] );
-			}
+			\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 
 			// Log the error to error_log.
 			error_log( __( 'OIDC authentication failed. Details:', 'authorizer' ) ); // phpcs:ignore
