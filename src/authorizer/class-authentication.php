@@ -1004,7 +1004,7 @@ class Authentication extends Singleton {
 
 		// Fetch the OIDC Client ID (allow overrides from filter or constant).
 		// Note: constant/filter overrides are only supported for a single OIDC server.
-		if ( defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
+		if ( 1 === $oidc_server_id && defined( 'AUTHORIZER_OIDC_CLIENT_ID' ) ) {
 			$oidc_client_id = \AUTHORIZER_OIDC_CLIENT_ID;
 		}
 		/**
@@ -1014,11 +1014,13 @@ class Authentication extends Singleton {
 		 *
 		 * @param string $oidc_client_id  The stored OIDC Client ID.
 		 */
-		$oidc_client_id = apply_filters( 'authorizer_oidc_client_id', $oidc_client_id );
+		if ( 1 === $oidc_server_id ) {
+			$oidc_client_id = apply_filters( 'authorizer_oidc_client_id', $oidc_client_id );
+		}
 
 		// Fetch the OIDC Client Secret (allow overrides from filter or constant).
 		// Note: constant/filter overrides are only supported for a single OIDC server.
-		if ( defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
+		if ( 1 === $oidc_server_id && defined( 'AUTHORIZER_OIDC_CLIENT_SECRET' ) ) {
 			$oidc_client_secret = \AUTHORIZER_OIDC_CLIENT_SECRET;
 		}
 		/**
@@ -1028,7 +1030,9 @@ class Authentication extends Singleton {
 		 *
 		 * @param string $oidc_client_secret  The stored OIDC Client Secret.
 		 */
-		$oidc_client_secret = apply_filters( 'authorizer_oidc_client_secret', $oidc_client_secret );
+		if ( 1 === $oidc_server_id ) {
+			$oidc_client_secret = apply_filters( 'authorizer_oidc_client_secret', $oidc_client_secret );
+		}
 
 		// Move on if required params aren't specified in settings.
 		if (
