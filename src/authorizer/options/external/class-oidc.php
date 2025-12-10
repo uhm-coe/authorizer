@@ -566,5 +566,17 @@ class Oidc extends \Authorizer\Singleton {
 			unset( $_SESSION['oidc_redirect_to'] );
 		}
 	}
+
+	/**
+	 * Delete OIDC user meta when a user signs out.
+	 *
+	 * @param int $user_id ID of user logging out.
+	 */
+	public function delete_oidc_user_meta( $user_id = 0 ) {
+		if ( ! empty( $user_id ) ) {
+			delete_user_meta( $user_id, 'oidc_id_token' );
+			delete_user_meta( $user_id, 'oidc_server_id' );
+		}
+	}
 }
 

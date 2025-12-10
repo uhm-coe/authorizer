@@ -2186,8 +2186,7 @@ class Authentication extends Singleton {
 					}
 
 					// Clean up user meta before redirect (library's signOut() will exit).
-					delete_user_meta( $user_id, 'oidc_id_token' );
-					delete_user_meta( $user_id, 'oidc_server_id' );
+					\Authorizer\Options\External\Oidc::get_instance()->delete_oidc_user_meta( $user_id );
 
 					// Use library's signOut() method (handles discovery, URL building, and redirect).
 					// Pass empty string if no ID token (library will still include it in params).
@@ -2196,24 +2195,15 @@ class Authentication extends Singleton {
 				} catch ( \Jumbojett\OpenIDConnectClientException $e ) {
 					// Provider doesn't support RP-initiated logout (no end_session_endpoint) or other error.
 					// Clean up and continue with normal WordPress logout.
-					if ( ! empty( $user_id ) ) {
-						delete_user_meta( $user_id, 'oidc_id_token' );
-						delete_user_meta( $user_id, 'oidc_server_id' );
-					}
+					\Authorizer\Options\External\Oidc::get_instance()->delete_oidc_user_meta( $user_id );
 				} catch ( \Exception $e ) {
 					// Fallback to local logout if RP-initiated logout fails.
 					// Clean up and continue with normal WordPress logout.
-					if ( ! empty( $user_id ) ) {
-						delete_user_meta( $user_id, 'oidc_id_token' );
-						delete_user_meta( $user_id, 'oidc_server_id' );
-					}
+					\Authorizer\Options\External\Oidc::get_instance()->delete_oidc_user_meta( $user_id );
 				}
 			} else {
 				// No OIDC issuer/credentials configured - clean up and continue with normal WordPress logout.
-				if ( ! empty( $user_id ) ) {
-					delete_user_meta( $user_id, 'oidc_id_token' );
-					delete_user_meta( $user_id, 'oidc_server_id' );
-				}
+				\Authorizer\Options\External\Oidc::get_instance()->delete_oidc_user_meta( $user_id );
 			}
 		}
 	}
