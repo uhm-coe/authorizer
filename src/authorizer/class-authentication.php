@@ -27,13 +27,6 @@ class Authentication extends Singleton {
 	private static $authenticated_by = '';
 
 	/**
-	 * Tracks the user ID of the user currently logging out.
-	 *
-	 * @var int
-	 */
-	private static $logging_out_user_id = 0;
-
-	/**
 	 * Authenticate against an external service.
 	 *
 	 * Filter: authenticate
@@ -2047,9 +2040,11 @@ class Authentication extends Singleton {
 	 *
 	 * Action: wp_logout
 	 *
+	 * @param int $user_id ID of the user that was logged out.
+	 *
 	 * @return void
 	 */
-	public function custom_logout() {
+	public function custom_logout( $user_id ) {
 		// Grab plugin settings.
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
@@ -2147,22 +2142,16 @@ class Authentication extends Singleton {
 
 		// If logged in via OIDC, perform RP-initiated logout if supported.
 		if ( 'oidc' === self::$authenticated_by && '1' === $auth_settings['oidc'] ) {
-			// Get ID token and server ID from user meta (stored during authentication).
-			// Use stored user ID from pre_logout() since get_current_user_id() returns 0 after logout.
-			$user_id = self::$logging_out_user_id;
-			if ( empty( $user_id ) ) {
-				return;
-			}
-			$id_token_hint = get_user_meta( $user_id, 'oidc_id_token', true );
+			$id_token_hint  = get_user_meta( $user_id, 'oidc_id_token', true );
 			$oidc_server_id = get_user_meta( $user_id, 'oidc_server_id', true );
 			if ( empty( $oidc_server_id ) ) {
 				$oidc_server_id = 1;
 			}
 
 			// Get issuer and credentials for the server that was used.
-			$suffix      = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
-			$oidc_issuer = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
-			$oidc_client_id = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
+			$suffix             = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
+			$oidc_issuer        = $auth_settings[ 'oidc_issuer' . $suffix ] ?? '';
+			$oidc_client_id     = $auth_settings[ 'oidc_client_id' . $suffix ] ?? '';
 			$oidc_client_secret = $auth_settings[ 'oidc_client_secret' . $suffix ] ?? '';
 
 			// Fetch the OIDC Client ID (allow overrides from filter or constant).
