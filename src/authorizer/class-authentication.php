@@ -347,13 +347,6 @@ class Authentication extends Singleton {
 			$oidc_id_token  = isset( $result['oidc_id_token'] ) && ! empty( $result['oidc_id_token'] ) ? $result['oidc_id_token'] : null;
 		}
 
-		// We'll track how this user was authenticated in user meta.
-		// Note: For existing users, we store authenticated_by here. For newly created users,
-		// we'll store it after check_user_access() returns (see below).
-		if ( $user ) {
-			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
-		}
-
 		// Check this external user's access against the access lists
 		// (pending, approved, blocked).
 		$result = Authorization::get_instance()->check_user_access( $user, $externally_authenticated_emails, $result );
@@ -375,9 +368,6 @@ class Authentication extends Singleton {
 		// Store user meta for the authenticated user (handles both existing and newly created users).
 		// This must happen after check_user_access() because new users are created during that call.
 		if ( $user ) {
-			// Store authenticated_by if not already stored (for newly created users).
-			update_user_meta( $user->ID, 'authenticated_by', $authenticated_by );
-			
 			// Store OIDC server ID and ID token in user meta for RP-initiated logout.
 			if ( 'oidc' === $authenticated_by ) {
 				// Always store server ID if present (needed to determine which OIDC server was used).

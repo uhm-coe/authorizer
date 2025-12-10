@@ -51,6 +51,12 @@ class Authorization extends Singleton {
 			)
 		);
 
+		// If this is an existing user, update which external service authenticated
+		// them.
+		if ( $user && ! empty( $user_data['authenticated_by'] ) ) {
+			update_user_meta( $user->ID, 'authenticated_by', $user_data['authenticated_by'] );
+		}
+
 		// Get whether to update first/last name on login from the external service
 		// used to authenticate this user.
 		$attr_update_on_login = '';
@@ -337,6 +343,11 @@ class Authorization extends Singleton {
 					 * );
 					 */
 					do_action( 'authorizer_user_register', $user, $user_data );
+
+					// Save which external service authenticated this new user to user meta.
+					if ( $user && ! empty( $user_data['authenticated_by'] ) ) {
+						update_user_meta( $user->ID, 'authenticated_by', $user_data['authenticated_by'] );
+					}
 
 					// If multisite, iterate through all sites in the network and add the user
 					// currently logging in to any of them that have the user on the approved list.
