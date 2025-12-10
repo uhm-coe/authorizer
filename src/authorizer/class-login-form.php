@@ -524,7 +524,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		// Check whether we should redirect to OIDC.
-		$should_auto_login = (
+		if (
 			isset( $_SERVER['QUERY_STRING'] ) &&
 			strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) === false && // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 			array_key_exists( 'oidc_auto_login', $auth_settings ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) &&
@@ -534,12 +534,10 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			( ! array_key_exists( 'cas', $auth_settings ) || '1' !== $auth_settings['cas'] ) &&
 			( ! array_key_exists( 'oauth2', $auth_settings ) || '1' !== $auth_settings['oauth2'] ) &&
 			array_key_exists( 'advanced_hide_wp_login', $auth_settings ) && '1' === $auth_settings['advanced_hide_wp_login']
-		);
-
-		// Skip auto-login if session flag is set (set during OIDC logout).
-		// This prevents auto-login after logout redirect, regardless of where IDP redirects to.
-		// Only check if auto-login would otherwise be triggered (avoids unnecessary session starts).
-		if ( $should_auto_login ) {
+		) {
+			// Skip auto-login if session flag is set (set during OIDC logout).
+			// This prevents auto-login after logout redirect, regardless of where IDP redirects to.
+			// Only check if auto-login would otherwise be triggered (avoids unnecessary session starts).
 			if ( PHP_SESSION_NONE === session_status() ) {
 				session_start();
 			}
@@ -547,9 +545,8 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				unset( $_SESSION['oidc_logged_out'] );
 				return $errors;
 			}
-		}
 
-		if ( $should_auto_login ) {
+			// Redirect to OIDC login.
 			wp_redirect( Helper::modify_current_url_for_external_login( 'oidc', intval( $auth_settings['oidc_auto_login'] ) ) ); // phpcs:ignore WordPress.Security.SafeRedirect.wp_redirect_wp_redirect
 			exit;
 		}
