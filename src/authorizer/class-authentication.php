@@ -330,10 +330,11 @@ class Authentication extends Singleton {
 			}
 		}
 
-		// Always clean up OIDC session variables after authentication attempt, regardless of user lookup result.
-		// This prevents session pollution if OIDC authentication succeeds but user verification fails.
-		// Note: oidc_redirect_to is preserved here and cleaned up later in maybe_redirect_after_oidc_login()
-		// after it's used for the login redirect.
+		// Always clean up OIDC session variables after authentication attempt,
+		// regardless of user lookup result. This prevents session pollution if OIDC
+		// authentication succeeds but user verification fails.
+		// Note: oidc_redirect_to is preserved here and cleaned up later in
+		// maybe_redirect_after_oidc_login() after it's used for the login redirect.
 		if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
 			unset( $_SESSION['oidc_server_id'] );
 		}
@@ -980,7 +981,7 @@ class Authentication extends Singleton {
 			$_GET['external'] = 'oidc';
 		}
 
-		// If this is an OAuth2 login attempt and the id param is missing, default
+		// If this is an OIDC login attempt and the id param is missing, default
 		// it to 1.
 		if ( ! empty( $_GET['external'] ) && 'oidc' === $_GET['external'] && empty( $_GET['id'] ) ) {
 			$_GET['id'] = 1;
