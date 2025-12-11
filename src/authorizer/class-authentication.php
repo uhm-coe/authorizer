@@ -237,10 +237,10 @@ class Authentication extends Singleton {
 				array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
 				'1' === $auth_settings['advanced_disable_wp_login'] &&
 				(
-					'1' === $auth_settings['cas'] ||
 					'1' === $auth_settings['oauth2'] ||
-					'1' === $auth_settings['google'] ||
 					'1' === $auth_settings['oidc'] ||
+					'1' === $auth_settings['google'] ||
+					'1' === $auth_settings['cas'] ||
 					'1' === $auth_settings['ldap']
 				)
 			) {

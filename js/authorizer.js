@@ -582,6 +582,11 @@
 			});
 		});
 
+		// Event handler: Show/hide OIDC tab based on checkbox
+		$( 'input[name="auth_settings[oidc]"]' ).on( 'change', function() {
+			$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( this ).is( ':checked' ) );
+		});
+
 		// Event handler: Show/hide Google tab based on checkbox
 		$( 'input[name="auth_settings[google]"]' ).on( 'change', function() {
 			$( '.nav-tab-wrapper .nav-tab-external_google' ).toggle( $( this ).is( ':checked' ) );
@@ -590,11 +595,6 @@
 		// Event handler: Show/hide CAS tab based on checkbox
 		$( 'input[name="auth_settings[cas]"]' ).on( 'change', function() {
 			$( '.nav-tab-wrapper .nav-tab-external_cas' ).toggle( $( this ).is( ':checked' ) );
-		});
-
-		// Event handler: Show/hide OIDC tab based on checkbox
-		$( 'input[name="auth_settings[oidc]"]' ).on( 'change', function() {
-			$( '.nav-tab-wrapper .nav-tab-external_oidc' ).toggle( $( this ).is( ':checked' ) );
 		});
 
 		// Event handler: Show/hide LDAP tab based on checkbox

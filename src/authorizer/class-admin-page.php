@@ -16,10 +16,10 @@ use Authorizer\Options\Login_Access;
 use Authorizer\Options\Public_Access;
 use Authorizer\Options\External;
 use Authorizer\Options\External\OAuth2;
+use Authorizer\Options\External\Oidc;
 use Authorizer\Options\External\Google;
 use Authorizer\Options\External\Cas;
 use Authorizer\Options\External\Ldap;
-use Authorizer\Options\External\Oidc;
 use Authorizer\Options\Advanced;
 
 /**
@@ -86,7 +86,7 @@ class Admin_Page extends Singleton {
 			)
 		);
 
-		// Add help tab for External Service (CAS, LDAP, OAuth, OIDC, Google) Settings.
+		// Add help tab for External Service (OAuth2, OIDC, Google, CAS, LDAP) Settings.
 		$help_auth_settings_external_content = '
 			<p>' . __( '<strong>Default role for new users</strong>: Specify which role new external users will get by default. Be sure to choose a role with limited permissions!', 'authorizer' ) . '</p>
 			<p>' . __( "<strong>Type of external service to authenticate against</strong>: Choose which authentication service type you will be using. You'll have to fill out different fields below depending on which service you choose.", 'authorizer' ) . '</p>
@@ -1285,11 +1285,11 @@ class Admin_Page extends Singleton {
 		$login_access  = Login_Access::get_instance();
 		$public_access = Public_Access::get_instance();
 		$external      = External::get_instance();
+		$oauth2        = OAuth2::get_instance();
+		$oidc          = Oidc::get_instance();
 		$google        = Google::get_instance();
 		$cas           = Cas::get_instance();
 		$ldap          = Ldap::get_instance();
-		$oauth2        = OAuth2::get_instance();
-		$oidc          = Oidc::get_instance();
 		$advanced      = Advanced::get_instance();
 		$auth_settings = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_multisite_settings', array() );
 		?>
