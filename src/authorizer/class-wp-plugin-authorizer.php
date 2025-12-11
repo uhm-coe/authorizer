@@ -42,7 +42,7 @@ class WP_Plugin_Authorizer extends Singleton {
 
 		// Custom logout action using external service.
 		add_action( 'clear_auth_cookie', array( Authentication::get_instance(), 'pre_logout' ) );
-		add_action( 'wp_logout', array( Authentication::get_instance(), 'custom_logout' ) );
+		add_action( 'wp_logout', array( Authentication::get_instance(), 'custom_logout' ), 10, 1 );
 
 		// Create settings link on Plugins page.
 		add_filter( 'plugin_action_links_' . plugin_basename( plugin_root() ), array( Admin_Page::get_instance(), 'plugin_settings_link' ) );

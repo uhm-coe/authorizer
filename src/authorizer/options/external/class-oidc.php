@@ -549,9 +549,34 @@ class Oidc extends \Authorizer\Singleton {
 	public function maybe_redirect_after_oidc_login( $redirect_to ) {
 		if ( ! empty( $_SESSION['oidc_redirect_to'] ) ) {
 			$redirect_to = sanitize_url( $_SESSION['oidc_redirect_to'] );
+			unset( $_SESSION['oidc_redirect_to'] );
 		}
 
 		return $redirect_to;
+	}
+
+	/**
+	 * Unset OIDC session variables to prevent session pollution during any of the
+	 * login failure cases (e.g., successful OIDC authentication, but user blocked
+	 * in WordPress).
+	 */
+	public function maybe_unset_oidc_session_vars() {
+		if ( PHP_SESSION_NONE !== session_status() ) {
+			unset( $_SESSION['oidc_server_id'] );
+			unset( $_SESSION['oidc_redirect_to'] );
+		}
+	}
+
+	/**
+	 * Delete OIDC user meta when a user signs out.
+	 *
+	 * @param int $user_id ID of user logging out.
+	 */
+	public function delete_oidc_user_meta( $user_id = 0 ) {
+		if ( ! empty( $user_id ) ) {
+			delete_user_meta( $user_id, 'oidc_id_token' );
+			delete_user_meta( $user_id, 'oidc_server_id' );
+		}
 	}
 }
 
