@@ -219,6 +219,29 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 		?>
 		<div id="auth-external-service-login">
+			<?php /* Note: Google button must come first to avoid its container overlapping other buttons. */ ?>
+			<?php if ( '1' === $auth_settings['google'] ) : ?>
+				<script src="https://accounts.google.com/gsi/client" async defer></script>
+				<div id="g_id_onload"
+					data-use_fedcm_for_prompt="true"
+					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
+					data-context="signin"
+					data-ux_mode="popup"
+					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
+					data-callback="signInCallback">
+				</div>
+				<div class="g_id_signin"
+					data-type="standard"
+					data-shape="pill"
+					data-theme="filled_blue"
+					data-text="signin_with"
+					data-size="large"
+					data-logo_alignment="left"
+					data-width="270">
+				</div>
+				<br>
+			<?php endif; ?>
+
 			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
 				<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
@@ -303,28 +326,6 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						</a></p>
 					<?php endfor; ?>
 				<?php endif; ?>
-			<?php endif; ?>
-
-			<?php if ( '1' === $auth_settings['google'] ) : ?>
-				<script src="https://accounts.google.com/gsi/client" async defer></script>
-				<div id="g_id_onload"
-					data-use_fedcm_for_prompt="true"
-					data-client_id="<?php echo esc_attr( trim( $auth_settings['google_clientid'] ) ); ?>"
-					data-context="signin"
-					data-ux_mode="popup"
-					data-nonce="<?php echo esc_attr( wp_create_nonce( 'google_csrf_nonce' ) ); ?>"
-					data-callback="signInCallback">
-				</div>
-				<div class="g_id_signin"
-					data-type="standard"
-					data-shape="pill"
-					data-theme="filled_blue"
-					data-text="signin_with"
-					data-size="large"
-					data-logo_alignment="left"
-					data-width="270">
-				</div>
-				<br>
 			<?php endif; ?>
 
 			<?php if ( '1' === $auth_settings['cas'] ) : ?>
