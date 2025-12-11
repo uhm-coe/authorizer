@@ -592,6 +592,7 @@ class Ajax_Endpoints extends Singleton {
 			// Sanitize posted data.
 			$access_users_pending = array();
 			if ( isset( $_POST['access_users_pending'] ) && is_array( $_POST['access_users_pending'] ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				$access_users_pending = $options->sanitize_update_auth_users( wp_unslash( $_POST['access_users_pending'] ) );
 			}
 
@@ -629,6 +630,7 @@ class Ajax_Endpoints extends Singleton {
 			// Sanitize posted data.
 			$access_users_approved = array();
 			if ( isset( $_POST['access_users_approved'] ) && is_array( $_POST['access_users_approved'] ) ) {
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 				$access_users_approved = $options->sanitize_update_auth_users( wp_unslash( $_POST['access_users_approved'] ) );
 			}
 
@@ -845,6 +847,7 @@ class Ajax_Endpoints extends Singleton {
 			$access_users_blocked = array();
 			if ( isset( $_POST['access_users_blocked'] ) && is_array( $_POST['access_users_blocked'] ) ) {
 				$access_users_blocked = $options->sanitize_update_auth_users(
+					// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 					wp_unslash( $_POST['access_users_blocked'] ),
 					array(
 						'allow_wildcard_email' => true,
