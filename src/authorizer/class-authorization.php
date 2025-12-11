@@ -23,9 +23,13 @@ class Authorization extends Singleton {
 	 *
 	 * @param WP_User $user        User to check.
 	 * @param array   $user_emails Array of user's plaintext emails (in case current user doesn't have a WP account).
-	 * @param array   $user_data   Array of keys for email, username, first_name, last_name,
-	 *                             authenticated_by, google_attributes, cas_attributes, ldap_attributes,
-	 *                             oauth2_attributes, oidc_attributes.
+	 * @param array   $user_data   Array of keys for email, username, first_name, last_name, authenticated_by,
+	 *                             and any of the following based on authentication method:
+	 *                             google_attributes,
+	 *                             cas_attributes, cas_server_id,
+	 *                             ldap_attributes,
+	 *                             oauth2_attributes, oauth2_provider, oauth2_server_id,
+	 *                             oidc_attributes, oidc_server_id.
 	 * @return WP_Error|WP_User
 	 *                             WP_Error if there was an error on user creation / adding user to blog.
 	 *                             WP_Error / wp_die() if user does not have access.
@@ -47,53 +51,42 @@ class Authorization extends Singleton {
 			)
 		);
 
+		// If this is an existing user, update which external service authenticated
+		// them.
+		if ( $user && ! empty( $user_data['authenticated_by'] ) ) {
+			update_user_meta( $user->ID, 'authenticated_by', $user_data['authenticated_by'] );
+		}
+
+		// Get whether to update first/last name on login from the external service
+		// used to authenticate this user.
+		$attr_update_on_login = '';
+		if ( ! empty( $user_data['authenticated_by'] ) ) {
+			$attr_update_on_login_key = '';
+			if ( 'cas' === $user_data['authenticated_by'] ) {
+				$attr_update_on_login_key = empty( $user_data['cas_server_id'] ) || 1 === intval( $user_data['cas_server_id'] ) ? 'cas_attr_update_on_login' : 'cas_attr_update_on_login_' . $user_data['cas_server_id'];
+			} elseif ( 'ldap' === $user_data['authenticated_by'] ) {
+				$attr_update_on_login_key = 'ldap_attr_update_on_login';
+			} elseif ( 'oauth2' === $user_data['authenticated_by'] ) {
+				$attr_update_on_login_key = empty( $user_data['oauth2_server_id'] ) || 1 === intval( $user_data['oauth2_server_id'] ) ? 'oauth2_attr_update_on_login' : 'oauth2_attr_update_on_login_' . $user_data['oauth2_server_id'];
+			} elseif ( 'oidc' === $user_data['authenticated_by'] ) {
+				$attr_update_on_login_key = empty( $user_data['oidc_server_id'] ) || 1 === intval( $user_data['oidc_server_id'] ) ? 'oidc_attr_update_on_login' : 'oidc_attr_update_on_login_' . $user_data['oidc_server_id'];
+			}
+			if ( ! empty( $attr_update_on_login_key ) ) {
+				$attr_update_on_login = ! empty( $auth_settings[ $attr_update_on_login_key ] ) ? $auth_settings[ $attr_update_on_login_key ] : '';
+			}
+		}
+
 		// Detect whether this user's first and last name should be updated below
-		// (if the external CAS/LDAP service provides a different value, the option
-		// is set to update it, and it's empty if the option to only set it if empty
-		// is enabled).
+		// (if the external service provides a different value, the option is set to
+		// update it, and it's empty if the option to only set it if empty is
+		// enabled).
 		$should_update_first_name =
 			$user && ! empty( $user_data['first_name'] ) && $user_data['first_name'] !== $user->first_name &&
-			(
-				(
-					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->first_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->first_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->first_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'oidc' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['oidc_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['oidc_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oidc_attr_update_on_login'] && empty( $user->first_name ) ) )
-				)
-			);
+			( '1' === $attr_update_on_login || ( 'update-if-empty' === $attr_update_on_login && empty( $user->first_name ) ) );
 
 		$should_update_last_name =
 			$user && ! empty( $user_data['last_name'] ) && $user_data['last_name'] !== $user->last_name &&
-			(
-				(
-					! empty( $user_data['authenticated_by'] ) && 'cas' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['cas_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['cas_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['cas_attr_update_on_login'] && empty( $user->last_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'ldap' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['ldap_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['ldap_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['ldap_attr_update_on_login'] && empty( $user->last_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'oauth2' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['oauth2_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['oauth2_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oauth2_attr_update_on_login'] && empty( $user->last_name ) ) )
-				) || (
-					! empty( $user_data['authenticated_by'] ) && 'oidc' === $user_data['authenticated_by'] &&
-					! empty( $auth_settings['oidc_attr_update_on_login'] ) &&
-					( '1' === $auth_settings['oidc_attr_update_on_login'] || ( 'update-if-empty' === $auth_settings['oidc_attr_update_on_login'] && empty( $user->last_name ) ) )
-				)
-			);
+			( '1' === $attr_update_on_login || ( 'update-if-empty' === $attr_update_on_login && empty( $user->last_name ) ) );
 
 		/**
 		 * Filter whether to block the currently logging in user based on any of
@@ -205,7 +198,7 @@ class Authorization extends Singleton {
 
 		// If this externally-authenticated user is an existing administrator (admin
 		// in single site mode, or super admin in network mode), and isn't blocked,
-		// let them in. Update their first/last name if needed (CAS/LDAP).
+		// let them in. Update their first/last name if needed.
 		if ( $user && is_super_admin( $user->ID ) ) {
 			if ( $should_update_first_name ) {
 				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
@@ -350,6 +343,11 @@ class Authorization extends Singleton {
 					 * );
 					 */
 					do_action( 'authorizer_user_register', $user, $user_data );
+
+					// Save which external service authenticated this new user to user meta.
+					if ( $user && ! empty( $user_data['authenticated_by'] ) ) {
+						update_user_meta( $user->ID, 'authenticated_by', $user_data['authenticated_by'] );
+					}
 
 					// If multisite, iterate through all sites in the network and add the user
 					// currently logging in to any of them that have the user on the approved list.

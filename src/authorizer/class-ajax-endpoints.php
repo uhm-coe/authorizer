@@ -259,24 +259,6 @@ class Ajax_Endpoints extends Singleton {
 				) );
 			}
 		}
-		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
-			// Add options if more than one CAS server.
-			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
-				$allowed = array_merge( $allowed, array(
-					'cas_custom_label_' . $cas_num_server,
-					'cas_host_' . $cas_num_server,
-					'cas_port_' . $cas_num_server,
-					'cas_path_' . $cas_num_server,
-					'cas_method_' . $cas_num_server,
-					'cas_version_' . $cas_num_server,
-					'cas_attr_email_' . $cas_num_server,
-					'cas_attr_first_name_' . $cas_num_server,
-					'cas_attr_last_name_' . $cas_num_server,
-					'cas_attr_update_on_login_' . $cas_num_server,
-					'cas_link_on_username_' . $cas_num_server,
-				) );
-			}
-		}
 		if ( ! empty( $auth_multisite_settings['oidc_num_servers'] ) && intval( $auth_multisite_settings['oidc_num_servers'] ) > 1 ) {
 			// Add options if more than one OIDC server.
 			foreach ( range( 2, min( intval( $auth_multisite_settings['oidc_num_servers'] ), 20 ) ) as $oidc_num_server ) {
@@ -297,6 +279,24 @@ class Ajax_Endpoints extends Singleton {
 					'oidc_require_verified_email_' . $oidc_num_server,
 					'oidc_link_on_username_' . $oidc_num_server,
 					'oidc_hosteddomain_' . $oidc_num_server,
+				) );
+			}
+		}
+		if ( ! empty( $auth_multisite_settings['cas_num_servers'] ) && intval( $auth_multisite_settings['cas_num_servers'] ) > 1 ) {
+			// Add options if more than one CAS server.
+			foreach ( range( 2, min( intval( $auth_multisite_settings['cas_num_servers'] ), 10 ) ) as $cas_num_server ) {
+				$allowed = array_merge( $allowed, array(
+					'cas_custom_label_' . $cas_num_server,
+					'cas_host_' . $cas_num_server,
+					'cas_port_' . $cas_num_server,
+					'cas_path_' . $cas_num_server,
+					'cas_method_' . $cas_num_server,
+					'cas_version_' . $cas_num_server,
+					'cas_attr_email_' . $cas_num_server,
+					'cas_attr_first_name_' . $cas_num_server,
+					'cas_attr_last_name_' . $cas_num_server,
+					'cas_attr_update_on_login_' . $cas_num_server,
+					'cas_link_on_username_' . $cas_num_server,
 				) );
 			}
 		}
