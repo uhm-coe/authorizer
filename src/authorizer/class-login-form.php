@@ -369,6 +369,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 					<?php endfor; ?>
 				<?php endif; ?>
 			<?php endif; ?>
+
 			<?php if ( ( isset( $auth_settings['advanced_hide_wp_login'] ) && '1' === $auth_settings['advanced_hide_wp_login'] && isset( $_SERVER['QUERY_STRING'] ) && false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) || ( isset( $auth_settings['advanced_disable_wp_login'] ) && '1' === $auth_settings['advanced_disable_wp_login'] && '1' !== $auth_settings['ldap'] && ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oidc'] ) && ( empty( $auth_settings['advanced_disable_wp_login_bypass_usernames'] ) || ! isset( $_SERVER['QUERY_STRING'] ) || false === strpos( $_SERVER['QUERY_STRING'], 'external=wordpress' ) ) ) ) : // phpcs:ignore WordPress.Security.ValidatedSanitizedInput ?>
 				<style type="text/css">
 					body.login-action-login form {

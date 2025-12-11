@@ -188,34 +188,6 @@ class Admin_Page extends Singleton {
 			)
 		);
 
-		// Add (indented) help tab for OIDC Settings.
-		$help_auth_settings_external_oidc_content = '
-			<p><strong><em>' . __( 'If you enable OIDC logins:', 'authorizer' ) . '</em></strong></p>
-			<ul>
-				<li>' . __( '<strong>Issuer URL</strong>: Enter the base URL of your OIDC provider (e.g., https://login.microsoftonline.com/{tenant}/v2.0 or https://keycloak.example.com/realms/{realm}). The plugin will use discovery to find the authorization and token endpoints.', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Client ID</strong>: Enter the Client ID provided by your OIDC provider.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OIDC_CLIENT_ID', '...' );</code>, or you may fetch it from an external service by hooking into the <code>authorizer_oidc_client_id</code> filter.", 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Client Secret</strong>: Enter the Client Secret provided by your OIDC provider.', 'authorizer' ) . '<br>' . __( "Note: for increased security, you can leave this field blank and instead define this value either in wp-config.php via <code>define( 'AUTHORIZER_OIDC_CLIENT_SECRET', '...' );</code>, or you may fetch it from an external service by hooking into the <code>authorizer_oidc_client_secret</code> filter.", 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Scopes</strong>: Enter space-separated scopes to request (default: openid email profile).', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Prompt parameter</strong>: Optional parameter to control authentication prompt behavior (e.g., login, consent, select_account).', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Login hint parameter</strong>: Optional parameter to pre-fill the username (e.g., user@example.com).', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Max age parameter</strong>: Optional parameter specifying maximum authentication age in seconds.', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Attribute containing username</strong>: Enter the claim name that contains the username (default: preferred_username). If not found, the plugin will fallback to the sub claim.', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Attribute containing email</strong>: Enter the claim name that contains the email address (default: email).', 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Attribute containing first name</strong>: Enter the claim name that has the user's first name (default: given_name).", 'authorizer' ) . '</li>
-				<li>' . __( "<strong>Attribute containing last name</strong>: Enter the claim name that has the user's last name (default: family_name).", 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Name attribute update</strong>: Select whether the first and last names retrieved from OIDC should overwrite any value the user has entered in the first and last name fields in their WordPress profile.', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>Require verified email</strong>: If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ) . '</li>
-				<li>' . __( '<strong>OIDC Hosted Domain</strong>: Restrict OIDC logins to specific email domains (one per line). Leave blank to allow all valid sign-ins.', 'authorizer' ) . '</li>
-			</ul>
-		';
-		$screen->add_help_tab(
-			array(
-				'id'      => 'help_auth_settings_external_oidc_content',
-				'title'   => '&nbsp; - ' . __( 'OIDC', 'authorizer' ),
-				'content' => wp_kses_post( $help_auth_settings_external_oidc_content ),
-			)
-		);
-
 		// Add (indented) help tab for LDAP Settings.
 		$help_auth_settings_external_ldap_content = '
 			<p><strong><em>' . __( 'If you enable LDAP logins:', 'authorizer' ) . '</em></strong></p>
@@ -537,13 +509,6 @@ class Admin_Page extends Singleton {
 			'auth_settings_external_ldap',
 			__( 'LDAP Logins', 'authorizer' ),
 			array( Ldap::get_instance(), 'print_checkbox_auth_external_ldap' ),
-			'authorizer',
-			'auth_settings_external'
-		);
-		add_settings_field(
-			'auth_settings_external_oidc',
-			__( 'OIDC Logins', 'authorizer' ),
-			array( Oidc::get_instance(), 'print_checkbox_auth_external_oidc' ),
 			'authorizer',
 			'auth_settings_external'
 		);
@@ -1387,10 +1352,6 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'LDAP Logins', 'authorizer' ); ?></th>
 							<td><?php $ldap->print_checkbox_auth_external_ldap( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
-						</tr>
-						<tr>
-							<th scope="row"><?php esc_html_e( 'OIDC Logins', 'authorizer' ); ?></th>
-							<td><?php $oidc->print_checkbox_auth_external_oidc( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 					</tbody></table>
 

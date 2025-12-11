@@ -1997,7 +1997,7 @@ class Authentication extends Singleton {
 	 * @return void
 	 */
 	public function pre_logout() {
-		self::$authenticated_by    = get_user_meta( get_current_user_id(), 'authenticated_by', true );
+		self::$authenticated_by = get_user_meta( get_current_user_id(), 'authenticated_by', true );
 
 		// If we didn't find an authenticated method, check $_REQUEST (if this is a
 		// pending user facing the "no access" message, their logout link will
