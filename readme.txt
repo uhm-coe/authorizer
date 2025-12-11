@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.12.1
+Stable tag: 3.13.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,14 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.13.0 =
+* Released Thu Dec 11, 2025.
+* Add ability to authenticate via OIDC servers. Props lc-sam for the [pull request](https://github.com/uhm-coe/authorizer/pull/180/)!
+* Fix linking CAS accounts by username on any additional configured CAS servers (previously only worked on the first CAS server).
+* Fix updating first/last names on login for any additional configured CAS/OAuth2/OIDC servers.
+* Update French translations. Props @julienlusson!
+* Update composer dependencies: league/oauth2-client (2.8.1 => 2.9.0).
 
 = 3.12.1 =
 * Restore original redirectUri (omit id=1 param) for already-configured OAuth2 servers. This fixes existing clients breaking because the redirectUri no longer matches after updating to Authorizer 3.12.1. Props mdebski for the [report](https://github.com/uhm-coe/authorizer/commit/f8155808e57679ecccd60d63785fe78111f99da5#r170993356)!

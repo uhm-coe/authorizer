@@ -1,5 +1,13 @@
 # Changelog
 
+= 3.13.0 =
+* Released Thu Dec 11, 2025.
+* Add ability to authenticate via OIDC servers. Props lc-sam for the [pull request](https://github.com/uhm-coe/authorizer/pull/180/)!
+* Fix linking CAS accounts by username on any additional configured CAS servers (previously only worked on the first CAS server).
+* Fix updating first/last names on login for any additional configured CAS/OAuth2/OIDC servers.
+* Update French translations. Props @julienlusson!
+* Update composer dependencies: league/oauth2-client (2.8.1 => 2.9.0).
+
 = 3.12.1 =
 * Restore original redirectUri (omit id=1 param) for already-configured OAuth2 servers. This fixes existing clients breaking because the redirectUri no longer matches after updating to Authorizer 3.12.1. Props mdebski for the [report](https://github.com/uhm-coe/authorizer/commit/f8155808e57679ecccd60d63785fe78111f99da5#r170993356)!
 
