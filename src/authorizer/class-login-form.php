@@ -220,7 +220,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		?>
 		<div id="auth-external-service-login">
 			<?php /* Note: Google button must come first to avoid its container overlapping other buttons. */ ?>
-			<?php if ( '1' === $auth_settings['google'] ) : ?>
+			<?php if ( isset( $auth_settings['google'] ) && '1' === $auth_settings['google'] ) : ?>
 				<script src="https://accounts.google.com/gsi/client" async defer></script>
 				<div id="g_id_onload"
 					data-use_fedcm_for_prompt="true"
@@ -242,7 +242,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<br>
 			<?php endif; ?>
 
-			<?php if ( '1' === $auth_settings['oauth2'] ) : ?>
+			<?php if ( isset( $auth_settings['oauth2'] ) && '1' === $auth_settings['oauth2'] ) : ?>
 				<p><a class="button button-primary button-external button-<?php echo esc_attr( $auth_settings['oauth2_provider'] ); ?>" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oauth2' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
 					<span class="label">
@@ -285,7 +285,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<?php endif; ?>
 			<?php endif; ?>
 
-			<?php if ( '1' === $auth_settings['oidc'] ) : ?>
+			<?php if ( isset( $auth_settings['oidc'] ) && '1' === $auth_settings['oidc'] ) : ?>
 				<p><a class="button button-primary button-external button-oidc" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'oidc' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
 					<span class="label">
@@ -328,7 +328,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 				<?php endif; ?>
 			<?php endif; ?>
 
-			<?php if ( '1' === $auth_settings['cas'] ) : ?>
+			<?php if ( isset( $auth_settings['cas'] ) && '1' === $auth_settings['cas'] ) : ?>
 				<p><a class="button button-primary button-external button-cas" href="<?php echo esc_attr( Helper::modify_current_url_for_external_login( 'cas' ) ); ?>">
 					<span class="dashicons dashicons-lock"></span>
 					<span class="label">
@@ -385,7 +385,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 						display: none;
 					}
 				</style>
-			<?php elseif ( '1' === $auth_settings['cas'] || '1' === $auth_settings['google'] || '1' === $auth_settings['oauth2'] || '1' === $auth_settings['oidc'] ) : ?>
+			<?php elseif ( ( isset( $auth_settings['cas'] ) && '1' === $auth_settings['cas'] ) || ( isset( $auth_settings['google'] ) && '1' === $auth_settings['google'] ) || ( isset( $auth_settings['oauth2'] ) && '1' === $auth_settings['oauth2'] ) || ( isset( $auth_settings['oidc'] ) && '1' === $auth_settings['oidc'] ) ) : ?>
 				<h3> &mdash; <?php esc_html_e( 'or', 'authorizer' ); ?> &mdash; </h3>
 			<?php endif; ?>
 		</div>

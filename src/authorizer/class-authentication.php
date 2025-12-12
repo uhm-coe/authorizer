@@ -141,6 +141,7 @@ class Authentication extends Singleton {
 		// Try OAuth2 authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
+			isset( $auth_settings['oauth2'] ) &&
 			'1' === $auth_settings['oauth2'] &&
 			0 === count( $externally_authenticated_emails ) &&
 			! is_wp_error( $result )
@@ -159,6 +160,7 @@ class Authentication extends Singleton {
 		// Try OIDC authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
+			isset( $auth_settings['oidc'] ) &&
 			'1' === $auth_settings['oidc'] &&
 			0 === count( $externally_authenticated_emails ) &&
 			! is_wp_error( $result )
@@ -177,6 +179,7 @@ class Authentication extends Singleton {
 		// Try Google authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
+			isset( $auth_settings['google'] ) &&
 			'1' === $auth_settings['google'] &&
 			0 === count( $externally_authenticated_emails ) &&
 			! is_wp_error( $result )
@@ -195,6 +198,7 @@ class Authentication extends Singleton {
 		// Try CAS authentication if it's enabled and we don't have a
 		// successful login yet.
 		if (
+			isset( $auth_settings['cas'] ) &&
 			'1' === $auth_settings['cas'] &&
 			0 === count( $externally_authenticated_emails ) &&
 			! is_wp_error( $result )
@@ -213,6 +217,7 @@ class Authentication extends Singleton {
 		// Try LDAP authentication if it's enabled and we don't have an
 		// authenticated user yet.
 		if (
+			isset( $auth_settings['ldap'] ) &&
 			'1' === $auth_settings['ldap'] &&
 			0 === count( $externally_authenticated_emails ) &&
 			! is_wp_error( $result )
@@ -237,11 +242,11 @@ class Authentication extends Singleton {
 				array_key_exists( 'advanced_disable_wp_login', $auth_settings ) &&
 				'1' === $auth_settings['advanced_disable_wp_login'] &&
 				(
-					'1' === $auth_settings['oauth2'] ||
-					'1' === $auth_settings['oidc'] ||
-					'1' === $auth_settings['google'] ||
-					'1' === $auth_settings['cas'] ||
-					'1' === $auth_settings['ldap']
+					( isset( $auth_settings['oauth2'] ) && '1' === $auth_settings['oauth2'] ) ||
+					( isset( $auth_settings['oidc'] ) && '1' === $auth_settings['oidc'] ) ||
+					( isset( $auth_settings['google'] ) && '1' === $auth_settings['google'] ) ||
+					( isset( $auth_settings['cas'] ) && '1' === $auth_settings['cas'] ) ||
+					( isset( $auth_settings['ldap'] ) && '1' === $auth_settings['ldap'] )
 				)
 			) {
 				// Edge case: if WordPress logins are disabled but the username/email
