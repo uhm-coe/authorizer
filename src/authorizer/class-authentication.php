@@ -1372,10 +1372,18 @@ class Authentication extends Singleton {
 		if ( empty( $auth_settings['cas_num_servers'] ) ) {
 			$auth_settings['cas_num_servers'] = 1;
 		}
+
+		// If this is a CAS login attempt and the id param is missing, default
+		// it to 1.
+		if ( ! empty( $_GET['external'] ) && 'cas' === $_GET['external'] && empty( $_GET['id'] ) ) {
+			$_GET['id'] = 1;
+		}
+
 		// phpcs:ignore WordPress.Security.NonceVerification
 		if ( empty( $_GET['external'] ) || 'cas' !== $_GET['external'] || empty( $_GET['id'] ) || ! in_array( intval( $_GET['id'] ), range( 1, 10 ), true ) || intval( $_GET['id'] ) > intval( $auth_settings['cas_num_servers'] ) ) {
 			return null;
 		}
+
 		// Get the CAS server id (since multiple CAS servers can be configured), and
 		// the relevant CAS settings for that server.
 		// phpcs:ignore WordPress.Security.NonceVerification
