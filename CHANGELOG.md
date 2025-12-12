@@ -1,5 +1,9 @@
 # Changelog
 
+= 3.13.2 =
+* Fix php warnings about new OIDC settings if settings have not been saved after updating to version 3.13.x.
+* Allow hiding WordPress logins if only an OAuth2 server is configured.
+
 = 3.13.1 =
 * Hotfix for some CAS logins no longer working after the latest update.
 
