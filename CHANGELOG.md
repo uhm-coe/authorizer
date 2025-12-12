@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.13.1 =
+* Hotfix for some CAS logins no longer working after the latest update.
+
 = 3.13.0 =
 * Released Thu Dec 11, 2025.
 * Add ability to authenticate via OIDC servers. Props lc-sam for the [pull request](https://github.com/uhm-coe/authorizer/pull/180/)!

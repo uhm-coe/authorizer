@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.13.0
+Stable tag: 3.13.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.13.1 =
+* Hotfix for some CAS logins no longer working after the latest update.
 
 = 3.13.0 =
 * Released Thu Dec 11, 2025.
