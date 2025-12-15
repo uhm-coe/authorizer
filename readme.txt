@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.13.2
+Stable tag: 3.13.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,10 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.13.3 =
+* Fix Google logins on hosts with nonstandard PHP session configuration. Props oskarasriauba for the [report](https://github.com/uhm-coe/authorizer/issues/186)!
+* Update French translations. Props @julienlusson!
 
 = 3.13.2 =
 * Fix php warnings about new OIDC settings if settings have not been saved after updating to version 3.13.x.

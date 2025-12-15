@@ -1,5 +1,9 @@
 # Changelog
 
+= 3.13.3 =
+* Fix Google logins on hosts with nonstandard PHP session configuration. Props oskarasriauba for the [report](https://github.com/uhm-coe/authorizer/issues/186)!
+* Update French translations. Props @julienlusson!
+
 = 3.13.2 =
 * Fix php warnings about new OIDC settings if settings have not been saved after updating to version 3.13.x.
 * Allow hiding WordPress logins if only an OAuth2 server is configured.
