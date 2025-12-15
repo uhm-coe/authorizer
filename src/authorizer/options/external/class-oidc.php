@@ -561,7 +561,7 @@ class Oidc extends \Authorizer\Singleton {
 	 * in WordPress).
 	 */
 	public function maybe_unset_oidc_session_vars() {
-		if ( PHP_SESSION_NONE !== session_status() ) {
+		if ( PHP_SESSION_ACTIVE === session_status() ) {
 			unset( $_SESSION['oidc_server_id'] );
 			unset( $_SESSION['oidc_redirect_to'] );
 		}

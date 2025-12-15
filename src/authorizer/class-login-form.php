@@ -540,7 +540,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			// Skip auto-login if session flag is set (set during OIDC logout).
 			// This prevents auto-login after logout redirect, regardless of where IDP redirects to.
 			// Only check if auto-login would otherwise be triggered (avoids unnecessary session starts).
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			if ( ! empty( $_SESSION['oidc_logged_out'] ) ) {

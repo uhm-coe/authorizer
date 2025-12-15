@@ -340,7 +340,7 @@ class Authentication extends Singleton {
 		// authentication succeeds but user verification fails.
 		// Note: oidc_redirect_to is preserved here and cleaned up later in
 		// maybe_redirect_after_oidc_login() after it's used for the login redirect.
-		if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
+		if ( 'oidc' === $authenticated_by && PHP_SESSION_ACTIVE === session_status() ) {
 			unset( $_SESSION['oidc_server_id'] );
 		}
 
@@ -355,7 +355,7 @@ class Authentication extends Singleton {
 		// Fail with message if there was an error creating/adding the user.
 		if ( is_wp_error( $check_user_access_result ) || 0 === $check_user_access_result ) {
 			// Clean up oidc_redirect_to if access check fails (redirect filter won't run).
-			if ( 'oidc' === $authenticated_by && PHP_SESSION_NONE !== session_status() ) {
+			if ( 'oidc' === $authenticated_by && PHP_SESSION_ACTIVE === session_status() ) {
 				unset( $_SESSION['oidc_redirect_to'] );
 			}
 
@@ -415,7 +415,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OAuth2 server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -507,7 +507,7 @@ class Authentication extends Singleton {
 		// Authenticate with GitHub.
 		// See: https://github.com/thephpleague/oauth2-github.
 		if ( 'github' === $oauth2_provider ) {
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			$provider = new \League\OAuth2\Client\Provider\Github( array(
@@ -592,7 +592,7 @@ class Authentication extends Singleton {
 		} elseif ( 'azure' === $oauth2_provider ) {
 			// Authenticate with the Microsoft Azure oauth2 client.
 			// See: https://github.com/thenetworg/oauth2-azure.
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			try {
@@ -736,7 +736,7 @@ class Authentication extends Singleton {
 				return null;
 			}
 
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			// Save the redirect URL for WordPress so we can restore it after a
@@ -962,7 +962,7 @@ class Authentication extends Singleton {
 		if ( empty( $_GET['external'] ) && ! empty( $_GET['code'] ) && ! empty( $_GET['state'] ) ) {
 			// Fetch the OIDC server id from the session variable created during the
 			// initial request.
-			if ( PHP_SESSION_NONE === session_status() ) {
+			if ( PHP_SESSION_ACTIVE !== session_status() ) {
 				session_start();
 			}
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput
@@ -1051,7 +1051,7 @@ class Authentication extends Singleton {
 		}
 
 		// Start session for state/nonce/PKCE storage.
-		if ( PHP_SESSION_NONE === session_status() ) {
+		if ( PHP_SESSION_ACTIVE !== session_status() ) {
 			session_start();
 		}
 
@@ -1249,10 +1249,10 @@ class Authentication extends Singleton {
 		}
 
 		// Get one time use token.
-		if ( PHP_SESSION_NONE === session_status() ) {
+		if ( PHP_SESSION_ACTIVE !== session_status() ) {
 			session_start();
 		}
-		$token = array_key_exists( 'token', $_SESSION ) ? $_SESSION['token'] : null;
+		$token = empty( $_SESSION['token'] ) ? null : $_SESSION['token'];
 
 		// No token, so this is not a succesful Google login.
 		if ( empty( $token ) ) {
@@ -2040,7 +2040,7 @@ class Authentication extends Singleton {
 
 		// If logged in to CAS, Log out of CAS.
 		if ( 'cas' === self::$authenticated_by && '1' === $auth_settings['cas'] ) {
-			if ( ! array_key_exists( 'PHPCAS_CLIENT', $GLOBALS ) || ! array_key_exists( 'phpCAS', $_SESSION ) ) {
+			if ( empty( $GLOBALS['PHPCAS_CLIENT'] ) || empty( $_SESSION['phpCAS'] ) ) {
 
 				/**
 				 * Get the CAS server protocol version (default to SAML 1.1).
@@ -2080,10 +2080,10 @@ class Authentication extends Singleton {
 		}
 
 		// If session token set, log out of Google.
-		if ( PHP_SESSION_NONE === session_status() ) {
+		if ( PHP_SESSION_ACTIVE !== session_status() ) {
 			session_start();
 		}
-		if ( 'google' === self::$authenticated_by && array_key_exists( 'token', $_SESSION ) ) {
+		if ( 'google' === self::$authenticated_by && ! empty( $_SESSION['token'] ) ) {
 			$token = $_SESSION['token'];
 
 			// Fetch the Google Client ID (allow overrides from filter or constant).
@@ -2192,7 +2192,7 @@ class Authentication extends Singleton {
 					// of where the IDP redirects back to (wp-login.php, wp-admin, /, etc.).
 					// Only needed if auto-login is enabled; if disabled, there's no auto-login to prevent.
 					if ( ! empty( $auth_settings['oidc_auto_login'] ) && in_array( intval( $auth_settings['oidc_auto_login'] ), range( 1, 20 ), true ) ) {
-						if ( PHP_SESSION_NONE === session_status() ) {
+						if ( PHP_SESSION_ACTIVE !== session_status() ) {
 							session_start();
 						}
 						$_SESSION['oidc_logged_out'] = true;
