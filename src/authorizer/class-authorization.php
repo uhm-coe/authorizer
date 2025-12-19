@@ -657,7 +657,7 @@ class Authorization extends Singleton {
 		 */
 		if ( apply_filters( 'authorizer_has_access', $has_access, $wp ) === true ) {
 			// Turn off the public notice about browsing anonymously.
-			update_option( 'auth_settings_advanced_public_notice', false );
+			update_option( 'auth_settings_advanced_public_notice', false, true );
 
 			// We've determined that the current user has access, so simply return to grant access.
 			return $wp;
@@ -692,9 +692,9 @@ class Authorization extends Singleton {
 		}
 		if ( in_array( strval( $current_page_id ), $auth_settings['access_public_pages'], true ) ) {
 			if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
-				update_option( 'auth_settings_advanced_public_notice', false );
+				update_option( 'auth_settings_advanced_public_notice', false, true );
 			} else {
-				update_option( 'auth_settings_advanced_public_notice', true );
+				update_option( 'auth_settings_advanced_public_notice', true, true );
 			}
 			return $wp;
 		}
@@ -704,9 +704,9 @@ class Authorization extends Singleton {
 		foreach ( $current_page_categories as $current_page_category ) {
 			if ( in_array( 'cat_' . $current_page_category, $auth_settings['access_public_pages'], true ) ) {
 				if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
-					update_option( 'auth_settings_advanced_public_notice', false );
+					update_option( 'auth_settings_advanced_public_notice', false, true );
 				} else {
-					update_option( 'auth_settings_advanced_public_notice', true );
+					update_option( 'auth_settings_advanced_public_notice', true, true );
 				}
 				return $wp;
 			}
@@ -716,9 +716,9 @@ class Authorization extends Singleton {
 		if ( strlen( $current_page_id ) < 1 ) {
 			if ( in_array( 'auth_public_404', $auth_settings['access_public_pages'], true ) ) {
 				if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
-					update_option( 'auth_settings_advanced_public_notice', false );
+					update_option( 'auth_settings_advanced_public_notice', false, true );
 				} else {
-					update_option( 'auth_settings_advanced_public_notice', true );
+					update_option( 'auth_settings_advanced_public_notice', true, true );
 				}
 				return $wp;
 			}
@@ -731,9 +731,9 @@ class Authorization extends Singleton {
 			$current_category_name        = end( $current_category_name_pieces );
 			if ( in_array( 'cat_' . $current_category_name, $auth_settings['access_public_pages'], true ) ) {
 				if ( 'no_warning' === $auth_settings['access_public_warning'] ) {
-					update_option( 'auth_settings_advanced_public_notice', false );
+					update_option( 'auth_settings_advanced_public_notice', false, true );
 				} else {
-					update_option( 'auth_settings_advanced_public_notice', true );
+					update_option( 'auth_settings_advanced_public_notice', true, true );
 				}
 				return $wp;
 			}

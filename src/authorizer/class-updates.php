@@ -48,17 +48,17 @@ class Updates extends Singleton {
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_pending', $auth_settings ) ) {
 				update_option( 'auth_settings_access_users_pending', $auth_settings['access_users_pending'], false );
 				unset( $auth_settings['access_users_pending'] );
-				update_option( 'auth_settings', $auth_settings );
+				update_option( 'auth_settings', $auth_settings, true );
 			}
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_approved', $auth_settings ) ) {
 				update_option( 'auth_settings_access_users_approved', $auth_settings['access_users_approved'], false );
 				unset( $auth_settings['access_users_approved'] );
-				update_option( 'auth_settings', $auth_settings );
+				update_option( 'auth_settings', $auth_settings, true );
 			}
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_blocked', $auth_settings ) ) {
 				update_option( 'auth_settings_access_users_blocked', $auth_settings['access_users_blocked'], false );
 				unset( $auth_settings['access_users_blocked'] );
-				update_option( 'auth_settings', $auth_settings );
+				update_option( 'auth_settings', $auth_settings, true );
 			}
 			// Copy multisite user lists to new options (if they exist).
 			if ( is_multisite() ) {
@@ -134,7 +134,7 @@ class Updates extends Singleton {
 				if ( array_key_exists( 'ldap_password', $auth_settings ) && strlen( $auth_settings['ldap_password'] ) > 0 ) {
 					$plaintext_ldap_password        = Helper::decrypt( $auth_settings['ldap_password'], 'mcrypt' );
 					$auth_settings['ldap_password'] = Helper::encrypt( $plaintext_ldap_password );
-					update_option( 'auth_settings', $auth_settings );
+					update_option( 'auth_settings', $auth_settings, true );
 				}
 			}
 			// Update version to reflect this change has been made.
@@ -438,7 +438,7 @@ class Updates extends Singleton {
 				$auth_settings = get_option( 'auth_settings', array() );
 				if ( array_key_exists( 'ldap_test_pass', $auth_settings ) && strlen( $auth_settings['ldap_test_pass'] ) > 0 ) {
 					unset( $auth_settings['ldap_test_pass'] );
-					update_option( 'auth_settings', $auth_settings );
+					update_option( 'auth_settings', $auth_settings, true );
 				}
 			}
 			// Update version to reflect this change has been made.
@@ -550,7 +550,7 @@ class Updates extends Singleton {
 			if ( is_multisite() ) {
 				update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version', $auth_version );
 			} else {
-				update_option( 'auth_version', $auth_version );
+				update_option( 'auth_version', $auth_version, true );
 			}
 		}
 	}
