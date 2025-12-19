@@ -54,11 +54,8 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Modify the log in URL (if applicable options are set).
 		add_filter( 'login_url', array( Login_Form::get_instance(), 'maybe_add_external_wordpress_to_log_in_links' ) );
 
-		// If we have a custom login error, add the filter to show it.
-		$error = get_option( 'auth_settings_advanced_login_error' );
-		if ( $error && strlen( $error ) > 0 ) {
-			add_filter( 'login_errors', array( Login_Form::get_instance(), 'show_advanced_login_error' ) );
-		}
+		// If we have a custom login error, show it.
+		add_filter( 'login_errors', array( Login_Form::get_instance(), 'show_advanced_login_error' ) );
 
 		// Redirect to wp-login.php?redirect_to=? destination after an OAuth2 login.
 		add_filter( 'login_redirect', array( Options\External\OAuth2::get_instance(), 'maybe_redirect_after_oauth2_login' ), 10, 2 );
@@ -162,12 +159,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Hint: For Multisite Network Admin Dashboard use wp_network_dashboard_setup instead of wp_dashboard_setup.
 		add_action( 'wp_dashboard_setup', array( Dashboard_Widget::get_instance(), 'add_dashboard_widgets' ) );
 
-		// If we have a custom admin message, add the action to show it.
-		$notice = get_option( 'auth_settings_advanced_admin_notice' );
-		if ( $notice && strlen( $notice ) > 0 ) {
-			add_action( 'admin_notices', array( Admin_Page::get_instance(), 'show_advanced_admin_notice' ) );
-			add_action( 'network_admin_notices', array( Admin_Page::get_instance(), 'show_advanced_admin_notice' ) );
-		}
+		// If we have a custom admin message, render it.
+		add_action( 'admin_notices', array( Admin_Page::get_instance(), 'show_advanced_admin_notice' ) );
+		add_action( 'network_admin_notices', array( Admin_Page::get_instance(), 'show_advanced_admin_notice' ) );
 
 		// Add [authorizer_login_form] shortcode to render the login form.
 		add_shortcode( 'authorizer_login_form', array( Login_Form::get_instance(), 'shortcode_authorizer_login_form' ) );

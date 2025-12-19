@@ -276,9 +276,9 @@ class Admin_Page extends Singleton {
 	 */
 	public function show_advanced_admin_notice() {
 		$notice = get_option( 'auth_settings_advanced_admin_notice' );
-		delete_option( 'auth_settings_advanced_admin_notice' );
 
 		if ( $notice && strlen( $notice ) > 0 ) {
+			delete_option( 'auth_settings_advanced_admin_notice' );
 			?>
 			<div class="error">
 				<p><?php echo wp_kses( $notice, Helper::$allowed_html ); ?></p>

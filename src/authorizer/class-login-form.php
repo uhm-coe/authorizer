@@ -733,8 +733,11 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 	 */
 	public function show_advanced_login_error( $errors ) {
 		$error = get_option( 'auth_settings_advanced_login_error' );
-		delete_option( 'auth_settings_advanced_login_error' );
-		$errors = '    ' . $error . "<br />\n";
+		if ( $error && strlen( $error ) > 0 ) {
+			delete_option( 'auth_settings_advanced_login_error' );
+			$errors = '    ' . $error . "<br />\n";
+		}
+
 		return $errors;
 	}
 
