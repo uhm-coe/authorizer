@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.13.3
+Stable tag: 3.13.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,10 @@ WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.or
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.13.4 =
+* Performance: only autoload plugin options used on every page. The change will take effect the next time the specific option is updated (e.g., the list of Approved Users). Props @raalknz for the [suggestion](https://wordpress.org/support/topic/should-i-keep-authorizers-options-autoloaded/)!
+* Update composer dependencies: phpseclib/phpseclib (3.0.47 => 3.0.48).
 
 = 3.13.3 =
 * Fix Google logins on hosts with nonstandard PHP session configuration. Props oskarasriauba for the [report](https://github.com/uhm-coe/authorizer/issues/186)!

@@ -1,5 +1,9 @@
 # Changelog
 
+= 3.13.4 =
+* Performance: only autoload plugin options used on every page. The change will take effect the next time the specific option is updated (e.g., the list of Approved Users). Props @raalknz for the [suggestion](https://wordpress.org/support/topic/should-i-keep-authorizers-options-autoloaded/)!
+* Update composer dependencies: phpseclib/phpseclib (3.0.47 => 3.0.48).
+
 = 3.13.3 =
 * Fix Google logins on hosts with nonstandard PHP session configuration. Props oskarasriauba for the [report](https://github.com/uhm-coe/authorizer/issues/186)!
 * Update French translations. Props @julienlusson!
