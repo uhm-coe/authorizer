@@ -116,7 +116,7 @@ class Authorization extends Singleton {
 							'date_added' => wp_date( 'M Y' ),
 						)
 					);
-					update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+					update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked, false );
 				}
 
 				// If the blocked external user has a WordPress account, mark it as
@@ -153,7 +153,7 @@ class Authorization extends Singleton {
 					'<a class="button" href="' . wp_logout_url( $redirect_to ) . '">' .
 					__( 'Back', 'authorizer' ) .
 					'</a></p>';
-				update_option( 'auth_settings_advanced_login_error', $error_message );
+				update_option( 'auth_settings_advanced_login_error', $error_message, false );
 				wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 				return new \WP_Error( 'invalid_login', __( 'Invalid login attempted.', 'authorizer' ) );
 			}
@@ -234,7 +234,7 @@ class Authorization extends Singleton {
 					foreach ( $auth_settings_access_users_pending as $key => $pending_user ) {
 						if ( 0 === strcasecmp( $pending_user['email'], $user_email ) ) {
 							unset( $auth_settings_access_users_pending[ $key ] );
-							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
 							break;
 						}
 					}
@@ -248,7 +248,7 @@ class Authorization extends Singleton {
 				);
 				array_push( $auth_settings_access_users_approved, $approved_user );
 				array_push( $auth_settings_access_users_approved_single, $approved_user );
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single, false );
 			}
 
 			// Check our externally authenticated user against the approved
@@ -270,7 +270,7 @@ class Authorization extends Singleton {
 						if ( $user_info['email'] === $auth_settings_access_user_approved_single['email'] ) {
 							if ( $auth_settings_access_users_approved_single[ $index ]['role'] !== $approved_role ) {
 								$auth_settings_access_users_approved_single[ $index ]['role'] = $approved_role;
-								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single );
+								update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved_single, false );
 							}
 							break;
 						}
@@ -507,7 +507,7 @@ class Authorization extends Singleton {
 					$pending_user['role']       = $approved_role;
 					$pending_user['date_added'] = '';
 					array_push( $auth_settings_access_users_pending, $pending_user );
-					update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+					update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
 
 					// Create strings used in the email notification.
 					$site_name              = get_bloginfo( 'name' );
@@ -595,7 +595,7 @@ class Authorization extends Singleton {
 					'<a class="button" href="' . wp_logout_url( $redirect_to ) . $external_param . '">' .
 					__( 'Back', 'authorizer' ) .
 					'</a></p>';
-				update_option( 'auth_settings_advanced_login_error', $error_message );
+				update_option( 'auth_settings_advanced_login_error', $error_message, false );
 				wp_die( wp_kses( $error_message, Helper::$allowed_html ), esc_html( $page_title ) );
 			}
 		}

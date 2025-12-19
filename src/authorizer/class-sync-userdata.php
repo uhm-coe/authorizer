@@ -65,8 +65,8 @@ class Sync_Userdata extends Singleton {
 			}
 		}
 		if ( $updated ) {
-			update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 		}
 	}
 
@@ -156,7 +156,7 @@ class Sync_Userdata extends Singleton {
 			'email' => $email,
 			'time'  => time(),
 		);
-		update_option( 'auth_settings_recently_sent_emails', $recently_sent_emails );
+		update_option( 'auth_settings_recently_sent_emails', $recently_sent_emails, false );
 
 		// Get welcome email subject and body text.
 		$subject = $options->get( 'access_email_approved_users_subject' );
@@ -263,7 +263,7 @@ class Sync_Userdata extends Singleton {
 				}
 			}
 			if ( $changed ) {
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 			}
 		}
 	}
@@ -352,7 +352,7 @@ class Sync_Userdata extends Singleton {
 					unset( $auth_settings_access_users_approved[ $key ] );
 				}
 			}
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 		}
 
 		// We're hooking into this filter merely for its location in the codebase,
@@ -386,7 +386,7 @@ class Sync_Userdata extends Singleton {
 				}
 			}
 			if ( $list_changed ) {
-				update_option( 'auth_settings_' . $list_name, $user_list );
+				update_option( 'auth_settings_' . $list_name, $user_list, false );
 			}
 		}
 	}
@@ -489,7 +489,7 @@ class Sync_Userdata extends Singleton {
 				'local_user' => true,
 			);
 			array_push( $auth_settings_access_users_approved, $approved_user );
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 		}
 
 		// Restore original blog.
@@ -634,8 +634,8 @@ class Sync_Userdata extends Singleton {
 		}
 
 		if ( $updated ) {
-			update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
-			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+			update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
+			update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 		}
 	}
 

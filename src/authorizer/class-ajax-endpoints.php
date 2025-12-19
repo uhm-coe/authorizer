@@ -540,7 +540,7 @@ class Ajax_Endpoints extends Singleton {
 				}
 			}
 			if ( $should_update_auth_settings_access_users_approved ) {
-				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+				update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 			}
 		} elseif ( strpos( $meta_key, 'acf___' ) === 0 && class_exists( 'acf' ) ) {
 			// Update user's usermeta value for usermeta key stored in authorizer options.
@@ -608,7 +608,7 @@ class Ajax_Endpoints extends Singleton {
 							$options->get( 'access_users_pending', Helper::SINGLE_CONTEXT )
 						);
 						array_push( $auth_settings_access_users_pending, $pending_user );
-						update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+						update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
 					}
 				} elseif ( 'remove' === $pending_user['edit_action'] ) {
 
@@ -617,7 +617,7 @@ class Ajax_Endpoints extends Singleton {
 					foreach ( $auth_settings_access_users_pending as $key => $existing_user ) {
 						if ( 0 === strcasecmp( $pending_user['email'], $existing_user['email'] ) ) {
 							unset( $auth_settings_access_users_pending[ $key ] );
-							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
+							update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
 							break;
 						}
 					}
@@ -715,7 +715,7 @@ class Ajax_Endpoints extends Singleton {
 						);
 						$approved_user['date_added']         = wp_date( 'M Y' );
 						array_push( $auth_settings_access_users_approved, $approved_user );
-						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 						// Edge case: if added user already exists in WordPress, make sure
 						// their role matches the one just set here when adding to the
 						// approved list. Note: this will also trigger a redundant role
@@ -785,7 +785,7 @@ class Ajax_Endpoints extends Singleton {
 									// approved list in the set_user_role action above. Remove
 									// them from the Approved Users list here.
 									unset( $auth_settings_access_users_approved[ $key ] );
-									update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+									update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 								}
 								break;
 							}
@@ -834,7 +834,7 @@ class Ajax_Endpoints extends Singleton {
 									break;
 								}
 							}
-							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+							update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 						}
 					}
 				}
@@ -874,7 +874,7 @@ class Ajax_Endpoints extends Singleton {
 						);
 						$blocked_user['date_added']         = wp_date( 'M Y' );
 						array_push( $auth_settings_access_users_blocked, $blocked_user );
-						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+						update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked, false );
 					} else {
 						$invalid_emails[] = $blocked_user['email'];
 					}
@@ -891,7 +891,7 @@ class Ajax_Endpoints extends Singleton {
 					foreach ( $auth_settings_access_users_blocked as $key => $existing_user ) {
 						if ( 0 === strcasecmp( $blocked_user['email'], $existing_user['email'] ) ) {
 							unset( $auth_settings_access_users_blocked[ $key ] );
-							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+							update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked, false );
 							break;
 						}
 					}

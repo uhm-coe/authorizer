@@ -839,9 +839,9 @@ class Options extends Singleton {
 
 		// Save default options to database.
 		update_option( 'auth_settings', $auth_settings );
-		update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending );
-		update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
-		update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked );
+		update_option( 'auth_settings_access_users_pending', $auth_settings_access_users_pending, false );
+		update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
+		update_option( 'auth_settings_access_users_blocked', $auth_settings_access_users_blocked, false );
 
 		// Multisite defaults.
 		if ( is_multisite() && $args['set_multisite_options'] ) {

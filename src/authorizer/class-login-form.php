@@ -611,8 +611,8 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_time_last_failed', time() );
 			update_user_meta( $user->ID, 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
 		} else {
-			update_option( 'auth_settings_advanced_lockouts_time_last_failed', time() );
-			update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1 );
+			update_option( 'auth_settings_advanced_lockouts_time_last_failed', time(), false );
+			update_option( 'auth_settings_advanced_lockouts_failed_attempts', $num_attempts + 1, false );
 		}
 
 		// Log a lockout if we hit the configured limit (via Simple History plugin).

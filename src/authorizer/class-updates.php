@@ -46,17 +46,17 @@ class Updates extends Singleton {
 			// Copy single site user lists to new options (if they exist).
 			$auth_settings = get_option( 'auth_settings' );
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_pending', $auth_settings ) ) {
-				update_option( 'auth_settings_access_users_pending', $auth_settings['access_users_pending'] );
+				update_option( 'auth_settings_access_users_pending', $auth_settings['access_users_pending'], false );
 				unset( $auth_settings['access_users_pending'] );
 				update_option( 'auth_settings', $auth_settings );
 			}
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_approved', $auth_settings ) ) {
-				update_option( 'auth_settings_access_users_approved', $auth_settings['access_users_approved'] );
+				update_option( 'auth_settings_access_users_approved', $auth_settings['access_users_approved'], false );
 				unset( $auth_settings['access_users_approved'] );
 				update_option( 'auth_settings', $auth_settings );
 			}
 			if ( is_array( $auth_settings ) && array_key_exists( 'access_users_blocked', $auth_settings ) ) {
-				update_option( 'auth_settings_access_users_blocked', $auth_settings['access_users_blocked'] );
+				update_option( 'auth_settings_access_users_blocked', $auth_settings['access_users_blocked'], false );
 				unset( $auth_settings['access_users_blocked'] );
 				update_option( 'auth_settings', $auth_settings );
 			}
@@ -222,7 +222,7 @@ class Updates extends Singleton {
 						}
 					}
 					if ( $should_update ) {
-						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved );
+						update_option( 'auth_settings_access_users_approved', $auth_settings_access_users_approved, false );
 					}
 				}
 			}
