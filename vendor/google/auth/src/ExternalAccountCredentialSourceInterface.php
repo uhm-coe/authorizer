@@ -1,6 +1,6 @@
 <?php
-/*
- * Copyright 2014 Google Inc.
+/**
+ * Copyright 2023 Google Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,20 +15,10 @@
  * limitations under the License.
  */
 
-function oauth2client_php_autoload($className)
-{
-    $classPath = explode('_', $className);
-    if ($classPath[0] != 'Google') {
-        return;
-    }
-    if (count($classPath) > 3) {
-        // Maximum class file path depth in this project is 3.
-        $classPath = array_slice($classPath, 0, 3);
-    }
-    $filePath = dirname(__FILE__) . '/src/' . implode('/', $classPath) . '.php';
-    if (file_exists($filePath)) {
-        require_once $filePath;
-    }
-}
+namespace Google\Auth;
 
-spl_autoload_register('oauth2client_php_autoload');
+interface ExternalAccountCredentialSourceInterface
+{
+    public function fetchSubjectToken(?callable $httpHandler = null): string;
+    public function getCacheKey(): ?string;
+}

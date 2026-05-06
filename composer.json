@@ -4,12 +4,12 @@
     "homepage": "https://github.com/uhm-coe/authorizer",
     "type": "project",
     "require": {
-        "apereo/phpcas": "^1.3",
-        "google/apiclient": "^2.7",
+        "apereo/phpcas": "^1.6",
+        "google/apiclient": "^2.19",
         "jumbojett/openid-connect-php": "^1.0",
-        "league/oauth2-client": "^2.6",
+        "league/oauth2-client": "^2.9",
         "league/oauth2-github": "^2.0",
-        "thenetworg/oauth2-azure": "^2.0"
+        "thenetworg/oauth2-azure": "^2.2"
     },
     "license": "GPL-2.0-or-later",
     "authors": [
