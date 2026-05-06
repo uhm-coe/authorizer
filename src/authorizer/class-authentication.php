@@ -2030,7 +2030,7 @@ class Authentication extends Singleton {
 	 *
 	 * @return void
 	 */
-	public function custom_logout( $user_id ) {
+	public function custom_logout( $user_id = 0 ) {
 		// Grab plugin settings.
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
