@@ -45,7 +45,7 @@ The [University of Hawai'i][http://hawaii.edu/], which provides authentication f
 
 = Need a tutorial on how to set up Keycloak as an OAuth2 server to integrate with Authorizer?
 
-WordPress user @2brx2b has contributed a helpful one here: [https://wordpress.org/support/topic/tutorial-for-authorizer-keycloak/](https://wordpress.org/support/topic/tutorial-for-authorizer-keycloak/).
+WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz/2025/10/05/wordpress-sso-keycloak-authorizer/](https://codegito.xyz/2025/10/05/wordpress-sso-keycloak-authorizer/).
 
 == Screenshots ==
 
