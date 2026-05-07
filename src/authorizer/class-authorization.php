@@ -298,11 +298,9 @@ class Authorization extends Singleton {
 					}
 					// If there's already a user with this username (e.g.,
 					// johndoe/johndoe@gmail.com exists, and we're trying to add
-					// johndoe/johndoe@example.com), use the full email address
-					// as the username.
-					if ( get_user_by( 'login', $username ) !== false ) {
-						$username = $user_info['email'];
-					}
+					// johndoe/johndoe@example.com), try appending digits to the end until
+					// a free username is found (e.g., johndoe2).
+					$username = Helper::ensure_unique_username( $username );
 					$result = wp_insert_user(
 						array(
 							'user_login'      => strtolower( $username ),

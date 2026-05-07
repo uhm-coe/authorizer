@@ -539,4 +539,48 @@ class Helper {
 
 		return "$scheme$user$pass$host$port$path$query$fragment";
 	}
+
+	/**
+	 * Returns the unmodified username if no existing WordPress users already use
+	 * it; otherwise, append a digit to the end until a free username is found. If
+	 * username[2-9] all exist, fall back to a UUID (v4).
+	 *
+	 * @param string $username Username to ensure is not yet used.
+	 *
+	 * @return string Username not already in use.
+	 */
+	public static function ensure_unique_username( $username = '' ) {
+		if ( empty( $username ) ) {
+			$username = uniqid( 'user' );
+		}
+
+		$index = 2;
+		while ( get_user_by( 'login', $username ) !== false ) {
+			// Short circuit if we've tried appending 2-9 and still haven't found a
+			// free username. Use a UUID in that (unlikely) case.
+			if ( $index > 9 ) {
+				$username = self::get_uuid();
+				break;
+			}
+
+			$username = $username . strval( $index++ );
+		}
+
+		return $username;
+	}
+
+	/**
+	 * Create a unique UUID (version 4).
+	 *
+	 * @return string UUID.
+	 */
+	public static function get_uuid() {
+		$uuid = random_bytes( 16 );
+		// Set UUID version to 4.
+		$uuid[6] = chr( ord( $uuid[6] ) & 0x0f | 0x04 );
+		// Set to variant 1.
+		$uuid[8] = chr( ord( $uuid[8] ) & 0x3f | 0x80 );
+
+		return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $uuid ), 4 ) );
+	}
 }

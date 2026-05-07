@@ -661,13 +661,11 @@ class Ajax_Endpoints extends Singleton {
 						$plaintext_password = wp_generate_password(); // random password
 						// If there's already a user with this username (e.g.,
 						// johndoe/johndoe@gmail.com exists, and we're trying to add
-						// johndoe/johndoe@example.com), use the full email address
-						// as the username.
+						// johndoe/johndoe@example.com), try appending digits to the end
+						// until a free username is found (e.g., johndoe2).
 						$username = explode( '@', $approved_user['email'] );
 						$username = $username[0];
-						if ( get_user_by( 'login', $username ) !== false ) {
-							$username = Helper::lowercase( $approved_user['email'] );
-						}
+						$username = Helper::ensure_unique_username( $username );
 						if ( 'false' !== $approved_user['multisite_user'] ) {
 							$result = wpmu_create_user(
 								strtolower( $username ),
