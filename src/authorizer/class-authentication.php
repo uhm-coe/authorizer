@@ -1634,8 +1634,14 @@ class Authentication extends Singleton {
 			$domain = preg_match( '/[^.]*\.[^.]*$/', $ldap_hosts[0], $matches ) === 1 ? $matches[0] : '';
 		}
 
-		// remove @domain if it exists in the username (i.e., if user entered their email).
-		$username = str_replace( '@' . $domain, '', $username );
+		// Remove @domain if it exists in the username (i.e., if user entered their
+		// email) only if the "LDAP attribute containing email address" is set to
+		// an @domain value, indicating no email addresses are available in LDAP,
+		// and we should look up LDAP "username" if the user entered username or
+		// username@domain in the login form.
+		if ( str_starts_with( $auth_settings['ldap_attr_email'], '@' ) ) {
+			$username = str_replace( '@' . $domain, '', $username );
+		}
 
 		// Fail silently (fall back to WordPress authentication) if both username
 		// and password are empty (this will be the case when visiting wp-login.php
