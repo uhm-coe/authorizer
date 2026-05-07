@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 6.9
-Stable tag: 3.13.4
+Stable tag: 3.14.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,14 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.14.0 =
+* Fix error on Google and OAuth2 logins from an unsupported domain (when configured to only allow specific domain(s) to log in). Props dbnschools for the [bug report](https://github.com/uhm-coe/authorizer/issues/193)!
+* Drop support for PHP 7.2, 7.4, and 8.0. PHP 8.1 or higher is now required (due to dependency requirements).
+* Update composer dependency: phpseclib/phpseclib (3.0.48 => 3.0.52) (security).
+* Update composer dependencies: apereo/phpcas (1.6.1 => 1.6.2); thenetworg/oauth2-azure (2.2.2 => 2.2.5); firebase/php-jwt (v6.4.0 => v7.0.5); google/apiclient (v2.14.0 => v2.19.3); google/apiclient-services (v0.302.0 => v0.440.0); google/auth (v1.26.0 => v1.50.1); guzzlehttp/psr7 (2.8.0 => 2.9.0); monolog/monolog (2.10.0 => 3.10.0); paragonie/constant_time_encoding (v2.8.2 => v3.1.3); psr/cache (1.0.1 => 3.0.0); psr/http-message (1.1 => 2.0); psr/log (1.1.4 => 3.0.2); symfony/deprecation-contracts (v2.5.4 => v3.7.0).
+* Avoid using emails as usernames as a fallback when creating a user with a username that already exists. Prefer appending a digit (2-9) after the username, and fall back to a UUID (v4) if username[2-9] all already exist.
+* Allow LDAP logins using email address (as an alternative to username) if the "LDAP attribute containing email address" config option is set.
 
 = 3.13.4 =
 * Performance: only autoload plugin options used on every page. The change will take effect the next time the specific option is updated (e.g., the list of Approved Users). Props @raalknz for the [suggestion](https://wordpress.org/support/topic/should-i-keep-authorizers-options-autoloaded/)!
