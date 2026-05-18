@@ -1,5 +1,6 @@
 #loginform .button-external {
 	font-size: 18px;
+	line-height: 2;
 	height: 50px;
 	margin: 0 0 20px 0;
 	padding-top: 7px;
@@ -8,6 +9,7 @@
 }
 #loginform .button-external .dashicons {
 	font-size: 32px;
+	line-height: 1;
 }
 #loginform .button-external .label {
 	padding-left: 20px;
