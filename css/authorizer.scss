@@ -3,7 +3,7 @@
 
 // Import WordPress 5.7 admin colors.
 // See: https://make.wordpress.org/core/2021/02/23/standardization-of-wp-admin-colors-in-wordpress-5-7/
-@import 'wp-admin-colors';
+@use 'wp-admin-colors';
 
 // Target just the Dashboard > Authorizer, and Network Dashboard > Authorizer.
 .toplevel_page_authorizer,
@@ -203,11 +203,11 @@
 	table.form-table {
 		tr {
 			&.border-top {
-				border-top: 3px solid $color-gray-5;
+				border-top: 3px solid wp-admin-colors.$color-gray-5;
 			}
 
 			&.border-top-small {
-				border-top: 1px solid $color-gray-5;
+				border-top: 1px solid wp-admin-colors.$color-gray-5;
 			}
 		}
 	}
@@ -332,20 +332,20 @@
 	// Colors for user lists.
 	#list_auth_settings_access_users_pending {
 		.auth-email {
-			background-color: $color-yellow-5;
-			border-color: $color-yellow-20;
+			background-color: wp-admin-colors.$color-yellow-5;
+			border-color: wp-admin-colors.$color-yellow-20;
 		}
 	}
 	#list_auth_settings_access_users_approved {
 		.auth-email {
-			background-color: $color-green-5;
-			border-color: $color-green-20;
+			background-color: wp-admin-colors.$color-green-5;
+			border-color: wp-admin-colors.$color-green-20;
 		}
 	}
 	#list_auth_settings_access_users_blocked {
 		.auth-email {
-			background-color: $color-red-5;
-			border-color: $color-red-20;
+			background-color: wp-admin-colors.$color-red-5;
+			border-color: wp-admin-colors.$color-red-20;
 		}
 	}
 
@@ -377,8 +377,8 @@
 	}
 	.auth_multisite_override_overlay {
 		.overlay-note {
-			background: $color-white;
-			border: 1px solid $color-gray-30;
+			background: wp-admin-colors.$color-white;
+			border: 1px solid wp-admin-colors.$color-gray-30;
 			cursor: default;
 			margin: 0 15em;
 			opacity: 0;
