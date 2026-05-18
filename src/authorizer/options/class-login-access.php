@@ -20,7 +20,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_section_info_access_login( $args = '' ) {
@@ -36,7 +36,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_radio_auth_access_who_can_login( $args = '' ) {
@@ -77,7 +77,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_select_auth_access_role_receive_pending_emails( $args = '' ) {
@@ -99,7 +99,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_select_auth_access_users_receive_pending_emails( $args = '' ) {
@@ -123,7 +123,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_wysiwyg_auth_access_pending_redirect_to_message( $args = '' ) {
@@ -185,7 +185,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_wysiwyg_auth_access_blocked_redirect_to_message( $args = '' ) {
@@ -247,7 +247,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_checkbox_auth_access_should_email_approved_users( $args = '' ) {
@@ -266,7 +266,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_auth_access_email_approved_users_subject( $args = '' ) {
@@ -319,7 +319,7 @@ class Login_Access extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_wysiwyg_auth_access_email_approved_users_body( $args = '' ) {

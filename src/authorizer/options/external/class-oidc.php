@@ -21,7 +21,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_checkbox_auth_external_oidc( $args = '' ) {
@@ -40,7 +40,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_select_oidc_auto_login( $args = '' ) {
@@ -78,7 +78,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_number_oidc_num_servers( $args = '' ) {
@@ -99,7 +99,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_custom_label( $args = '' ) {
@@ -120,7 +120,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_issuer( $args = '' ) {
@@ -141,7 +141,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_client_id( $args = '' ) {
@@ -151,7 +151,6 @@ class Oidc extends \Authorizer\Singleton {
 		$oidc_num_server      = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? 1 : intval( $args['oidc_num_server'] );
 		$option               = 'oidc_client_id' . $suffix;
 		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
-
 
 		// Omit server id=1 from redirect_uri for consistency with CAS and OAuth2
 		// implementations.
@@ -213,7 +212,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_text_oidc_client_secret( $args = '' ) {
@@ -272,7 +271,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_scopes( $args = '' ) {
@@ -293,7 +292,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_prompt( $args = '' ) {
@@ -314,7 +313,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_login_hint( $args = '' ) {
@@ -335,7 +334,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_max_age( $args = '' ) {
@@ -356,7 +355,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_attr_username( $args = '' ) {
@@ -381,7 +380,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_attr_email( $args = '' ) {
@@ -406,7 +405,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_attr_first_name( $args = '' ) {
@@ -427,7 +426,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_attr_last_name( $args = '' ) {
@@ -448,7 +447,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_select_oidc_attr_update_on_login( $args = '' ) {
@@ -477,7 +476,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_checkbox_oidc_require_verified_email( $args = '' ) {
@@ -498,7 +497,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_oidc_hosteddomain( $args = '' ) {
@@ -519,7 +518,7 @@ class Oidc extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode, oidc_num_server).
+	 * @param  array $args Args (e.g., multisite admin mode, oidc_num_server).
 	 * @return void
 	 */
 	public function print_checkbox_oidc_link_on_username( $args = '' ) {

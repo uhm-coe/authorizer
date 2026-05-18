@@ -21,7 +21,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_checkbox_auth_external_ldap( $args = '' ) {
@@ -43,7 +43,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_host( $args = '' ) {
@@ -66,7 +66,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_port( $args = '' ) {
@@ -90,7 +90,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_checkbox_ldap_tls( $args = '' ) {
@@ -110,7 +110,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_search_base( $args = '' ) {
@@ -133,7 +133,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_search_filter( $args = '' ) {
@@ -156,7 +156,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_uid( $args = '' ) {
@@ -176,7 +176,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_attr_email( $args = '' ) {
@@ -199,7 +199,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_user( $args = '' ) {
@@ -282,7 +282,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_password_ldap_password( $args = '' ) {
@@ -339,7 +339,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_lostpassword_url( $args = '' ) {
@@ -359,7 +359,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_attr_first_name( $args = '' ) {
@@ -379,7 +379,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_ldap_attr_last_name( $args = '' ) {
@@ -399,7 +399,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_select_ldap_attr_update_on_login( $args = '' ) {
@@ -427,7 +427,7 @@ class Ldap extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_text_button_ldap_test_user( $args = '' ) {

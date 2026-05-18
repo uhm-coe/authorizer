@@ -20,7 +20,7 @@ class Access_Lists extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_section_info_access_lists( $args = '' ) {
@@ -57,7 +57,7 @@ class Access_Lists extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_combo_auth_access_users_pending( $args = '' ) {
@@ -101,7 +101,7 @@ class Access_Lists extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_combo_auth_access_users_approved( $args = '' ) {
@@ -240,7 +240,7 @@ class Access_Lists extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
-	 * @param  string $args Args (e.g., multisite admin mode).
+	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
 	public function print_combo_auth_access_users_blocked( $args = '' ) {
