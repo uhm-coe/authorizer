@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.0
-Stable tag: 3.14.0
+Stable tag: 3.14.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,11 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.14.1 =
+* Fix login button text alignment in WordPress 7.
+* Admin style fixes for WordPress 7 (settings page and dashboard widget).
+* Tested up to WordPress 7.
 
 = 3.14.0 =
 * Fix error on Google and OAuth2 logins from an unsupported domain (when configured to only allow specific domain(s) to log in). Props dbnschools for the [bug report](https://github.com/uhm-coe/authorizer/issues/193)!

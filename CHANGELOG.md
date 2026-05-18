@@ -1,5 +1,10 @@
 # Changelog
 
+= 3.14.1 =
+* Fix login button text alignment in WordPress 7.
+* Admin style fixes for WordPress 7 (settings page and dashboard widget).
+* Tested up to WordPress 7.
+
 = 3.14.0 =
 * Fix error on Google and OAuth2 logins from an unsupported domain (when configured to only allow specific domain(s) to log in). Props dbnschools for the [bug report](https://github.com/uhm-coe/authorizer/issues/193)!
 * Drop support for PHP 7.2, 7.4, and 8.0. PHP 8.1 or higher is now required (due to dependency requirements).
