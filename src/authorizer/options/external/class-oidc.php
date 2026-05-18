@@ -112,7 +112,7 @@ class Oidc extends \Authorizer\Singleton {
 		// Print option elements.
 		esc_html_e( 'The button on the login page will read:', 'authorizer' );
 		?>
-		<p><a class="button button-primary button-large button-external button-oidc"><span class="dashicons dashicons-lock"></span> <strong><?php esc_html_e( 'Sign in with', 'authorizer' ); ?> </strong><input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="OIDC" /></a></p>
+		<p><a class="button button-primary button-large button-external button-oidc"><span class="dashicons dashicons-lock"></span> <?php esc_html_e( 'Sign in with', 'authorizer' ); ?> <input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="OIDC" /></a></p>
 		<?php
 	}
 

@@ -42,24 +42,28 @@
 	// Demo CAS login button sizing.
 	.button.button-external {
 		padding: 3px 16px;
-		height: 40px;
+		font-size: 18px;
+		line-height: 2.4;
+		height: 50px;
 	}
 	.button-external .dashicons {
-		margin: 4px 4px 0 0;
-		font-size: 24px;
+		margin: 4px 18px 0 0;
+		font-size: 32px;
+		line-height: 1;
 	}
 	.button-external input[type=text] {
-		width: 100px;
+		margin-left: 4px;
+		font-size: inherit;
+		width: 120px;
 	}
 	@media screen and (max-width: 782px) {
 		.button-external {
-			width: 280px;
-			height: 50px;
 			font-size: 16px;
 		}
 		.button-external .dashicons {
 			margin: 4px 16px 0 0;
 			font-size: 30px;
+			line-height: 1.1;
 		}
 		.button-external input[type=text] {
 			width: 120px;
@@ -240,9 +244,9 @@
 	.tablenav {
 		height: auto;
 
-		// Fix offset current page input relative to pager buttons.
+		// Fix offset current page input relative to pager buttons (WordPress < 7.0).
 		.current-page {
-			margin-top: -4px;
+			margin-bottom: 4px;
 		}
 	}
 
