@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.0
-Stable tag: 3.14.1
+Stable tag: 3.14.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.14.2 =
+* Force asset reload (for WordPress 7.0 style fixes).
 
 = 3.14.1 =
 * Fix login button text alignment in WordPress 7.

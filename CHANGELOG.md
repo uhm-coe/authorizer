@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.14.2 =
+* Force asset reload (for WordPress 7.0 style fixes).
+
 = 3.14.1 =
 * Fix login button text alignment in WordPress 7.
 * Admin style fixes for WordPress 7 (settings page and dashboard widget).
