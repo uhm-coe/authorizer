@@ -52,9 +52,10 @@
 		line-height: 1;
 	}
 	.button-external input[type=text] {
+		field-sizing: content;
+		min-width: 80px;
 		margin-left: 4px;
 		font-size: inherit;
-		width: 120px;
 	}
 	@media screen and (max-width: 782px) {
 		.button-external {
@@ -66,7 +67,6 @@
 			line-height: 1.1;
 		}
 		.button-external input[type=text] {
-			width: 120px;
 			display: inline;
 		}
 	}
