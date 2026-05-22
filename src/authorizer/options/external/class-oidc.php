@@ -485,6 +485,38 @@ class Oidc extends \Authorizer\Singleton {
 	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_select_oidc_force_auth_method( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$suffix               = empty( $args['oidc_num_server'] ) || 1 === $args['oidc_num_server'] ? '' : '_' . $args['oidc_num_server'];
+		$option               = 'oidc_force_auth_method' . $suffix;
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+		$values               = array(
+			''                    => __( 'Autodetect (default)', 'authorizer' ),
+			'client_secret_post'  => __( 'Post body (client_secret_post)', 'authorizer' ),
+			'client_secret_basic' => __( 'Authorization header (client_secret_basic)', 'authorizer' ),
+			'client_secret_jwt'   => __( 'JWT assertion (client_secret_jwt)', 'authorizer' ),
+			'private_key_jwt'     => __( 'JWT assertion with private key (private_key_jwt)', 'authorizer' ),
+		);
+
+		// Print option elements.
+		?>
+		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
+			<?php foreach ( $values as $value => $label ) : ?>
+				<option value="<?php echo esc_attr( $value ); ?>" <?php selected( $auth_settings_option, $value ); ?>><?php echo esc_html( $label ); ?></option>
+			<?php endforeach; ?>
+		</select>
+		<p class="description"><?php esc_html_e( 'Note: If using Okta as a provider, choose Post body (client_secret_post)', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  array $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_checkbox_oidc_require_verified_email( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();

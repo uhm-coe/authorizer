@@ -997,6 +997,7 @@ class Authentication extends Singleton {
 		$oidc_attr_email             = $auth_settings[ 'oidc_attr_email' . $suffix ] ?? 'email';
 		$oidc_attr_first_name        = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
 		$oidc_attr_last_name         = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
+		$oidc_force_auth_method      = $auth_settings[ 'oidc_force_auth_method' . $suffix ] ?? '';
 		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
 		$oidc_link_on_username       = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
 		$oidc_hosteddomain           = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
@@ -1068,6 +1069,17 @@ class Authentication extends Singleton {
 				$oidc_client_id,
 				$oidc_client_secret
 			);
+
+			// Use a specified auth method if provided and valid (note: some providers
+			// like Okta will fail with "Error 'invalid_request' received from IdP:
+			// Cannot supply multiple client credentials. Use one of the following:
+			// credentials in the Authorization header, credentials in the post body,
+			// or a client_assertion in the post body" because the underlying OIDC
+			// client by default provides the Client ID in both the Authorization
+			// header and the post body).
+			if ( ! empty( $oidc_force_auth_method ) && in_array( $oidc_force_auth_method, array( 'client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'private_key_jwt' ), true ) ) {
+				$oidc->setTokenEndpointAuthMethodsSupported( array( $oidc_force_auth_method ) );
+			}
 
 			// Set redirect URL.
 			$oidc->setRedirectURL( $redirect_uri );

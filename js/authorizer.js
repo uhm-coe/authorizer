@@ -1190,6 +1190,7 @@
 		params.oidc_attr_first_name = $( '#auth_settings_oidc_attr_first_name' ).val();
 		params.oidc_attr_last_name = $( '#auth_settings_oidc_attr_last_name' ).val();
 		params.oidc_attr_update_on_login = $( '#auth_settings_oidc_attr_update_on_login' ).val();
+		params.oidc_force_auth_method = $( '#auth_settings_oidc_force_auth_method' ).val();
 		params.oidc_require_verified_email = $( '#auth_settings_oidc_require_verified_email' ).is( ':checked' ) ? '1' : '';
 		params.oidc_link_on_username = $( '#auth_settings_oidc_link_on_username' ).is( ':checked' ) ? '1' : '';
 		params.oidc_hosteddomain = $( '#auth_settings_oidc_hosteddomain' ).val();
@@ -1208,6 +1209,7 @@
 				params['oidc_attr_first_name_' + oidc_num_server] = $( '#auth_settings_oidc_attr_first_name_' + oidc_num_server ).val();
 				params['oidc_attr_last_name_' + oidc_num_server] = $( '#auth_settings_oidc_attr_last_name_' + oidc_num_server ).val();
 				params['oidc_attr_update_on_login_' + oidc_num_server] = $( '#auth_settings_oidc_attr_update_on_login_' + oidc_num_server ).val();
+				params['oidc_force_auth_method_' + oidc_num_server] = $( '#auth_settings_oidc_force_auth_method_' + oidc_num_server ).val();
 				params['oidc_require_verified_email_' + oidc_num_server] = $( '#auth_settings_oidc_require_verified_email_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
 				params['oidc_link_on_username_' + oidc_num_server] = $( '#auth_settings_oidc_link_on_username_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
 			}

@@ -139,6 +139,7 @@ class Admin_Page extends Singleton {
 				<li>' . __( "<strong>Attribute containing first name</strong>: Enter the claim name that has the user's first name (default: given_name).", 'authorizer' ) . '</li>
 				<li>' . __( "<strong>Attribute containing last name</strong>: Enter the claim name that has the user's last name (default: family_name).", 'authorizer' ) . '</li>
 				<li>' . __( '<strong>Name attribute update</strong>: Select whether the first and last names retrieved from OIDC should overwrite any value the user has entered in the first and last name fields in their WordPress profile.', 'authorizer' ) . '</li>
+				<li>' . __( '<strong>Force auth method</strong>: Select whether to let the provider determine which auth method to use (the default), or override it. This can be useful for providers (e.g., Okta) that are particular about supplying credentials via multiple methods, like the post body and the Authorization header.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>Require verified email</strong>: If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ) . '</li>
 				<li>' . __( '<strong>OIDC Hosted Domain</strong>: Restrict OIDC logins to specific email domains (one per line). Leave blank to allow all valid sign-ins.', 'authorizer' ) . '</li>
 			</ul>
@@ -840,6 +841,16 @@ class Admin_Page extends Singleton {
 				'auth_settings_oidc_attr_update_on_login' . $suffix,
 				$prefix . __( 'Name attribute update', 'authorizer' ),
 				array( Oidc::get_instance(), 'print_select_oidc_attr_update_on_login' ),
+				'authorizer',
+				'auth_settings_external_oidc',
+				array(
+					'oidc_num_server' => $oidc_num_server,
+				)
+			);
+			add_settings_field(
+				'auth_settings_oidc_force_auth_method' . $suffix,
+				$prefix . __( 'Force auth method', 'authorizer' ),
+				array( Oidc::get_instance(), 'print_select_oidc_force_auth_method' ),
 				'authorizer',
 				'auth_settings_external_oidc',
 				array(
@@ -1700,6 +1711,17 @@ class Admin_Page extends Singleton {
 								</td>
 							</tr>
 							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Force auth method', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oidc->print_select_oidc_force_auth_method( array(
+										'context'         => Helper::NETWORK_CONTEXT,
+										'oidc_num_server' => $oidc_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
 								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Require verified email', 'authorizer' ); ?></th>
 								<td>
 									<?php
@@ -2063,7 +2085,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.12.0', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.14.3', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
