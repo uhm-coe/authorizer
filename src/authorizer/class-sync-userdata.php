@@ -13,6 +13,9 @@ use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains functions for interfacing with WordPress users and syncing between
  * them and users in the Authorizer lists.

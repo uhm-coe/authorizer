@@ -22,6 +22,9 @@ use Authorizer\Options\External\Cas;
 use Authorizer\Options\External\Ldap;
 use Authorizer\Options\Advanced;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains functions for creating the Authorizer Settings page and adding it to
  * the WordPress Dashboard menu.

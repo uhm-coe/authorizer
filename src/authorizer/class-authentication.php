@@ -13,6 +13,9 @@ use Authorizer\Helper;
 use Authorizer\Options;
 use Authorizer\Authorization;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Implements the authentication (is user who they say they are?) features of
  * the plugin.

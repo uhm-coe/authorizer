@@ -12,6 +12,9 @@ namespace Authorizer\Options;
 use Authorizer\Helper;
 use Authorizer\Options;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains functions for rendering the Login Access tab in Authorizer Settings.
  */

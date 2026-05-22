@@ -12,6 +12,9 @@ namespace Authorizer\Options\External;
 use Authorizer\Helper;
 use Authorizer\Options;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains functions for rendering the OIDC options in the External Service
  * tab in Authorizer Settings.

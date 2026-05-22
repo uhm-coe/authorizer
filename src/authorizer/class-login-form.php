@@ -12,6 +12,9 @@ namespace Authorizer;
 use Authorizer\Helper;
 use Authorizer\Options;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains modifications to the WordPress login form.
  */

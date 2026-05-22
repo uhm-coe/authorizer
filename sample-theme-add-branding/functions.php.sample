@@ -1,5 +1,8 @@
 <?php
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 // Custom function to add a branding option to the Authorizer plugin.
 function my_authorizer_add_branding_option( $branding_options ) {
 	$new_branding_option = array(

@@ -20,6 +20,9 @@ use Authorizer\Sync_Userdata;
 use Authorizer\Ajax_Endpoints;
 use Authorizer\Dashboard_Widget;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Main plugin class. Activates/deactivates the plugin, and registers all hooks.
  */

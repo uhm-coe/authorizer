@@ -7,6 +7,9 @@
  * @package  authorizer
  */
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 if ( ! function_exists( 'array_key_last' ) ) {
 	/**
 	 * Polyfill for array_key_last(), used in class-cas.php. Not available in PHP

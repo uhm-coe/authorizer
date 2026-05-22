@@ -11,6 +11,9 @@ namespace Authorizer;
 
 use Authorizer\Helper;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 /**
  * Contains functions for rendering the Access Lists tab in Authorizer Settings.
  */

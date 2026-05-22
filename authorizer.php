@@ -23,6 +23,9 @@
 
 namespace Authorizer;
 
+// Prevent direct access.
+defined( 'ABSPATH' ) || exit;
+
 require_once __DIR__ . '/polyfills.php';
 
 require_once __DIR__ . '/src/authorizer/abstract-class-singleton.php';

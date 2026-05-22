@@ -380,7 +380,7 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 == Upgrade Notice ==
 
 = 3.12.1 =
-* Notice for OAuth2 users: if you modified the `redirectUri` in your server configuration to add the new `id=1` param after updating to version 3.12.0, this update reverts that change for already existing OAuth2 server configs. The first OAuth2 server configured will now omit the `id` querystring param. Please remove `&id=1` from the configured `redirectUri` on your external OAuth2 provider. Any additional configured OAuth2 servers (id=2, id=3, etc.) will have the param included, as shown in the helper text in Authorizer settings.
+* Notice for OAuth2 users: if you modified `redirectUri` in your server config to add the `id=1` param after updating to version 3.12.0, this update reverts that change for existing OAuth2 server configs. Please remove `&id=1` from the configured `redirectUri` on your external OAuth2 provider.
 
 = 3.5.0 =
 **Upgrade Notice**: Google Sign-Ins now use the new [Google Identity Services library](https://developers.google.com/identity/gsi/web/guides/migration), which uses a different Sign In button UI and may also include the One Tap prompt. Please test if you use Google Sign-Ins!
