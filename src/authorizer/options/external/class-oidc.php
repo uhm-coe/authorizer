@@ -163,6 +163,12 @@ class Oidc extends \Authorizer\Singleton {
 		?>
 		<p>
 			<?php esc_html_e( 'Generate your Client ID and Secret for your OIDC provider by following their specific instructions.', 'authorizer' ); ?>
+			<br>
+			<?php esc_html_e( 'If asked for a redirect or callback URL, use:', 'authorizer' ); ?>
+			<strong style="white-space:nowrap;"><?php echo esc_html( $redirect_uri ); ?></strong>
+			<br>
+			<?php esc_html_e( 'If asked for a Logout redirect URI, use:', 'authorizer' ); ?>
+			<strong style="white-space:nowrap;"><?php echo esc_html( home_url( '/' ) ); ?></strong>
 		</p>
 		<?php
 		// If ID is overridden by filter or constant, don't expose the value;
