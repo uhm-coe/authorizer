@@ -53,7 +53,7 @@ class Oidc extends \Authorizer\Singleton {
 		// Print option elements.
 		?>
 		<select id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]">
-			<option value="" <?php selected( $auth_settings_option, '' ); ?>><?php echo esc_html_e( 'Off', 'default' ); ?></option>
+			<option value="" <?php selected( $auth_settings_option, '' ); ?>><?php echo esc_html_e( 'Off', 'authorizer' ); ?></option>
 			<?php foreach ( range( 1, $oidc_num_servers ) as $server_num ) : ?>
 					<option value="<?php echo esc_attr( $server_num ); ?>" <?php selected( $auth_settings_option, strval( $server_num ) ); ?>>
 						<?php
