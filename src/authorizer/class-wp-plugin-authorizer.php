@@ -66,6 +66,9 @@ class WP_Plugin_Authorizer extends Singleton {
 		// Redirect to wp-login.php?redirect_to=? destination after an OIDC login.
 		add_filter( 'login_redirect', array( Options\External\Oidc::get_instance(), 'maybe_redirect_after_oidc_login' ), 10, 2 );
 
+		// Enable localization. Translation files stored in /languages.
+		add_action( 'init', array( $this, 'load_textdomain' ) );
+
 		// Perform plugin updates if newer version installed.
 		add_action( 'plugins_loaded', array( Updates::get_instance(), 'auth_update_check' ) );
 
@@ -277,5 +280,19 @@ class WP_Plugin_Authorizer extends Singleton {
 	 */
 	public function deactivate() {
 		// Do nothing. Use uninstall.php instead.
+	}
+
+
+	/**
+	 * Load translated strings from *.mo files in /languages.
+	 *
+	 * Action: plugins_loaded
+	 */
+	public function load_textdomain() {
+		load_plugin_textdomain(
+			'authorizer',
+			false,
+			basename( dirname( plugin_root() ) ) . '/languages'
+		);
 	}
 }
