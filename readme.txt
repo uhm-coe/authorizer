@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.0
-Stable tag: 3.14.2
+Stable tag: 3.14.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,12 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.14.3 =
+* Restore local plugin translations. Props julienlusson for discovering the [problem](https://github.com/uhm-coe/authorizer/issues/197)!
+* Fix OIDC logins on Okta (add "Force auth method" option to Authorizer settings and set to client_secret_post). Props @rmarks for the [troubleshooting](https://github.com/uhm-coe/authorizer/issues/195)!
+* Show "Logout redirect URI" in OIDC configuration (in case the provider needs that set).
+* Fix various small issues reported by Plugin Check.
 
 = 3.14.2 =
 * Force asset reload (for WordPress 7.0 style fixes).

@@ -1,5 +1,11 @@
 # Changelog
 
+= 3.14.3 =
+* Restore local plugin translations. Props julienlusson for discovering the [problem](https://github.com/uhm-coe/authorizer/issues/197)!
+* Fix OIDC logins on Okta (add "Force auth method" option to Authorizer settings and set to client_secret_post). Props @rmarks for the [troubleshooting](https://github.com/uhm-coe/authorizer/issues/195)!
+* Show "Logout redirect URI" in OIDC configuration (in case the provider needs that set).
+* Fix various small issues reported by Plugin Check.
+
 = 3.14.2 =
 * Force asset reload (for WordPress 7.0 style fixes).
 
