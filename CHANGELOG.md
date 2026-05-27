@@ -1,5 +1,8 @@
 # Changelog
 
+= 3.14.4 =
+* Update French translations. Props @julienlusson!
+
 = 3.14.3 =
 * Restore local plugin translations. Props julienlusson for discovering the [problem](https://github.com/uhm-coe/authorizer/issues/197)!
 * Fix OIDC logins on Okta (add "Force auth method" option to Authorizer settings and set to client_secret_post). Props @rmarks for the [troubleshooting](https://github.com/uhm-coe/authorizer/issues/195)!

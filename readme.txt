@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.0
-Stable tag: 3.14.3
+Stable tag: 3.14.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,9 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.14.4 =
+* Update French translations. Props @julienlusson!
 
 = 3.14.3 =
 * Restore local plugin translations. Props julienlusson for discovering the [problem](https://github.com/uhm-coe/authorizer/issues/197)!
