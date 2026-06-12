@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'CAS_AuthenticationException' => $vendorDir . '/apereo/phpcas/source/CAS/AuthenticationException.php',
     'CAS_Client' => $vendorDir . '/apereo/phpcas/source/CAS/Client.php',
     'CAS_CookieJar' => $vendorDir . '/apereo/phpcas/source/CAS/CookieJar.php',
@@ -80,5 +81,9 @@ return array(
     'Google_Utils_UriTemplate' => $vendorDir . '/google/apiclient/src/aliases.php',
     'Jumbojett\\OpenIDConnectClient' => $vendorDir . '/jumbojett/openid-connect-php/src/OpenIDConnectClient.php',
     'Jumbojett\\OpenIDConnectClientException' => $vendorDir . '/jumbojett/openid-connect-php/src/OpenIDConnectClient.php',
+    'PhpToken' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/PhpToken.php',
+    'Stringable' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Stringable.php',
+    'UnhandledMatchError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/UnhandledMatchError.php',
+    'ValueError' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/ValueError.php',
     'phpCAS' => $vendorDir . '/apereo/phpcas/source/CAS.php',
 );
