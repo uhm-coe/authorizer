@@ -2128,7 +2128,10 @@ class Admin_Page extends Singleton {
 		wp_register_style( 'select2', plugins_url( 'vendor-custom/select2/4.0.13/dist/css/select2.min.css', plugin_root() ), array(), '4.0.13' );
 		wp_enqueue_style( 'select2' );
 
-		add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
-		add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
+		// Hook into admin notices (only on plugin settings page, not dashboard).
+		if ( 'admin_head-index.php' !== current_action() ) {
+			add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
+			add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
+		}
 	}
 }
