@@ -289,12 +289,12 @@ class Admin_Page extends Singleton {
 			foreach ( $cas_urls as $cas_url ) :
 				$response      = wp_remote_get( trailingslashit( $cas_url ) . 'serviceValidate' );
 				$response_code = wp_remote_retrieve_response_code( $response );
-				if ( empty( $response_code ) || $response_code < 200 || $response_code >= 400 ) :
+				if ( empty( $response_code ) || $response_code < 200 || $response_code > 400 ) :
 					$response_body = wp_remote_retrieve_body( $response );
 					// Check the legacy CAS endpoint first before reporting unreachable.
 					$response      = wp_remote_get( trailingslashit( $cas_url ) . 'login' );
 					$response_code = wp_remote_retrieve_response_code( $response );
-					if ( empty( $response_code ) || $response_code < 200 || $response_code >= 400 ) :
+					if ( empty( $response_code ) || $response_code < 200 || $response_code > 400 ) :
 						// Flag CAS URL as unreachable.
 						$unreachable_cas_urls[ $cas_url ] = empty( $response_body ) ? '' : $response_body;
 					endif;
