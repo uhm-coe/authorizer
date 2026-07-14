@@ -236,9 +236,10 @@ class Admin_Page extends Singleton {
 
 
 	/**
-	 * Add notices to the top of the options page.
+	 * Add notices to the top of the options page and network options page.
 	 *
 	 * Action: load-settings_page_authorizer > admin_notices
+	 * Action: load-settings_page_authorizer > network_admin_notices
 	 *
 	 * Description: Check for invalid settings combinations and show a warning message, e.g.:
 	 *   if ( cas url inaccessible ) : ?>
@@ -2131,6 +2132,7 @@ class Admin_Page extends Singleton {
 		// Hook into admin notices (only on plugin settings page, not dashboard).
 		if ( 'admin_head-index.php' !== current_action() ) {
 			add_action( 'admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the options page.
+			add_action( 'network_admin_notices', array( self::get_instance(), 'admin_notices' ) ); // Add any notices to the top of the network options page.
 			add_action( 'admin_head', array( self::get_instance(), 'admin_head' ) ); // Add help documentation to the options page.
 		}
 	}
