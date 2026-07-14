@@ -252,16 +252,69 @@ class Admin_Page extends Singleton {
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
 		if ( '1' === $auth_settings['cas'] ) :
-			// Check if provided CAS URL is accessible.
-			$protocol       = in_array( strval( $auth_settings['cas_port'] ), array( '80', '8080' ), true ) ? 'http' : 'https';
-			$cas_url        = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
-			$legacy_cas_url = trailingslashit( $cas_url ) . 'login'; // Check the specific CAS login endpoint (old; some servers don't register a ./login endpoint, use serviceValidate instead).
-			$cas_url        = trailingslashit( $cas_url ) . 'serviceValidate'; // Check the specific CAS login endpoint.
-			if ( ! Helper::url_is_accessible( $cas_url ) && ! Helper::url_is_accessible( $legacy_cas_url ) ) :
-				$authorizer_options_url = 'settings' === $auth_settings['advanced_admin_menu'] ? admin_url( 'options-general.php?page=authorizer' ) : admin_url( '?page=authorizer' );
+			// Get link to the default CAS settings page.
+			$authorizer_options_url = admin_url( '?page=authorizer&tab=external_cas' );
+			// If the Authorizer menu item is under Settings, point to that settings page.
+			if ( 'settings' === $auth_settings['advanced_admin_menu'] ) {
+				$authorizer_options_url = admin_url( 'options-general.php?page=authorizer&tab=external_cas' );
+			}
+			// If we're in multisite settings, point to that settings page instead.
+			if ( is_network_admin() ) {
+				$authorizer_options_url = network_admin_url( '?page=authorizer&tab=external_cas' );
+			}
+
+			// Fetch all configured CAS server URLs.
+			$cas_urls = array();
+			// Fetch first configured CAS server.
+			$protocol   = in_array( strval( $auth_settings['cas_port'] ), array( '80', '8080' ), true ) ? 'http' : 'https';
+			$cas_url    = $protocol . '://' . $auth_settings['cas_host'] . ':' . $auth_settings['cas_port'] . $auth_settings['cas_path'];
+			$cas_urls[] = $cas_url;
+			// Fetch any additional CAS servers configured.
+			if ( empty( $auth_settings['cas_num_servers'] ) ) :
+				$auth_settings['cas_num_servers'] = 1;
+			endif;
+			if ( $auth_settings['cas_num_servers'] > 1 ) :
+				for ( $i = 2; $i <= $auth_settings['cas_num_servers']; $i++ ) :
+					if ( empty( $auth_settings[ 'cas_host_' . $i ] ) ) :
+						continue;
+					endif;
+					$protocol   = in_array( strval( $auth_settings[ 'cas_port_' . $i ] ), array( '80', '8080' ), true ) ? 'http' : 'https';
+					$cas_url    = $protocol . '://' . $auth_settings[ 'cas_host_' . $i ] . ':' . $auth_settings[ 'cas_port_' . $i ] . $auth_settings[ 'cas_path_' . $i ];
+					$cas_urls[] = $cas_url;
+				endfor;
+			endif;
+
+			// Check for any configured CAS servers that are unreachable.
+			$unreachable_cas_urls = array();
+			foreach ( $cas_urls as $cas_url ) :
+				$response      = wp_remote_get( trailingslashit( $cas_url ) . 'serviceValidate' );
+				$response_code = wp_remote_retrieve_response_code( $response );
+				if ( empty( $response_code ) || $response_code < 200 || $response_code >= 400 ) :
+					$response_body = wp_remote_retrieve_body( $response );
+					// Check the legacy CAS endpoint first before reporting unreachable.
+					$response      = wp_remote_get( trailingslashit( $cas_url ) . 'login' );
+					$response_code = wp_remote_retrieve_response_code( $response );
+					if ( empty( $response_code ) || $response_code < 200 || $response_code >= 400 ) :
+						// Flag CAS URL as unreachable.
+						$unreachable_cas_urls[ $cas_url ] = empty( $response_body ) ? '' : $response_body;
+					endif;
+				endif;
+			endforeach;
+
+			if ( ! empty( $unreachable_cas_urls ) ) :
 				?>
 				<div class='notice notice-warning is-dismissible'>
-					<p><?php esc_html_e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href='<?php echo esc_attr( $authorizer_options_url ); ?>&tab=external'><?php esc_html_e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php esc_html_e( 'if you intend to use it.', 'authorizer' ); ?></p>
+					<p><?php esc_html_e( "Can't reach CAS server. Please provide", 'authorizer' ); ?> <a href="<?php echo esc_attr( $authorizer_options_url ); ?>"><?php esc_html_e( 'accurate CAS settings', 'authorizer' ); ?></a> <?php esc_html_e( 'if you intend to use it.', 'authorizer' ); ?></p>
+					<ul>
+						<?php foreach ( $unreachable_cas_urls as $unreachable_cas_url => $error_message ) : ?>
+							<li>
+								<strong><?php echo esc_html( $unreachable_cas_url ); ?></strong>
+								<?php if ( ! empty( $error_message ) ) : ?>
+									<br><pre><?php echo esc_html( $error_message ); ?></pre>
+								<?php endif; ?>
+							</li>
+						<?php endforeach; ?>
+					</ul>
 				</div>
 				<?php
 			endif;
