@@ -79,6 +79,16 @@ class Options extends Singleton {
 				$tab = '&tab=access_lists';
 			} elseif ( 0 === strpos( $option, 'advanced_' ) ) {
 				$tab = '&tab=advanced';
+			} elseif ( str_starts_with( $option, 'oauth2_' ) ) {
+				$tab = '&tab=external_oauth2';
+			} elseif ( str_starts_with( $option, 'oidc_' ) ) {
+				$tab = '&tab=external_oidc';
+			} elseif ( str_starts_with( $option, 'google_' ) ) {
+				$tab = '&tab=external_google';
+			} elseif ( str_starts_with( $option, 'cas_' ) ) {
+				$tab = '&tab=external_cas';
+			} elseif ( str_starts_with( $option, 'ldap_' ) ) {
+				$tab = '&tab=external_ldap';
 			}
 			?>
 			<div id="overlay-hide-auth_settings_<?php echo esc_attr( $option ); ?>" class="auth_multisite_override_overlay">
