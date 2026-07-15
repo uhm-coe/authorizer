@@ -220,6 +220,21 @@ class WP_Plugin_Authorizer extends Singleton {
 		$options       = Options::get_instance();
 		$sync_userdata = Sync_Userdata::get_instance();
 
+		// Set plugin version (used to perform database migrations after updating).
+		// Note: do nothing if already set; a previous installation was detected,
+		// and migrations may need to be performed on the existing options.
+		if ( is_multisite() ) {
+			$auth_version = get_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version' );
+			if ( empty( $auth_version ) ) {
+				update_blog_option( get_main_site_id( get_main_network_id() ), 'auth_version', wp_date( 'Ymd' ) );
+			}
+		} else {
+			$auth_version = get_option( 'auth_version' );
+			if ( empty( $auth_version ) ) {
+				update_option( 'auth_version', wp_date( 'Ymd' ), true );
+			}
+		}
+
 		// If we're in a multisite environment, run the plugin activation for each
 		// site when network enabling.
 		// Note: wp-cli does not use nonces, so we skip the nonce check here to
