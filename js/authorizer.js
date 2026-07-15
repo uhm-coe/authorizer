@@ -674,6 +674,12 @@
 			var tab = '';
 			if ( getQuerystringValuesByKey( 'tab' ).length > 0 ) {
 				tab = getQuerystringValuesByKey( 'tab' )[0];
+				// Remove querystring param (to avoid returning to that tab after saving
+				// settings, where the user could have moved to a different tab which
+				// would update the value in sessionStorage).
+				url = new URL( window.location.href );
+				url.searchParams.delete( 'tab' );
+				window.history.replaceState( null, '', url.toString() );
 			} else if ( sessionStorage.getItem( 'tab' ) ) {
 				tab = sessionStorage.getItem( 'tab' );
 			}
