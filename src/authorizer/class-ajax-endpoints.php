@@ -378,6 +378,9 @@ class Ajax_Endpoints extends Singleton {
 		// Get custom usermeta field to show.
 		$advanced_usermeta = $options->get( 'advanced_usermeta' );
 
+		// Get whether to render the username column.
+		$advanced_show_usernames = $options->get( 'advanced_show_usernames', Helper::SINGLE_CONTEXT, 'allow override' );
+
 		// Filter user list to search terms.
 		if ( ! empty( $_REQUEST['search'] ) ) {
 			$search_term          = sanitize_text_field( wp_unslash( $_REQUEST['search'] ) );
@@ -439,7 +442,7 @@ class Ajax_Endpoints extends Singleton {
 			if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 				continue;
 			endif;
-			$access_lists->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
+			$access_lists->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta, ! empty( $advanced_show_usernames ) );
 		endfor;
 
 		// Send response to client.
