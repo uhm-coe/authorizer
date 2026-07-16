@@ -1286,6 +1286,7 @@
 		params.advanced_hide_wp_login = $( '#auth_settings_advanced_hide_wp_login' ).is( ':checked' ) ? '1' : '';
 		params.advanced_disable_wp_login = $( '#auth_settings_advanced_disable_wp_login' ).is( ':checked' ) ? '1' : '';
 		params.advanced_disable_wp_login_bypass_usernames = $( '#auth_settings_advanced_disable_wp_login_bypass_usernames' ).val();
+		params.advanced_show_usernames = $( '#auth_settings_advanced_show_usernames' ).is( ':checked' ) ? '1' : '';
 		params.advanced_widget_enabled = $( '#auth_settings_advanced_widget_enabled' ).is( ':checked' ) ? '1' : '';
 		params.advanced_users_per_page = $( '#auth_settings_advanced_users_per_page' ).val();
 		params.advanced_users_sort_by = $( '#auth_settings_advanced_users_sort_by' ).val();

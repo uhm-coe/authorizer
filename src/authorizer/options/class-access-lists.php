@@ -138,6 +138,9 @@ class Access_Lists extends \Authorizer\Singleton {
 		// Get custom usermeta field to show.
 		$advanced_usermeta = $options->get( 'advanced_usermeta' );
 
+		// Get whether to render the username column.
+		$advanced_show_usernames = $options->get( 'advanced_show_usernames', Helper::SINGLE_CONTEXT, 'allow override' );
+
 		// Adjust javascript function prefixes if multisite.
 		$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
 		$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
@@ -210,7 +213,7 @@ class Access_Lists extends \Authorizer\Singleton {
 					if ( empty( $approved_user ) || count( $approved_user ) < 1 ) :
 						continue;
 					endif;
-					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta );
+					$this->render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta, ! empty( $advanced_show_usernames ) );
 				endfor;
 				?>
 			</ul>
@@ -418,9 +421,10 @@ class Access_Lists extends \Authorizer\Singleton {
 	 * @param string $option            List user is in (e.g., 'access_users_approved').
 	 * @param string $admin_mode        Current admin context.
 	 * @param string $advanced_usermeta Usermeta field to display.
+	 * @param bool   $show_username     Whether to render a username column.
 	 * @return void
 	 */
-	public function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta ) {
+	public function render_user_element( $approved_user, $key, $option, $admin_mode, $advanced_usermeta, $show_username = false ) {
 		// Adjust javascript function prefixes if multisite.
 		$js_function_prefix      = Helper::NETWORK_CONTEXT === $admin_mode ? 'authMultisite' : 'auth';
 		$is_multisite_admin_page = Helper::NETWORK_CONTEXT === $admin_mode;
@@ -481,6 +485,15 @@ class Access_Lists extends \Authorizer\Singleton {
 				readonly="true"
 				class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'email', $is_multisite_user ) ); ?>"
 			/>
+			<?php if ( $show_username ) : ?>
+				<input
+					type="text"
+					id="<?php echo esc_attr( $option_id ); ?>_username"
+					value="<?php echo empty( $approved_wp_user->user_login ) ? '' : esc_attr( $approved_wp_user->user_login ); ?>"
+					readonly="true"
+					class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'username', $is_multisite_user ) ); ?>"
+				/>
+			<?php endif; ?>
 			<select
 				id="<?php echo esc_attr( $option_id ); ?>_role"
 				class="<?php echo esc_attr( Helper::get_css_class_name_for_option( 'role', $is_multisite_user ) ); ?>"

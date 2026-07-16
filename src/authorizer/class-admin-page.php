@@ -1311,6 +1311,13 @@ class Admin_Page extends Singleton {
 			'auth_settings_advanced'
 		);
 		add_settings_field(
+			'auth_settings_advanced_show_usernames',
+			__( 'Show usernames in approved users list', 'authorizer' ),
+			array( Advanced::get_instance(), 'print_checkbox_auth_advanced_show_usernames' ),
+			'authorizer',
+			'auth_settings_advanced'
+		);
+		add_settings_field(
 			'auth_settings_advanced_widget_enabled',
 			__( 'Show dashboard widget to admin users', 'authorizer' ),
 			array( Advanced::get_instance(), 'print_checkbox_auth_advanced_widget_enabled' ),
@@ -2086,6 +2093,10 @@ class Admin_Page extends Singleton {
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Approved users sort order', 'authorizer' ); ?></th>
 							<td><?php $advanced->print_select_auth_advanced_users_sort_order( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
+						</tr>
+						<tr>
+							<th scope="row"><?php esc_html_e( 'Show usernames in approved users list', 'authorizer' ); ?></th>
+							<td><?php $advanced->print_checkbox_auth_advanced_show_usernames( array( 'context' => Helper::NETWORK_CONTEXT ) ); ?></td>
 						</tr>
 						<tr>
 							<th scope="row"><?php esc_html_e( 'Show Dashboard Widget', 'authorizer' ); ?></th>

@@ -238,6 +238,7 @@ class Ajax_Endpoints extends Singleton {
 			'advanced_users_per_page',
 			'advanced_users_sort_by',
 			'advanced_users_sort_order',
+			'advanced_show_usernames',
 			'advanced_widget_enabled',
 		);
 		if ( ! empty( $auth_multisite_settings['oauth2_num_servers'] ) && intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {

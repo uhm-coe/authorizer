@@ -346,6 +346,9 @@ class Options extends Singleton {
 				// Override Sort users order.
 				$auth_settings['advanced_users_sort_order'] = $auth_multisite_settings['advanced_users_sort_order'];
 
+				// Override Show usernames in approved users list.
+				$auth_settings['advanced_show_usernames'] = $auth_multisite_settings['advanced_show_usernames'] ?? '';
+
 				// Override Show Dashboard Widget.
 				$auth_settings['advanced_widget_enabled'] = $auth_multisite_settings['advanced_widget_enabled'];
 			}
@@ -859,6 +862,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'advanced_users_sort_order', $auth_settings ) ) {
 			$auth_settings['advanced_users_sort_order'] = 'asc';
 		}
+		if ( ! array_key_exists( 'advanced_show_usernames', $auth_settings ) ) {
+			$auth_settings['advanced_show_usernames'] = '';
+		}
 		if ( ! array_key_exists( 'advanced_widget_enabled', $auth_settings ) ) {
 			$auth_settings['advanced_widget_enabled'] = '1';
 		}
@@ -1294,6 +1300,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'advanced_users_sort_order', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_users_sort_order'] = 'asc';
 			}
+			if ( ! array_key_exists( 'advanced_show_usernames', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['advanced_show_usernames'] = '';
+			}
 			if ( ! array_key_exists( 'advanced_widget_enabled', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['advanced_widget_enabled'] = '1';
 			}
@@ -1565,6 +1574,9 @@ class Options extends Singleton {
 		if ( ! isset( $auth_settings['advanced_users_sort_order'] ) || ! in_array( $auth_settings['advanced_users_sort_order'], array( 'asc', 'desc' ), true ) ) {
 			$auth_settings['advanced_users_sort_order'] = 'asc';
 		}
+
+		// Sanitize Show usernames in approved users list (checkbox: value can only be '1' or empty string).
+		$auth_settings['advanced_show_usernames'] = array_key_exists( 'advanced_show_usernames', $auth_settings ) && strlen( $auth_settings['advanced_show_usernames'] ) > 0 ? '1' : '';
 
 		// Sanitize Show Dashboard Widget (checkbox: value can only be '1' or empty string).
 		$auth_settings['advanced_widget_enabled'] = array_key_exists( 'advanced_widget_enabled', $auth_settings ) && strlen( $auth_settings['advanced_widget_enabled'] ) > 0 ? '1' : '';

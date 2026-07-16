@@ -406,6 +406,25 @@ class Advanced extends \Authorizer\Singleton {
 	 * @param  array $args Args (e.g., multisite admin mode).
 	 * @return void
 	 */
+	public function print_checkbox_auth_advanced_show_usernames( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$option               = 'advanced_show_usernames';
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Show Usernames in Approved Users List', 'authorizer' ); ?></label>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  array $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
 	public function print_checkbox_auth_advanced_widget_enabled( $args = '' ) {
 		// Get plugin option.
 		$options              = Options::get_instance();
