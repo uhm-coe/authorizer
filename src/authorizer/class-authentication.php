@@ -309,6 +309,14 @@ class Authentication extends Singleton {
 			if ( isset( $auth_settings[ $cas_link_on_username_key ] ) && 1 === intval( $auth_settings[ $cas_link_on_username_key ] ) ) {
 				$link_on_username = true;
 			}
+		} elseif ( 'oauth2' === $authenticated_by ) {
+			// Check the specific OAuth2 server's link_on_username setting.
+			$oauth2_server_id            = isset( $result['oauth2_server_id'] ) ? intval( $result['oauth2_server_id'] ) : 1;
+			$suffix                      = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
+			$oauth2_link_on_username_key = 'oauth2_link_on_username' . $suffix;
+			if ( isset( $auth_settings[ $oauth2_link_on_username_key ] ) && 1 === intval( $auth_settings[ $oauth2_link_on_username_key ] ) ) {
+				$link_on_username = true;
+			}
 		} elseif ( 'oidc' === $authenticated_by ) {
 			// Check the specific OIDC server's link_on_username setting.
 			$oidc_server_id            = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
@@ -440,20 +448,21 @@ class Authentication extends Singleton {
 		// Get the OAuth2 server id (since multiple OAuth2 servers can be configured),
 		// and the relevant settings for that server.
 		// phpcs:ignore WordPress.Security.NonceVerification
-		$oauth2_server_id       = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
-		$suffix                 = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
-		$oauth2_provider        = $auth_settings[ 'oauth2_provider' . $suffix ] ?? '';
-		$oauth2_clientid        = $auth_settings[ 'oauth2_clientid' . $suffix ] ?? '';
-		$oauth2_clientsecret    = $auth_settings[ 'oauth2_clientsecret' . $suffix ] ?? '';
-		$oauth2_hosteddomain    = $auth_settings[ 'oauth2_hosteddomain' . $suffix ] ?? '';
-		$oauth2_tenant_id       = $auth_settings[ 'oauth2_tenant_id' . $suffix ] ?? '';
-		$oauth2_url_authorize   = $auth_settings[ 'oauth2_url_authorize' . $suffix ] ?? '';
-		$oauth2_url_token       = $auth_settings[ 'oauth2_url_token' . $suffix ] ?? '';
-		$oauth2_url_resource    = $auth_settings[ 'oauth2_url_resource' . $suffix ] ?? '';
-		$oauth2_attr_username   = $auth_settings[ 'oauth2_attr_username' . $suffix ] ?? '';
-		$oauth2_attr_email      = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
-		$oauth2_attr_first_name = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
-		$oauth2_attr_last_name  = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
+		$oauth2_server_id        = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
+		$suffix                  = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
+		$oauth2_provider         = $auth_settings[ 'oauth2_provider' . $suffix ] ?? '';
+		$oauth2_clientid         = $auth_settings[ 'oauth2_clientid' . $suffix ] ?? '';
+		$oauth2_clientsecret     = $auth_settings[ 'oauth2_clientsecret' . $suffix ] ?? '';
+		$oauth2_hosteddomain     = $auth_settings[ 'oauth2_hosteddomain' . $suffix ] ?? '';
+		$oauth2_tenant_id        = $auth_settings[ 'oauth2_tenant_id' . $suffix ] ?? '';
+		$oauth2_url_authorize    = $auth_settings[ 'oauth2_url_authorize' . $suffix ] ?? '';
+		$oauth2_url_token        = $auth_settings[ 'oauth2_url_token' . $suffix ] ?? '';
+		$oauth2_url_resource     = $auth_settings[ 'oauth2_url_resource' . $suffix ] ?? '';
+		$oauth2_attr_username    = $auth_settings[ 'oauth2_attr_username' . $suffix ] ?? '';
+		$oauth2_attr_email       = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
+		$oauth2_attr_first_name  = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
+		$oauth2_attr_last_name   = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
+		$oauth2_link_on_username = $auth_settings[ 'oauth2_link_on_username' . $suffix ] ?? '';
 
 		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
 		// Note: constant/filter overrides are only supported for a single OAuth2 server.
@@ -856,7 +865,7 @@ class Authentication extends Singleton {
 				 */
 				$email = apply_filters( 'authorizer_oauth2_generic_authenticated_email', $email, $attributes );
 
-				// Set the username to the email prefix (if we don't have one).
+				// Set the username (if we don't have one) to the email prefix.
 				if ( ! empty( $email ) && empty( $username ) ) {
 					if ( is_array( $email ) && ! empty( $email[0] ) ) {
 						$username = current( explode( '@', $email[0] ) );
@@ -866,7 +875,7 @@ class Authentication extends Singleton {
 				}
 			}
 		} else {
-			// Move on if a supported providers wasn't selected.
+			// Move on if a supported provider wasn't selected.
 			return null;
 		}
 
@@ -880,32 +889,39 @@ class Authentication extends Singleton {
 			$externally_authenticated_email = array_filter( array( Helper::lowercase( $email ) ) );
 		}
 
-		// Move on if no emails were found.
-		if ( empty( $externally_authenticated_email ) ) {
-			return null;
-		}
+		// Email address is normally required, unless configured to link on username
+		// (less secure).
+		if ( '1' !== $oauth2_link_on_username ) {
+			// Move on if no emails were found.
+			if ( empty( $externally_authenticated_email ) ) {
+				return null;
+			}
 
-		/**
-		 * Fail if hosteddomain param is set and the logging in user's email address
-		 * doesn't match the allowed hosted domain.
-		 */
-		if (
-			array_key_exists( 'oauth2_hosteddomain', $auth_settings ) &&
-			strlen( $oauth2_hosteddomain ) > 0
-		) {
-			// Allow multiple whitelisted domains.
-			$oauth2_hosteddomains = explode( "\n", str_replace( "\r", '', $oauth2_hosteddomain ) );
-			$valid_domain         = false;
-			foreach ( $externally_authenticated_email as $email ) {
-				$email_domain = substr( strrchr( $email, '@' ), 1 );
-				if ( in_array( $email_domain, $oauth2_hosteddomains, true ) ) {
-					$valid_domain = true;
+			/**
+			 * Fail if hosteddomain param is set and the logging in user's email address
+			 * doesn't match the allowed hosted domain.
+			 */
+			if (
+				array_key_exists( 'oauth2_hosteddomain', $auth_settings ) &&
+				strlen( $oauth2_hosteddomain ) > 0
+			) {
+				// Allow multiple whitelisted domains.
+				$oauth2_hosteddomains = explode( "\n", str_replace( "\r", '', $oauth2_hosteddomain ) );
+				$valid_domain         = false;
+				foreach ( $externally_authenticated_email as $email ) {
+					$email_domain = substr( strrchr( $email, '@' ), 1 );
+					if ( in_array( $email_domain, $oauth2_hosteddomains, true ) ) {
+						$valid_domain = true;
+					}
+				}
+				if ( ! $valid_domain ) {
+					$this->custom_logout();
+					return new \WP_Error( 'invalid_oauth2_login', __( 'Email address does not match the allowed hosted domain', 'authorizer' ) );
 				}
 			}
-			if ( ! $valid_domain ) {
-				$this->custom_logout();
-				return new \WP_Error( 'invalid_oauth2_login', __( 'Email address does not match the allowed hosted domain', 'authorizer' ) );
-			}
+		} elseif ( empty( $username ) ) {
+			// When linking by username, username is required.
+			return new \WP_Error( 'oauth2_no_username', __( '<strong>ERROR</strong>: OAuth2 provider did not return a username.', 'authorizer' ) );
 		}
 
 		// Get user first name (handle string or array results from attribute).

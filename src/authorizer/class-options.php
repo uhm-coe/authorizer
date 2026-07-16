@@ -197,6 +197,7 @@ class Options extends Singleton {
 				$auth_settings['oauth2_attr_first_name']      = $auth_multisite_settings['oauth2_attr_first_name'] ?? '';
 				$auth_settings['oauth2_attr_last_name']       = $auth_multisite_settings['oauth2_attr_last_name'] ?? '';
 				$auth_settings['oauth2_attr_update_on_login'] = $auth_multisite_settings['oauth2_attr_update_on_login'] ?? '';
+				$auth_settings['oauth2_link_on_username']     = $auth_multisite_settings['oauth2_link_on_username'] ?? '';
 				// Add any options for extra OAuth2 servers.
 				if ( ! empty( $auth_multisite_settings['oauth2_num_servers'] ) && intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {
 					foreach ( range( 2, min( intval( $auth_multisite_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
@@ -214,6 +215,7 @@ class Options extends Singleton {
 						$auth_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ]      = $auth_multisite_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ]       = $auth_multisite_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = $auth_multisite_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] ?? '';
+						$auth_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ]     = $auth_multisite_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] ?? '';
 					}
 				}
 
@@ -510,6 +512,9 @@ class Options extends Singleton {
 		if ( ! array_key_exists( 'oauth2_attr_update_on_login', $auth_settings ) ) {
 			$auth_settings['oauth2_attr_update_on_login'] = '';
 		}
+		if ( ! array_key_exists( 'oauth2_link_on_username', $auth_settings ) ) {
+			$auth_settings['oauth2_link_on_username'] = '';
+		}
 		if ( intval( $auth_settings['oauth2_num_servers'] ) > 1 ) {
 			foreach ( range( 2, min( intval( $auth_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
 				if ( ! array_key_exists( 'oauth2_provider_' . $oauth2_num_server, $auth_settings ) ) {
@@ -553,6 +558,9 @@ class Options extends Singleton {
 				}
 				if ( ! array_key_exists( 'oauth2_attr_update_on_login_' . $oauth2_num_server, $auth_settings ) ) {
 					$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
+				}
+				if ( ! array_key_exists( 'oauth2_link_on_username_' . $oauth2_num_server, $auth_settings ) ) {
+					$auth_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] = '';
 				}
 			}
 		}
@@ -955,6 +963,9 @@ class Options extends Singleton {
 			if ( ! array_key_exists( 'oauth2_attr_update_on_login', $auth_multisite_settings ) ) {
 				$auth_multisite_settings['oauth2_attr_update_on_login'] = '';
 			}
+			if ( ! array_key_exists( 'oauth2_link_on_username', $auth_multisite_settings ) ) {
+				$auth_multisite_settings['oauth2_link_on_username'] = '';
+			}
 			if ( intval( $auth_multisite_settings['oauth2_num_servers'] ) > 1 ) {
 				foreach ( range( 2, min( intval( $auth_multisite_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
 					if ( ! array_key_exists( 'oauth2_provider_' . $oauth2_num_server, $auth_multisite_settings ) ) {
@@ -998,6 +1009,9 @@ class Options extends Singleton {
 					}
 					if ( ! array_key_exists( 'oauth2_attr_update_on_login_' . $oauth2_num_server, $auth_multisite_settings ) ) {
 						$auth_multisite_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
+					}
+					if ( ! array_key_exists( 'oauth2_link_on_username_' . $oauth2_num_server, $auth_multisite_settings ) ) {
+						$auth_multisite_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] = '';
 					}
 				}
 			}
@@ -1372,6 +1386,9 @@ class Options extends Singleton {
 			$auth_settings['oauth2_attr_update_on_login'] = '';
 		}
 
+		// Sanitize OAuth2 link on username (checkbox: value can only be '1' or empty string).
+		$auth_settings['oauth2_link_on_username'] = array_key_exists( 'oauth2_link_on_username', $auth_settings ) && strlen( $auth_settings['oauth2_link_on_username'] ) > 0 ? '1' : '';
+
 		// Sanitize settings for any additional OAuth2 servers.
 		if ( intval( $auth_settings['oauth2_num_servers'] ) > 1 ) {
 			foreach ( range( 2, min( intval( $auth_settings['oauth2_num_servers'] ), 20 ) ) as $oauth2_num_server ) {
@@ -1379,6 +1396,9 @@ class Options extends Singleton {
 				if ( ! isset( $auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] ) || ! in_array( $auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ], array( '', '1', 'update-if-empty' ), true ) ) {
 					$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
 				}
+
+				// Sanitize OAuth2 link on username (checkbox: value can only be '1' or empty string).
+				$auth_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] = array_key_exists( 'oauth2_link_on_username_' . $oauth2_num_server, $auth_settings ) && strlen( $auth_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] ) > 0 ? '1' : '';
 			}
 		}
 

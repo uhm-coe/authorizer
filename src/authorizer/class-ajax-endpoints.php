@@ -178,6 +178,7 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_attr_first_name',
 			'oauth2_attr_last_name',
 			'oauth2_attr_update_on_login',
+			'oauth2_link_on_username',
 			'oidc',
 			'oidc_auto_login',
 			'oidc_num_servers',
@@ -257,6 +258,7 @@ class Ajax_Endpoints extends Singleton {
 					'oauth2_attr_first_name_' . $oauth2_num_server,
 					'oauth2_attr_last_name_' . $oauth2_num_server,
 					'oauth2_attr_update_on_login_' . $oauth2_num_server,
+					'oauth2_link_on_username_' . $oauth2_num_server,
 				) );
 			}
 		}

@@ -742,6 +742,16 @@ class Admin_Page extends Singleton {
 					'oauth2_num_server' => $oauth2_num_server,
 				)
 			);
+			add_settings_field(
+				'auth_settings_oauth2_link_on_username' . $suffix,
+				$prefix . __( 'OAuth2 users linked by username', 'authorizer' ),
+				array( Oauth2::get_instance(), 'print_checkbox_oauth2_link_on_username' ),
+				'authorizer',
+				'auth_settings_external_oauth2',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
 		}
 
 		// Create External Service (OIDC) Settings section.
@@ -1599,6 +1609,17 @@ class Admin_Page extends Singleton {
 									?>
 								</td>
 							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'OAuth2 users linked by username', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_checkbox_oauth2_link_on_username( array(
+										'context'         => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
 						<?php endforeach; ?>
 					</tbody></table>
 
@@ -2142,7 +2163,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.14.3', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.15.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',
