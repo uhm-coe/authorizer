@@ -1,5 +1,15 @@
 # Changelog
 
+= 3.15.0 =
+* Allow OAuth2 servers to link to WordPress accounts via username instead of email (less secure, but supports more uncommon server configurations). Props mateuswetah for the [request](https://github.com/uhm-coe/authorizer/issues/203)!
+* Add option to show WordPress usernames in the Approved Users list.
+* Check reachability of all configured CAS servers, not just the first.
+* Fix Keycloak CAS servers being flagged as unreachable. Props hegocre for the [report](https://github.com/uhm-coe/authorizer/issues/204)!
+* Fix database migrations running on new installs.
+* Fix linking to correct tab on overridden multisite setting (for individual external service settings).
+* Fix outdated tab loading in Authorizer Settings (if specified in the querystring).
+* Update composer dependencies: firebase/php-jwt (v7.0.5 => v7.1.0); google/apiclient (v2.19.3 => v2.19.4); google/apiclient-services (v0.440.0 => v0.451.0); google/auth (v1.50.1 => v1.52.0); guzzlehttp/guzzle (7.10.0 => 7.15.1); guzzlehttp/promises (2.3.0 => 2.5.1); guzzlehttp/psr7 (2.9.0 => 2.13.0); phpseclib/phpseclib (3.0.52 => 3.0.55); symfony/deprecation-contracts (v3.7.0 => v3.7.1); thenetworg/oauth2-azure (v2.2.5 => v2.2.6).
+
 = 3.14.4 =
 * Update French translations. Props @julienlusson!
 
