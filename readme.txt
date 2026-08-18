@@ -64,6 +64,10 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 
 == Changelog ==
 
+= 3.15.1 =
+* Security fix: prevent authenticated OAuth2 users from impersonating other users by spoofing OAuth2 user attributes (authenticated privilege escalation). Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
+* Upgrade composer dependencies: google/apiclient-services (v0.451.0 => v0.455.0); google/auth (v1.52.0 => v1.53.0); guzzlehttp/guzzle (7.15.2 => 7.15.3); guzzlehttp/promises (2.5.1 => 2.5.2); phpseclib/phpseclib (3.0.55 => 3.0.56).
+
 = 3.15.0 =
 * Allow OAuth2 servers to link to WordPress accounts via username instead of email (less secure, but supports more uncommon server configurations). Props mateuswetah for the [request](https://github.com/uhm-coe/authorizer/issues/203)!
 * Add option to show WordPress usernames in the Approved Users list.
@@ -397,6 +401,9 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
 
 == Upgrade Notice ==
+
+= 3.15.1 =
+* OAuth2 users: confirm that OAuth2 logins continue to function. If not, edit the value in "Attribute containing email" in Authorizer Settings for the configured generic OAuth2 provider (GitHub/Azure providers are not affected). Authorizer now only trusts email addresses appearing in that attribute.
 
 = 3.12.1 =
 * Notice for OAuth2 users: if you modified `redirectUri` in your server config to add the `id=1` param after updating to version 3.12.0, this update reverts that change for existing OAuth2 server configs. Please remove `&id=1` from the configured `redirectUri` on your external OAuth2 provider.
