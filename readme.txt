@@ -403,7 +403,7 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 == Upgrade Notice ==
 
 = 3.15.1 =
-* OAuth2 users: confirm that OAuth2 logins continue to function. If not, edit the value in "Attribute containing email" in Authorizer Settings for the configured generic OAuth2 provider (GitHub/Azure providers are not affected). Authorizer now only trusts email addresses appearing in that attribute.
+* OAuth2 users: confirm that OAuth2 logins continue to function. If not, edit the value in "Attribute containing email" in Authorizer Settings for the generic OAuth2 provider (GitHub/Azure providers are unaffected). Authorizer now only trusts email addresses appearing in that attribute.
 
 = 3.12.1 =
 * Notice for OAuth2 users: if you modified `redirectUri` in your server config to add the `id=1` param after updating to version 3.12.0, this update reverts that change for existing OAuth2 server configs. Please remove `&id=1` from the configured `redirectUri` on your external OAuth2 provider.
