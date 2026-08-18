@@ -575,11 +575,10 @@ class Authentication extends Singleton {
 
 				try {
 					// Look up user using token.
-					$user = $provider->getResourceOwner( $token );
-
+					$user       = $provider->getResourceOwner( $token );
+					$attributes = $user->toArray();
 					$email      = $user->getEmail();
 					$username   = $user->getNickname();
-					$attributes = $user->toArray();
 
 					// If user has no public email, fetch all emails and use those.
 					if ( empty( $email ) ) {
@@ -693,17 +692,10 @@ class Authentication extends Singleton {
 
 				try {
 					// Look up user using token.
-					$user = $provider->getResourceOwner( $token );
-
+					$user       = $provider->getResourceOwner( $token );
 					$attributes = $user->toArray();
 					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
 					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];
-
-					// Attempt to find an email address in the resource owner attributes
-					// if we couldn't find one in the `email` attribute.
-					if ( empty( $email ) ) {
-						$email = Helper::find_emails_in_multi_array( $attributes );
-					}
 				} catch ( \Exception $e ) {
 					// Failed to get user details.
 					return null;
@@ -826,14 +818,10 @@ class Authentication extends Singleton {
 
 				try {
 					// Look up user using token.
-					$user = $provider->getResourceOwner( $token );
-
-					$email      = '';
-					$username   = '';
+					$user       = $provider->getResourceOwner( $token );
 					$attributes = $user->toArray();
-
-					// Attempt to find an email address in the resource owner attributes.
-					$email = Helper::find_emails_in_multi_array( $attributes );
+					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
+					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];
 				} catch ( \Exception $e ) {
 					// Failed to get user details.
 					return null;

@@ -320,27 +320,6 @@ class Helper {
 
 
 	/**
-	 * Helper function to discover the email addresses in a value in a
-	 * multidimensional array.
-	 *
-	 * @param  array $haystack Multidimensional array, possibly containing an email.
-	 * @param  array $emails   Array of email addresses found.
-	 * @return array            Array of Discovered emails, or empty array.
-	 */
-	public static function find_emails_in_multi_array( $haystack, &$emails = array() ) {
-		if ( is_array( $haystack ) ) {
-			foreach ( $haystack as $key => $value ) {
-				self::find_emails_in_multi_array( $value, $emails );
-			}
-		} elseif ( filter_var( $haystack, FILTER_VALIDATE_EMAIL ) ) {
-			$emails[] = $haystack;
-		}
-
-		return $emails;
-	}
-
-
-	/**
 	 * Helper function to determine if an URL is accessible.
 	 *
 	 * @param  string $url URL that should be publicly reachable.
