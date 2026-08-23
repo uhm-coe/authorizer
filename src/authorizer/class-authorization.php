@@ -199,20 +199,6 @@ class Authorization extends Singleton {
 		 */
 		$automatically_approve_login = apply_filters( 'authorizer_automatically_approve_login', false, $user_data, $user );
 
-		// If this externally-authenticated user is an existing administrator (admin
-		// in single site mode, or super admin in network mode), and isn't blocked,
-		// let them in. Update their first/last name if needed.
-		if ( $user && is_super_admin( $user->ID ) ) {
-			if ( $should_update_first_name ) {
-				update_user_meta( $user->ID, 'first_name', $user_data['first_name'] );
-			}
-			if ( $should_update_last_name ) {
-				update_user_meta( $user->ID, 'last_name', $user_data['last_name'] );
-			}
-
-			return $user;
-		}
-
 		// Iterate through each of the email addresses provided by the external
 		// service and determine if any of them have access.
 		$last_email = end( $user_emails );
