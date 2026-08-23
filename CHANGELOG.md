@@ -1,5 +1,10 @@
 # Changelog
 
+= 3.15.2 =
+* Security hardening: prior versions of Authorizer allowed all valid administrator logins to succeed, even if those administrators were not in the Authorizer Approved list. Starting with this version, administrator users will also need to be listed in the Authorizer Approved list in order to successfully log in. Administrators, please verify you are listed in the Authorizer Approved list so you are not locked out.
+* Security fix: GitHub OAuth2 logins now only accept verified email addresses. Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
+* Configured OAuth2 (generic) providers can now require verified email addresses (a truthy `email_verified` attribute released from the provider).
+
 = 3.15.1 =
 * Security fix: prevent authenticated OAuth2 users from impersonating other users by spoofing OAuth2 user attributes (authenticated privilege escalation). Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
 * Upgrade composer dependencies: google/apiclient-services (v0.451.0 => v0.455.0); google/auth (v1.52.0 => v1.53.0); guzzlehttp/guzzle (7.15.2 => 7.15.3); guzzlehttp/promises (2.5.1 => 2.5.2); phpseclib/phpseclib (3.0.55 => 3.0.56).

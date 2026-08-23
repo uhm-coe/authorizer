@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.1
-Stable tag: 3.15.1
+Stable tag: 3.15.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,11 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.15.2 =
+* Security hardening: prior versions of Authorizer allowed all valid administrator logins to succeed, even if those administrators were not in the Authorizer Approved list. Starting with this version, administrator users will also need to be listed in the Authorizer Approved list in order to successfully log in. Administrators, please verify you are listed in the Authorizer Approved list so you are not locked out.
+* Security fix: GitHub OAuth2 logins now only accept verified email addresses. Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
+* Configured OAuth2 (generic) providers can now require verified email addresses (a truthy `email_verified` attribute released from the provider).
 
 = 3.15.1 =
 * Security fix: prevent authenticated OAuth2 users from impersonating other users by spoofing OAuth2 user attributes (authenticated privilege escalation). Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
@@ -401,6 +406,10 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
 
 == Upgrade Notice ==
+
+= 3.15.2 =
+* This version includes security fixes (authenticated privilege escalation affecting some specific OAuth2 configurations).
+* Administrators, please verify you are listed in the Authorizer Approved list (prior versions allowed all successful administrator logins to succeed, even if they were not listed in the Authorizer Approved list).
 
 = 3.15.1 =
 * OAuth2 users: confirm that OAuth2 logins continue to function. If not, edit the value in "Attribute containing email" in Authorizer Settings for the generic OAuth2 provider (GitHub/Azure providers are unaffected). Authorizer now only trusts email addresses appearing in that attribute.
