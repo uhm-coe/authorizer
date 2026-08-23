@@ -590,7 +590,12 @@ class Authentication extends Singleton {
 						);
 						$attributes['emails'] = array_filter( array_map(
 							function ( $entry ) {
-								return empty( $entry['email'] ) ? '' : $entry['email'];
+								// Filter out empty or unverified email addresses.
+								if ( empty( $entry['email'] ) || empty( $entry['verified'] ) ) {
+									return false;
+								}
+
+								return $entry['email'];
 							},
 							(array) $provider->getParsedResponse( $request )
 						) );
