@@ -1163,6 +1163,7 @@
 		params.oauth2_attr_first_name = $( '#auth_settings_oauth2_attr_first_name' ).val();
 		params.oauth2_attr_last_name = $( '#auth_settings_oauth2_attr_last_name' ).val();
 		params.oauth2_attr_update_on_login = $( '#auth_settings_oauth2_attr_update_on_login' ).val();
+		params.oauth2_require_verified_email = $( '#auth_settings_oauth2_require_verified_email' ).is( ':checked' ) ? '1' : '';
 		params.oauth2_link_on_username = $( '#auth_settings_oauth2_link_on_username' ).is( ':checked' ) ? '1' : '';
 		if ( params.oauth2_num_servers > 1 ) {
 			for ( var oauth2_num_server = 2; oauth2_num_server <= params.oauth2_num_servers && oauth2_num_server <= 20; oauth2_num_server++ ) {
@@ -1180,6 +1181,7 @@
 				params['oauth2_attr_first_name_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_first_name_' + oauth2_num_server ).val();
 				params['oauth2_attr_last_name_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_last_name_' + oauth2_num_server ).val();
 				params['oauth2_attr_update_on_login_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_update_on_login_' + oauth2_num_server ).val();
+				params['oauth2_require_verified_email_' + oauth2_num_server] = $( '#auth_settings_oauth2_require_verified_email_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
 				params['oauth2_link_on_username_' + oauth2_num_server] = $( '#auth_settings_oauth2_link_on_username_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
 			}
 		}

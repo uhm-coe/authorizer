@@ -743,6 +743,16 @@ class Admin_Page extends Singleton {
 				)
 			);
 			add_settings_field(
+				'auth_settings_oauth2_require_verified_email' . $suffix,
+				$prefix . __( 'Require verified email', 'authorizer' ),
+				array( Oauth2::get_instance(), 'print_checkbox_oauth2_require_verified_email' ),
+				'authorizer',
+				'auth_settings_external_oauth2',
+				array(
+					'oauth2_num_server' => $oauth2_num_server,
+				)
+			);
+			add_settings_field(
 				'auth_settings_oauth2_link_on_username' . $suffix,
 				$prefix . __( 'OAuth2 users linked by username', 'authorizer' ),
 				array( Oauth2::get_instance(), 'print_checkbox_oauth2_link_on_username' ),
@@ -1611,6 +1621,17 @@ class Admin_Page extends Singleton {
 									<?php
 									$oauth2->print_select_oauth2_attr_update_on_login( array(
 										'context' => Helper::NETWORK_CONTEXT,
+										'oauth2_num_server' => $oauth2_num_server,
+									) );
+									?>
+								</td>
+							</tr>
+							<tr>
+								<th scope="row"><?php echo esc_html( $prefix ); ?><?php esc_html_e( 'Require verified email', 'authorizer' ); ?></th>
+								<td>
+									<?php
+									$oauth2->print_checkbox_oauth2_require_verified_email( array(
+										'context'         => Helper::NETWORK_CONTEXT,
 										'oauth2_num_server' => $oauth2_num_server,
 									) );
 									?>

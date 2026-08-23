@@ -543,6 +543,27 @@ class OAuth2 extends \Authorizer\Singleton {
 	/**
 	 * Settings print callback.
 	 *
+	 * @param  array $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_checkbox_oauth2_require_verified_email( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$suffix               = empty( $args['oauth2_num_server'] ) || 1 === $args['oauth2_num_server'] ? '' : '_' . $args['oauth2_num_server'];
+		$option               = 'oauth2_require_verified_email' . $suffix;
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// Print option elements.
+		?>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Require verified email address', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
 	 * @param  array $args Args (e.g., multisite admin mode, oauth2_num_server).
 	 * @return void
 	 */

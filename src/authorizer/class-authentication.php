@@ -448,21 +448,22 @@ class Authentication extends Singleton {
 		// Get the OAuth2 server id (since multiple OAuth2 servers can be configured),
 		// and the relevant settings for that server.
 		// phpcs:ignore WordPress.Security.NonceVerification
-		$oauth2_server_id        = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
-		$suffix                  = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
-		$oauth2_provider         = $auth_settings[ 'oauth2_provider' . $suffix ] ?? '';
-		$oauth2_clientid         = $auth_settings[ 'oauth2_clientid' . $suffix ] ?? '';
-		$oauth2_clientsecret     = $auth_settings[ 'oauth2_clientsecret' . $suffix ] ?? '';
-		$oauth2_hosteddomain     = $auth_settings[ 'oauth2_hosteddomain' . $suffix ] ?? '';
-		$oauth2_tenant_id        = $auth_settings[ 'oauth2_tenant_id' . $suffix ] ?? '';
-		$oauth2_url_authorize    = $auth_settings[ 'oauth2_url_authorize' . $suffix ] ?? '';
-		$oauth2_url_token        = $auth_settings[ 'oauth2_url_token' . $suffix ] ?? '';
-		$oauth2_url_resource     = $auth_settings[ 'oauth2_url_resource' . $suffix ] ?? '';
-		$oauth2_attr_username    = $auth_settings[ 'oauth2_attr_username' . $suffix ] ?? '';
-		$oauth2_attr_email       = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
-		$oauth2_attr_first_name  = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
-		$oauth2_attr_last_name   = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
-		$oauth2_link_on_username = $auth_settings[ 'oauth2_link_on_username' . $suffix ] ?? '';
+		$oauth2_server_id              = empty( $_GET['id'] ) ? 1 : intval( $_GET['id'] );
+		$suffix                        = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
+		$oauth2_provider               = $auth_settings[ 'oauth2_provider' . $suffix ] ?? '';
+		$oauth2_clientid               = $auth_settings[ 'oauth2_clientid' . $suffix ] ?? '';
+		$oauth2_clientsecret           = $auth_settings[ 'oauth2_clientsecret' . $suffix ] ?? '';
+		$oauth2_hosteddomain           = $auth_settings[ 'oauth2_hosteddomain' . $suffix ] ?? '';
+		$oauth2_tenant_id              = $auth_settings[ 'oauth2_tenant_id' . $suffix ] ?? '';
+		$oauth2_url_authorize          = $auth_settings[ 'oauth2_url_authorize' . $suffix ] ?? '';
+		$oauth2_url_token              = $auth_settings[ 'oauth2_url_token' . $suffix ] ?? '';
+		$oauth2_url_resource           = $auth_settings[ 'oauth2_url_resource' . $suffix ] ?? '';
+		$oauth2_attr_username          = $auth_settings[ 'oauth2_attr_username' . $suffix ] ?? '';
+		$oauth2_attr_email             = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
+		$oauth2_attr_first_name        = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
+		$oauth2_attr_last_name         = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
+		$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '';
+		$oauth2_link_on_username       = $auth_settings[ 'oauth2_link_on_username' . $suffix ] ?? '';
 
 		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
 		// Note: constant/filter overrides are only supported for a single OAuth2 server.
@@ -842,6 +843,13 @@ class Authentication extends Singleton {
 						$email = trim( $attributes[ $oauth2_attr_email ] );
 					} elseif ( is_array( $attributes[ $oauth2_attr_email ] ) ) {
 						$email = $attributes[ $oauth2_attr_email ];
+					}
+				}
+
+				// Enforce email verification if required.
+				if ( '1' === $oauth2_require_verified_email ) {
+					if ( empty( $attributes['email_verified'] ) || true !== $attributes['email_verified'] ) {
+						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
 
