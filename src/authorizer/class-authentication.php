@@ -391,6 +391,26 @@ class Authentication extends Singleton {
 			}
 		}
 
+		// If this is an OAuth2 Azure login and "require verified email address" is
+		// enabled, update OAuth2 user meta for the successfully logged in user if
+		// it was set in a transient after verifying the email address.
+		if ( $user && 'oauth2' === $authenticated_by ) {
+			$oauth2_server_id    = isset( $result['oauth2_server_id'] ) ? intval( $result['oauth2_server_id'] ) : 1;
+			$suffix              = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
+			$oauth2_provider_key = 'oauth2_provider' . $suffix;
+			if ( isset( $auth_settings[ $oauth2_provider_key ] ) && 'azure' === $auth_settings[ $oauth2_provider_key ] ) {
+				$oid = get_transient( 'authorizer_oauth2_azure_oid_for_' . $user->user_email );
+				$tid = get_transient( 'authorizer_oauth2_azure_tid_for_' . $user->user_email );
+				// Copy transients to user meta.
+				if ( ! empty( $oid ) && ! empty( $tid ) ) {
+					update_user_meta( $user->ID, 'authorizer_oauth2_azure_oid_for_tid_' . $tid, $oid );
+					delete_transient( 'authorizer_oauth2_azure_oid_for_' . $user->user_email );
+					delete_transient( 'authorizer_oauth2_azure_tid_for_' . $user->user_email );
+					delete_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $oauth2_server_id );
+				}
+			}
+		}
+
 		// Integration: disable Cloudflare Turnstile verification from the
 		// simple-cloudflare-turnstile plugin if it is activated (conflicts with
 		// our redirects from external services). We assume that we dont't need bot
@@ -705,6 +725,65 @@ class Authentication extends Singleton {
 				} catch ( \Exception $e ) {
 					// Failed to get user details.
 					return null;
+				}
+
+				// Enforce email verification if required.
+				if ( '1' === $oauth2_require_verified_email ) {
+					if ( empty( $email ) ) {
+						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
+					}
+
+					$wpuser = get_user_by( 'email', $email );
+
+					// First look for a transient that was set when they confirmed their
+					// email (for return users, the values are moved to user meta).
+					$verified_tid = get_transient( 'authorizer_oauth2_azure_tid_for_' . $email );
+					$verified_oid = get_transient( 'authorizer_oauth2_azure_oid_for_' . $email );
+					if ( ! empty( $wpuser ) && empty( $verified_tid ) ) {
+						$verified_tid = $tid;
+						$verified_oid = get_user_meta( $wpuser->ID, 'authorizer_oauth2_azure_oid_for_tid_' . $verified_tid, true );
+					}
+
+					// Validate the object ID of the logging in user.
+					if ( empty( $verified_tid ) || empty( $verified_oid ) ) {
+						// If there are no saved tenant ID or object ID, send a verification
+						// email. After the user clicks the link in the email, they will
+						// replay the authentication flow and end up here to check again.
+						$args             = array(
+							'action' => 'authorizer_oauth2_azure_verify_email',
+							'tid'    => $tid,
+							'oid'    => $oid,
+							'server' => $oauth2_server_id,
+							'email'  => $email,
+							'token'  => wp_generate_uuid4(),
+							'nonce'  => wp_create_nonce( 'authorizer_oauth2_azure_verify_email_nonce_oid_' . $oid ),
+						);
+						$verification_url = add_query_arg( $args, admin_url( 'admin-post.php' ) );
+						set_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $oauth2_server_id, $username . ' , ' . $email . ' , ' . $args['token'], DAY_IN_SECONDS );
+						wp_mail(
+							$email,
+							__( 'Action required: Verify your email address', 'authorizer' ),
+							sprintf(
+								/* TRANSLATORS: 1: Name of site 2: Site URL 3: Verification URL */
+								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n", 'authorizer' ),
+								get_bloginfo( 'name' ),
+								get_bloginfo( 'url' ),
+								$verification_url
+							)
+						);
+						// Notify the user to check their email.
+						return new \WP_Error(
+							'oauth2_pending_verification',
+							sprintf(
+								/* TRANSLATORS: Email */
+								__( '<strong>Email verification required</strong>: Please check your inbox (%s) for a verification email and click the link to finish signing in.', 'authorizer' ),
+								$email
+							)
+						);
+					} elseif ( $verified_oid !== $oid ) {
+						// If the object ID doesn't match the Azure response, deny the login.
+						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
+					}
 				}
 
 				/**
@@ -2257,5 +2336,81 @@ class Authentication extends Singleton {
 				\Authorizer\Options\External\Oidc::get_instance()->delete_oidc_user_meta( $user_id );
 			}
 		}
+	}
+
+	/**
+	 * When an OAuth2 Azure user authenticates for the first time, their email
+	 * address is sent a verification email to confirm ownership (since Microsoft
+	 * does not guarantee email validity. This function handles the magic link
+	 * sent in that email and associates the user's object ID (oid) from Azure
+	 * with their WordPress account (via user meta).
+	 *
+	 * @see https://www.microsoft.com/en-us/msrc/blog/2023/06/potential-risk-of-privilege-escalation-in-azure-ad-applications
+	 * @see https://learn.microsoft.com/en-us/answers/questions/812672/microsoft-openid-connect-getting-verified-email#answer-1251027
+	 *
+	 * @url wp-admin/admin-post.php?action=authorizer_oauth2_azure_verify_email
+	 * @action admin_post_nopriv_authorizer_oauth2_azure_verify_email
+	 *
+	 * param $_REQUEST['action'] The name of this admin post action.
+	 * param $_REQUEST['tid']    The tenant ID of the Azure server.
+	 * param $_REQUEST['oid']    The object ID of the Azure user.
+	 * param $_REQUEST['server'] The OAuth2 config ID for this Azure server.
+	 * param $_REQUEST['email']  The email of the Azure user.
+	 * param $_REQUEST['token']  The token to verify against the transient set during login.
+	 * param $_REQUEST['nonce']  Security nonce.
+	 *
+	 * @return void
+	 */
+	public function oauth2_azure_verify_email() {
+		// Ensure params are set.
+		$tid    = sanitize_key( wp_unslash( $_REQUEST['tid'] ?? '' ) );
+		$oid    = sanitize_key( wp_unslash( $_REQUEST['oid'] ?? '' ) );
+		$server = absint( wp_unslash( $_REQUEST['server'] ?? '' ) );
+		$email  = sanitize_email( wp_unslash( $_REQUEST['email'] ?? '' ) );
+		$token  = sanitize_key( wp_unslash( $_REQUEST['token'] ?? '' ) );
+		$nonce  = sanitize_key( wp_unslash( $_REQUEST['nonce'] ?? '' ) );
+		if (
+			empty( $_REQUEST['tid'] ) ||
+			empty( $_REQUEST['oid'] ) ||
+			empty( $_REQUEST['server'] ) ||
+			empty( $_REQUEST['email'] ) ||
+			empty( $_REQUEST['token'] ) ||
+			empty( $_REQUEST['nonce'] )
+		) {
+			die();
+		}
+
+		// Verify nonce.
+		if ( ! wp_verify_nonce( $nonce, 'authorizer_oauth2_azure_verify_email_nonce_oid_' . $oid ) ) {
+			wp_nonce_ays( 'authorizer_oauth2_azure_verify_email_nonce' );
+			die();
+		}
+
+		// Validate email and token.
+		$username_email_token = get_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $server );
+		if ( empty( $username_email_token ) ) {
+			die();
+		}
+		$username_email_token = explode( ' , ', $username_email_token );
+		if ( 3 !== count( $username_email_token ) ) {
+			die();
+		}
+		if ( $email !== $username_email_token[1] || $token !== $username_email_token[2] ) {
+			die();
+		}
+
+		// We now have a verified email from a valid OAuth2 Azure login, so we can
+		// save the user's Azure object ID to a transient. This will be copied to
+		// user meta later (when they return to the authentication flow after this).
+		set_transient( 'authorizer_oauth2_azure_oid_for_' . $email, $oid, DAY_IN_SECONDS );
+		set_transient( 'authorizer_oauth2_azure_tid_for_' . $email, $tid, DAY_IN_SECONDS );
+
+		// Redirect back to OAuth2 Azure authentication flow to complete the login.
+		$querystring = array( 'external' => 'oauth2' );
+		if ( $server > 1 ) {
+			$querystring['id'] = $server;
+		}
+		$url = add_query_arg( $querystring, wp_login_url( home_url() ) );
+		wp_safe_redirect( $url );
 	}
 }
