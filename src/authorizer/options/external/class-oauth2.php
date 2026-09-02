@@ -557,7 +557,7 @@ class OAuth2 extends \Authorizer\Singleton {
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Require verified email address', 'authorizer' ); ?></label>
 		<p class="description description-oauth2-generic"><?php esc_html_e( 'If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ); ?></p>
-		<p class="description description-oauth2-azure"><?php esc_html_e( 'If checked, users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-subject" target="_blank"><?php esc_html_e( 'Microsoft Documentation', 'authorizer' ); ?></a></p>
+		<p class="description description-oauth2-azure"><?php esc_html_e( 'If checked, users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-subject" target="_blank"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
 		<?php
 	}
 
