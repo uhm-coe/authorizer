@@ -254,14 +254,14 @@ class Admin_Page extends Singleton {
 		// Warn on any OAuth2 Azure providers without Tenant ID restrictions.
 		if ( '1' === $auth_settings['oauth2'] ) :
 			// Get link to the default OAuth2 settings page.
-			$authorizer_options_url = admin_url( '?page=authorizer&tab=external_oauth2' );
+			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
 			if ( 'settings' === $auth_settings['advanced_admin_menu'] ) {
 				$authorizer_options_url = admin_url( 'options-general.php?page=authorizer&tab=external_oauth2' );
 			}
 			// If we're in multisite settings, point to that settings page instead.
 			if ( is_network_admin() ) {
-				$authorizer_options_url = network_admin_url( '?page=authorizer&tab=external_oauth2' );
+				$authorizer_options_url = network_admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
 			}
 
 			// Warn if any OAuth2 Azure servers have no Tenant ID restrictions.
@@ -292,14 +292,14 @@ class Admin_Page extends Singleton {
 
 		if ( '1' === $auth_settings['cas'] ) :
 			// Get link to the default CAS settings page.
-			$authorizer_options_url = admin_url( '?page=authorizer&tab=external_cas' );
+			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_cas' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
 			if ( 'settings' === $auth_settings['advanced_admin_menu'] ) {
 				$authorizer_options_url = admin_url( 'options-general.php?page=authorizer&tab=external_cas' );
 			}
 			// If we're in multisite settings, point to that settings page instead.
 			if ( is_network_admin() ) {
-				$authorizer_options_url = network_admin_url( '?page=authorizer&tab=external_cas' );
+				$authorizer_options_url = network_admin_url( 'admin.php?page=authorizer&tab=external_cas' );
 			}
 
 			// Fetch all configured CAS server URLs.
