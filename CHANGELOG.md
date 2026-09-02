@@ -1,5 +1,11 @@
 # Changelog
 
+= 3.15.3 =
+* Security hardening: prior versions of Authorizer did not restrict Azure OAuth2 tenants when the "Tenant ID" setting was left blank. Starting with this version, an admin notice appears warning users when this setting is blank or "common". Props [Raphael](https://patchstack.com/database/researchers/62666357-2b66-4614-a810-64af95bebbc5) for the coordinated disclosure via wordpress.org and patchstack!
+* Security hardening: add Azure OAuth2 option "require verified email address". When enabling this, users logging in will need to perform a one-time email address verification. The WordPress server will email a unique login link to their email address. [Reference 1](https://www.microsoft.com/en-us/msrc/blog/2023/06/potential-risk-of-privilege-escalation-in-azure-ad-applications) [Reference 2](https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-subject)
+* Fix missing admin page title when following a CAS or OAuth2 admin notice link.
+* Upgrade composer dependencies: league/oauth2-github (2.0.0 => 3.1.1); google/apiclient-services (v0.455.0 => v0.457.0); guzzlehttp/guzzle (7.15.3 => 7.15.5); guzzlehttp/promises (2.5.2 => 2.5.3); guzzlehttp/psr7 (2.13.0 => 2.13.1); phpseclib/phpseclib (3.0.56 => 3.0.57); monolog/monolog (3.10.0 => 3.11.0).
+
 = 3.15.2 =
 * Security hardening: prior versions of Authorizer allowed all valid administrator logins to succeed, even if those administrators were not in the Authorizer Approved list. Starting with this version, administrator users will also need to be listed in the Authorizer Approved list in order to successfully log in. Administrators, please verify you are listed in the Authorizer Approved list so you are not locked out.
 * Security fix: GitHub OAuth2 logins now only accept verified email addresses. Props [Steve](https://patchstack.com/database/researchers/007c1fea-292a-403c-8318-403d517777fd) for the coordinated disclosure via wordpress.org and patchstack!
