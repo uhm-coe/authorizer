@@ -727,6 +727,13 @@ class Authentication extends Singleton {
 					return null;
 				}
 
+				// Validate the tenant ID if required.
+				$tid = $user->getTenantId();
+				$oid = $user->getId();
+				if ( ! empty( $oauth2_tenant_id ) && 'common' !== $oauth2_tenant_id && $oauth2_tenant_id !== $tid ) {
+						return new \WP_Error( 'oauth2_tenant_id_not_allowed', __( '<strong>ERROR</strong>: This Tenant ID is not allowed.', 'authorizer' ) );
+				}
+
 				// Enforce email verification if required.
 				if ( '1' === $oauth2_require_verified_email ) {
 					if ( empty( $email ) ) {

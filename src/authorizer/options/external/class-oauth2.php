@@ -350,8 +350,9 @@ class OAuth2 extends \Authorizer\Singleton {
 
 		// Print option elements.
 		?>
-		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="common" autocomplete="off" />
-		<p class="description"><?php esc_html_e( 'Example:  "common", or a specific Azure Directory Tenant ID', 'authorizer' ); ?></p>
+		<input type="text" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="<?php echo esc_attr( $auth_settings_option ); ?>" placeholder="common" autocomplete="off" style="width:330px;" />
+		<p class="description"><?php esc_html_e( 'Restrict OAuth2 logins to a specific Azure Tenant ID.', 'authorizer' ); ?></p>
+		<p class="description"><?php esc_html_e( 'Note: Microsoft recommends always restricting by Tenant ID and not using "common" (which accepts any Tenant ID). If you want to accept logins from Personal Microsoft accounts, use the following Tenant ID', 'authorizer' ); ?>: <code>9188040d-6c67-4c5b-b112-36a304b66dad</code> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
 		<?php
 	}
 
