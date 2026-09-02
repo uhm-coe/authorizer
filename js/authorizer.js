@@ -509,7 +509,15 @@
 		$( '.nav-tab-wrapper .nav-tab-external_ldap' ).toggle( $( '#auth_settings_ldap' ).is( ':checked' ) );
 
 		// Hide some OAuth2 options based on current settings.
-		auth_settings_external_oauth2_servers.forEach( function( server ) {
+		auth_settings_external_oauth2_servers.forEach( function ( server ) {
+			// Hide all OAuth2 options if OAuth2 provider isn't chosen.
+			if ( '' === server.provider.find( 'select' ).val() ) {
+				animateOption( 'hide_immediately', server.custom_label );
+				animateOption( 'hide_immediately', server.clientid );
+				animateOption( 'hide_immediately', server.clientsecret );
+				animateOption( 'hide_immediately', server.hosteddomain );
+				animateOption( 'hide_immediately', server.link_on_username );
+			}
 			// Hide OAuth2 generic options if OAuth2 provider is unchecked or generic isn't chosen.
 			if ( 'generic' !== server.provider.find( 'select' ).val() ) {
 				animateOption( 'hide_immediately', server.url_authorize );
@@ -570,6 +578,12 @@
 		// Event handler: Show/hide OAuth2 generic/azure options based on provider.
 		auth_settings_external_oauth2_servers.forEach( function( server ) {
 			server.provider.find( 'select' ).on( 'change', function() {
+				var action = '' === $( this ).val() ? 'hide' : 'show';
+				animateOption( action, server.custom_label );
+				animateOption( action, server.clientid );
+				animateOption( action, server.clientsecret );
+				animateOption( action, server.hosteddomain );
+				animateOption( action, server.link_on_username );
 				var action = 'generic' === $( this ).val() ? 'show' : 'hide';
 				animateOption( action, server.url_authorize );
 				animateOption( action, server.url_token );
