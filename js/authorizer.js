@@ -545,6 +545,32 @@
 			} else if ( 'azure' !== server.provider.find( 'select' ).val() ) {
 				animateOption( 'hide_immediately', $( '.description-oauth2-azure', server.require_verified_email ) );
 			}
+
+			// Enforce email verification if Azure Tenant ID not set.
+			const has_no_tenant_id = ['', 'common'].includes( $( 'input', server.tenant_id ).val() );
+			$( 'input', server.require_verified_email ).prop( 'disabled', has_no_tenant_id );
+			if ( has_no_tenant_id ) {
+				$( 'input', server.require_verified_email ).prop( 'checked', true );
+			}
+
+			// Event handler: enforce email verification if Azure Tenant ID not set.
+			$( 'input', server.tenant_id ).on( 'input', function () {
+				const has_no_tenant_id = ['', 'common'].includes( $( this ).val() );
+				$( 'input', server.require_verified_email ).prop( 'disabled', has_no_tenant_id );
+				if ( has_no_tenant_id ) {
+					$( 'input', server.require_verified_email ).prop( 'checked', true );
+				}
+			});
+
+			// Event handler: conditionally set disable attribute on email verification when selecting OAuth2 provider.
+			$( 'select', server.provider ).on( 'input', function () {
+				const is_azure_provider = 'azure' === $( this ).val();
+				const has_no_tenant_id = ['', 'common'].includes( $( 'input', server.tenant_id ).val() );
+				$( 'input', server.require_verified_email ).prop( 'disabled', is_azure_provider && has_no_tenant_id );
+				if ( is_azure_provider && has_no_tenant_id ) {
+					$( 'input', server.require_verified_email ).prop( 'checked', true );
+				}
+			});
 		} );
 
 		// Hide Bypass Usernames if Disable WordPress logins is unchecked.

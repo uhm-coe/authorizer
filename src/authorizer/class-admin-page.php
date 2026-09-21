@@ -281,7 +281,7 @@ class Admin_Page extends Singleton {
 			if ( ! empty( $oauth2_azure_servers_without_tenant_restrictions ) ) :
 				?>
 				<div class='notice notice-warning is-dismissible'>
-					<p><?php esc_html_e( 'Warning: a configured OAuth2 Azure server does not have any Tenant ID restrictions.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
+					<p><?php esc_html_e( 'Warning: a configured OAuth2 Azure server does not have any Tenant ID restrictions.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed and cannot be disabled.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
 					<?php foreach ( $oauth2_azure_servers_without_tenant_restrictions as $server_id ) : ?>
 						<a href="<?php echo esc_attr( $authorizer_options_url ); ?>#:~:text=<?php echo esc_html( $server_id ); ?>.%20Tenant%20ID" class="button button-primary"><?php esc_html_e( 'Review OAuth2 Server', 'authorizer' ); ?> #<?php echo esc_html( $server_id ); ?></a>
 					<?php endforeach; ?>
@@ -2234,7 +2234,7 @@ class Admin_Page extends Singleton {
 	 * Action: admin_head-index.php
 	 */
 	public function load_options_page() {
-		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.15.3', true );
+		wp_enqueue_script( 'authorizer', plugins_url( 'js/authorizer.js', plugin_root() ), array( 'jquery-effects-shake' ), '3.16.0', true );
 		wp_localize_script(
 			'authorizer',
 			'authL10n',

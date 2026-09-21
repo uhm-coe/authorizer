@@ -734,8 +734,8 @@ class Authentication extends Singleton {
 						return new \WP_Error( 'oauth2_tenant_id_not_allowed', __( '<strong>ERROR</strong>: This Tenant ID is not allowed.', 'authorizer' ) );
 				}
 
-				// Enforce email verification if required.
-				if ( '1' === $oauth2_require_verified_email ) {
+				// Enforce email verification if enabled, or if Tenant ID is "common" or empty.
+				if ( '1' === $oauth2_require_verified_email || empty( $oauth2_tenant_id ) || 'common' === $oauth2_tenant_id ) {
 					if ( empty( $email ) ) {
 						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
