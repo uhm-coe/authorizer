@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.1
-Stable tag: 3.15.3
+Stable tag: 3.16.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,11 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.16.0 =
+* Azure OAuth2 configurations without a Tenant ID specified in Authorizer config (or "common" as the Tenant ID) now enforce email verification. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your Azure config to include your Tenant ID.
+* Upgrade composer dependencies: firebase/php-jwt (v7.1.0 => v7.2.0); google/apiclient (v2.19.4 => v2.20.0); google/apiclient-services (v0.457.0 => v0.460.0); google/auth (v1.53.0 => v1.55.0); guzzlehttp/guzzle (7.15.5 => 8.2.0); guzzlehttp/promises (2.5.3 => 3.0.2); guzzlehttp/psr7 (2.13.1 => 3.1.0); league/oauth2-client (2.9.0 => 2.9.1); monolog/monolog (3.11.0 => 3.12.0).
+* Update French translations. Props @julienlusson!
 
 = 3.15.3 =
 * Security hardening: prior versions of Authorizer did not restrict Azure OAuth2 tenants when the "Tenant ID" setting was left blank. Starting with this version, an admin notice appears warning users when this setting is blank or "common". Props [Raphael](https://patchstack.com/database/researchers/62666357-2b66-4614-a810-64af95bebbc5) for the coordinated disclosure via wordpress.org and patchstack!
@@ -413,9 +418,12 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 
 == Upgrade Notice ==
 
+= 3.16.0 =
+* This version includes security fixes for Azure OAuth2 configurations. Azure OAuth2 users, if you have not specified a specific Tenant ID in Authorizer config, email verification will be automatically performed. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your Azure config to include your Tenant ID.
+
 = 3.15.3 =
 * This version includes security fixes for Azure OAuth2 configurations.
-* Azure OAuth2 users, when enabling "require verified email address," users will need to perform a one-time email address verification before they can log in. The WordPress server will email a unique login link to the email address. [More Info](https://www.microsoft.com/en-us/msrc/blog/2023/06/potential-risk-of-privilege-escalation-in-azure-ad-applications)
+* Azure OAuth2 users, when enabling "require verified email address," users will need to perform a one-time email address verification before they can log in. The WordPress server will email a unique login link to the email address.
 * Azure OAuth2 users are encouraged to restrict access by Tenant ID in Authorizer Settings, and will be shown an admin notice if Tenant ID is empty or set to "common".
 
 = 3.15.2 =
