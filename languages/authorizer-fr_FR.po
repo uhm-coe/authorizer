@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Authorizer en français\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/authorizer\n"
-"POT-Creation-Date: 2026-09-03 14:12+0200\n"
+"POT-Creation-Date: 2026-09-22 10:29+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: University of Hawaii <dcdc@hawaii.edu>\n"
 "Language-Team: Paul Ryan <paul.ryan@hawaii.edu>\n"
@@ -940,6 +940,13 @@ msgid ""
 msgstr ""
 "Attention : un serveur OAuth2 Azure paramétré n’a aucune restrictions d’ID "
 "de locataire."
+
+#: src/authorizer/class-admin-page.php:284
+msgid ""
+"Email verification will be automatically performed and cannot be disabled."
+msgstr ""
+"La vérification par courrier électronique sera faite automatiquement et ne "
+"peut pas être désactivée."
 
 #: src/authorizer/class-admin-page.php:284
 #: src/authorizer/options/external/class-oauth2.php:355
@@ -3051,7 +3058,15 @@ msgstr ""
 "unique en cliquant sur le lien d’un courrier électronique envoyé par cette "
 "plateforme WordPress après une connexion Azure réussie."
 
-#: src/authorizer/options/external/class-oauth2.php:581
+#: src/authorizer/options/external/class-oauth2.php:562
+msgid ""
+"Note: if Tenant ID is \"common\" or empty, this check is automatically "
+"performed for security reasons."
+msgstr ""
+"Note : si l’ID de locataire est « common » ou vide, cette vérification est "
+"automatiquement effectuée pour des raisons de sécurités."
+
+#: src/authorizer/options/external/class-oauth2.php:582
 msgid ""
 "Link OAuth2 accounts to WordPress accounts by their username (leave this off "
 "to link by email address)"
@@ -3059,7 +3074,7 @@ msgstr ""
 "Lier les comptes OAuth2 aux comptes WordPress par leur nom d’utilisateur "
 "(laisser désactivé pour lier via l’adresse électronique)"
 
-#: src/authorizer/options/external/class-oauth2.php:582
+#: src/authorizer/options/external/class-oauth2.php:583
 msgid ""
 "Note: The default (and most secure) behavior is to associate WordPress "
 "accounts with OAuth2 accounts by the email they have in common. However, "
