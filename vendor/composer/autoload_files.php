@@ -8,6 +8,7 @@ $baseDir = dirname($vendorDir);
 return array(
     'a4a119a56e50fbb293281d9a48007e0e' => $vendorDir . '/symfony/polyfill-php80/bootstrap.php',
     '5897ea0ac4cccf14d323035e65887801' => $vendorDir . '/symfony/polyfill-php82/bootstrap.php',
+    '6e3fae29631ef280660b3cdad06f25a8' => $vendorDir . '/symfony/deprecation-contracts/function.php',
     '1f87db08236948d07391152dccb70f04' => $vendorDir . '/google/apiclient-services/autoload.php',
     'decc78cc4436b1292c6c0d151b19445c' => $vendorDir . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
     '344f11dc3484aaed5cbde58e23513be4' => $vendorDir . '/apereo/phpcas/source/CAS.php',

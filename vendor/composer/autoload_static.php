@@ -9,6 +9,7 @@ class ComposerStaticInit3afe4a77f11b1a9be67c8c9e1abad910
     public static $files = array (
         'a4a119a56e50fbb293281d9a48007e0e' => __DIR__ . '/..' . '/symfony/polyfill-php80/bootstrap.php',
         '5897ea0ac4cccf14d323035e65887801' => __DIR__ . '/..' . '/symfony/polyfill-php82/bootstrap.php',
+        '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
         '1f87db08236948d07391152dccb70f04' => __DIR__ . '/..' . '/google/apiclient-services/autoload.php',
         'decc78cc4436b1292c6c0d151b19445c' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/bootstrap.php',
         '344f11dc3484aaed5cbde58e23513be4' => __DIR__ . '/..' . '/apereo/phpcas/source/CAS.php',
