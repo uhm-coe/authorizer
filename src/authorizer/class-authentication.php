@@ -482,7 +482,7 @@ class Authentication extends Singleton {
 		$oauth2_attr_email             = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
 		$oauth2_attr_first_name        = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
 		$oauth2_attr_last_name         = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
-		$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '';
+		$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '1';
 		$oauth2_link_on_username       = $auth_settings[ 'oauth2_link_on_username' . $suffix ] ?? '';
 
 		// Fetch the Oauth2 Client ID (allow overrides from filter or constant).
@@ -1104,7 +1104,7 @@ class Authentication extends Singleton {
 		$oidc_attr_first_name        = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
 		$oidc_attr_last_name         = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
 		$oidc_force_auth_method      = $auth_settings[ 'oidc_force_auth_method' . $suffix ] ?? '';
-		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
+		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '1';
 		$oidc_link_on_username       = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
 		$oidc_hosteddomain           = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
 
