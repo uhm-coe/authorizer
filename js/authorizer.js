@@ -547,10 +547,12 @@
 			}
 
 			// Enforce email verification if Azure Tenant ID not set.
-			const has_no_tenant_id = ['', 'common'].includes( $( 'input', server.tenant_id ).val() );
-			$( 'input', server.require_verified_email ).prop( 'disabled', has_no_tenant_id );
-			if ( has_no_tenant_id ) {
-				$( 'input', server.require_verified_email ).prop( 'checked', true );
+			if ( [ 'azure' ].includes( server.provider.find( 'select' ).val() ) ) {
+				const has_no_tenant_id = ['', 'common'].includes( $( 'input', server.tenant_id ).val() );
+				$( 'input', server.require_verified_email ).prop( 'disabled', has_no_tenant_id );
+				if ( has_no_tenant_id ) {
+					$( 'input', server.require_verified_email ).prop( 'checked', true );
+				}
 			}
 
 			// Event handler: enforce email verification if Azure Tenant ID not set.
