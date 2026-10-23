@@ -1548,8 +1548,8 @@ class Options extends Singleton {
 				}
 
 				// Sanitize OIDC force auth method (select: value can only be 'client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'private_key_jwt', or empty string).
-				if ( ! isset( $auth_settings[ 'oidc_force_auth_method' . $oidc_num_server ] ) || ! in_array( $auth_settings[ 'oidc_force_auth_method' . $oidc_num_server ], array( '', 'client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'private_key_jwt' ), true ) ) {
-					$auth_settings[ 'oidc_force_auth_method' . $oidc_num_server ] = '';
+				if ( ! isset( $auth_settings[ 'oidc_force_auth_method_' . $oidc_num_server ] ) || ! in_array( $auth_settings[ 'oidc_force_auth_method_' . $oidc_num_server ], array( '', 'client_secret_basic', 'client_secret_post', 'client_secret_jwt', 'private_key_jwt' ), true ) ) {
+					$auth_settings[ 'oidc_force_auth_method_' . $oidc_num_server ] = '';
 				}
 
 				// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
