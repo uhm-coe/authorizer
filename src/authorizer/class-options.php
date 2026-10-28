@@ -115,7 +115,6 @@ class Options extends Singleton {
 			return null;
 		}
 
-// if ('oidc_require_verified_email'===$option){er($auth_settings);}
 		return $auth_settings[ $option ];
 	}
 
