@@ -786,6 +786,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			(
 				'1' === $auth_settings['cas'] ||
 				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['oidc'] ||
 				'1' === $auth_settings['google'] ||
 				'1' === $auth_settings['ldap']
 			) && ! (
@@ -826,6 +827,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			(
 				'1' === $auth_settings['cas'] ||
 				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['oidc'] ||
 				'1' === $auth_settings['google'] ||
 				'1' === $auth_settings['ldap']
 			)
@@ -860,6 +862,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			(
 				'1' === $auth_settings['cas'] ||
 				'1' === $auth_settings['oauth2'] ||
+				'1' === $auth_settings['oidc'] ||
 				'1' === $auth_settings['google'] ||
 				'1' === $auth_settings['ldap']
 			)
