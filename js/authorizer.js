@@ -1365,10 +1365,10 @@
 			// Disable wait cursor.
 			$( 'html' ).removeClass( 'busy' );
 
-			// If the save was successful, and we have more than 1 CAS or OAuth2
-			// servers configured, reload the page to render the additional CAS/Oauth2
-			// server settings fields.
-			if ( succeeded && ( params.cas_num_servers > 1 || params.oauth2_num_servers > 1 ) ) {
+			// If the save was successful, and we have more than 1 CAS/OAuth2/OIDC
+			// server(s) configured, reload the page to render the additional
+			// CAS/Oauth2/OIDC server settings fields.
+			if ( succeeded && ( params.cas_num_servers > 1 || params.oauth2_num_servers > 1 || params.oidc_num_servers > 1 ) ) {
 				location.reload();
 			}
 		}).fail( function() {
