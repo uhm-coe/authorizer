@@ -1283,6 +1283,7 @@
 				params['oidc_force_auth_method_' + oidc_num_server] = $( '#auth_settings_oidc_force_auth_method_' + oidc_num_server ).val();
 				params['oidc_require_verified_email_' + oidc_num_server] = $( '#auth_settings_oidc_require_verified_email_' + oidc_num_server ).length < 1 || $( '#auth_settings_oidc_require_verified_email_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
 				params['oidc_link_on_username_' + oidc_num_server] = $( '#auth_settings_oidc_link_on_username_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
+				params['oidc_hosteddomain_' + oidc_num_server] = $( '#auth_settings_oidc_hosteddomain_' + oidc_num_server ).val();
 			}
 		}
 
