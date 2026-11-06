@@ -334,8 +334,8 @@ class Admin_Page extends Singleton {
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
-		// Warn on any OAuth2 Azure providers without Tenant ID restrictions.
-		if ( '1' === $auth_settings['oauth2'] ) :
+		// Warn (only admins) on any OAuth2 Azure providers without Tenant ID restrictions.
+		if ( '1' === $auth_settings['oauth2'] && current_user_can( 'create_users' ) ) :
 			// Get link to the default OAuth2 settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
