@@ -251,45 +251,7 @@ class Admin_Page extends Singleton {
 		$options       = Options::get_instance();
 		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
-		// Warn on any OAuth2 Azure providers without Tenant ID restrictions.
-		if ( '1' === $auth_settings['oauth2'] ) :
-			// Get link to the default OAuth2 settings page.
-			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
-			// If the Authorizer menu item is under Settings, point to that settings page.
-			if ( 'settings' === $auth_settings['advanced_admin_menu'] ) {
-				$authorizer_options_url = admin_url( 'options-general.php?page=authorizer&tab=external_oauth2' );
-			}
-			// If we're in multisite settings, point to that settings page instead.
-			if ( is_network_admin() ) {
-				$authorizer_options_url = network_admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
-			}
-
-			// Warn if any OAuth2 Azure servers have no Tenant ID restrictions.
-			$oauth2_azure_servers_without_tenant_restrictions = array();
-			if ( empty( $auth_settings['oauth2_num_servers'] ) ) :
-				$auth_settings['oauth2_num_servers'] = 1;
-			endif;
-			for ( $i = 1; $i <= $auth_settings['oauth2_num_servers']; $i++ ) :
-				$suffix = 1 === $i ? '' : '_' . $i;
-				if (
-					'azure' === $auth_settings[ 'oauth2_provider' . $suffix ] &&
-					( empty( $auth_settings[ 'oauth2_tenant_id' . $suffix ] ) || 'common' === $auth_settings[ 'oauth2_tenant_id' . $suffix ] )
-				) :
-					$oauth2_azure_servers_without_tenant_restrictions[] = $i;
-				endif;
-			endfor;
-			if ( ! empty( $oauth2_azure_servers_without_tenant_restrictions ) ) :
-				?>
-				<div class='notice notice-warning is-dismissible'>
-					<p><?php esc_html_e( 'Warning: a configured OAuth2 Azure server does not have any Tenant ID restrictions.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed and cannot be disabled.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
-					<?php foreach ( $oauth2_azure_servers_without_tenant_restrictions as $server_id ) : ?>
-						<a href="<?php echo esc_attr( $authorizer_options_url ); ?>#:~:text=<?php echo esc_html( $server_id ); ?>.%20Tenant%20ID" class="button button-primary"><?php esc_html_e( 'Review OAuth2 Server', 'authorizer' ); ?> #<?php echo esc_html( $server_id ); ?></a>
-					<?php endforeach; ?>
-				</div>
-				<?php
-			endif;
-		endif;
-
+		// Warn on any coinfigured CAS servers that are unreachable.
 		if ( '1' === $auth_settings['cas'] ) :
 			// Get link to the default CAS settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_cas' );
@@ -362,18 +324,57 @@ class Admin_Page extends Singleton {
 
 
 	/**
-	 * Show custom admin notice.
-	 *
-	 * Note: currently unused, but if anywhere we:
-	 *   add_option( 'auth_settings_advanced_admin_notice, 'Your message.' );
-	 * It will display and then delete that message on the admin dashboard.
+	 * Show any admin notices (on all admin pages).
 	 *
 	 * Filter: admin_notices
 	 * filter: network_admin_notices
 	 */
 	public function show_advanced_admin_notice() {
-		$notice = get_option( 'auth_settings_advanced_admin_notice' );
+		// Grab plugin settings.
+		$options       = Options::get_instance();
+		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
 
+		// Warn on any OAuth2 Azure providers without Tenant ID restrictions.
+		if ( '1' === $auth_settings['oauth2'] ) :
+			// Get link to the default OAuth2 settings page.
+			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
+			// If the Authorizer menu item is under Settings, point to that settings page.
+			if ( 'settings' === $auth_settings['advanced_admin_menu'] ) {
+				$authorizer_options_url = admin_url( 'options-general.php?page=authorizer&tab=external_oauth2' );
+			}
+			// If we're in multisite settings, point to that settings page instead.
+			if ( is_network_admin() ) {
+				$authorizer_options_url = network_admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
+			}
+
+			// Warn if any OAuth2 Azure servers have no Tenant ID restrictions.
+			$oauth2_azure_servers_without_tenant_restrictions = array();
+			if ( empty( $auth_settings['oauth2_num_servers'] ) ) :
+				$auth_settings['oauth2_num_servers'] = 1;
+			endif;
+			for ( $i = 1; $i <= $auth_settings['oauth2_num_servers']; $i++ ) :
+				$suffix = 1 === $i ? '' : '_' . $i;
+				if (
+					'azure' === $auth_settings[ 'oauth2_provider' . $suffix ] &&
+					( empty( $auth_settings[ 'oauth2_tenant_id' . $suffix ] ) || 'common' === $auth_settings[ 'oauth2_tenant_id' . $suffix ] )
+				) :
+					$oauth2_azure_servers_without_tenant_restrictions[] = $i;
+				endif;
+			endfor;
+			if ( ! empty( $oauth2_azure_servers_without_tenant_restrictions ) ) :
+				?>
+				<div class='notice notice-warning is-dismissible'>
+					<p><?php esc_html_e( 'Warning: a configured OAuth2 Azure server does not have any Tenant ID restrictions.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed and cannot be disabled.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
+					<?php foreach ( $oauth2_azure_servers_without_tenant_restrictions as $server_id ) : ?>
+						<a href="<?php echo esc_attr( $authorizer_options_url ); ?>#:~:text=<?php echo esc_html( $server_id ); ?>.%20Tenant%20ID" class="button button-primary"><?php esc_html_e( 'Review OAuth2 Server', 'authorizer' ); ?> #<?php echo esc_html( $server_id ); ?></a>
+					<?php endforeach; ?>
+				</div>
+				<?php
+			endif;
+		endif;
+
+		// Show any ephemeral notices added with: `add_option( 'auth_settings_advanced_admin_notice, '' );`.
+		$notice = get_option( 'auth_settings_advanced_admin_notice' );
 		if ( $notice && strlen( $notice ) > 0 ) {
 			delete_option( 'auth_settings_advanced_admin_notice' );
 			?>
