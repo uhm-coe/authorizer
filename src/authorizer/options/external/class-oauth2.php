@@ -558,8 +558,67 @@ class OAuth2 extends \Authorizer\Singleton {
 		?>
 		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Require verified email address', 'authorizer' ); ?></label>
 		<p class="description description-oauth2-generic"><?php esc_html_e( 'If checked, users must have a verified email address (email_verified claim) to log in.', 'authorizer' ); ?></p>
+		<p class="description description-oauth2-generic"><?php esc_html_e( 'If not checked, users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful sign-in.', 'authorizer' ); ?></p>
 		<p class="description description-oauth2-azure"><?php esc_html_e( 'If checked, users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-subject" target="_blank"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
 		<p class="description description-oauth2-azure"><?php esc_html_e( 'Note: if Tenant ID is "common" or empty, this check is automatically performed for security reasons.', 'authorizer' ); ?></p>
+		<?php
+	}
+
+
+	/**
+	 * Settings print callback.
+	 *
+	 * @param  array $args Args (e.g., multisite admin mode).
+	 * @return void
+	 */
+	public function print_checkbox_oauth2_dangerously_skip_email_verification( $args = '' ) {
+		// Get plugin option.
+		$options              = Options::get_instance();
+		$suffix               = empty( $args['oauth2_num_server'] ) || 1 === $args['oauth2_num_server'] ? '' : '_' . $args['oauth2_num_server'];
+		$option               = 'oauth2_dangerously_skip_email_verification' . $suffix;
+		$auth_settings_option = $options->get( $option, Helper::get_context( $args ), 'allow override', 'print overlay' );
+
+		// If setting is overridden by filter or constant, don't expose the value;
+		// just print an informational message.
+		if ( has_filter( 'authorizer_oauth2' . $suffix . '_dangerously_skip_email_verification' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: filter name */
+						__( 'This setting is not editable since it has been defined in the %s filter.', 'authorizer' ),
+						'<code>authorizer_oauth2' . $suffix . '_dangerously_skip_email_verification</code>'
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		} elseif ( defined( 'AUTHORIZER_OAUTH2' . $suffix . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
+			?>
+			<input type="hidden" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="" />
+			<p class="description">
+				<?php
+				echo wp_kses_post(
+					sprintf(
+						/* TRANSLATORS: %s: defined constant name */
+						__( 'This setting is not editable since it has been defined in wp-config.php via %s', 'authorizer' ),
+						"<code>define( 'AUTHORIZER_OAUTH2" . $suffix . "_DANGEROUSLY_SKIP_EMAIL_VERIFICATION', '...' );</code>"
+					)
+				);
+				?>
+			</p>
+			<?php
+			return;
+		}
+
+		// Print option elements.
+		?>
+		<input type="checkbox" id="auth_settings_<?php echo esc_attr( $option ); ?>" name="auth_settings[<?php echo esc_attr( $option ); ?>]" value="1"<?php checked( 1 === intval( $auth_settings_option ) ); ?> /><label for="auth_settings_<?php echo esc_attr( $option ); ?>"><?php esc_html_e( 'Bypass email verification (unsafe)', 'authorizer' ); ?></label>
+		<p class="description"><?php esc_html_e( 'Warning: If checked, users may be able to log in with unverified emails. This can allow impersonation of existing accounts.', 'authorizer' ); ?></p>
+		<p class="description"><?php esc_html_e( 'This is not recommended unless you can confirm the user email addresses from the identify provider have already been verified.', 'authorizer' ); ?></p>
 		<?php
 	}
 

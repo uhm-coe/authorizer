@@ -179,6 +179,7 @@ class Ajax_Endpoints extends Singleton {
 			'oauth2_attr_last_name',
 			'oauth2_attr_update_on_login',
 			'oauth2_require_verified_email',
+			'oauth2_dangerously_skip_email_verification',
 			'oauth2_link_on_username',
 			'oidc',
 			'oidc_auto_login',
@@ -198,6 +199,7 @@ class Ajax_Endpoints extends Singleton {
 			'oidc_attr_update_on_login',
 			'oidc_force_auth_method',
 			'oidc_require_verified_email',
+			'oidc_dangerously_skip_email_verification',
 			'oidc_link_on_username',
 			'oidc_hosteddomain',
 			'google',
@@ -261,6 +263,7 @@ class Ajax_Endpoints extends Singleton {
 					'oauth2_attr_last_name_' . $oauth2_num_server,
 					'oauth2_attr_update_on_login_' . $oauth2_num_server,
 					'oauth2_require_verified_email_' . $oauth2_num_server,
+					'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server,
 					'oauth2_link_on_username_' . $oauth2_num_server,
 				) );
 			}
@@ -284,6 +287,7 @@ class Ajax_Endpoints extends Singleton {
 					'oidc_attr_update_on_login_' . $oidc_num_server,
 					'oidc_force_auth_method_' . $oidc_num_server,
 					'oidc_require_verified_email_' . $oidc_num_server,
+					'oidc_dangerously_skip_email_verification_' . $oidc_num_server,
 					'oidc_link_on_username_' . $oidc_num_server,
 					'oidc_hosteddomain_' . $oidc_num_server,
 				) );
