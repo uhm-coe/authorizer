@@ -269,6 +269,13 @@ class Authentication extends Singleton {
 					}
 				}
 
+				// Edge case: If we already received an error from one of our custom
+				// authenticate functions (e.g., pending email verification), return
+				// that error instead of the default error below.
+				if ( is_wp_error( $result ) ) {
+					return $result;
+				}
+
 				remove_filter( 'authenticate', 'wp_authenticate_username_password', 20, 3 );
 				remove_filter( 'authenticate', 'wp_authenticate_email_password', 20, 3 );
 
