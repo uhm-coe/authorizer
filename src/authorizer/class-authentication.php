@@ -1528,7 +1528,7 @@ class Authentication extends Singleton {
 						);
 						// Notify the user to check their email.
 						return new \WP_Error(
-							'oauth2_pending_verification',
+							'oidc_pending_verification',
 							sprintf(
 								/* TRANSLATORS: Email */
 								__( '<strong>Email verification required</strong>: Please check your inbox (%s) for a verification email and click the link to finish signing in.', 'authorizer' ),
@@ -1537,7 +1537,7 @@ class Authentication extends Singleton {
 						);
 					} elseif ( $verified_sub !== $sub ) {
 						// If the subject claim doesn't match the response, deny the login.
-						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
+						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
 
