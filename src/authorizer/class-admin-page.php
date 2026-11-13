@@ -388,7 +388,7 @@ class Admin_Page extends Singleton {
 			endfor;
 			if ( ! empty( $oidc_servers_without_require_verified_email_and_verification_not_skipped ) ) :
 				?>
-				<div class='notice notice-warning'>
+				<div class='notice notice-warning authorizer-warning-no-oidc-email-verification'>
 					<p><?php esc_html_e( 'Warning: a configured OIDC server does not require verified emails.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed unless explicitly disabled with the "Skip email verification" option.', 'authorizer' ); ?> </p>
 					<p><?php esc_html_e( 'Email verification consists of a one-time email verification performed by clicking a link in an email sent to them from this WordPress server after a successful OIDC sign-in.', 'authorizer' ); ?> </p>
 					<?php foreach ( $oidc_servers_without_require_verified_email_and_verification_not_skipped as $server_id ) : ?>
@@ -455,7 +455,7 @@ class Admin_Page extends Singleton {
 			endfor;
 			if ( ! empty( $oauth2_generic_servers_without_require_verified_email_and_verification_not_skipped ) ) :
 				?>
-				<div class='notice notice-warning'>
+				<div class='notice notice-warning authorizer-warning-no-oauth2-email-verification'>
 					<p><?php esc_html_e( 'Warning: a configured OAuth2 (generic) server does not require verified emails.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed unless explicitly disabled with the "Skip email verification" option.', 'authorizer' ); ?> </p>
 					<p><?php esc_html_e( 'Email verification consists of a one-time email verification performed by clicking a link in an email sent to them from this WordPress server after a successful OAuth2 sign-in.', 'authorizer' ); ?> </p>
 					<?php foreach ( $oauth2_generic_servers_without_require_verified_email_and_verification_not_skipped as $server_id ) : ?>
@@ -499,7 +499,7 @@ class Admin_Page extends Singleton {
 			endfor;
 			if ( ! empty( $oauth2_azure_servers_without_tenant_restrictions ) ) :
 				?>
-				<div class='notice notice-warning'>
+				<div class='notice notice-warning authorizer-warning-no-oauth2-email-verification'>
 					<p><?php esc_html_e( 'Warning: a configured OAuth2 Azure server does not have any Tenant ID restrictions.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed and cannot be disabled.', 'authorizer' ); ?> <a href="https://learn.microsoft.com/en-us/entra/identity-platform/claims-validation#validate-the-tenant"><?php esc_html_e( 'More Info', 'authorizer' ); ?></a></p>
 					<?php foreach ( $oauth2_azure_servers_without_tenant_restrictions as $server_id ) : ?>
 						<a href="<?php echo esc_attr( $authorizer_options_url ); ?>#:~:text=<?php echo esc_html( $server_id ); ?>.%20Tenant%20ID" class="button button-primary"><?php esc_html_e( 'Review OAuth2 Server', 'authorizer' ); ?> #<?php echo esc_html( $server_id ); ?></a>
