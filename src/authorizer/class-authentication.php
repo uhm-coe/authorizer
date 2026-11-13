@@ -714,7 +714,7 @@ class Authentication extends Singleton {
 					// Look up user using token.
 					$user       = $provider->getResourceOwner( $token );
 					$attributes = $user->toArray();
-					$email      = $user->getEmail();
+					$email      = sanitize_email( $user->getEmail() );
 					$username   = $user->getNickname();
 
 					// If user has no public email, fetch all emails and use those.
@@ -731,7 +731,7 @@ class Authentication extends Singleton {
 									return false;
 								}
 
-								return $entry['email'];
+								return sanitize_email( $entry['email'] );
 							},
 							(array) $provider->getParsedResponse( $request )
 						) );
@@ -836,7 +836,7 @@ class Authentication extends Singleton {
 					// Look up user using token.
 					$user       = $provider->getResourceOwner( $token );
 					$attributes = $user->toArray();
-					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
+					$email      = empty( $attributes['email'] ) ? '' : sanitize_email( $attributes['email'] );
 					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];
 				} catch ( \Exception $e ) {
 					// Failed to get user details.
@@ -1029,7 +1029,7 @@ class Authentication extends Singleton {
 					$user       = $provider->getResourceOwner( $token );
 					$attributes = $user->toArray();
 					$sub        = empty( $attributes['sub'] ) ? '' : $attributes['sub'];
-					$email      = empty( $attributes['email'] ) ? '' : $attributes['email'];
+					$email      = empty( $attributes['email'] ) ? '' : sanitize_email( $attributes['email'] );
 					$username   = empty( $attributes['preferred_username'] ) ? '' : $attributes['preferred_username'];
 				} catch ( \Exception $e ) {
 					// Failed to get user details.
@@ -1048,9 +1048,9 @@ class Authentication extends Singleton {
 				// Get custom email attribute, if specified.
 				if ( ! empty( $oauth2_attr_email ) && ! empty( $attributes[ $oauth2_attr_email ] ) ) {
 					if ( is_string( $attributes[ $oauth2_attr_email ] ) ) {
-						$email = trim( $attributes[ $oauth2_attr_email ] );
+						$email = sanitize_email( trim( $attributes[ $oauth2_attr_email ] ) );
 					} elseif ( is_array( $attributes[ $oauth2_attr_email ] ) ) {
-						$email = $attributes[ $oauth2_attr_email ];
+						$email = array_filter( array_map( 'sanitize_email', $attributes[ $oauth2_attr_email ] ) );
 					}
 				}
 
@@ -1712,7 +1712,7 @@ class Authentication extends Singleton {
 		}
 
 		// Get email address.
-		$email = Helper::lowercase( $payload['email'] );
+		$email = Helper::lowercase( sanitize_email( $payload['email'] ) );
 
 		$email_domain = substr( strrchr( $email, '@' ), 1 );
 		$username     = current( explode( '@', $email ) );
