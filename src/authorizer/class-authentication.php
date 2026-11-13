@@ -1118,7 +1118,11 @@ class Authentication extends Singleton {
 							)
 						);
 					} elseif ( $verified_sub !== $sub ) {
-						// If the subject claim doesn't match the response, deny the login.
+						// If the subject claim doesn't match the response, deny the login
+						// and delete the transients granting access (in case a legitimate
+						// user clicked the link in an email triggered by an impersonator).
+						delete_transient( 'authorizer_oauth2_generic_url_for_' . $email );
+						delete_transient( 'authorizer_oauth2_generic_sub_for_' . $email );
 						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
@@ -1543,7 +1547,11 @@ class Authentication extends Singleton {
 							)
 						);
 					} elseif ( $verified_sub !== $sub ) {
-						// If the subject claim doesn't match the response, deny the login.
+						// If the subject claim doesn't match the response, deny the login
+						// and delete the transients granting access (in case a legitimate
+						// user clicked the link in an email triggered by an impersonator).
+						delete_transient( 'authorizer_oidc_iss_for_' . $email );
+						delete_transient( 'authorizer_oidc_sub_for_' . $email );
 						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
