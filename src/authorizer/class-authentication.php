@@ -888,7 +888,7 @@ class Authentication extends Singleton {
 							__( 'Action required: Verify your email address', 'authorizer' ),
 							sprintf(
 								/* TRANSLATORS: 1: Name of site 2: Site URL 3: Verification URL */
-								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n", 'authorizer' ),
+								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n\nIf you did not just attempt to sign in, do not click this link; someone may be trying to access your account.\n", 'authorizer' ),
 								get_bloginfo( 'name' ),
 								get_bloginfo( 'url' ),
 								$verification_url
@@ -1102,7 +1102,7 @@ class Authentication extends Singleton {
 							__( 'Action required: Verify your email address', 'authorizer' ),
 							sprintf(
 								/* TRANSLATORS: 1: Name of site 2: Site URL 3: Verification URL */
-								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n", 'authorizer' ),
+								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n\nIf you did not just attempt to sign in, do not click this link; someone may be trying to access your account.\n", 'authorizer' ),
 								get_bloginfo( 'name' ),
 								get_bloginfo( 'url' ),
 								$verification_url
@@ -1531,7 +1531,7 @@ class Authentication extends Singleton {
 							__( 'Action required: Verify your email address', 'authorizer' ),
 							sprintf(
 								/* TRANSLATORS: 1: Name of site 2: Site URL 3: Verification URL */
-								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n", 'authorizer' ),
+								__( "Someone (hopefully you) signed into the website at:\n\n%1\$s\n%2\$s\n\nIf this was you, please visit the following link to verify your email and finish signing in:\n%3\$s\n\nIf you did not just attempt to sign in, do not click this link; someone may be trying to access your account.\n", 'authorizer' ),
 								get_bloginfo( 'name' ),
 								get_bloginfo( 'url' ),
 								$verification_url
