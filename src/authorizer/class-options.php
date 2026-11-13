@@ -197,7 +197,7 @@ class Options extends Singleton {
 				$auth_settings['oauth2_attr_first_name']                     = $auth_multisite_settings['oauth2_attr_first_name'] ?? '';
 				$auth_settings['oauth2_attr_last_name']                      = $auth_multisite_settings['oauth2_attr_last_name'] ?? '';
 				$auth_settings['oauth2_attr_update_on_login']                = $auth_multisite_settings['oauth2_attr_update_on_login'] ?? '';
-				$auth_settings['oauth2_require_verified_email']              = $auth_multisite_settings['oauth2_require_verified_email'] ?? '1';
+				$auth_settings['oauth2_require_verified_email']              = $auth_multisite_settings['oauth2_require_verified_email'] ?? '';
 				$auth_settings['oauth2_dangerously_skip_email_verification'] = $auth_multisite_settings['oauth2_dangerously_skip_email_verification'] ?? '';
 				$auth_settings['oauth2_link_on_username']                    = $auth_multisite_settings['oauth2_link_on_username'] ?? '';
 				// Add any options for extra OAuth2 servers.
@@ -217,7 +217,7 @@ class Options extends Singleton {
 						$auth_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ]                     = $auth_multisite_settings[ 'oauth2_attr_first_name_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ]                      = $auth_multisite_settings[ 'oauth2_attr_last_name_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ]                = $auth_multisite_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] ?? '';
-						$auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ]              = $auth_multisite_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] ?? '1';
+						$auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ]              = $auth_multisite_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server ] = $auth_multisite_settings[ 'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server ] ?? '';
 						$auth_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ]                    = $auth_multisite_settings[ 'oauth2_link_on_username_' . $oauth2_num_server ] ?? '';
 					}
@@ -241,7 +241,7 @@ class Options extends Singleton {
 				$auth_settings['oidc_attr_last_name']                      = $auth_multisite_settings['oidc_attr_last_name'] ?? 'family_name';
 				$auth_settings['oidc_attr_update_on_login']                = $auth_multisite_settings['oidc_attr_update_on_login'] ?? '';
 				$auth_settings['oidc_force_auth_method']                   = $auth_multisite_settings['oidc_force_auth_method'] ?? '';
-				$auth_settings['oidc_require_verified_email']              = $auth_multisite_settings['oidc_require_verified_email'] ?? '1';
+				$auth_settings['oidc_require_verified_email']              = $auth_multisite_settings['oidc_require_verified_email'] ?? '';
 				$auth_settings['oidc_dangerously_skip_email_verification'] = $auth_multisite_settings['oidc_dangerously_skip_email_verification'] ?? '';
 				$auth_settings['oidc_link_on_username']                    = $auth_multisite_settings['oidc_link_on_username'] ?? '';
 				$auth_settings['oidc_hosteddomain']                        = $auth_multisite_settings['oidc_hosteddomain'] ?? '';
@@ -262,7 +262,7 @@ class Options extends Singleton {
 						$auth_settings[ 'oidc_attr_last_name_' . $oidc_num_server ]                      = $auth_multisite_settings[ 'oidc_attr_last_name_' . $oidc_num_server ] ?? 'family_name';
 						$auth_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ]                = $auth_multisite_settings[ 'oidc_attr_update_on_login_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_force_auth_method_' . $oidc_num_server ]                   = $auth_multisite_settings[ 'oidc_force_auth_method_' . $oidc_num_server ] ?? '';
-						$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ]              = $auth_multisite_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ?? '1';
+						$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ]              = $auth_multisite_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_dangerously_skip_email_verification_' . $oidc_num_server ] = $auth_multisite_settings[ 'oidc_dangerously_skip_email_verification_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_link_on_username_' . $oidc_num_server ]                    = $auth_multisite_settings[ 'oidc_link_on_username_' . $oidc_num_server ] ?? '';
 						$auth_settings[ 'oidc_hosteddomain_' . $oidc_num_server ]                        = $auth_multisite_settings[ 'oidc_hosteddomain_' . $oidc_num_server ] ?? '';
@@ -1438,7 +1438,11 @@ class Options extends Singleton {
 		}
 
 		// Sanitize OAuth2 require verified email (checkbox: value can only be '1' or empty string; defaults to '1').
-		$auth_settings['oauth2_require_verified_email'] = ! array_key_exists( 'oauth2_require_verified_email', $auth_settings ) || strlen( $auth_settings['oauth2_require_verified_email'] ) > 0 ? '1' : '';
+		$auth_settings['oauth2_require_verified_email'] = array_key_exists( 'oauth2_require_verified_email', $auth_settings ) && strlen( $auth_settings['oauth2_require_verified_email'] ) > 0 ? '1' : '';
+		// Default OAuth2 require verified email to '1' when first enabling OAuth2 external service.
+		if ( empty( $auth_settings['oauth2_require_verified_email'] ) && empty( $auth_settings['oauth2'] ) && ! empty( $_REQUEST['auth_settings']['oauth2'] ) ) {
+			$auth_settings['oauth2_require_verified_email'] = '1';
+		}
 
 		// Sanitize OAuth2 skip email verification (checkbox: value can only be '1' or empty string).
 		$auth_settings['oauth2_dangerously_skip_email_verification'] = array_key_exists( 'oauth2_dangerously_skip_email_verification', $auth_settings ) && strlen( $auth_settings['oauth2_dangerously_skip_email_verification'] ) > 0 ? '1' : '';
@@ -1564,8 +1568,12 @@ class Options extends Singleton {
 			$auth_settings['oidc_force_auth_method'] = '';
 		}
 
-		// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string; defaults to '1').
-		$auth_settings['oidc_require_verified_email'] = ! array_key_exists( 'oidc_require_verified_email', $auth_settings ) || strlen( $auth_settings['oidc_require_verified_email'] ) > 0 ? '1' : '';
+		// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
+		$auth_settings['oidc_require_verified_email'] = array_key_exists( 'oidc_require_verified_email', $auth_settings ) && strlen( $auth_settings['oidc_require_verified_email'] ) > 0 ? '1' : '';
+		// Default OIDC require verified email to '1' when first enabling OIDC external service.
+		if ( empty( $auth_settings['oidc_require_verified_email'] ) && empty( $auth_settings['oidc'] ) && ! empty( $_REQUEST['auth_settings']['oidc'] ) ) {
+			$auth_settings['oidc_require_verified_email'] = '1';
+		}
 
 		// Sanitize OIDC skip email verification (checkbox: value can only be '1' or empty string).
 		$auth_settings['oidc_dangerously_skip_email_verification'] = array_key_exists( 'oidc_dangerously_skip_email_verification', $auth_settings ) && strlen( $auth_settings['oidc_dangerously_skip_email_verification'] ) > 0 ? '1' : '';

@@ -426,7 +426,7 @@ class Authentication extends Singleton {
 			$oauth2_server_id              = isset( $result['oauth2_server_id'] ) ? intval( $result['oauth2_server_id'] ) : 1;
 			$suffix                        = $oauth2_server_id > 1 ? '_' . $oauth2_server_id : '';
 			$is_oauth2_generic_provider    = isset( $auth_settings[ 'oauth2_provider' . $suffix ] ) && 'generic' === $auth_settings[ 'oauth2_provider' . $suffix ];
-			$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '1';
+			$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '';
 			// Allow constant or filter overrides of this option.
 			$oauth2_dangerously_skip_email_verification = $auth_settings[ 'oauth2_dangerously_skip_email_verification' . $suffix ] ?? '';
 			if ( defined( 'AUTHORIZER_OAUTH2_' . $oauth2_server_id . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
@@ -469,7 +469,7 @@ class Authentication extends Singleton {
 		if ( $user && 'oidc' === $authenticated_by ) {
 			$oidc_server_id = isset( $result['oidc_server_id'] ) ? intval( $result['oidc_server_id'] ) : 1;
 			$suffix         = $oidc_server_id > 1 ? '_' . $oidc_server_id : '';
-			$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '1';
+			$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
 			// Allow constant or filter overrides of this option.
 			$oidc_dangerously_skip_email_verification = $auth_settings[ 'oidc_dangerously_skip_email_verification' . $suffix ] ?? '';
 			if ( defined( 'AUTHORIZER_OIDC_' . $oidc_server_id . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
@@ -576,7 +576,7 @@ class Authentication extends Singleton {
 		$oauth2_attr_email             = $auth_settings[ 'oauth2_attr_email' . $suffix ] ?? '';
 		$oauth2_attr_first_name        = $auth_settings[ 'oauth2_attr_first_name' . $suffix ] ?? '';
 		$oauth2_attr_last_name         = $auth_settings[ 'oauth2_attr_last_name' . $suffix ] ?? '';
-		$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '1';
+		$oauth2_require_verified_email = $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ?? '';
 		$oauth2_link_on_username       = $auth_settings[ 'oauth2_link_on_username' . $suffix ] ?? '';
 
 		// Allow constant or filter overrides of this option.
@@ -1293,7 +1293,7 @@ class Authentication extends Singleton {
 		$oidc_attr_first_name        = $auth_settings[ 'oidc_attr_first_name' . $suffix ] ?? 'given_name';
 		$oidc_attr_last_name         = $auth_settings[ 'oidc_attr_last_name' . $suffix ] ?? 'family_name';
 		$oidc_force_auth_method      = $auth_settings[ 'oidc_force_auth_method' . $suffix ] ?? '';
-		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '1';
+		$oidc_require_verified_email = $auth_settings[ 'oidc_require_verified_email' . $suffix ] ?? '';
 		$oidc_link_on_username       = $auth_settings[ 'oidc_link_on_username' . $suffix ] ?? '';
 		$oidc_hosteddomain           = $auth_settings[ 'oidc_hosteddomain' . $suffix ] ?? '';
 
