@@ -354,11 +354,34 @@ class Admin_Page extends Singleton {
 			endif;
 			for ( $i = 1; $i <= $auth_settings['oidc_num_servers']; $i++ ) :
 				$suffix = 1 === $i ? '' : '_' . $i;
+
+				// Allow constant or filter overrides of this option.
+				$oidc_dangerously_skip_email_verification = $auth_settings[ 'oidc_dangerously_skip_email_verification' . $suffix ] ?? '';
+				if ( defined( 'AUTHORIZER_OIDC_' . $i . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
+					$oidc_dangerously_skip_email_verification = constant( 'AUTHORIZER_OIDC_' . $i . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' );
+				}
+				// Also allow constant without server_id (applies to the first configured server).
+				if ( 1 === $i && defined( 'AUTHORIZER_OIDC_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
+					$oidc_dangerously_skip_email_verification = constant( 'AUTHORIZER_OIDC_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' );
+				}
+				/**
+				 * Filters the OIDC Skip email verification option. A truthy value will skip verification.
+				 *
+				 * @since 3.9.0
+				 *
+				 * @param string $oidc_dangerously_skip_email_verification  The existing OIDC Skip email verification option.
+				 */
+				$oidc_dangerously_skip_email_verification = apply_filters( 'authorizer_oidc_' . $i . '_dangerously_skip_email_verification', $oidc_dangerously_skip_email_verification );
+				// Also allow filter without server_id (applies to the first configured server).
+				if ( 1 === $i ) {
+					$oidc_dangerously_skip_email_verification = apply_filters( 'authorizer_oidc_dangerously_skip_email_verification', $oidc_dangerously_skip_email_verification );
+				}
+
 				if (
 					! empty( $auth_settings[ 'oidc_client_id' . $suffix ] ) &&
 					! empty( $auth_settings[ 'oidc_client_secret' . $suffix ] ) &&
 					empty( $auth_settings[ 'oidc_require_verified_email' . $suffix ] ) &&
-					empty( $auth_settings[ 'oidc_dangerously_skip_email_verification' . $suffix ] )
+					empty( $oidc_dangerously_skip_email_verification )
 				) :
 					$oidc_servers_without_require_verified_email_and_verification_not_skipped[] = $i;
 				endif;
@@ -397,12 +420,35 @@ class Admin_Page extends Singleton {
 			endif;
 			for ( $i = 1; $i <= $auth_settings['oauth2_num_servers']; $i++ ) :
 				$suffix = 1 === $i ? '' : '_' . $i;
+
+				// Allow constant or filter overrides of the skip email option.
+				$oauth2_dangerously_skip_email_verification = $auth_settings[ 'oauth2_dangerously_skip_email_verification' . $suffix ] ?? '';
+				if ( defined( 'AUTHORIZER_OAUTH2_' . $i . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
+					$oauth2_dangerously_skip_email_verification = constant( 'AUTHORIZER_OAUTH2_' . $i . '_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' );
+				}
+				// Also allow constant without server_id (applies to the first configured server).
+				if ( 1 === $i && defined( 'AUTHORIZER_OAUTH2_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' ) ) {
+					$oauth2_dangerously_skip_email_verification = constant( 'AUTHORIZER_OAUTH2_DANGEROUSLY_SKIP_EMAIL_VERIFICATION' );
+				}
+				/**
+				 * Filters the Oauth2 Skip email verification option. A truthy value will skip verification.
+				 *
+				 * @since 3.9.0
+				 *
+				 * @param string $oauth2_dangerously_skip_email_verification  The existing Oauth2 Skip email verification option.
+				 */
+				$oauth2_dangerously_skip_email_verification = apply_filters( 'authorizer_oauth2_' . $i . '_dangerously_skip_email_verification', $oauth2_dangerously_skip_email_verification );
+				// Also allow filter without server_id (applies to the first configured server).
+				if ( 1 === $i ) {
+					$oauth2_dangerously_skip_email_verification = apply_filters( 'authorizer_oauth2_dangerously_skip_email_verification', $oauth2_dangerously_skip_email_verification );
+				}
+
 				if (
 					'generic' === $auth_settings[ 'oauth2_provider' . $suffix ] &&
-					! empty( $auth_settings[ 'oauth2_client_id' . $suffix ] ) &&
-					! empty( $auth_settings[ 'oauth2_client_secret' . $suffix ] ) &&
+					! empty( $auth_settings[ 'oauth2_clientid' . $suffix ] ) &&
+					! empty( $auth_settings[ 'oauth2_clientsecret' . $suffix ] ) &&
 					empty( $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ) &&
-					empty( $auth_settings[ 'oauth2_dangerously_skip_email_verification' . $suffix ] )
+					empty( $oauth2_dangerously_skip_email_verification )
 				) :
 					$oauth2_generic_servers_without_require_verified_email_and_verification_not_skipped[] = $i;
 				endif;
