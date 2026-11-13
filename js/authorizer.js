@@ -1249,7 +1249,7 @@
 				params['oauth2_attr_last_name_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_last_name_' + oauth2_num_server ).val();
 				params['oauth2_attr_update_on_login_' + oauth2_num_server] = $( '#auth_settings_oauth2_attr_update_on_login_' + oauth2_num_server ).val();
 				params['oauth2_require_verified_email_' + oauth2_num_server] = $( '#auth_settings_oauth2_require_verified_email_' + oauth2_num_server ).length < 1 || $( '#auth_settings_oauth2_require_verified_email_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
-				params['oauth2_dangerously_skip_email_verification_' + oauth2_num_server] = $( '#auth_settings_oauth2_dangerously_skip_email_verification_' + oauth2_num_server ).length < 1 || $( '#auth_settings_oauth2_dangerously_skip_email_verification_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
+				params['oauth2_dangerously_skip_email_verification_' + oauth2_num_server] = $( '#auth_settings_oauth2_dangerously_skip_email_verification_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
 				params['oauth2_link_on_username_' + oauth2_num_server] = $( '#auth_settings_oauth2_link_on_username_' + oauth2_num_server ).is( ':checked' ) ? '1' : '';
 			}
 		}
@@ -1292,7 +1292,7 @@
 				params['oidc_attr_update_on_login_' + oidc_num_server] = $( '#auth_settings_oidc_attr_update_on_login_' + oidc_num_server ).val();
 				params['oidc_force_auth_method_' + oidc_num_server] = $( '#auth_settings_oidc_force_auth_method_' + oidc_num_server ).val();
 				params['oidc_require_verified_email_' + oidc_num_server] = $( '#auth_settings_oidc_require_verified_email_' + oidc_num_server ).length < 1 || $( '#auth_settings_oidc_require_verified_email_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
-				params['oidc_dangerously_skip_email_verification_' + oidc_num_server] = $( '#auth_settings_oidc_dangerously_skip_email_verification_' + oidc_num_server ).length < 1 || $( '#auth_settings_oidc_dangerously_skip_email_verification_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
+				params['oidc_dangerously_skip_email_verification_' + oidc_num_server] = $( '#auth_settings_oidc_dangerously_skip_email_verification_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
 				params['oidc_link_on_username_' + oidc_num_server] = $( '#auth_settings_oidc_link_on_username_' + oidc_num_server ).is( ':checked' ) ? '1' : '';
 				params['oidc_hosteddomain_' + oidc_num_server] = $( '#auth_settings_oidc_hosteddomain_' + oidc_num_server ).val();
 			}
