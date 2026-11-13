@@ -336,7 +336,7 @@ class Admin_Page extends Singleton {
 
 		// Warn (only admins) on any OIDC providers not requiring verified emails
 		// (and not explicitly skipped, and with a nonempty client ID and secret).
-		if ( '1' === $auth_settings['oidc'] && current_user_can( 'create_users' ) ) :
+		if ( ! empty( $auth_settings['oidc'] ) && current_user_can( 'create_users' ) ) :
 			// Get link to the default OIDC settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oidc' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
@@ -402,7 +402,7 @@ class Admin_Page extends Singleton {
 		// Warn (only admins) on any Oauth2 generic providers not requiring verified
 		// emails (and not explicitly skipped, and with a nonempty client ID and
 		// secret).
-		if ( '1' === $auth_settings['oauth2'] && current_user_can( 'create_users' ) ) :
+		if ( ! empty( $auth_settings['oauth2'] ) && current_user_can( 'create_users' ) ) :
 			// Get link to the default OAuth2 settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
@@ -469,7 +469,7 @@ class Admin_Page extends Singleton {
 		// Warn (only admins) on any OAuth2 Azure providers without Tenant ID
 		// restrictions (only warn if the provider has a configured Client ID/Secret
 		// to avoid warning users while they are still configuring the server).
-		if ( '1' === $auth_settings['oauth2'] && current_user_can( 'create_users' ) ) :
+		if ( ! empty( $auth_settings['oauth2'] ) && current_user_can( 'create_users' ) ) :
 			// Get link to the default OAuth2 settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
 			// If the Authorizer menu item is under Settings, point to that settings page.
