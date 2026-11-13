@@ -867,8 +867,11 @@ class Authentication extends Singleton {
 						$verified_oid = get_user_meta( $wpuser->ID, 'authorizer_oauth2_azure_oid_for_tid_' . $verified_tid, true );
 					}
 
-					// Validate the object ID of the logging in user.
-					if ( empty( $verified_tid ) || empty( $verified_oid ) ) {
+					// Send an email to validate the object ID of the logging in user
+					// (skip if one was already sent; the transient lasts one hour, so a
+					// user can receive at most 1 email per hour).
+					$email_transient = get_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $oauth2_server_id );
+					if ( empty( $email_transient ) && ( empty( $verified_tid ) || empty( $verified_oid ) ) ) {
 						// If there are no saved tenant ID or object ID, send a verification
 						// email. After the user clicks the link in the email, they will
 						// replay the authentication flow and end up here to check again.
@@ -1080,8 +1083,11 @@ class Authentication extends Singleton {
 						$verified_sub = get_user_meta( $wpuser->ID, 'authorizer_oauth2_generic_sub_for_url_' . substr( $verified_url, 0, 98 ), true );
 					}
 
-					// Validate the object ID of the logging in user.
-					if ( empty( $verified_url ) || empty( $verified_sub ) ) {
+					// Send an email to validate the object ID of the logging in user
+					// (skip if one was already sent; the transient lasts one hour, so a
+					// user can receive at most 1 email per hour).
+					$email_transient = get_transient( 'authorizer_oauth2_generic_sub_' . $sub . '_url_' . substr( $oauth2_url_authorize, 0, 98 ) . '_' . $oauth2_server_id );
+					if ( empty( $email_transient ) && ( empty( $verified_url ) || empty( $verified_sub ) ) ) {
 						// If there are no saved authorization url or subject claim, send a
 						// verification email. After the user clicks the link in the email,
 						// they will replay the authentication flow and end up here to check
@@ -1510,8 +1516,11 @@ class Authentication extends Singleton {
 						$verified_sub = get_user_meta( $wpuser->ID, 'authorizer_oidc_sub_for_iss_' . substr( $verified_iss, 0, 108 ), true );
 					}
 
-					// Validate the object ID of the logging in user.
-					if ( empty( $verified_iss ) || empty( $verified_sub ) ) {
+					// Send an email to validate the object ID of the logging in user
+					// (skip if one was already sent; the transient lasts one hour, so a
+					// user can receive at most 1 email per hour).
+					$email_transient = get_transient( 'authorizer_oidc_sub_' . $sub . '_iss_' . substr( $iss, 0, 108 ) . '_' . $oidc_server_id );
+					if ( empty( $email_transient ) && ( empty( $verified_iss ) || empty( $verified_sub ) ) ) {
 						// If there are no saved iss or subject claims, send a verification
 						// email. After the user clicks the link in the email, they will
 						// replay the authentication flow and end up here to check again.
