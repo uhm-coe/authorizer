@@ -882,7 +882,7 @@ class Authentication extends Singleton {
 							'nonce'  => wp_create_nonce( 'authorizer_oauth2_azure_verify_email_nonce_oid_' . $oid ),
 						);
 						$verification_url = add_query_arg( $args, admin_url( 'admin-post.php' ) );
-						set_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $oauth2_server_id, $username . ' , ' . $email . ' , ' . $args['token'], DAY_IN_SECONDS );
+						set_transient( 'authorizer_oauth2_azure_oid_' . $oid . '_tid_' . $tid . '_' . $oauth2_server_id, $username . ' , ' . $email . ' , ' . $args['token'], HOUR_IN_SECONDS );
 						wp_mail(
 							$email,
 							__( 'Action required: Verify your email address', 'authorizer' ),
@@ -1096,7 +1096,7 @@ class Authentication extends Singleton {
 							'nonce'  => wp_create_nonce( 'authorizer_oauth2_generic_verify_email_nonce_sub_' . $sub ),
 						);
 						$verification_url = add_query_arg( $args, admin_url( 'admin-post.php' ) );
-						set_transient( 'authorizer_oauth2_generic_sub_' . $sub . '_url_' . substr( $oauth2_url_authorize, 0, 98 ) . '_' . $oauth2_server_id, $username . ' , ' . $email . ' , ' . $args['token'], DAY_IN_SECONDS );
+						set_transient( 'authorizer_oauth2_generic_sub_' . $sub . '_url_' . substr( $oauth2_url_authorize, 0, 98 ) . '_' . $oauth2_server_id, $username . ' , ' . $email . ' , ' . $args['token'], HOUR_IN_SECONDS );
 						wp_mail(
 							$email,
 							__( 'Action required: Verify your email address', 'authorizer' ),
@@ -1525,7 +1525,7 @@ class Authentication extends Singleton {
 							'nonce'  => wp_create_nonce( 'authorizer_oidc_verify_email_nonce_sub_' . $sub ),
 						);
 						$verification_url = add_query_arg( $args, admin_url( 'admin-post.php' ) );
-						set_transient( 'authorizer_oidc_sub_' . $sub . '_iss_' . substr( $iss, 0, 108 ) . '_' . $oidc_server_id, $username . ' , ' . $email . ' , ' . $args['token'], DAY_IN_SECONDS );
+						set_transient( 'authorizer_oidc_sub_' . $sub . '_iss_' . substr( $iss, 0, 108 ) . '_' . $oidc_server_id, $username . ' , ' . $email . ' , ' . $args['token'], HOUR_IN_SECONDS );
 						wp_mail(
 							$email,
 							__( 'Action required: Verify your email address', 'authorizer' ),
