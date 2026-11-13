@@ -399,6 +399,8 @@ class Admin_Page extends Singleton {
 				$suffix = 1 === $i ? '' : '_' . $i;
 				if (
 					'generic' === $auth_settings[ 'oauth2_provider' . $suffix ] &&
+					! empty( $auth_settings[ 'oauth2_client_id' . $suffix ] ) &&
+					! empty( $auth_settings[ 'oauth2_client_secret' . $suffix ] ) &&
 					empty( $auth_settings[ 'oauth2_require_verified_email' . $suffix ] ) &&
 					empty( $auth_settings[ 'oauth2_dangerously_skip_email_verification' . $suffix ] )
 				) :
@@ -407,7 +409,7 @@ class Admin_Page extends Singleton {
 			endfor;
 			if ( ! empty( $oauth2_generic_servers_without_require_verified_email_and_verification_not_skipped ) ) :
 				?>
-				<div class='notice notice-warning is-dismissible'>
+				<div class='notice notice-warning'>
 					<p><?php esc_html_e( 'Warning: a configured OAuth2 (generic) server does not require verified emails.', 'authorizer' ); ?> <?php esc_html_e( 'Email verification will be automatically performed unless explicitly disabled with the "Skip email verification" option.', 'authorizer' ); ?> </p>
 					<p><?php esc_html_e( 'Email verification consists of a one-time email verification performed by clicking a link in an email sent to them from this WordPress server after a successful OAuth2 sign-in.', 'authorizer' ); ?> </p>
 					<?php foreach ( $oauth2_generic_servers_without_require_verified_email_and_verification_not_skipped as $server_id ) : ?>
@@ -418,7 +420,9 @@ class Admin_Page extends Singleton {
 			endif;
 		endif;
 
-		// Warn (only admins) on any OAuth2 Azure providers without Tenant ID restrictions.
+		// Warn (only admins) on any OAuth2 Azure providers without Tenant ID
+		// restrictions (only warn if the provider has a configured Client ID/Secret
+		// to avoid warning users while they are still configuring the server).
 		if ( '1' === $auth_settings['oauth2'] && current_user_can( 'create_users' ) ) :
 			// Get link to the default OAuth2 settings page.
 			$authorizer_options_url = admin_url( 'admin.php?page=authorizer&tab=external_oauth2' );
@@ -440,6 +444,8 @@ class Admin_Page extends Singleton {
 				$suffix = 1 === $i ? '' : '_' . $i;
 				if (
 					'azure' === $auth_settings[ 'oauth2_provider' . $suffix ] &&
+					! empty( $auth_settings[ 'oauth2_clientid' . $suffix ] ) &&
+					! empty( $auth_settings[ 'oauth2_clientsecret' . $suffix ] ) &&
 					( empty( $auth_settings[ 'oauth2_tenant_id' . $suffix ] ) || 'common' === $auth_settings[ 'oauth2_tenant_id' . $suffix ] )
 				) :
 					$oauth2_azure_servers_without_tenant_restrictions[] = $i;
