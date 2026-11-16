@@ -224,6 +224,12 @@
 			margin-left: 24px;
 		}
 	}
+
+	// Highlight the table row containing an option in the URL hash.
+	tr:has(:target) {
+		background-color: #fef8ee;
+		box-shadow:  #fef8ee 0px 0px 10px 5px;
+	}
 }
 
 
