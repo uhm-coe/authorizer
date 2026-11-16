@@ -2671,6 +2671,14 @@ class Authentication extends Singleton {
 			die();
 		}
 
+		// If user is logged in, log them out first before continuing below (else
+		// the nonce won't match because nonce's are unique per user, and the nonce
+		// was set for the "anonymous" user).
+		if ( is_user_logged_in() ) {
+			wp_logout();
+			unset( $_COOKIE[ LOGGED_IN_COOKIE ] );
+		}
+
 		// Verify nonce.
 		if ( ! wp_verify_nonce( $nonce, 'authorizer_oauth2_azure_verify_email_nonce_oid_' . $oid ) ) {
 			wp_nonce_ays( 'authorizer_oauth2_azure_verify_email_nonce' );
@@ -2745,6 +2753,14 @@ class Authentication extends Singleton {
 			die();
 		}
 
+		// If user is logged in, log them out first before continuing below (else
+		// the nonce won't match because nonce's are unique per user, and the nonce
+		// was set for the "anonymous" user).
+		if ( is_user_logged_in() ) {
+			wp_logout();
+			unset( $_COOKIE[ LOGGED_IN_COOKIE ] );
+		}
+
 		// Verify nonce.
 		if ( ! wp_verify_nonce( $nonce, 'authorizer_oauth2_generic_verify_email_nonce_sub_' . $sub ) ) {
 			wp_nonce_ays( 'authorizer_oauth2_generic_verify_email_nonce' );
@@ -2817,6 +2833,14 @@ class Authentication extends Singleton {
 			empty( $_REQUEST['nonce'] )
 		) {
 			die();
+		}
+
+		// If user is logged in, log them out first before continuing below (else
+		// the nonce won't match because nonce's are unique per user, and the nonce
+		// was set for the "anonymous" user).
+		if ( is_user_logged_in() ) {
+			wp_logout();
+			unset( $_COOKIE[ LOGGED_IN_COOKIE ] );
 		}
 
 		// Verify nonce.
