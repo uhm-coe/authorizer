@@ -1059,7 +1059,7 @@ class Authentication extends Singleton {
 
 				// Enforce verified_email claim if required.
 				if ( '1' === $oauth2_require_verified_email ) {
-					if ( empty( $attributes['email_verified'] ) || true !== $attributes['email_verified'] ) {
+					if ( ! Helper::isVariantOfJSONTrue( $attributes['email_verified'] ?? false ) ) {
 						return new \WP_Error( 'oauth2_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );
 					}
 				}
@@ -1490,7 +1490,7 @@ class Authentication extends Singleton {
 
 				// Enforce email_verified claim if required.
 				if ( '1' === $oidc_require_verified_email ) {
-					if ( empty( $user_info['email_verified'] ) || true !== $user_info['email_verified'] ) {
+					if ( ! Helper::isVariantOfJSONTrue( $user_info['email_verified'] ?? false ) ) {
 						// Clean up session variables before returning error.
 						\Authorizer\Options\External\Oidc::get_instance()->maybe_unset_oidc_session_vars();
 						return new \WP_Error( 'oidc_email_not_verified', __( '<strong>ERROR</strong>: Email address must be verified to log in.', 'authorizer' ) );

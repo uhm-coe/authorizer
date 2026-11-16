@@ -562,4 +562,33 @@ class Helper {
 
 		return vsprintf( '%s%s-%s-%s-%s-%s%s%s', str_split( bin2hex( $uuid ), 4 ) );
 	}
+
+	/**
+	 * When parsing boolean claims from third party identity providers, some fail
+	 * to properly cast values as boolean, resulting in truthy values like 'true',
+	 * 'TRUE', '1', 1, or true. This helper function detects those variants and
+	 * returns boolean true (for the above) and false for all other values.
+	 *
+	 * @param int|bool|string $value
+	 * @return boolean
+	 */
+	public static function isVariantOfJSONTrue( $value ) {
+		if ( empty( $value ) ) {
+			return false;
+		}
+
+		if ( is_bool( $value ) ) {
+			return $value;
+		}
+
+		if ( is_int( $value ) ) {
+			return 1 === $value;
+		}
+
+		if ( is_string( $value ) ) {
+			return 'true' === strtolower( $value ) || '1' === $value;
+		}
+
+		return false;
+	}
 }
