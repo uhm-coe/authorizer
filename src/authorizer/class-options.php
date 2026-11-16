@@ -1730,30 +1730,32 @@ class Options extends Singleton {
 	 * @return void
 	 */
 	public function print_section_info_tabs( $args = '' ) {
+		// phpcs:ignore WordPress.Security.NonceVerification
+		$active_tab = empty( $_GET['tab'] ) ? 'access_lists' : sanitize_key( wp_unslash( $_GET['tab'] ) );
 		if ( Helper::NETWORK_CONTEXT === Helper::get_context( $args ) ) :
 			?>
 			<h2 class="nav-tab-wrapper">
-				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-access_lists<?php echo 'access_lists' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external<?php echo 'external' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oauth2<?php echo 'external_oauth2' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oidc<?php echo 'external_oidc' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_google<?php echo 'external_google' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_cas<?php echo 'external_cas' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_ldap<?php echo 'external_ldap' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-advanced<?php echo 'advanced' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
 		<?php else : ?>
 			<h2 class="nav-tab-wrapper">
-				<a class="nav-tab nav-tab-access_lists nav-tab-active" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-access_login" href="javascript:chooseTab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-access_public" href="javascript:chooseTab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oauth2" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_oidc" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_google" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_cas" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-external_ldap" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
-				<a class="nav-tab nav-tab-advanced" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-access_lists<?php echo 'access_lists' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('access_lists' );"><?php esc_html_e( 'Access Lists', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-access_login<?php echo 'access_login' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('access_login' );"><?php esc_html_e( 'Login Access', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-access_public<?php echo 'access_public' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('access_public' );"><?php esc_html_e( 'Public Access', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external<?php echo 'external' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external' );"><?php esc_html_e( 'External Service', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oauth2<?php echo 'external_oauth2' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_oauth2' );"><?php esc_html_e( 'OAuth2', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_oidc<?php echo 'external_oidc' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_oidc' );"><?php esc_html_e( 'OIDC', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_google<?php echo 'external_google' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_google' );"><?php esc_html_e( 'Google', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_cas<?php echo 'external_cas' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_cas' );"><?php esc_html_e( 'CAS', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-external_ldap<?php echo 'external_ldap' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('external_ldap' );"><?php esc_html_e( 'LDAP', 'authorizer' ); ?></a>
+				<a class="nav-tab nav-tab-advanced<?php echo 'advanced' === $active_tab ? ' nav-tab-active' : ''; ?>" href="javascript:chooseTab('advanced' );"><?php esc_html_e( 'Advanced', 'authorizer' ); ?></a>
 			</h2>
 			<?php
 		endif;
