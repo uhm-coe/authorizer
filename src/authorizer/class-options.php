@@ -1437,7 +1437,7 @@ class Options extends Singleton {
 			$auth_settings['oauth2_attr_update_on_login'] = '';
 		}
 
-		// Sanitize OAuth2 require verified email (checkbox: value can only be '1' or empty string; defaults to '1').
+		// Sanitize OAuth2 require verified email (checkbox: value can only be '1' or empty string).
 		$auth_settings['oauth2_require_verified_email'] = array_key_exists( 'oauth2_require_verified_email', $auth_settings ) && strlen( $auth_settings['oauth2_require_verified_email'] ) > 0 ? '1' : '';
 		// Default OAuth2 require verified email to '1' when first enabling OAuth2 external service.
 		if ( empty( $auth_settings['oauth2_require_verified_email'] ) && empty( $auth_settings['oauth2'] ) && ! empty( $_REQUEST['auth_settings']['oauth2'] ) ) {
@@ -1458,8 +1458,8 @@ class Options extends Singleton {
 					$auth_settings[ 'oauth2_attr_update_on_login_' . $oauth2_num_server ] = '';
 				}
 
-				// Sanitize OAuth2 require verified email (checkbox: value can only be '1' or empty string; defaults to '1').
-				$auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] = ! array_key_exists( 'oauth2_require_verified_email_' . $oauth2_num_server, $auth_settings ) || strlen( $auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] ) > 0 ? '1' : '';
+				// Sanitize OAuth2 require verified email (checkbox: value can only be '1' or empty string).
+				$auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] = array_key_exists( 'oauth2_require_verified_email_' . $oauth2_num_server, $auth_settings ) && strlen( $auth_settings[ 'oauth2_require_verified_email_' . $oauth2_num_server ] ) > 0 ? '1' : '';
 
 				// Sanitize OAuth2 skip email verification (checkbox: value can only be '1' or empty string).
 				$auth_settings[ 'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server ] = array_key_exists( 'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server, $auth_settings ) && strlen( $auth_settings[ 'oauth2_dangerously_skip_email_verification_' . $oauth2_num_server ] ) > 0 ? '1' : '';
@@ -1597,8 +1597,8 @@ class Options extends Singleton {
 					$auth_settings[ 'oidc_force_auth_method_' . $oidc_num_server ] = '';
 				}
 
-				// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string; defaults to '1').
-				$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = ! array_key_exists( 'oidc_require_verified_email_' . $oidc_num_server, $auth_settings ) || strlen( $auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ) > 0 ? '1' : '';
+				// Sanitize OIDC require verified email (checkbox: value can only be '1' or empty string).
+				$auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] = array_key_exists( 'oidc_require_verified_email_' . $oidc_num_server, $auth_settings ) && strlen( $auth_settings[ 'oidc_require_verified_email_' . $oidc_num_server ] ) > 0 ? '1' : '';
 
 				// Sanitize OIDC skip email verification (checkbox: value can only be '1' or empty string).
 				$auth_settings[ 'oidc_dangerously_skip_email_verification_' . $oidc_num_server ] = array_key_exists( 'oidc_dangerously_skip_email_verification_' . $oidc_num_server, $auth_settings ) && strlen( $auth_settings[ 'oidc_dangerously_skip_email_verification_' . $oidc_num_server ] ) > 0 ? '1' : '';
