@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.1
-Stable tag: 3.16.0
+Stable tag: 3.17.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,22 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.17.2 =
+* Released Mon Nov 16, 2026.
+* Security: OIDC and OAuth2 (generic) configurations that don't require an email_verified claim in Authorizer config now enforce manual email verification. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your OIDC/OAuth2 config to require the email_verified claim.
+* Add option to OIDC and OAuth2 (generic) configs to skip manual email verification (e.g., if the identify provider already asserts verified emails but does not use the the email_verified claim, or if the WordPress server cannot send emails).
+* Add `AUTHORIZER_OIDC_{SERVER_ID}_DANGEROUSLY_SKIP_EMAIL_VERIFICATION` wp-config.php constants and `authorizer_oidc_{server_id}_dangerously_skip_email_verification` filters to programmatically override this new option.
+* Add `AUTHORIZER_OAUTH2_{SERVER_ID}_DANGEROUSLY_SKIP_EMAIL_VERIFICATION` wp-config.php constants and `authorizer_oauth2_{server_id}_dangerously_skip_email_verification` filters to programmatically override this new option.
+* Security hardening: Enable require_verified_email by default for OIDC and OAuth2 configs. Props [baeseungwon1010](https://patchstack.com/database/researchers/4650920f-fc26-4af0-9779-691da4eefb7d) for the coordinated disclosure via wordpress.org and patchstack!
+* Security hardening: run all emails returned from external authentication services through `sanitize_email()`.
+* Change Azure OAuth2 Tenant ID admin_notice to show on all admin screens instead of just Authorizer Settings screens.
+* Fix missing sanitization for OIDC "Force auth method" setting.
+* Fix inadvertent disabling of the "Require verified email" checkbox on non-Azure OAuth2 configs.
+* Fix password resets available if WordPress logins were disabled but only OIDC logins were enabled. Props [lc-sam](https://github.com/lc-sam) for the bugfix!
+* Fix for reloading multisite settings on save if multiple OIDC servers exist (to render any additional server settings). Props [lc-sam](https://github.com/lc-sam) for the bugfix!
+* Fix OIDC hosted domain setting not saved for OIDC server 2 and higher. Props [lc-sam](https://github.com/lc-sam) for the bugfix!
+* Upgrade composer dependencies: firebase/php-jwt (v7.2.0 => v7.2.1); google/apiclient (v2.20.0 => v2.20.1); google/apiclient-services (v0.460.0 => v0.466.0); google/auth (v1.55.0 => v1.55.3); guzzlehttp/guzzle (8.2.0 => 8.5.0); guzzlehttp/promises (3.0.2 => 3.1.0); guzzlehttp/psr7 (3.1.0 => 3.4.0); monolog/monolog (3.12.0 => 3.12.1); symfony/polyfill-php80 (v1.37.0 => v1.43.0); symfony/polyfill-php82 (v1.38.1 => v1.43.0); phpseclib/phpseclib (3.0.57 => 3.0.58); paragonie/constant_time_encoding (v3.1.3 => v3.1.4); symfony/deprecation-contracts (v3.7.1 => v3.8.1).
 
 = 3.16.0 =
 * Azure OAuth2 configurations without a Tenant ID specified in Authorizer config (or "common" as the Tenant ID) now enforce email verification. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your Azure config to include your Tenant ID.
@@ -417,6 +433,9 @@ monolog/monolog 1.26.0 => 1.26.1; paragonie/random_compat 2.0.19 => 2.0.20; phps
 * [Full changelog available here](https://github.com/uhm-coe/authorizer/blob/master/CHANGELOG.md)
 
 == Upgrade Notice ==
+
+= 3.17.2 =
+* This version includes security fixes for OIDC and OAuth2 (generic) configurations. If you don't require an email_verified claim in Authorizer config, users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful OIDC or OAuth2 (generic) sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your OIDC/OAuth2 config to require the email_verified claim.
 
 = 3.16.0 =
 * This version includes security fixes for Azure OAuth2 configurations. Azure OAuth2 users, if you have not specified a specific Tenant ID in Authorizer config, email verification will be automatically performed. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your Azure config to include your Tenant ID.
