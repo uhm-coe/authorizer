@@ -203,6 +203,10 @@ final class StreamHandler
             throw new RequestException('The stream handler cannot guarantee a multiplexed protocol; required multiplexing needs a cURL handler.', $request);
         }
 
+        if (\strpbrk($request->getMethod(), "\r\n\0") !== false) {
+            throw new RequestException('HTTP method must not contain a carriage return, line feed or NUL byte.', $request);
+        }
+
         $protocolVersion = $request->getProtocolVersion();
 
         if ('' === $protocolVersion) {
@@ -1031,7 +1035,7 @@ final class StreamHandler
                     }
                 }
                 try {
-                    $resource = @\fopen((string) $uri, 'r', false, $contextResource);
+                    $resource = @\fopen((string) $uri->withFragment(''), 'r', false, $contextResource);
                 } finally {
                     if ($blankFrom && --self::$fromBlankDepth === 0 && self::$fromToRestore !== false) {
                         \ini_set('from', self::$fromToRestore);
@@ -1430,6 +1434,11 @@ final class StreamHandler
             }
 
             foreach ($value as $val) {
+                $val = (string) $val;
+                if (\strpbrk("$name$val", "\r\n\0") !== false) {
+                    throw new RequestException('Request header fields must not contain a carriage return, line feed or NUL byte.', $request);
+                }
+
                 $headers .= "$name: $val\r\n";
             }
         }
