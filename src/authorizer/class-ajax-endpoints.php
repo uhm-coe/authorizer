@@ -25,9 +25,9 @@ class Ajax_Endpoints extends Singleton {
 	 *
 	 * Flow: "Sign in with Google" button clicked; JS Google library
 	 * called; JS function signInCallback() fired with results from Google;
-	 * signInCallback() posts code and nonce (via AJAX) to this function;
-	 * This function checks the token using the Google PHP library, and
-	 * saves it to a session variable if it's authentic; control passes
+	 * signInCallback() posts token, nonce, and sid (via AJAX) to this function;
+	 * This function verifies the sid matches the current user's session, and
+	 * saves token to a session variable if so; control passes
 	 * back to signInCallback(), which will reload the current page
 	 * (wp-login.php) on success; wp-login.php reloads; custom_authenticate
 	 * hooked into authenticate action fires again, and
@@ -49,63 +49,22 @@ class Ajax_Endpoints extends Singleton {
 			die( '' );
 		}
 
-		// Google authentication token.
+		session_start();
+
+		// Verify session param (sid) matches the one saved on the intitial wp-login
+		// page load. This protects against user A tricking user B into submitting
+		// user A's token and logging user B into user A's account (login CSRF).
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		$sid = isset( $_POST['sid'] ) ? wp_unslash( $_POST['sid'] ) : null;
+		if ( empty( $sid ) || empty( $_SESSION['sid'] ) || $sid !== $_SESSION['sid'] ) {
+			$response = 'Invalid session';
+			die( esc_html( $response ) );
+		}
+
+
+		// Store the Google authentication token (for verifying later in wp-login).
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 		$id_token = isset( $_POST['credential'] ) ? wp_unslash( $_POST['credential'] ) : null;
-
-		// Grab plugin settings.
-		$options       = Options::get_instance();
-		$auth_settings = $options->get_all( Helper::SINGLE_CONTEXT, 'allow override' );
-
-		// Fetch the Google Client ID (allow overrides from filter or constant).
-		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_ID' ) ) {
-			$auth_settings['google_clientid'] = \AUTHORIZER_GOOGLE_CLIENT_ID;
-		}
-		/**
-		 * Filters the Google Client ID used by Authorizer to authenticate.
-		 *
-		 * @since 3.9.0
-		 *
-		 * @param string $google_client_id  The stored Google Client ID.
-		 */
-		$auth_settings['google_clientid'] = apply_filters( 'authorizer_google_client_id', $auth_settings['google_clientid'] );
-
-		// Fetch the Google Client Secret (allow overrides from filter or constant).
-		if ( defined( 'AUTHORIZER_GOOGLE_CLIENT_SECRET' ) ) {
-			$auth_settings['google_clientsecret'] = \AUTHORIZER_GOOGLE_CLIENT_SECRET;
-		}
-		/**
-		 * Filters the Google Client Secret used by Authorizer to authenticate.
-		 *
-		 * @since 3.6.1
-		 *
-		 * @param string $google_client_secret  The stored Google Client Secret.
-		 */
-		$auth_settings['google_clientsecret'] = apply_filters( 'authorizer_google_client_secret', $auth_settings['google_clientsecret'] );
-
-		// Build the Google Client.
-		$client = new \Google_Client();
-		$client->setApplicationName( 'WordPress' );
-		$client->setClientId( trim( $auth_settings['google_clientid'] ) );
-		$client->setClientSecret( trim( $auth_settings['google_clientsecret'] ) );
-		$client->setRedirectUri( 'postmessage' );
-
-		/**
-		 * If the hosted domain parameter is set, restrict logins to that domain
-		 * (only available in google-api-php-client v2 or higher).
-		 */
-		if (
-			array_key_exists( 'google_hosteddomain', $auth_settings ) &&
-			strlen( $auth_settings['google_hosteddomain'] ) > 0 &&
-			$client::LIBVER >= '2.0.0'
-		) {
-			$google_hosteddomains = explode( "\n", str_replace( "\r", '', $auth_settings['google_hosteddomain'] ) );
-			$google_hosteddomain  = trim( $google_hosteddomains[0] );
-			$client->setHostedDomain( $google_hosteddomain );
-		}
-
-		// Store the token (for verifying later in wp-login).
-		session_start();
 		if ( empty( $_SESSION['token'] ) ) {
 			// Store the token in the session for later use.
 			$_SESSION['token'] = $id_token;

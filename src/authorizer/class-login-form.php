@@ -175,6 +175,7 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 			action: 'process_google_login',
 			credential: credentialResponse.credential,
 			nonce: $('#g_id_onload' ).data( 'nonce' ),
+			sid: '<?php echo esc_attr( $_SESSION['sid'] ); ?>',
 		}, function() {
 			// Reload wp-login.php to continue the authentication process.
 			var newHref = authUpdateQuerystringParam( location.href, 'external', 'google' );
@@ -224,6 +225,12 @@ function signInCallback( credentialResponse ) { // jshint ignore:line
 		<div id="auth-external-service-login">
 			<?php /* Note: Google button must come first to avoid its container overlapping other buttons. */ ?>
 			<?php if ( isset( $auth_settings['google'] ) && '1' === $auth_settings['google'] ) : ?>
+				<?php
+				session_status() === PHP_SESSION_ACTIVE || session_start();
+				if ( empty( $_SESSION['sid'] ) ) {
+					$_SESSION['sid'] = wp_generate_uuid4();
+				}
+				?>
 				<script src="https://accounts.google.com/gsi/client" async defer></script>
 				<div id="g_id_onload"
 					data-use_fedcm_for_prompt="true"

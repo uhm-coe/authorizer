@@ -1651,9 +1651,7 @@ class Authentication extends Singleton {
 		}
 
 		// Get one time use token.
-		if ( PHP_SESSION_ACTIVE !== session_status() ) {
-			session_start();
-		}
+		session_status() === PHP_SESSION_ACTIVE || session_start();
 		$token = empty( $_SESSION['token'] ) ? null : $_SESSION['token'];
 
 		// No token, so this is not a succesful Google login.
