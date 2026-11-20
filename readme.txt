@@ -2,7 +2,7 @@
 Contributors: figureone, the_magician, pkarjala, aargh-a-knot, elarequi, jojaba, slyraskal
 Tags: login, authentication, cas, ldap, oauth
 Tested up to: 7.1
-Stable tag: 3.17.2
+Stable tag: 3.17.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -63,6 +63,12 @@ WordPress user @2brx2b has contributed a helpful one here: [https://codegito.xyz
 12. Authorizer Option overridden by a Network Admin Option.
 
 == Changelog ==
+
+= 3.17.3 =
+* Released Fri Nov 20, 2026.
+* Security fix: harden Google login AJAX handler (prevent any user A tricking user B into submitting user A's token and logging user B into user A's account). Props Rathnadeepan (HotWater) / HotWater-015 for the coordinated disclosure!
+* Update French translations. Props @julienlusson!
+* Upgrade composer dependencies: firebase/php-jwt (v7.2.1 => v7.2.2); google/apiclient-services (v0.466.0 => v0.467.0); guzzlehttp/guzzle (8.5.0 => 8.5.2); guzzlehttp/promises (3.1.0 => 3.1.1); guzzlehttp/psr7 (3.4.0 => 3.5.1); monolog/monolog (3.12.1 => 3.13.0); paragonie/constant_time_encoding (v3.1.4 => v3.1.5); phpseclib/phpseclib (3.0.58 => 3.0.59).
 
 = 3.17.2 =
 * Released Mon Nov 16, 2026.

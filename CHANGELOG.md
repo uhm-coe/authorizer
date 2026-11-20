@@ -1,5 +1,11 @@
 # Changelog
 
+= 3.17.3 =
+* Released Fri Nov 20, 2026.
+* Security fix: harden Google login AJAX handler (prevent any user A tricking user B into submitting user A's token and logging user B into user A's account). Props Rathnadeepan (HotWater) / HotWater-015 for the coordinated disclosure!
+* Update French translations. Props @julienlusson!
+* Upgrade composer dependencies: firebase/php-jwt (v7.2.1 => v7.2.2); google/apiclient-services (v0.466.0 => v0.467.0); guzzlehttp/guzzle (8.5.0 => 8.5.2); guzzlehttp/promises (3.1.0 => 3.1.1); guzzlehttp/psr7 (3.4.0 => 3.5.1); monolog/monolog (3.12.1 => 3.13.0); paragonie/constant_time_encoding (v3.1.4 => v3.1.5); phpseclib/phpseclib (3.0.58 => 3.0.59).
+
 = 3.17.2 =
 * Released Mon Nov 16, 2026.
 * Security: OIDC and OAuth2 (generic) configurations that don't require an email_verified claim in Authorizer config now enforce manual email verification. Users must perform a one-time email verification by clicking a link in an email sent to them from this WordPress server after a successful Azure sign-in. Before upgrading, confirm that this WordPress server can successfully send emails, or update your OIDC/OAuth2 config to require the email_verified claim.
